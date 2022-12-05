@@ -1,0 +1,20 @@
+# Hatch Build Directories
+**/dist/*
+**/build/*
+
+# Hatch Testing Directories
+**/.pytest_cache/*
+**/.coverage
+
+# PyCharm
+**/.idea/*
+
+# Python Working Directories
+**/__pycache__
+
+# SqLite
+**.sqlite
+
+# Execution
+
+*.log
