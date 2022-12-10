@@ -1,0 +1,27 @@
+{
+  "name": "tasks-desktop",
+  "productName": "Tasks",
+  "version": "1.0.0",
+  "description": "Tasks and Todos",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\""
+  },
+  "keywords": [],
+  "author": {
+    "name": "rodrigorar",
+    "email": "rodrigo.ra.rosa@gmail.com"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.4",
+    "@electron-forge/maker-deb": "^6.0.4",
+    "electron": "22.0.0"
+  }
+}
