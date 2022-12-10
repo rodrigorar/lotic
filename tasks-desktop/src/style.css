@@ -5,3 +5,61 @@ body {
   max-width: 38rem;
   padding: 2rem;
 }
+
+.app-font {
+  font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
+}
+
+.title {
+  font-size: x-large;
+  font-weight: bolder;
+}
+
+.button {
+  background-color: orange;
+  box-shadow: 1px 1px 0 0 darkslategrey;
+  text-align: center;
+  font-weight: bold;
+  font-size: large;
+  padding: 10px;
+  text-shadow: 5px;
+  border-radius: 15%;
+  border-style: none;
+}
+
+.button:hover {
+  background-color: #f7c368;
+  text-shadow: 10px;
+  border-style: dashed;
+}
+
+.top-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border: solid;
+  display: block;
+}
+
+.container {
+  border: solid;
+  display: block;
+}
+
+.bottom-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: block;
+  border: solid; /* To be removed */
+  width: 100%
+}
+
+.button-container {
+  float: right;
+  padding-left: 15%;
+  padding-right: 15%;
+  padding-top: 5%;
+  padding-bottom: 5%;
+}
