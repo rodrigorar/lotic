@@ -45,13 +45,15 @@ body {
   display: block;
   width: 23rem;
   height: 19rem;
+  margin-bottom: 1rem;
+  overflow-y: auto;
 }
 
 .bottom-container {
   bottom: 0;
   left: 0;
   width: 23rem;
-  height: 4rem;
+  height: 2rem;
 }
 
 .button-container {
@@ -64,4 +66,9 @@ body {
   border-width: 0;
   color: lightgray;
   background-color: lightgray
+}
+
+.task-checkbox {
+  float: right;
+  margin-right: 1rem;
 }

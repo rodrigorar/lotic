@@ -4,37 +4,24 @@
     <meta charset="UTF-8" />
     <title>Tasks</title>
     <link rel="stylesheet" href="../style.css" />
-    <script src="./home.js"></script>
+    <script defer src="./home.js"></script>
   </head>
   <body>
     <div class="top-container">
       <h1 class="title app-font">Upcoming</h1>
     </div>
-    <div class="container">
-      <div id="task-1">
-        <span>Task # 1</span>
-        <input style="float: right;" type="checkbox">
-        <hr class="separator">
-      </div>
-      <div id="task-2">
-        <span>Task # 2</span>
-        <input style="float: right;" type="checkbox">
-        <hr class="separator">
-      </div>
-      <div id="task-3">
-        <span>Task # 3</span>
-        <input style="float: right;" type="checkbox">
-        <hr class="separator">
-      </div>
-      <div id="task-4">
-        <span>Task # 4</span>
-        <input style="float: right;" type="checkbox">
-        <hr class="separator">
-      </div>
+    <div id="tasks-container" class="container">
+      <!-- Task Entry Div Structure
+        <div id="task-1">
+          <span>Task # 1</span>
+          <input id='task-1-completed' class="task-checkbox" type="checkbox">
+          <hr class="separator">
+        </div>
+      -->
     </div>
     <div class="bottom-container">
       <div class="button-container">
-        <button class="button app-font">Add</button>
+        <button id="add-task-button" class="button app-font">Add</button>
       </div>
     </div>
   </body>
