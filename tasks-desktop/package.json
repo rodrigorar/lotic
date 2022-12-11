@@ -22,6 +22,9 @@
   "devDependencies": {
     "@electron-forge/cli": "^6.0.4",
     "@electron-forge/maker-deb": "^6.0.4",
-    "electron": "22.0.0"
+    "@types/hidefile": "^3.0.0",
+    "electron": "22.0.0",
+    "electron-build": "^0.0.3",
+    "sqlite3": "^5.1.2"
   }
 }
