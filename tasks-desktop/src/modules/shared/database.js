@@ -35,7 +35,26 @@ module.exports.UnitOfWork = {
 // Create base data structures
 module.exports.runSchemaMigrations = () => {
     begin();
-    db.run('CREATE TABLE IF NOT EXISTS task (id TEXT UNIQUE, content TEXT, created_at TEXT, updated_at TEXT);');
+    db.run(createTaskTable);
+    db.run(createTaskSyncTable);
     end();
 }
 
+
+// Schema migrations
+
+const createTaskTable = 
+    'CREATE TABLE IF NOT EXISTS task (' +
+        'task_id TEXT UNIQUE PRIMARY KEY,' +
+        'title TEXT,' +
+        'created_at TEXT NOT NULL,' +
+        'updated_at TEXT NOT NULL' +
+    ')';
+
+const createTaskSyncTable = 'CREATE TABLE IF NOT EXISTS task_sync (' +
+        'task_sync_id TEXT UNIQUE PRIMARY KEY,' +
+        'task_id TEXT UNIQUE NOT NULL,' +
+        'synch_status TEXT NOT NULL,' +
+        'created_at TEXT NOT NULL,' +
+        'updated_at TEXT NOT NULL' +
+    ')';

@@ -9,7 +9,7 @@ async function doCall(httpCall) {
     try {
         return await httpCall();
     } catch (error) {
-        console.log(error.data);
+        console.log(error.cause);
     }
 }
 

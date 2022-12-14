@@ -13,6 +13,7 @@ runSchemaMigrations();
 HttpClient.get('/persons/1')
   .then(result => {
     if (result) {
+      console.log('Backend Call!');
       console.log(result.data);
     }
   });

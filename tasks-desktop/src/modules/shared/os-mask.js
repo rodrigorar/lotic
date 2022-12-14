@@ -7,7 +7,6 @@ const DATA_FILE = 'tasks_db.sqlite';
 
 const prepareDataDirIfNecessary = (isDev) => {
     if (isDev) {
-        // Do nothing!
         return;
     }
 
@@ -21,7 +20,7 @@ const prepareDataDirIfNecessary = (isDev) => {
 } 
 
 const databaseFile = (isDev) => {
-    return ! isDev ? './tasks_dev.sqlite' : Path.join(homedir, '.tasks', DATA_FILE);
+    return isDev ? './tasks_dev.sqlite' : Path.join(homedir, '.tasks', DATA_FILE);
 }
 
 module.exports.OSMask = {
