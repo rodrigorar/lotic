@@ -68,7 +68,22 @@ body {
   background-color: lightgray
 }
 
+/* Inputs */
+
 .task-checkbox {
   float: right;
   margin-right: 1rem;
+}
+
+.transparent-text-input {
+  border: none;
+  width: 20rem;
+  font-size: large;
+  margin-right: 0;
+  padding-right: 0;
+
+}
+
+.transparent-text-input:focus {
+  outline: none;
 }
