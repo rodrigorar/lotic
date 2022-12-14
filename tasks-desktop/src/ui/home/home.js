@@ -28,6 +28,12 @@ function createTaskDOM(id, contents) {
     return containerDiv;
 }
 
+logger.trace('This is a trace');
+logger.info('This is an info');
+logger.warn('This is a warn with no error');
+logger.warn('', new Error('This is the error'));
+logger.error(new Error('This is the error error'));
+
 let id = 1;
 addTaskButton.addEventListener('click', () => {
     taskContainer.appendChild(createTaskDOM(id, 'Task - #' + id));

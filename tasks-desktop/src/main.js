@@ -1,6 +1,7 @@
 const { runSchemaMigrations } = require('./modules/shared/database');
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
+const { LoggerHandler } = require('./handlers/logging');
 const { OSMask } = require('./modules/shared/os-mask');
 const { isDev } = require('./modules/shared/utils');
 const { HttpClient } = require('./modules/shared/http');
@@ -37,3 +38,10 @@ app.on('ready', () => {
 
   Menu.setApplicationMenu(null);
 });
+
+// Logging Event Listeners
+
+ipcMain.on('log:trace', LoggerHandler.handleTraceLog);
+ipcMain.on('log:info', LoggerHandler.handleInfoLog);
+ipcMain.on('log:warn', LoggerHandler.handleWarnLog);
+ipcMain.on('log:error', LoggerHandler.handleErrorLog);
