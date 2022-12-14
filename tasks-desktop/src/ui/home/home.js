@@ -1,15 +1,21 @@
+/**
+ * IMPORTANT: If using the task id, the format for the DOM id is <anyname-we-want-with-hifens>:<task-id> exlusively,
+ * otherwise we won't be able to extract the task id from the DOM id. 
+ */
+
 const taskContainer = document.querySelector("#tasks-container");
 const addTaskButton = document.querySelector("#add-task-button");
 
-function createTaskDOM(id, contents) {
+function createTaskDOM(id) {
     const containerDiv = document.createElement('div');
-    containerDiv.id = 'task-' + id;
+    containerDiv.id = 'container:' + id; // container:task-id
 
     const text = document.createElement('input');
     text.classList.add('transparent-text-input');
-    text.id = 'task-' + id + '-text';
+    text.id = 'text-input:' + id; // text-input:<task-id>
     text.type = 'text';
     text.placeholder = 'Tasks title'
+    text.addEventListener('input', handleTextInput);
 
     const span = document.createElement('span');
     span.appendChild(text);
@@ -28,14 +34,30 @@ function createTaskDOM(id, contents) {
     return containerDiv;
 }
 
-let id = 1;
-addTaskButton.addEventListener('click', () => {
-    taskContainer.appendChild(createTaskDOM(id, 'Task - #' + id));
-    id++;
+async function createTask() {
+    const newId = await utils.generateId();
+    taskContainer.appendChild(createTaskDOM(newId));
+}
+
+// Init UI
+const taskIds = [];
+if (taskIds.length == 0) {
+    createTask();
+}
+
+// Add Task Button Event Listeners
+
+addTaskButton.addEventListener('click', async () => {
+    createTask();
 });
 
-// Create dummy data in the UI
-while (id < 6) {
-    taskContainer.appendChild(createTaskDOM(id, 'Task - #' + id));
-    id++;
+// Handlers
+
+function handleTextInput(event) {
+    tasks.updateTitle(extractId(event.target.id), event.target.value);
+}
+
+// Helper functions
+function extractId(blob) {
+    return blob.replace(/.*\:/, "");
 }

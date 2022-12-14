@@ -8,3 +8,15 @@ contextBridge.exposeInMainWorld('logger', {
     warn: (message, error = undefined) => ipcRenderer.send('log:warn', message, error),
     error: (error) => ipcRenderer.send('log:error', error)
 });
+
+// utils
+
+contextBridge.exposeInMainWorld('utils', {
+    generateId: () => ipcRenderer.invoke('utils:id:generate')
+});
+
+// tasks
+
+contextBridge.exposeInMainWorld('tasks', {
+    updateTitle: (taskId, newTitle) => ipcRenderer.send('tasks:title:update', taskId, newTitle)
+})
