@@ -18,5 +18,8 @@ contextBridge.exposeInMainWorld('utils', {
 // tasks
 
 contextBridge.exposeInMainWorld('tasks', {
-    updateTitle: (taskId, newTitle) => ipcRenderer.send('tasks:title:update', taskId, newTitle)
+    createTask: (data) => ipcRenderer.send('tasks:create', data),
+    updateTask: (taskId, data) => ipcRenderer.send('tasks:update', taskId, data),
+    completeTask: (taskId) => ipcRenderer.send('tasks:complete', taskId),
+    listTasks: () => ipcRenderer.invoke('tasks:list')
 })

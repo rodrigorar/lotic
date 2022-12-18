@@ -6,7 +6,7 @@
 const taskContainer = document.querySelector("#tasks-container");
 const addTaskButton = document.querySelector("#add-task-button");
 
-function createTaskDOM(id) {
+function createTaskDOM(id, title = undefined) {
     const containerDiv = document.createElement('div');
     containerDiv.id = 'container:' + id; // container:task-id
 
@@ -15,20 +15,25 @@ function createTaskDOM(id) {
     text.id = 'text-input:' + id; // text-input:<task-id>
     text.type = 'text';
     text.placeholder = 'Tasks title'
+    if (title) {
+        text.value = title;
+    }
     text.addEventListener('input', handleTextInput);
 
     const span = document.createElement('span');
     span.appendChild(text);
 
-    const input = document.createElement('input');
-    input.type = 'checkbox';
-    input.classList.add("task-checkbox");
+    const completionInput = document.createElement('input');
+    completionInput.type = 'checkbox';
+    completionInput.classList.add("task-checkbox");
+    completionInput.addEventListener('change', handleCompleteInput);
+    
 
     const separator = document.createElement('hr');
     separator.classList.add("separator");
 
     containerDiv.appendChild(span);
-    containerDiv.appendChild(input);
+    containerDiv.appendChild(completionInput);
     containerDiv.appendChild(separator);
 
     return containerDiv;
@@ -37,13 +42,28 @@ function createTaskDOM(id) {
 async function createTask() {
     const newId = await utils.generateId();
     taskContainer.appendChild(createTaskDOM(newId));
+
+    tasks.createTask({
+        id: newId,
+        title: '',
+        state: 'IN_TODO',
+        createdAt: new Date(),
+        updatedAt: new Date()
+    });
 }
 
-// Init UI
-const taskIds = [];
-if (taskIds.length == 0) {
-    createTask();
+async function initUI() {
+    tasks.listTasks()
+        .then(tasks => {
+            if (tasks.length == 0) {
+                createTask();
+            } else {
+                tasks.forEach(entry => taskContainer.appendChild(createTaskDOM(entry.id, entry.title)));
+            }
+        });
 }
+
+initUI();
 
 // Add Task Button Event Listeners
 
@@ -54,10 +74,23 @@ addTaskButton.addEventListener('click', async () => {
 // Handlers
 
 function handleTextInput(event) {
-    tasks.updateTitle(extractId(event.target.id), event.target.value);
+    const taskId = extractId(event.target.id);
+    tasks.updateTask(taskId, {
+        id: taskId,
+        title: event.target.value,
+        updatedAt: new Date()
+    });
+}
+
+function handleCompleteInput(event) {
+    if (event.target.checked) {
+        tasks.completeTask(extractId(event.target.parentElement.id));
+        event.target.parentElement.remove();
+    }
 }
 
 // Helper functions
-function extractId(blob) {
-    return blob.replace(/.*\:/, "");
+
+function extractId(value) {
+    return value.replace(/.*\:/, "");
 }

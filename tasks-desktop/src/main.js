@@ -6,6 +6,7 @@ const { UtilsHandler } = require('./handlers/utils');
 const { OSMask } = require('./modules/shared/os-mask');
 const { isDev } = require('./modules/shared/utils');
 const { HttpClient } = require('./modules/shared/http');
+const { TasksHandler } = require('./modules/tasks/handlers');
 
 // Prepare local data directories
 OSMask.prepareDataDirIfNecessary(isDev);
@@ -51,4 +52,7 @@ ipcMain.on('log:error', LoggerHandler.handleErrorLog);
 ipcMain.handle('utils:id:generate', UtilsHandler.handleGenerateId);
 
 // Tasks Event Listeners
-ipcMain.on('tasks:title:update', (event, taskId, newTitle) => console.log('Id: ' + taskId + ' Title: ' + newTitle));
+ipcMain.on('tasks:create', TasksHandler.handleCreateTask);
+ipcMain.on('tasks:update', TasksHandler.handleUpdateTasks);
+ipcMain.on('tasks:complete', TasksHandler.handleCompletion);
+ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
