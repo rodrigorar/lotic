@@ -1,3 +1,4 @@
+const { Logger } = require('../../handlers/logging');
 const axios = require('axios');
 
 const client = axios.create({
@@ -14,7 +15,10 @@ async function doCall(httpCall) {
 }
 
 const get = async (url) => {
-    return await doCall(() => 
+    Logger.trace(`Calling URL: #GET ${url}`);
+
+    return await doCall(() =>
+        
         client.get(url, {
             headers: {
                 'Accept': 'application/json'
@@ -23,6 +27,8 @@ const get = async (url) => {
 };
 
 const post = async (url, data) => {
+    Logger.trace(`Calling URL: #POST ${url} with Data: ${JSON.stringify(data)}`);
+
     return await doCall(() =>
         client.post(url, data, {
             headers: {
@@ -33,7 +39,9 @@ const post = async (url, data) => {
 };
 
 const put = async (url, data) => {
-    return await doCall(() => 
+    Logger.trace(`Calling URL: #PUT ${url} with Data: ${JSON.stringify(data)}`);
+
+    return await doCall(() =>
         client.put(url, data, {
             headers: {
                 'Content-Type': 'application/json',
@@ -43,6 +51,8 @@ const put = async (url, data) => {
 };
 
 const del = async (url) => {
+    Logger.trace(`Calling URL: #DELETE ${url}`);
+
     return await doCall(() =>
         client.delete(url, {
             headers: {
