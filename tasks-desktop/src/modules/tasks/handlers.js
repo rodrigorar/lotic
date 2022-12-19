@@ -1,4 +1,3 @@
-const { Logger } = require('../../handlers/logging');
 const { Task, TASK_STATE, TasksRepository } = require('./data');
 
 function handleCreateTask(event, newTask) {
@@ -7,12 +6,6 @@ function handleCreateTask(event, newTask) {
 }
 
 function handleUpdateTasks(event, taskId, data) {
-    // TODO: Not implemented
-    console.log('Event: Update Tasks was called!');
-    console.log('Task Id: ' + taskId);
-    console.log('Title: ' + data.title);
-    console.log('Updated At: ' + data.updatedAt);
-
     TasksRepository.updateTask(taskId, data);
 }
 

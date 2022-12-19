@@ -19,7 +19,6 @@ db.each("SELECT rowid AS id, info FROM lorem", (err, row) => {
 let db;
 begin = async () => {
     const dbFile = OSMask.databaseFile(isDev);
-    Logger.trace('File: ' + dbFile);
     db = await open({
         filename: dbFile,
         driver: sqlite3.Database
@@ -45,8 +44,9 @@ module.exports.UnitOfWork = {
 
 // Create base data structures
 module.exports.runSchemaMigrations = async () => {
-    await begin(); 
     Logger.trace('Running schema migrations')
+    
+    await begin(); 
     await db.run(createTaskTable, []);
     await db.run(createTaskSyncTable, []);
     db.close();
