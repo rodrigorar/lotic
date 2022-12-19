@@ -89,6 +89,10 @@ function handleCompleteInput(event) {
     if (event.target.checked) {
         tasks.completeTask(extractId(event.target.parentElement.id));
         event.target.parentElement.remove();
+        
+        if (document.querySelector('input') == null) {
+            createTask();
+        }
     }
 }
 
