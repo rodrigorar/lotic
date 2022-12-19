@@ -50,6 +50,8 @@ async function createTask() {
         createdAt: new Date(),
         updatedAt: new Date()
     });
+
+    return newId;
 }
 
 async function initUI() {
@@ -68,7 +70,8 @@ initUI();
 // Add Task Button Event Listeners
 
 addTaskButton.addEventListener('click', async () => {
-    createTask();
+    const id = await createTask();
+    document.getElementById('text-input:' + id).focus();
 });
 
 // Handlers
