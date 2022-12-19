@@ -26,8 +26,19 @@ async function listTasks() {
     let result = [];
 
     await UnitOfWork.begin();
-    queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks', []);
+    const queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks', []);
     result = queryResult.map(entry => new Task(entry.task_id, entry.title, entry.state, entry.created_at, entry.updated_at));
+    UnitOfWork.end();
+
+    return result;
+}
+
+async function listById(taskIdList = []) {
+    let result = [];
+
+    await UnitOfWork.begin();
+    const queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks WHERE task_id in (?)', [taskIds]);
+    result = queryResult.map(entry => new Task(entry.task_id, entry.title, entry.state, entry.created_at, entry.update_at));
     UnitOfWork.end();
 
     return result;
@@ -46,6 +57,7 @@ module.exports.TasksRepository = {
     createTask,
     updateTask,
     listTasks,
+    listById, 
     deleteTask
 }
 

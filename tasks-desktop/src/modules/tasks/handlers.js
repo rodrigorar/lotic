@@ -1,20 +1,19 @@
-const { Task, TASK_STATE, TasksRepository } = require('./data');
+const { TaskServices } = require('./services');
 
 function handleCreateTask(event, newTask) {
-    const task = new Task(newTask.id, newTask.title, TASK_STATE[newTask.state], newTask.createdAt, newTask.updatedAt);
-    TasksRepository.createTask(task);
+    TaskServices.create(newTask);
 }
 
 function handleUpdateTasks(event, taskId, data) {
-    TasksRepository.updateTask(taskId, data);
+    TaskServices.update(taskId, data);
 }
 
 function handleCompletion(event, taskId) {
-    TasksRepository.deleteTask(taskId);
+    TaskServices.erase(taskId);
 }
 
 async function handleListTasks(event) {
-    return await TasksRepository.listTasks();
+    return await TaskServices.list();
 }
 
 module.exports.TasksHandler = {
