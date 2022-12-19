@@ -64,8 +64,8 @@ const createTaskTable =
         'updated_at TEXT NOT NULL' +
     ')';
 
-const createTaskSyncTable = 'CREATE TABLE IF NOT EXISTS tasks_sync (' +
-        'task_sync_id TEXT UNIQUE PRIMARY KEY,' +
+const createTaskSyncTable = 'CREATE TABLE IF NOT EXISTS tasks_synch (' +
+        'task_synch_id TEXT UNIQUE PRIMARY KEY,' +
         'task_id TEXT UNIQUE NOT NULL,' +
         'synch_status TEXT NOT NULL,' +
         'created_at TEXT NOT NULL,' +

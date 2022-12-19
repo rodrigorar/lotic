@@ -3,10 +3,11 @@ const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
 const { LoggerHandler } = require('./handlers/logging');
 const { UtilsHandler } = require('./handlers/utils');
+const { TasksHandler } = require('./handlers/tasks');
 const { OSMask } = require('./modules/shared/os-mask');
 const { isDev } = require('./modules/shared/utils');
 const { HttpClient } = require('./modules/shared/http');
-const { TasksHandler } = require('./modules/tasks/handlers');
+const { SynchManager } = require('./modules/synch-manager');
 
 // Prepare local data directories
 OSMask.prepareDataDirIfNecessary(isDev);
@@ -39,6 +40,15 @@ app.on('ready', () => {
   createWindow()
 
   Menu.setApplicationMenu(null);
+
+  // Update Tasks at Start
+  SynchManager.execute();
+
+  app.on('window-all-closed', () => {
+    // Update tasks at Close
+    SynchManager.execute();
+    app.quit();
+  });
 });
 
 // Logging Event Listeners

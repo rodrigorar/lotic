@@ -1,10 +1,10 @@
 const { Validators } = require("../shared/utils");
-const { TasksRepository } = require("./data");
+const { TasksRepository, Task, TASK_STATE } = require("./data");
 
 function create(taskData) {
     Validators.isNotNull(taskData, 'No task data was provided!');
 
-    const task = new Task(newTask.id, newTask.title, TASK_STATE[newTask.state], newTask.createdAt, newTask.updatedAt);
+    const task = new Task(taskData.id, taskData.title, TASK_STATE[taskData.state], taskData.createdAt, taskData.updatedAt);
     TasksRepository.createTask(task);
 }
 

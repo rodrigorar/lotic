@@ -1,4 +1,3 @@
-const { Logger } = require('../../handlers/logging');
 const { UnitOfWork } = require('../shared/database');
 
 function createTask(task) {
