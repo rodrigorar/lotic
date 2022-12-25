@@ -1,5 +1,6 @@
 const { generateId } = require('../shared/utils');
 const { UnitOfWork } = require("../shared/database");
+const { Logger } = require('../../handlers/logging');
 
 
 async function getLocalAndDirty() {
@@ -7,7 +8,7 @@ async function getLocalAndDirty() {
 
     await UnitOfWork.begin();
     const queryResult = UnitOfWork.getDB().all(
-        "SELECT * FROM tasks_synch WHERE synch_states = 'LOCAL' OR synch_states = 'DIRTY'",
+        "SELECT * FROM tasks_synch WHERE synch_status = 'LOCAL' OR synch_status = 'DIRTY'",
         []);
     result = queryResult.map(row => new TaskSynch(row.task_synch_id, row.task_id, row.synch_status, row.created_at, row.updated_at));
     UnitOfWork.end();
@@ -15,12 +16,14 @@ async function getLocalAndDirty() {
     return result;
 }
 
-function cleanup() {
+function markForRemoval(taskId) {
+    Logger.trace("Passing through repositories mark for removal");
     UnitOfWork.begin()
         .then(async (db) => {
+            Logger.trace('Executing query');
             await db.run(
-                "DELETE FROM tasks_synch WHERE synch_states = 'SYNCHED'", 
-                []);
+                "UPDATE tasks_synch SET synch_status = 'COMPLETE', updated_at = ? WHERE task_id = ?", 
+                [new Date(), taskId]);
             db.close();
         });
 }
@@ -51,7 +54,7 @@ function create(taskId) {
 
 module.exports.TaskSynchRepository = {
     getLocalAndDirty,
-    cleanup,
+    markForRemoval,
     markDirty,
     create
 }
@@ -60,6 +63,7 @@ const TASK_SYNCH_STATUS = {
     LOCAL: "LOCAL", // The task was never synched
     SYNCHED: "CLEAN", // The task is synched and hasn't been changed locally
     DIRTY: "DIRTY", // The task is synched but has been changed locally
+    COMPLETE: "COMPLETE" // The task is competed and has not been synched with the server yet. 
 }
 
 class TaskSynch {

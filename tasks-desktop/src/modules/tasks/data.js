@@ -47,7 +47,6 @@ function deleteTask(id) {
     UnitOfWork.begin()
         .then(async (db) => {
             await db.run('DELETE FROM tasks where task_id = ?', [id]);
-            await db.run('DELETE FROM tasks_sync WHERE task_id = ?', [id]);
             db.close();
         })
 }

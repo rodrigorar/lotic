@@ -1,6 +1,7 @@
 const { SynchManager } = require('../modules/synch-manager');
 const { TaskServices } = require('../modules/tasks/services');
 const { TasksSynchServices } = require('../modules/tasks_synch/services');
+const { Logger } = require('./logging');
 
 function handleCreateTask(event, newTask) {
     TaskServices.create(newTask);
@@ -17,8 +18,9 @@ function handleUpdateTasks(event, taskId, data) {
 
 function handleCompletion(event, taskId) {
     TaskServices.erase(taskId);
-    TasksSynchServices.markDirty(taskId);
-    SynchManager.execute();
+    Logger.trace('Passing through handle completion');
+    TasksSynchServices.markForRemoval(taskId);
+    //SynchManager.execute();
 }
 
 async function handleListTasks(event) {

@@ -13,5 +13,11 @@ module.exports = {
         }
       },
     },
+    {
+      name: '@electron-forge/maker-dmg',
+      config: {
+        //icon: `${iconPath}.icns`,
+      },
+    },
   ],
 };
