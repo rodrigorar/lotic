@@ -1,11 +1,9 @@
-const { Logger } = require("../../handlers/logging");
+const { Logger } = require("../shared/logger");
 const { HttpClient } = require("../shared/http");
 const { generateId } = require("../shared/utils");
 
 
 async function createTasks(taskList) {
-    Logger.trace('Calling Create Tasks');
-
     await HttpClient.post('/api/v1/tasks', {
         userId: '',
         requestId: `${generateId()}`,

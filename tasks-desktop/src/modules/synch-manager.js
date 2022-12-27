@@ -1,11 +1,9 @@
-const { Logger } = require("../handlers/logging");
+const { Logger } = require("./shared/logger");
 const { TasksRPC } = require("./tasks/rpc");
 const { TaskServices } = require("./tasks/services");
 
 
 async function execute() {
-    Logger.trace('Running Synch Manager...');
-
     const tasks = await TaskServices.list();
     TasksRPC.createTasks(tasks);
 

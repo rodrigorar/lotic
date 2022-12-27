@@ -1,8 +1,8 @@
 const { OSMask } = require('./os-mask');
 const { isDev } = require('./utils');
+const { Logger } = require('./logger');
 const { open } = require('sqlite');
 const sqlite3 = require('sqlite3').verbose();
-const { Logger } = require('../../handlers/logging');
 
 /*db.run("CREATE TABLE lorem (info TEXT)");
 

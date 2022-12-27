@@ -1,4 +1,4 @@
-const { Logger } = require('../../handlers/logging');
+const { Logger } = require('./logger');
 const axios = require('axios');
 
 const client = axios.create({

@@ -1,4 +1,3 @@
-const { Logger } = require("../../handlers/logging");
 const { ServiceUtils } = require("../shared/service-utils");
 const { Validators } = require("../shared/utils");
 const { TaskSynchRepository } = require("./data");
@@ -12,7 +11,6 @@ function createSynchMonitor(taskId) {
 
 function markForRemoval(taskId) {
     ServiceUtils.errorWrapper(() => {
-        Logger.trace('Passing through Sync Services and mark for removal');
         TaskSynchRepository.markForRemoval(taskId);
     });
 }

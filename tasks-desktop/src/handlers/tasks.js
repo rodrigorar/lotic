@@ -1,7 +1,6 @@
 const { SynchManager } = require('../modules/synch-manager');
 const { TaskServices } = require('../modules/tasks/services');
 const { TasksSynchServices } = require('../modules/tasks_synch/services');
-const { Logger } = require('./logging');
 
 function handleCreateTask(event, newTask) {
     TaskServices.create(newTask);
@@ -18,7 +17,6 @@ function handleUpdateTasks(event, taskId, data) {
 
 function handleCompletion(event, taskId) {
     TaskServices.erase(taskId);
-    Logger.trace('Passing through handle completion');
     TasksSynchServices.markForRemoval(taskId);
     //SynchManager.execute();
 }

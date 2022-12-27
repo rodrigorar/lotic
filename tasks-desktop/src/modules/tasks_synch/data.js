@@ -1,6 +1,5 @@
 const { generateId } = require('../shared/utils');
 const { UnitOfWork } = require("../shared/database");
-const { Logger } = require('../../handlers/logging');
 
 
 async function getLocalAndDirty() {
@@ -17,10 +16,8 @@ async function getLocalAndDirty() {
 }
 
 function markForRemoval(taskId) {
-    Logger.trace("Passing through repositories mark for removal");
     UnitOfWork.begin()
         .then(async (db) => {
-            Logger.trace('Executing query');
             await db.run(
                 "UPDATE tasks_synch SET synch_status = 'COMPLETE', updated_at = ? WHERE task_id = ?", 
                 [new Date(), taskId]);
