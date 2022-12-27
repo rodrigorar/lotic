@@ -39,9 +39,16 @@ function createTaskDOM(id, title = undefined) {
     return containerDiv;
 }
 
+let emptyTasks = [];
+
 async function createTask() {
     const newId = await utils.generateId();
-    taskContainer.appendChild(createTaskDOM(newId));
+    emptyTasks.push(newId);
+    
+    const newTaskDOM = createTaskDOM(newId);
+    taskContainer.appendChild(newTaskDOM);
+
+    document.getElementById('text-input:' + newId).focus();
 
     tasks.createTask({
         id: newId,
@@ -54,30 +61,55 @@ async function createTask() {
     return newId;
 }
 
+function setInitialFocus() {
+    if (emptyTasks.length > 0) {
+        document.getElementById('text-input:' + emptyTasks.pop()).focus();
+    }
+}
+
 async function initUI() {
     tasks.listTasks()
         .then(tasks => {
             if (tasks.length == 0) {
-                createTask();
+                const taskId = createTask();
+                uiTasks[taskId] = false;
             } else {
-                tasks.forEach(entry => taskContainer.appendChild(createTaskDOM(entry.id, entry.title)));
+                tasks.forEach(entry => {
+                    if (entry.title === '') {
+                        emptyTasks.push(entry.id);
+                    }
+                    taskContainer.appendChild(createTaskDOM(entry.id, entry.title))
+                });
             }
+            setInitialFocus();
         });
 }
 
 initUI();
 
-// Add Task Button Event Listeners
+// Add Task
 
 addTaskButton.addEventListener('click', async () => {
-    const id = await createTask();
-    document.getElementById('text-input:' + id).focus();
+    const taskId = await createTask();
+    emptyTasks.push(taskId);
+    document.getElementById('text-input:' + taskId).focus();
+});
+
+window.addEventListener('keypress', (key) => {
+    if (key.code === 'Enter') {
+        if (emptyTasks.length == 0) {
+            createTask();
+        }
+    }
 });
 
 // Handlers
 
 function handleTextInput(event) {
     const taskId = extractId(event.target.id);
+
+    updateEmptyTasks(taskId, event.target.value);
+    
     tasks.updateTask(taskId, {
         id: taskId,
         title: event.target.value,
@@ -87,7 +119,11 @@ function handleTextInput(event) {
 
 function handleCompleteInput(event) {
     if (event.target.checked) {
-        tasks.completeTask(extractId(event.target.parentElement.id));
+        const taskId = extractId(event.target.parentElement.id);
+
+        updateEmptyTasks(taskId);
+
+        tasks.completeTask(taskId);
         event.target.parentElement.remove();
         
         if (document.querySelector('input') == null) {
@@ -100,4 +136,14 @@ function handleCompleteInput(event) {
 
 function extractId(value) {
     return value.replace(/.*\:/, "");
+}
+
+function updateEmptyTasks(taskId, taskTitle = undefined) {
+    if (taskTitle === '') {
+        emptyTasks.push(taskId);
+    } else {
+        if (emptyTasks.length > 0) {
+            emptyTasks = emptyTasks.filter(id => taskId !== id);
+        }
+    }
 }
