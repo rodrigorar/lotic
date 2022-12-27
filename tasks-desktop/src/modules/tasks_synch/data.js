@@ -9,7 +9,7 @@ async function getLocalAndDirty() {
     const queryResult = UnitOfWork.getDB().all(
         "SELECT * FROM tasks_synch WHERE synch_status = 'LOCAL' OR synch_status = 'DIRTY'",
         []);
-    result = queryResult.map(row => new TaskSynch(row.task_synch_id, row.task_id, row.synch_status, row.created_at, row.updated_at));
+    result = queryResult.map(row => new TaskSynch(row.task_synch_id, row.task_id, row.synch_status, new Date(row.created_at), new Date(row.updated_at)));
     UnitOfWork.end();
 
     return result;
@@ -20,7 +20,7 @@ function markForRemoval(taskId) {
         .then(async (db) => {
             await db.run(
                 "UPDATE tasks_synch SET synch_status = 'COMPLETE', updated_at = ? WHERE task_id = ?", 
-                [new Date(), taskId]);
+                [new Date().toISOString(), taskId]);
             db.close();
         });
 }
@@ -30,7 +30,7 @@ function markDirty(taskId) {
         .then(async (db) => {
             await db.run(
                 "UPDATE tasks_synch SET synch_status = 'DIRTY', updated_at = ? WHERE task_id = ?",
-                [new Date(), taskId]);
+                [new Date().toISOString(), taskId]);
             db.close();
         });
 }
@@ -43,7 +43,7 @@ function create(taskId) {
 
             await db.run(
                 "INSERT INTO tasks_synch(task_synch_id, task_id, synch_status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
-                [id, taskId, TASK_SYNCH_STATUS['LOCAL'], currentDate, currentDate]);
+                [id, taskId, TASK_SYNCH_STATUS['LOCAL'], currentDate.toISOString(), currentDate.toISOString()]);
 
             db.close();
         });

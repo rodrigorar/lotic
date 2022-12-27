@@ -5,7 +5,7 @@ function createTask(task) {
         .then(async (db) => {
             await db.run(
                 `INSERT INTO tasks(task_id, title, state, created_at, updated_at) VALUES(?, ?, ?, ?, ?)`,
-                [task.id, task.title, task.state, task.createdAt, task.updatedAt]);
+                [task.id, task.title, task.state, task.createdAt.toISOString(), task.updatedAt.toISOString()]);
             db.close();
         });
 }
@@ -16,7 +16,7 @@ function updateTask(taskId, data) {
         .then(async (db) => {
             await db.run(
                 'UPDATE tasks SET title=?, updated_at=? WHERE task_id=?', 
-                [data.title, data.updatedAt, taskId]);
+                [data.title, data.updatedAt.toISOString(), taskId]);
             db.close();
         });
 }
@@ -26,7 +26,7 @@ async function listTasks() {
 
     await UnitOfWork.begin();
     const queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks', []);
-    result = queryResult.map(entry => new Task(entry.task_id, entry.title, entry.state, entry.created_at, entry.updated_at));
+    result = queryResult.map(entry => new Task(entry.task_id, entry.title, entry.state, new Date(entry.created_at), new Date(entry.updatedAt)));
     UnitOfWork.end();
 
     return result;
@@ -37,7 +37,7 @@ async function listById(taskIdList = []) {
 
     await UnitOfWork.begin();
     const queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks WHERE task_id in (?)', [taskIds]);
-    result = queryResult.map(entry => new Task(entry.task_id, entry.title, entry.state, entry.created_at, entry.update_at));
+    result = queryResult.map(entry => new Task(entry.task_id, entry.title, entry.state, new Date(entry.created_at), new Date(entry.update_at)));
     UnitOfWork.end();
 
     return result;
