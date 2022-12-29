@@ -4,6 +4,7 @@ body {
   margin: 0rem;
   max-width: 21rem;
   padding: 1rem;
+  overflow: hidden;
 }
 
 .app-font {
@@ -47,6 +48,10 @@ body {
   height: 19rem;
   margin-bottom: 1rem;
   overflow-y: auto;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
 }
 
 .bottom-container {

@@ -24,7 +24,7 @@ HttpClient.get('/persons/1')
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
-    width: 410,
+    width: 400,
     height: 500,
     resizable: false,
     webPreferences: {
