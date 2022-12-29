@@ -19,6 +19,7 @@ in the request.
 			"title": "<title>",
 			"description": "<description>",
 			"createdAt": "<timestamp 2022-10-30T09:00:00Z",
+			"updatedAt": "<timestamp 2022-10-30T09:00:00Z",
 			"ownerId": "<useruid:uuid>"
 		}
 	]
