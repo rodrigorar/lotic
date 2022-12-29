@@ -1,6 +1,7 @@
 const { hideSync } = require('hidefile');
 const fs = require('fs');
 const Path = require('path');
+const { Logger } = require('./logger');
 
 const homedir = require('os').homedir();
 const DATA_FILE = 'tasks_db.sqlite';
@@ -20,6 +21,7 @@ const prepareDataDirIfNecessary = (isDev) => {
 } 
 
 const databaseFile = (isDev) => {
+    Logger.trace(`Is in Development: ${isDev}`);
     return isDev ? './tasks_dev.sqlite' : Path.join(homedir, '.tasks', DATA_FILE);
 }
 

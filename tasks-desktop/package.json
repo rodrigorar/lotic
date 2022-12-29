@@ -5,7 +5,7 @@
   "description": "Tasks and Todos",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "NODE_ENV=development electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "lint": "echo \"No linting configured\""

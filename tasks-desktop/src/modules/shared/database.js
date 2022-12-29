@@ -4,18 +4,6 @@ const { Logger } = require('./logger');
 const { open } = require('sqlite');
 const sqlite3 = require('sqlite3').verbose();
 
-/*db.run("CREATE TABLE lorem (info TEXT)");
-
-const stmt = db.prepare("INSERT INTO lorem VALUES (?)");
-for (let i = 0; i < 10; i++) {
-    stmt.run("Ipsum " + i);
-}
-stmt.finalize();
-
-db.each("SELECT rowid AS id, info FROM lorem", (err, row) => {
-    console.log(row.id + ": " + row.info);
-});*/
-
 let db;
 begin = async () => {
     const dbFile = OSMask.databaseFile(isDev);

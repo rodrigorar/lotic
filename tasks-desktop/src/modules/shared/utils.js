@@ -1,7 +1,10 @@
 const { v4 } = require('uuid');
 const { Errors } = require('./errors');
+const { Logger } = require('./logger');
 
-module.exports.isDev = process.env.NODE_ENV !== 'production';
+module.exports.isDev = process.env.NODE_ENV == 'development';
+Logger.trace(`NODE ENV: ${process.env.NODE_ENV}`);
+
 module.exports.generateId = () => v4();
 
 function isNotNull(argument = undefined, message) {
