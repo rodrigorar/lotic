@@ -1,4 +1,6 @@
 
+URL_PREFIX_V1 = "/api/v1"
+
 
 class Maybe(object):
     _content = None

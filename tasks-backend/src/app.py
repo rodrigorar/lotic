@@ -1,3 +1,5 @@
+import logging
+
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from werkzeug.exceptions import HTTPException
@@ -13,10 +15,11 @@ def config_app():
     fileConfig(app_config.config_file())
 
 
-def setup_providers(db):
+def setup_providers(flask, db):
     from src.domain import DatabaseProvider, LogProvider
 
-    LogProvider().set_logger(app.logger)
+    flask.logger.setLevel(AppConfigurations().logging_level())
+    LogProvider().set_logger(flask.logger)
 
     DatabaseProvider().set_database(db)
     DatabaseSessionProvider().set_session_provider(db)
@@ -24,13 +27,16 @@ def setup_providers(db):
 
 def setup_blueprints(app_context: Flask):
     from src.infrastructure.example import example_bp
+    from src.infrastructure.user.entrypoints import user_bp
+
     app_context.register_blueprint(example_bp)
+    app_context.register_blueprint(user_bp)
 
 
-def start(app_context: Flask):
+def start(flask: Flask):
     from src.domain import DatabaseProvider
     db = DatabaseProvider().get()
-    with app.app_context():
+    with flask.app_context():
         db.create_all()
 
 
@@ -39,7 +45,7 @@ app.config.from_envvar('APP_CONFIG_FILE')
 AppProvider().set_app(app)
 
 config_app()
-setup_providers(SQLAlchemy(app))
+setup_providers(app, SQLAlchemy(app))
 setup_blueprints(app)
 start(app)
 

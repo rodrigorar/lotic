@@ -1,18 +1,20 @@
+import uuid
+from typing import Optional
 from src.domain import BaseRepository
-from src.utils import Maybe
+from src.domain.users import User
 
 
 class UserRepository(BaseRepository):
 
-    def get_by_id(self, unit_of_work, entity_id) -> Maybe:
+    def get_by_id(self, unit_of_work, user_id: uuid) -> Optional[User]:
         raise NotImplemented("UserRepository#get_by_id is not implemented.")
 
-    def insert(self, unit_of_work, entity):
+    def insert(self, unit_of_work, entity: User):
         raise NotImplemented("UserRepository#insert is not implemented.")
 
-    def update(self, unit_of_work, entity):
+    def update(self, unit_of_work, entity: User):
         raise NotImplemented("UserRepository#update is not implemented.")
 
-    def delete(self, unit_of_work, entity_id):
+    def delete(self, unit_of_work, user_id: uuid):
         raise NotImplemented("UserRepository#delete is not implemented.")
     
