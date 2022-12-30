@@ -43,7 +43,7 @@ dependencies = [
   "behave==1.2.6"
 ]
 [tool.hatch.envs.default.scripts]
-unit-tests = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=trailmania_server --cov=tests {args}"
+unit-tests = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=tasks_server --cov=tests {args}"
 unit-tests-no-cov = "test --no-cov {args}"
 integration-tests = "behave"
 server = "export APP_CONFIG_FILE=development.py; flask --app src/app run"
