@@ -19,5 +19,8 @@ class AppConfigurations:
     def config_file(self):
         return self._app_config.get('LOGGING_CONFIG')
 
+    def logging_level(self):
+        return self._app_config.get('LOGGING_LEVEL')
+
     def secret_key(self):
         return self._app_config.get('SECRET_KEY')
