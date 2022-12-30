@@ -1,4 +1,5 @@
 from logging import Logger
+from typing import Optional
 from src.domain.errors import ConflictError
 
 
