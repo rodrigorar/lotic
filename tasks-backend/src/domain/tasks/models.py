@@ -1,6 +1,5 @@
 import uuid
 from datetime import datetime
-
 from src.domain import DatabaseProvider
 from src.domain.users import User
 
@@ -15,7 +14,15 @@ class Task(db.Model):
     updated_at = db.Column(db.String, nullable=False)
     owner_id = db.Column(db.String, nullable=False)
 
-    def __init__(self, task_id, title, description, created_at, updated_at, owner_id):
+    def __init__(
+            self,
+            task_id: uuid,
+            title: str,
+            description: str,
+            created_at: datetime,
+            updated_at: datetime,
+            owner_id: uuid):
+
         self.id = task_id
         self.title = title
         self.description = description
@@ -46,12 +53,12 @@ class UserTasks(db.Model):
     user_id = db.Column(db.String, db.ForeignKey(User.id), nullable=False)
     task_id = db.Column(db.String, db.ForeignKey(Task.id), nullable=False)
 
-    def __init__(self, user_id, task_id):
+    def __init__(self, user_id: uuid, task_id: uuid):
         self.user_id = user_id
         self.task_id = task_id
 
     @classmethod
-    def from_values(cls, user_id, task_id):
+    def from_values(cls, user_id: uuid, task_id: uuid):
         assert user_id is not None, "User Id cannot be empty."
         assert task_id is not None, "Task Id cannot be empty."
         return cls(user_id, task_id)
