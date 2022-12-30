@@ -1,17 +1,16 @@
 from logging import Logger
 from src.domain.errors import ConflictError
-from src.utils import Maybe
 
 
 class BaseRepository:
 
-    def get_by_id(self, unit_of_work, entity_id) -> Maybe:
+    def get_by_id(self, unit_of_work, entity_id) -> Optional:
         raise NotImplemented("BaseRepository#get_by_id is not implemented!")
 
     def insert(self, unit_of_work, entity):
         raise NotImplemented("BaseRepository#insert is not implemented!")
 
-    def update(self, unit_of_work, entity_id, entity):
+    def update(self, unit_of_work, entity):
         raise NotImplemented("BaseRepository#update is not implemented!")
 
     def delete(self, unit_of_work, entity_id):

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from src.application.example import UseCaseAddPerson, UseCaseGetPerson, UseCaseListPeople
 from src.domain.example \
     import Person, PersonRepository, PersonServiceProvider, ServiceListPeople, ServiceGetPerson, ServiceAddPerson
@@ -24,19 +26,18 @@ class PersonRepositoryImpl(PersonRepository):
 
         unit_of_work.get_manager().add(entity)
 
-    def update(self, unit_of_work, person_id: int, entity: Person) -> None:
+    def update(self, unit_of_work, entity: Person) -> None:
         assert (unit_of_work is not None), "Unit of work cannot be None!"
         assert (entity is not None), "Person cannot be empty!"
-        assert (person_id is not None), "No id as been provided!"
 
-        person = Person.query.filter_by(id=person_id)
+        person = Person.query.filter_by(id=entity.id)
         person.first_name = entity.first_name if entity.first_name is not None else person.first_name
         person.last_name = entity.last_name if entity.last_name is not None else person.last_name
         person.age = entity.age if entity.age is not None else person.age
 
         unit_of_work.get_manager().add(person)
 
-    def delete(self, unit_of_work, person_id: int) -> Maybe:
+    def delete(self, unit_of_work, person_id: int):
         query_manager = unit_of_work.get_manager()
         query_manager.query(Person).filter_by(id=person_id).delete()
 

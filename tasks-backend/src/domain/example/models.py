@@ -10,10 +10,11 @@ class Person(db.Model):
     last_name = db.Column(db.String, nullable=False)
     age = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, first_name, last_name, age):
+    def __init__(self, first_name, last_name, age, person_id = None):
         self.first_name = first_name
         self.last_name = last_name
         self.age = age
+        self.id = person_id
 
     def name(self) -> str:
         return self.first_name + " " + self.last_name
@@ -21,4 +22,4 @@ class Person(db.Model):
     @classmethod
     def from_json(cls, json_data):
         values = json.loads(json_data)
-        return cls(values["id"], values["first_name"], values["last_name"], values["age"])
+        return cls(values["first_name"], values["last_name"], values["age"], values["id"])

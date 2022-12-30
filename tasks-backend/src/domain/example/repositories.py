@@ -14,7 +14,7 @@ class PersonRepository(BaseRepository):
     def insert(self, unit_of_work, entity: Person) -> None:
         raise NotImplemented("PersonRepository#insert is not implemented!")
 
-    def update(self, unit_of_work, person_id: int, entity: Person) -> None:
+    def update(self, unit_of_work, entity: Person) -> None:
         raise NotImplemented("PersonRepository#update is not implemented!")
 
     def delete(self, unit_of_work, person_id: int) -> Maybe:
