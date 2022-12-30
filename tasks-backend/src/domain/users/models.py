@@ -19,7 +19,7 @@ class User(db.Model):
         self.updated_at = updated_at
 
     @classmethod
-    def from_value(cls, user_id, email, created_at, updated_at):
+    def from_values(cls, user_id, email, created_at, updated_at):
         assert user_id is not None, "User Id cannot be empty."
         assert email is not None, "Email cannot be empty."
         assert created_at is not None, "Created At cannot be empty."

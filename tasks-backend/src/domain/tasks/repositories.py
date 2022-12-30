@@ -34,7 +34,7 @@ class UserTasksRepository(BaseRepository):
     def get_by_id(self, unit_of_work, entity_id: uuid) -> Optional[UserTasks]:
         raise NotImplemented("UserTasksRepository#get_by_id is not implemented.")
 
-    def list_tasks(self, unit_of_work, user_id: uuid) -> list[Task]:
+    def list(self, unit_of_work, user_id: uuid) -> list[UserTasks]:
         raise NotImplemented("UserTasksRepository#list_tasks is not implemented.")
 
     def insert(self, unit_of_work, entity: UserTasks):

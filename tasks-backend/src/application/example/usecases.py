@@ -3,10 +3,6 @@ from src.application.example import PersonDTO
 from src.domain.example import PersonServiceProvider, Person
 from src.utils import Maybe
 
-from src.domain.tasks import Task
-from src.domain.tasks import UserTasks
-from src.domain.users import User
-
 
 class UseCaseAddPerson(UseCase):
     __unit_of_work_provider = None
