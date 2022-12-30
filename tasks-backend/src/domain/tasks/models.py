@@ -2,14 +2,12 @@ import uuid
 from datetime import datetime
 
 from src.domain import DatabaseProvider
-from src.domain.users.models import User
+from src.domain.users import User
 
 db = DatabaseProvider().get()
 
 
 class Task(db.Model):
-    __tablename__ = "task"
-
     id = db.Column(db.String, primary_key=True)
     title = db.Column(db.String)
     description = db.Column(db.String)
@@ -44,10 +42,9 @@ class Task(db.Model):
 
 
 class UserTasks(db.Model):
-    __tablename__ = "user_tasks"
-
-    user_id: db.Column("user_id", db.String, db.ForeignKey(User.id), nullable=False)
-    task_id: db.Column("task_id", db.String, db.ForeignKey(Task.id), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String, db.ForeignKey(User.id), nullable=False)
+    task_id = db.Column(db.String, db.ForeignKey(Task.id), nullable=False)
 
     def __init__(self, user_id, task_id):
         self.user_id = user_id

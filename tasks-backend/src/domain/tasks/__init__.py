@@ -1,2 +1,2 @@
-from models import Task
-from repositories import TasksRepository
+from src.domain.tasks.models import Task, UserTasks
+from src.domain.tasks.repositories import TasksRepository

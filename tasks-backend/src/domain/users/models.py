@@ -7,12 +7,10 @@ db = DatabaseProvider().get()
 
 
 class User(db.Model):
-    __tablename__ = "user"
-
-    id: db.Column("id", db.String, primary_key=True)
-    email: db.Column("email", db.String, nullable=False)
-    created_at: db.Column("created_at", db.String, nullable=False)
-    updated_at: db.Column("updated_at", db.String, nullable=False)
+    id = db.Column(db.String, primary_key=True)
+    email = db.Column(db.String, nullable=False)
+    created_at = db.Column(db.String, nullable=False)
+    updated_at = db.Column(db.String, nullable=False)
 
     def __init__(self, user_id: uuid, email: str, created_at: datetime, updated_at: datetime):
         self.id = user_id
