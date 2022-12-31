@@ -1,9 +1,7 @@
 import uuid
 from typing import Optional
 from src.application import UnitOfWork
-from src.domain.users import User
-from src.domain.users.businessrules import UserBusinessRulesProvider, GetUser, CreateUser
-from src.domain.users.repositories import UserRepository
+from src.domain.users import User, UserBusinessRulesProvider, GetUser, CreateUser, UserRepository
 
 
 class UserRepositoryImpl(UserRepository):
@@ -16,9 +14,6 @@ class UserRepositoryImpl(UserRepository):
 
     def update(self, unit_of_work, entity):
         raise NotImplemented("UserRepositoryImpl#update is not implemented.")
-
-    def delete(self, unit_of_work, entity_id):
-        raise NotImplemented("UserRepositoryImpl#delete is not implemented.")
 
 
 class UserBusinessRulesProviderImpl(UserBusinessRulesProvider):
@@ -35,10 +30,10 @@ class UserBusinessRulesProviderImpl(UserBusinessRulesProvider):
 class UserUseCaseProvider:
 
     @staticmethod
-    def create_user_use_case():
+    def create_user():
         raise NotImplemented("UserUseCaseProvider#create_user_use_case is not implemented.")
 
     @staticmethod
-    def get_user_use_case():
+    def get_user():
         raise NotImplemented("UserUseCaseProvider#get_user_use_case is not implemented.")
     
