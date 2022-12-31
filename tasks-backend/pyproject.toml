@@ -40,7 +40,8 @@ dependencies = [
   "pytest-mock==3.10.0",
   "flask==2.2.2",
   "flask-sqlalchemy==3.0.2",
-  "behave==1.2.6"
+  "behave==1.2.6",
+  "mockito==1.4.0"
 ]
 [tool.hatch.envs.default.scripts]
 unit-tests = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=tasks_server --cov=tests {args}"

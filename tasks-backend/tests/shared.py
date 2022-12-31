@@ -1,25 +1,28 @@
+from mockito import mock
+
+from src.application import UnitOfWork
 
 
 class MockDatabase:
     class Column:
 
-        def __init__(self, type, nullable=False, primary_key=False):
-            self.type = type
+        def __init__(self, column_type, nullable=False, primary_key=False):
+            self.type = column_type
             self.nullable = nullable
             self.primary_key = primary_key
 
-        def no_op(self):
-            print("no_op")
-
     class Model:
-
-        def no_op(self):
-            print("no_op")
+        ...
 
     class Integer:
-        def no_op(self):
-            print("no_op")
+        ...
 
     class String:
-        def no_op(self):
-            print("no_op")
+        ...
+
+
+class UnitOfWorkMockProvider:
+
+    @staticmethod
+    def get():
+        return mock(UnitOfWork)

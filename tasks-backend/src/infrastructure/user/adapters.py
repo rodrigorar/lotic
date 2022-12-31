@@ -9,10 +9,10 @@ class UserRepositoryImpl(UserRepository):
     def get_by_id(self, unit_of_work: UnitOfWork, user_id: uuid) -> Optional[User]:
         raise NotImplemented("UserRepositoryImpl#get_by_id is not implemented.")
 
-    def insert(self, unit_of_work, entity):
+    def insert(self, unit_of_work, entity) -> uuid:
         raise NotImplemented("UserRepositoryImpl#insert is not implemented.")
 
-    def update(self, unit_of_work, entity):
+    def update(self, unit_of_work, entity) -> None:
         raise NotImplemented("UserRepositoryImpl#update is not implemented.")
 
 
