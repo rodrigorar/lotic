@@ -31,14 +31,14 @@ class TasksRepositoryImpl(TasksRepository):
 
 class UserTasksRepositoryImpl(UserTasksRepository):
 
-    def list(self, unit_of_work, user_id: uuid) -> list[UserTasks]:
-        raise NotImplementedError("UserTasksRepositoryImpl#list is not implemented.")
-
     def insert(self, unit_of_work, entity: UserTasks):
         raise NotImplementedError("UserTasksRepositoryImpl#insert is not implemented.")
 
     def insert_multiple(self, unit_of_work, entity: list[UserTasks]):
         raise NotImplementedError("UserTasksRepositoryImpl#insert_multiple is not implemented.")
+
+    def list(self, unit_of_work, user_id: uuid) -> list[UserTasks]:
+        raise NotImplementedError("UserTasksRepositoryImpl#list is not implemented.")
 
     def delete_by_task_id(self, unit_of_work, task_id: uuid):
         raise NotImplementedError("UserTasksRepositoryImpl#delete_by_task_id is not implemented.")
