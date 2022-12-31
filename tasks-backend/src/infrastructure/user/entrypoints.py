@@ -15,7 +15,7 @@ def create_user():
     return to_json({
         "type": "http://localhost:5000/not_implemented",
         "details": "Create User has not yet been implemented."
-    }), 500
+    }), 500, {'Content-Type': 'application/json'}
 
 
 @user_bp.get("/<uuid:user_id>")
@@ -25,4 +25,4 @@ def get_user(user_id):
     return to_json({
         "type": "http://localhost:5000/not_implemented",
         "details": "Get user has not yet been implemented."
-    }), 500
+    }), 500, {'Content-Type': 'application/json'}
