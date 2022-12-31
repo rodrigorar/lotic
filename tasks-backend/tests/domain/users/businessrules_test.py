@@ -1,21 +1,16 @@
 from datetime import datetime
 import uuid
 
+from mockito import mock, when
 import pytest
-from src.domain import DatabaseProvider
+
 from src.domain.errors import InternalError
-from tests.shared import MockDatabase, UnitOfWorkMockProvider
-from mockito import when, mock
+from tests.domain.shared import DomainUnitTestsBase
+from tests.shared import UnitOfWorkMockProvider
 
 
-class TestCreateUser:
+class TestCreateUser(DomainUnitTestsBase):
     USER_ID = uuid.uuid4()
-
-    @pytest.fixture(autouse=True)
-    def database_provider_aspect(self):
-        DatabaseProvider().set_database(MockDatabase())
-        yield
-        DatabaseProvider().set_database(None)
 
     def test_should_succeed(self):
         from src.domain.users import User, CreateUser, UserRepository

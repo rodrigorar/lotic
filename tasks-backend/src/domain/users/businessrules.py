@@ -12,6 +12,7 @@ class CreateUser(BaseBusinessRule):
         assert user is not None, "User entity cannot be empty"
         return self.user_repository.insert(self.unit_of_work, user)
 
+
 class GetUser(BaseBusinessRule):
 
     def execute(self, port):
