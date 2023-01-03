@@ -1,2 +1,2 @@
-from dto import UserDTO
-from usecases import UseCaseCreateUser, UseCaseGetUser
+from src.application.users.dto import UserDTO
+from src.application.users.usecases import UseCaseCreateUser, UseCaseGetUser
