@@ -1,3 +1,5 @@
+import uuid
+
 from src.domain import BaseBusinessRule
 from src.domain.users import UserRepository, User
 
@@ -15,8 +17,13 @@ class CreateUser(BaseBusinessRule):
 
 class GetUser(BaseBusinessRule):
 
-    def execute(self, port):
-        raise NotImplemented("GetUser#execute is not implemented.")
+    def __init__(self, unit_of_work, user_repository: UserRepository):
+        super().__init__(unit_of_work)
+        self.user_repository = user_repository
+
+    def execute(self, user_id: uuid):
+        assert user_id is not None, "User id cannot be empty"
+        return self.user_repository.get_by_id(self.unit_of_work, user_id)
 
 
 class UserBusinessRulesProvider:
