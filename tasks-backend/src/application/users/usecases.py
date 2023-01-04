@@ -18,7 +18,13 @@ class UseCaseCreateUser(UseCase):
         self.__user_business_rules_provider = user_business_rules_provider
 
     def execute(self, user: UserDTO):
-        raise NotImplemented("UseCaseCreateUser#execute is not implemented.")
+        assert user is not None, "User cannot be empty"
+
+        with self.__unit_of_work_provider.get() as unit_of_work:
+            business_rule = self.__user_business_rules_provider.create_user(unit_of_work)
+            result = business_rule.execute(user.to_entity())
+
+        return result
 
 
 class UseCaseGetUser(UseCase):

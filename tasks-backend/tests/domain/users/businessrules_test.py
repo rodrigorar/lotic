@@ -97,7 +97,7 @@ class TestGetUser(DomainUnitTestsBase):
             under_test.execute(None)
 
     def test_should_fail_repository_error(self):
-        from src.domain.users import User, GetUser, UserRepository
+        from src.domain.users import GetUser, UserRepository
 
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
         mocked_user_repository = mock(UserRepository)

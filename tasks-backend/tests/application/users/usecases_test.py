@@ -36,7 +36,7 @@ USER_PASSWORD = "passwd01"
 
 class TestUseCaseCreateUser:
 
-    @pytest.fixture
+    @pytest.fixture(autouse=True)
     def setup_mocks_aspect(self):
         global create_user_br
         global get_user_br
@@ -47,14 +47,14 @@ class TestUseCaseCreateUser:
         create_user_br = None
         get_user_br = None
 
-    def test_should_succeed(self, setup_mocks_aspect):
+    def test_should_succeed(self):
         from src.application.users import UseCaseCreateUser, UserDTO
 
         input_value = UserDTO(USER_ID, USER_EMAIL, USER_PASSWORD, datetime.now(), datetime.now())
 
-        when(create_user_br).execute(USER_ID).thenReturn(USER_ID)
+        when(create_user_br).execute(...).thenReturn(USER_ID)
 
-        under_test = UseCaseCreateUser(MockedUnitOfWorkProvider, MockedUserBusinessRulesProvider)
+        under_test = UseCaseCreateUser(MockedUnitOfWorkProvider(), MockedUserBusinessRulesProvider())
         result = under_test.execute(input_value)
 
         assert result is not None, "Result cannot be None"
@@ -63,30 +63,32 @@ class TestUseCaseCreateUser:
     def test_should_fail_none_input(self):
         from src.application.users import UseCaseCreateUser
 
+        when(create_user_br).execute(...).thenReturn(USER_ID)
+
         under_test = UseCaseCreateUser(None, None)
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
     # br = business_rule
-    def test_should_fail_create_user_br_error(self, setup_mocks_aspect):
+    def test_should_fail_create_user_br_error(self):
         from src.application.users import UseCaseCreateUser, UserDTO
 
         input_value = UserDTO(USER_ID, USER_EMAIL, USER_PASSWORD, datetime.now(), datetime.now())
 
-        when(create_user_br).execute(USER_ID).thenRaise(InternalError("Something went wrong"))
+        when(create_user_br).execute(...).thenRaise(InternalError("Something went wrong"))
 
-        under_test = UseCaseCreateUser(MockedUnitOfWorkProvider, MockedUserBusinessRulesProvider)
-        result = under_test.execute(input_value)
-
-        assert result is not None, "Result cannot be None"
-        assert result == USER_ID, "Result differs from expected"
+        under_test = UseCaseCreateUser(MockedUnitOfWorkProvider(), MockedUserBusinessRulesProvider())
+        with pytest.raises(InternalError):
+            under_test.execute(input_value)
 
     def test_should_fail_dto_to_entity_error(self, setup_mocks_aspect):
         from src.application.users import UseCaseCreateUser, UserDTO
 
         input_value = UserDTO(USER_ID, None, USER_PASSWORD, datetime.now(), datetime.now())
 
-        under_test = UseCaseCreateUser(MockedUnitOfWorkProvider, MockedUserBusinessRulesProvider)
+        when(create_user_br).execute(...).thenRaise(USER_ID)
+
+        under_test = UseCaseCreateUser(MockedUnitOfWorkProvider(), MockedUserBusinessRulesProvider())
         with pytest.raises(AssertionError):
             under_test.execute(input_value)
 
