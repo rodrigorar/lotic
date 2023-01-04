@@ -40,4 +40,9 @@ class UseCaseGetUser(UseCase):
         self.__user_business_rules_provider = user_business_rules_provider
 
     def execute(self, user_id: uuid):
-        raise NotImplemented("UseCaseGetUser#execute is not implemented.")
+        assert user_id is not None, "User id cannot be empty"
+
+        with self.__unit_of_work_provider.get() as unit_of_work:
+            business_rule = self.__user_business_rules_provider.get_user(unit_of_work)
+            result = business_rule.execute(user_id)
+        return UserDTO.from_entity(result) if result is not None else None

@@ -17,6 +17,17 @@ class UserDTO(DTOTranslator):
     def to_entity(self):
         return User.from_values(self.id, self.email, self.password, self.created_at, self.updated_at)
 
+    def equals(self, other):
+        return self.id == other.id \
+            and self.email == other.email \
+            and self.created_at == other.created_at
+
     @classmethod
     def from_entity(cls, entity):
+        assert entity is not None, "Entity cannot be empty"
+        assert entity.id is not None, "Id cannot be empty"
+        assert entity.email is not None, "Email cannot be empty"
+        assert entity.created_at is not None, "Created at cannot be empty"
+        assert entity.updated_at is not None, "Updated at cannot be empty"
+
         return cls(entity.id, entity.email, entity.password, entity.created_at, entity.updated_at)
