@@ -2,20 +2,20 @@ import uuid
 from datetime import datetime
 
 from src.application import DTOTranslator
-from src.domain.accounts import User
+from src.domain.accounts import Account
 
 
-class UserDTO(DTOTranslator):
+class AccountDTO(DTOTranslator):
 
-    def __init__(self, user_id: uuid, email: str, password: str, created_at: datetime, updated_at: datetime):
-        self.id = user_id
+    def __init__(self, account_id: uuid, email: str, password: str, created_at: datetime, updated_at: datetime):
+        self.id = account_id
         self.email = email
         self.password = password
         self.created_at = created_at
         self.updated_at = updated_at
 
     def to_entity(self):
-        return User.from_values(self.id, self.email, self.password, self.created_at, self.updated_at)
+        return Account.from_values(self.id, self.email, self.password, self.created_at, self.updated_at)
 
     def equals(self, other):
         return self.id == other.id \

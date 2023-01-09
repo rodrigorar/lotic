@@ -26,12 +26,12 @@ class GetAccount(BaseBusinessRule):
         return self.account_repository.get_by_id(self.unit_of_work, account_id)
 
 
-class UserBusinessRulesProvider:
+class AccountBusinessRulesProvider:
 
     @staticmethod
-    def create_user(unit_of_work) -> CreateAccount:
+    def create_account(unit_of_work) -> CreateAccount:
         raise NotImplemented("UserBusinessRulesProvider#created_user is not implemented.")
 
     @staticmethod
-    def get_user(unit_of_work) -> GetAccount:
+    def get_account(unit_of_work) -> GetAccount:
         raise NotImplemented("#UserBusinessRulesProvider#get_user is not implemented.")

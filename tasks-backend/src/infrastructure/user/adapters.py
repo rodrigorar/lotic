@@ -2,7 +2,7 @@ from datetime import datetime
 import uuid
 from typing import Optional
 from src.application import UnitOfWork
-from src.application.users import UseCaseCreateUser, UseCaseGetUser
+from src.application.accounts import UseCaseCreateUser, UseCaseGetUser
 from src.domain.errors import NotFoundError
 from src.domain.accounts import User, UserBusinessRulesProvider, GetUser, CreateUser, UserRepository
 from src.infrastructure import UnitOfWorkProviderImpl
