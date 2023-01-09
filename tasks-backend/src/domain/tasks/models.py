@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from src.domain import DatabaseProvider
-from src.domain.users import User
+from src.domain.accounts import User
 
 db = DatabaseProvider().get()
 

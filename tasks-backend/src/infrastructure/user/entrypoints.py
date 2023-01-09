@@ -5,7 +5,7 @@ from src.infrastructure import to_json
 from src.utils import URL_PREFIX_V1
 
 logger = LogProvider().get()
-user_bp = Blueprint("users", __name__, url_prefix=URL_PREFIX_V1 + "/users")
+user_bp = Blueprint("accounts", __name__, url_prefix=URL_PREFIX_V1 + "/accounts")
 
 
 @user_bp.post("")

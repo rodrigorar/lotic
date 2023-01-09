@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from src.application import DTOTranslator
-from src.domain.users import User
+from src.domain.accounts import User
 
 
 class UserDTO(DTOTranslator):

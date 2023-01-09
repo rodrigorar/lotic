@@ -10,7 +10,7 @@ from tests.shared import MockDatabase
 
 DatabaseProvider().set_database(MockDatabase())
 
-from src.domain.users import User, CreateUser, GetUser, UserBusinessRulesProvider
+from src.domain.accounts import User, CreateUser, GetUser, UserBusinessRulesProvider
 from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider
 
 

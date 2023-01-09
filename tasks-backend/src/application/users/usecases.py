@@ -2,7 +2,7 @@ import uuid
 
 from src.application import UseCase, UnitOfWorkProvider
 from src.application.users import UserDTO
-from src.domain.users import UserBusinessRulesProvider
+from src.domain.accounts import UserBusinessRulesProvider
 
 
 class UseCaseCreateUser(UseCase):
