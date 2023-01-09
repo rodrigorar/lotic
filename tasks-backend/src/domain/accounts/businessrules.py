@@ -30,8 +30,8 @@ class AccountBusinessRulesProvider:
 
     @staticmethod
     def create_account(unit_of_work) -> CreateAccount:
-        raise NotImplemented("UserBusinessRulesProvider#created_user is not implemented.")
+        raise NotImplemented("AccountBusinessRulesProvider#created_account is not implemented.")
 
     @staticmethod
     def get_account(unit_of_work) -> GetAccount:
-        raise NotImplemented("#UserBusinessRulesProvider#get_user is not implemented.")
+        raise NotImplemented("AccountBusinessRulesProvider#get_account is not implemented.")

@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from src.domain import DatabaseProvider
-from src.domain.accounts import User
+from src.domain.accounts import Account
 
 db = DatabaseProvider().get()
 
@@ -50,15 +50,15 @@ class Task(db.Model):
 
 class UserTasks(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String, db.ForeignKey(User.id), nullable=False)
+    account_id = db.Column(db.String, db.ForeignKey(Account.id), nullable=False)
     task_id = db.Column(db.String, db.ForeignKey(Task.id), nullable=False)
 
-    def __init__(self, user_id: uuid, task_id: uuid):
-        self.user_id = user_id
+    def __init__(self, account_id: uuid, task_id: uuid):
+        self.account_id = account_id
         self.task_id = task_id
 
     @classmethod
-    def from_values(cls, user_id: uuid, task_id: uuid):
-        assert user_id is not None, "User Id cannot be empty."
+    def from_values(cls, account_id: uuid, task_id: uuid):
+        assert account_id is not None, "User Id cannot be empty."
         assert task_id is not None, "Task Id cannot be empty."
-        return cls(user_id, task_id)
+        return cls(account_id, task_id)

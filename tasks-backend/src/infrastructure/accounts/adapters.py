@@ -32,7 +32,7 @@ class AccountRepositoryImpl(AccountRepository):
         query_manager = unit_of_work.get_manager()
         entry = query_manager.query(Account).filter_by(id=account.id).first()
         if entry is None:
-            raise NotFoundError("No valid accounts was found for id " + str(user.id))
+            raise NotFoundError("No valid accounts was found for id " + str(account.id))
 
         entry.email = account.email if account.email is not None else entry.email
         entry.password = account.password if account.password is not None else entry.password
@@ -44,11 +44,11 @@ class AccountRepositoryImpl(AccountRepository):
 class AccountBusinessRulesProviderImpl(AccountBusinessRulesProvider):
 
     @staticmethod
-    def create_user(unit_of_work) -> CreateAccount:
+    def create_account(unit_of_work) -> CreateAccount:
         return CreateAccount(unit_of_work, AccountRepositoryImpl())
 
     @staticmethod
-    def get_user(unit_of_work) -> GetAccount:
+    def get_account(unit_of_work) -> GetAccount:
         return GetAccount(unit_of_work, AccountRepositoryImpl())
 
 
@@ -56,13 +56,13 @@ account_business_rules_provider = AccountBusinessRulesProviderImpl()
 unit_of_work_provider = UnitOfWorkProviderImpl()
 
 
-class UserUseCaseProvider:
+class AccountUseCaseProvider:
 
     @staticmethod
-    def create_user():
+    def create_account():
         return UseCaseCreateAccount(unit_of_work_provider, account_business_rules_provider)
 
     @staticmethod
-    def get_user():
+    def get_account():
         return UseCaseGetAccount(unit_of_work_provider, account_business_rules_provider)
     
