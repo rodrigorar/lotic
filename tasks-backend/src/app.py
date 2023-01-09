@@ -27,11 +27,11 @@ def setup_providers(flask, db):
 
 def setup_blueprints(app_context: Flask):
     from src.infrastructure.example import example_bp
-    from src.infrastructure.user import user_bp
+    from src.infrastructure.accounts import accounts_bp
     from src.infrastructure.tasks import tasks_bp
 
     app_context.register_blueprint(example_bp)
-    app_context.register_blueprint(user_bp)
+    app_context.register_blueprint(accounts_bp)
     app_context.register_blueprint(tasks_bp)
 
 

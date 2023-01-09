@@ -1,14 +1,14 @@
 from behave import *
 
 
-@given('a new user')
+@given('a new accounts')
 def step_impl(context):
     pass
 
 
-@given('an existing user')
+@given('an existing accounts')
 def step_impl(context):
-    print('Load a test user id')
+    print('Load a test accounts id')
 
 
 @when('it tries to create an account')

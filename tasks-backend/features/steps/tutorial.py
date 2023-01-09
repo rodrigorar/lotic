@@ -6,9 +6,9 @@ def step_impl(context):
     pass
 
 
-@given('a regular user')
+@given('a regular accounts')
 def step_impl(context):
-    print('a regular user')
+    print('a regular accounts')
 
 
 @when('we implement a test')
