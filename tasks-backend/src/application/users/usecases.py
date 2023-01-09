@@ -2,7 +2,7 @@ import uuid
 
 from src.application import UseCase, UnitOfWorkProvider
 from src.application.users import UserDTO
-from src.domain.users import CreateUser, GetUser, UserBusinessRulesProvider
+from src.domain.users import UserBusinessRulesProvider
 
 
 class UseCaseCreateUser(UseCase):
@@ -23,7 +23,6 @@ class UseCaseCreateUser(UseCase):
         with self.__unit_of_work_provider.get() as unit_of_work:
             business_rule = self.__user_business_rules_provider.create_user(unit_of_work)
             result = business_rule.execute(user.to_entity())
-
         return result
 
 

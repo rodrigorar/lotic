@@ -1,39 +1,68 @@
+from datetime import datetime
 import uuid
 from typing import Optional
 from src.application import UnitOfWork
+from src.application.users import UseCaseCreateUser, UseCaseGetUser
+from src.domain.errors import NotFoundError
 from src.domain.users import User, UserBusinessRulesProvider, GetUser, CreateUser, UserRepository
+from src.infrastructure import UnitOfWorkProviderImpl
 
 
 class UserRepositoryImpl(UserRepository):
 
     def get_by_id(self, unit_of_work: UnitOfWork, user_id: uuid) -> Optional[User]:
-        raise NotImplemented("UserRepositoryImpl#get_by_id is not implemented.")
+        assert unit_of_work is not None, "Unit of work cannot be empty"
+        assert user_id is not None, "User id cannot be empty"
 
-    def insert(self, unit_of_work, entity) -> uuid:
-        raise NotImplemented("UserRepositoryImpl#insert is not implemented.")
+        query_manager = unit_of_work.get_manager()
+        return query_manager.query(User).filter_by(id=user_id).first()
 
-    def update(self, unit_of_work, entity) -> None:
-        raise NotImplemented("UserRepositoryImpl#update is not implemented.")
+    def insert(self, unit_of_work: UnitOfWork, user: User) -> uuid:
+        assert unit_of_work is not None, "Unit of work cannot be empty"
+        assert user is not None, "User cannot be empty"
+
+        query_manager = unit_of_work.get_manager()
+        query_manager.add(user)
+        return user.id
+
+    def update(self, unit_of_work: UnitOfWork, user: User) -> None:
+        assert unit_of_work is not None, "Unit of work cannot be empty"
+        assert user is not None, "User cannot be empty"
+
+        query_manager = unit_of_work.get_manager()
+        entry = query_manager.query(User).filter_by(id=user.id).first()
+        if entry is None:
+            raise NotFoundError("No valid user was found for id " + str(user.id))
+
+        entry.email = user.email if user.email is not None else entry.email
+        entry.password = user.password if user.password is not None else entry.password
+        entry.updated_at = datetime.now()
+
+        query_manager.add(entry)
 
 
 class UserBusinessRulesProviderImpl(UserBusinessRulesProvider):
 
     @staticmethod
     def create_user(unit_of_work) -> CreateUser:
-        raise NotImplemented("UserBusinessRulesProviderImpl#create_user is not implemented.")
+        return CreateUser(unit_of_work, UserRepositoryImpl())
 
     @staticmethod
     def get_user(unit_of_work) -> GetUser:
-        raise NotImplemented("UserBusinessRulesProviderImpl#get_user is not implemented.")
+        return GetUser(unit_of_work, UserRepositoryImpl())
+
+
+user_business_rules_provider = UserBusinessRulesProviderImpl()
+unit_of_work_provider = UnitOfWorkProviderImpl()
 
 
 class UserUseCaseProvider:
 
     @staticmethod
     def create_user():
-        raise NotImplemented("UserUseCaseProvider#create_user_use_case is not implemented.")
+        return UseCaseCreateUser(unit_of_work_provider, user_business_rules_provider)
 
     @staticmethod
     def get_user():
-        raise NotImplemented("UserUseCaseProvider#get_user_use_case is not implemented.")
+        return UseCaseGetUser(unit_of_work_provider, user_business_rules_provider)
     
