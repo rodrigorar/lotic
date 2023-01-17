@@ -15,7 +15,7 @@ class AccountRepositoryImpl(AccountRepository):
         assert account_id is not None, "Account id cannot be empty"
 
         query_manager = unit_of_work.get_manager()
-        return query_manager.query(Account).filter_by(id=account_id).first()
+        return query_manager.query(Account).filter_by(id=str(account_id)).first()
 
     def insert(self, unit_of_work: UnitOfWork, account: Account) -> uuid:
         assert unit_of_work is not None, "Unit of work cannot be empty"
