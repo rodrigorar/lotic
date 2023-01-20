@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from src.application import DTOTranslator
-from src.domain.tasks import Task, UserTasks
+from src.domain.tasks import Task, AccountTasks
 
 
 class TaskDTO(DTOTranslator):
@@ -38,7 +38,7 @@ class UserTasksDTO(DTOTranslator):
         self.task_id = task_id
 
     def to_entity(self):
-        return UserTasks.fromValues(self.user_id, self.task_id)
+        return AccountTasks.fromValues(self.user_id, self.task_id)
 
     @classmethod
     def from_entity(cls, entity):

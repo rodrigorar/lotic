@@ -23,12 +23,18 @@ class Task(db.Model):
             updated_at: datetime,
             owner_id: uuid):
 
-        self.id = task_id
+        self.id = str(task_id)
         self.title = title
         self.description = description
         self.created_at = created_at
         self.updated_at = updated_at
-        self.owner_id = owner_id
+        self.owner_id = str(owner_id)
+
+    def get_id(self):
+        return uuid.UUID(self.id)
+
+    def get_owner_id(self):
+        return uuid.UUID(self.owner_id)
 
     @classmethod
     def from_values(
@@ -48,14 +54,14 @@ class Task(db.Model):
         return cls(task_id, title, description, created_at, updated_at, owner_id)
 
 
-class UserTasks(db.Model):
+class AccountTasks(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     account_id = db.Column(db.String, db.ForeignKey(Account.id), nullable=False)
     task_id = db.Column(db.String, db.ForeignKey(Task.id), nullable=False)
 
     def __init__(self, account_id: uuid, task_id: uuid):
-        self.account_id = account_id
-        self.task_id = task_id
+        self.account_id = str(account_id)
+        self.task_id = str(task_id)
 
     @classmethod
     def from_values(cls, account_id: uuid, task_id: uuid):

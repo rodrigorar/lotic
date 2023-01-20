@@ -2,7 +2,7 @@ import uuid
 from typing import Optional
 
 from src.domain import BaseRepository
-from src.domain.tasks import Task, UserTasks
+from src.domain.tasks import Task, AccountTasks
 
 
 class TasksRepository(BaseRepository):
@@ -31,13 +31,13 @@ class TasksRepository(BaseRepository):
 
 class UserTasksRepository(BaseRepository):
 
-    def insert(self, unit_of_work, entity: UserTasks):
+    def insert(self, unit_of_work, entity: AccountTasks):
         raise NotImplemented("UserTasksRepository#insert is not implemented.")
 
-    def insert_multiple(self, unit_of_work, entities: list[UserTasks]):
+    def insert_multiple(self, unit_of_work, entities: list[AccountTasks]):
         raise NotImplemented("UserTasksRepository#insert_multiple not implemented.")
 
-    def list(self, unit_of_work, user_id: uuid) -> list[UserTasks]:
+    def list(self, unit_of_work, user_id: uuid) -> list[AccountTasks]:
         raise NotImplemented("UserTasksRepository#list_tasks is not implemented.")
 
     def delete_by_task_id(self, unit_of_work, task_id: uuid):

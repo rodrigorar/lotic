@@ -6,10 +6,11 @@ from src.application import UnitOfWork
 class MockDatabase:
     class Column:
 
-        def __init__(self, column_type, nullable=False, primary_key=False):
+        def __init__(self, column_type, nullable=False, primary_key=False, unique=False):
             self.type = column_type
             self.nullable = nullable
             self.primary_key = primary_key
+            self.unique = unique
 
     class Model:
         ...

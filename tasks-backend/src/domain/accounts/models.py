@@ -8,7 +8,7 @@ db = DatabaseProvider().get()
 
 class Account(db.Model):
     id = db.Column(db.String, primary_key=True)
-    email = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
     created_at = db.Column(db.String, nullable=False)
     updated_at = db.Column(db.String, nullable=False)

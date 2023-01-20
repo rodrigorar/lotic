@@ -1,4 +1,4 @@
-@fixture.trailmania.server
+@fixture.tasks.server
 Feature: showing off behave
 
   Scenario: run a simple test
@@ -7,6 +7,6 @@ Feature: showing off behave
       Then behave will test it for us!
 
   Scenario: Get Trail Map
-    Given a regular user
+    Given a regular account
     When they request for a trail map
     Then behave will test it for us!

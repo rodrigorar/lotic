@@ -1,5 +1,5 @@
 from src.domain.tasks.models \
-    import Task, UserTasks
+    import Task, AccountTasks
 
 from src.domain.tasks.repositories \
     import TasksRepository, UserTasksRepository

@@ -6,7 +6,7 @@ def step_impl(context):
     pass
 
 
-@given('a regular accounts')
+@given('a regular account')
 def step_impl(context):
     print('a regular accounts')
 

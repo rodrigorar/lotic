@@ -1,22 +1,37 @@
 from behave import *
 
 
-@given('a new accounts')
+@given('a valid new account information')
 def step_impl(context):
     pass
 
 
-@given('an existing accounts')
+@given('an invalid new account information')
 def step_impl(context):
-    print('Load a test accounts id')
+    print('Invalid account info')
 
 
-@when('it tries to create an account')
+@given('an existing account')
+def step_impl(context):
+    from src.domain.accounts import Account
+
+    with context.app.app_context():
+        account = context.db.session.query(Account).filter_by(email='john.doe@mail.not').first()
+        assert account is not None, 'No account for john.doe@mail.not'
+        context.test_account = account
+
+
+@given('a non existing account')
+def step_impl(context):
+    print('Get a non existing account')
+
+
+@when('it tries to create a new account')
 def step_impl(context):
     print("Call create account api")
 
 
-@when('calling the accounts api')
+@when('it tries to obtain the account information')
 def step_impl(context):
     print("Call the account api and get the account information")
 
@@ -26,7 +41,17 @@ def step_impl(context):
     print("Verify if the account was successfully created")
 
 
-@then('the account information should be returned')
+@then('an error is returned informing of the invalid information')
+def step_impl(context):
+    print("Deal with the error sent by the server")
+
+
+@then('return the account information')
 def step_impl(context):
     print("verify that the account information was returned as is correct")
+
+
+@then('return account not found')
+def step_impl(context):
+    print('No account found')
 
