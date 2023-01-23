@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from werkzeug.exceptions import HTTPException
 
-from src.domain.errors import NotFoundError
+from src.domain.errors import InvalidArgumentError, NotFoundError
 from src.infrastructure import AppProvider, DatabaseSessionProvider, AppConfigurations, to_json
 from logging.config import fileConfig
 
@@ -54,6 +54,8 @@ start(app)
 
 # Generic Error Handlers
 
+# TODO: Refactor these error handler to be easier to implement
+# and less prone to errors
 
 @app.errorhandler(Exception)
 def handle_generic_error(e):
@@ -62,7 +64,7 @@ def handle_generic_error(e):
         "title": "Internal Service Error",
         "status": "500",
         "detail": e.__str__
-    })
+    }), 500, {'Content-Type': 'application/problem+json'}
 
 
 @app.errorhandler(NotFoundError)
@@ -72,7 +74,17 @@ def handle_not_found_error(e: NotFoundError):
         "title": e.title,
         "status": "404",
         "details": e.details
-    })
+    }), 404, {'Content-Type': 'application/problem+json'}
+
+
+@app.errorhandler(InvalidArgumentError)
+def handle_invalid_argument_error(e: InvalidArgumentError):
+    return to_json({
+        "type": "http://localhost:5000/" + e.title,
+        "title": e.title,
+        "status": 400,
+        "details": e.details
+    }), 400, {'Content-Type': 'application/problem+json'}
 
 
 @app.errorhandler(HTTPException)

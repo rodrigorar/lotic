@@ -3,12 +3,12 @@ from behave import *
 
 @given('we have behave installed')
 def step_impl(context):
-    pass
+    from src.domain.accounts import Account
 
 
 @given('a regular account')
 def step_impl(context):
-    print('a regular accounts')
+    from src.domain.accounts import Account
 
 
 @when('we implement a test')

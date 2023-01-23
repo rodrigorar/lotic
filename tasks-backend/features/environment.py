@@ -36,7 +36,6 @@ def before_scenario(context, scenario):
     from src.domain.accounts import Account
     from src.domain.tasks import Task, AccountTasks
 
-    print('Before %s ' % scenario.name)
     with context.app.app_context():
 
         # John Doe Data
@@ -69,15 +68,24 @@ def before_scenario(context, scenario):
         context.db.session.add(AccountTasks(jane_doe_id, jane_doe_task_2))
 
         context.db.session.commit()
-    # Load the data into the database
 
 
 def after_scenario(context, scenario):
     from src.domain.accounts import Account
+    from src.domain.tasks import AccountTasks, Task
 
-    print('After %s' % scenario.name)
     with context.app.app_context():
-        result = context.db.session.query(Account).all()
-        for entry in result:
+
+        account_tasks_result = context.db.session.query(AccountTasks).all()
+        for entry in account_tasks_result:
             context.db.session.delete(entry)
+
+        accounts_result = context.db.session.query(Account).all()
+        for entry in accounts_result:
+            context.db.session.delete(entry)
+
+        tasks_result = context.db.session.query(Task).all()
+        for entry in tasks_result:
+            context.db.session.delete(entry)
+
         context.db.session.commit()

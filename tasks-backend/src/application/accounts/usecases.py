@@ -3,11 +3,12 @@ import uuid
 from src.application import UseCase, UnitOfWorkProvider
 from src.application.accounts import AccountDTO
 from src.domain.accounts import AccountBusinessRulesProvider
+from src.domain.errors import InvalidArgumentError
 
 
 class UseCaseCreateAccount(UseCase):
     __unit_of_work_provider = None
-    __account_business_rules_provider = None
+    __account_br_provider = None
 
     def __init__(
             self
@@ -15,14 +16,18 @@ class UseCaseCreateAccount(UseCase):
             , account_business_rules_provider: AccountBusinessRulesProvider):
 
         self.__unit_of_work_provider = unit_of_work_provider
-        self.__account_business_rules_provider = account_business_rules_provider
+        self.__account_br_provider = account_business_rules_provider
 
     def execute(self, account: AccountDTO):
         assert account is not None, "User cannot be empty"
 
         with self.__unit_of_work_provider.get() as unit_of_work:
-            business_rule = self.__account_business_rules_provider.create_account(unit_of_work)
-            result = business_rule.execute(account.to_entity())
+            validate_email_br = self.__account_br_provider.validate_account_email(unit_of_work)
+            if not validate_email_br.execute(account.email):
+                raise InvalidArgumentError("invalid_email", "Email is not valid")
+
+            create_account_br = self.__account_br_provider.create_account(unit_of_work)
+            result = create_account_br.execute(account.to_entity())
         return result
 
 

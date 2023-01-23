@@ -23,3 +23,9 @@ class InternalError(BaseError):
 
     def __init__(self, title="", details=""):
         super().__init__(title, details)
+
+
+class InvalidArgumentError(BaseError):
+
+    def __init__(self, title="", details=""):
+        super().__init__(title, details)
