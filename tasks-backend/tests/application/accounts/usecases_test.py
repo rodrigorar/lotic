@@ -5,16 +5,17 @@ from mockito import mock, when
 import pytest
 
 from src.domain import DatabaseProvider
-from src.domain.errors import InternalError
+from src.domain.errors import InternalError, InvalidArgumentError
 from tests.shared import MockDatabase
 
 DatabaseProvider().set_database(MockDatabase())
 
-from src.domain.accounts import Account, CreateAccount, GetAccount, AccountBusinessRulesProvider
+from src.domain.accounts import Account, CreateAccount, ValidateAccountEmail, GetAccount, AccountBusinessRulesProvider
 from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider
 
 
 global create_account_br
+global validate_account_email_br
 global get_account_br
 
 
@@ -23,6 +24,10 @@ class MockedAccountBusinessRulesProvider(AccountBusinessRulesProvider):
     @staticmethod
     def create_account(unit_of_work):
         return create_account_br
+
+    @staticmethod
+    def validate_account_email(unit_of_work):
+        return validate_account_email_br
 
     @staticmethod
     def get_account(unit_of_work):
@@ -40,12 +45,15 @@ class TestUseCaseCreateAccount:
     @pytest.fixture(autouse=True)
     def setup_mocks_aspect(self):
         global create_account_br
+        global validate_account_email_br
         global get_account_br
 
         create_account_br = mock(CreateAccount)
+        validate_account_email_br = mock(ValidateAccountEmail)
         get_account_br = mock(GetAccount)
         yield
         create_account_br = None
+        validate_account_email_br = None
         get_account_br = None
 
     def test_should_succeed(self):
@@ -53,6 +61,7 @@ class TestUseCaseCreateAccount:
 
         input_value = AccountDTO(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 
+        when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(True)
         when(create_account_br).execute(...).thenReturn(ACCOUNT_ID)
 
         under_test = UseCaseCreateAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
@@ -64,8 +73,6 @@ class TestUseCaseCreateAccount:
     def test_should_fail_none_input(self):
         from src.application.accounts import UseCaseCreateAccount
 
-        when(create_account_br).execute(...).thenReturn(ACCOUNT_ID)
-
         under_test = UseCaseCreateAccount(None, None)
         with pytest.raises(AssertionError):
             under_test.execute(None)
@@ -76,18 +83,31 @@ class TestUseCaseCreateAccount:
 
         input_value = AccountDTO(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 
+        when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(True)
         when(create_account_br).execute(...).thenRaise(InternalError("Something went wrong"))
 
         under_test = UseCaseCreateAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
         with pytest.raises(InternalError):
             under_test.execute(input_value)
 
+    def test_should_fail_validate_account_email_br_error(self):
+        from src.application.accounts import UseCaseCreateAccount, AccountDTO
+
+        input_value = AccountDTO(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
+
+        when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(False)
+
+        under_test = UseCaseCreateAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
+        with pytest.raises(InvalidArgumentError):
+            under_test.execute(input_value)
+
     def test_should_fail_dto_to_entity_error(self, setup_mocks_aspect):
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
 
-        input_value = AccountDTO(ACCOUNT_ID, None, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
+        input_value = AccountDTO(None, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 
-        when(create_account_br).execute(...).thenRaise(ACCOUNT_ID)
+        when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(True)
+        when(create_account_br).execute(...)  # Will throw error, no need to configure a behaviour
 
         under_test = UseCaseCreateAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
         with pytest.raises(AssertionError):
