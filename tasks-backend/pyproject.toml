@@ -47,6 +47,7 @@ dependencies = [
 unit-tests = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=tasks_server --cov=tests {args}"
 unit-tests-no-cov = "test --no-cov {args}"
 integration-tests = "APP_CONFIG_FILE=integration_test.py behave"
+tests = "hatch run unit-tests && hatch run integration-tests"
 server = "APP_CONFIG_FILE=development.py flask --app src/app run"
 
 [[tool.hatch.envs.test.matrix]]
