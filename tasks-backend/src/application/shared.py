@@ -32,7 +32,7 @@ class UnitOfWork:
     def rollback(self):
         raise NotImplemented("UnitOfWork#rollback is not implemented!")
 
-    def get_manager(self):
+    def query(self):
         raise NotImplemented("UnitOfWork#get_manager is not implemented")
 
     def __enter__(self):

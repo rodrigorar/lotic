@@ -28,7 +28,7 @@ class TestUnitOfWorkImpl(UnitOfWork):
     def rollback(self):
         ...
 
-    def get_manager(self):
+    def query(self):
         return None
 
 

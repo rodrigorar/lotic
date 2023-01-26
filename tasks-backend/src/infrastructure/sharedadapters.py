@@ -53,7 +53,7 @@ class UnitOfWorkImpl(UnitOfWork):
     def rollback(self):
         self._db_session.rollback()
 
-    def get_manager(self):
+    def query(self):
         return self._db_session
 
 

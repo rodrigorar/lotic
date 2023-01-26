@@ -3,7 +3,6 @@ import uuid
 
 from src.domain import BaseBusinessRule
 from src.domain.accounts import AccountRepository, Account
-from src.domain.errors import InvalidArgumentError
 
 
 class CreateAccount(BaseBusinessRule):

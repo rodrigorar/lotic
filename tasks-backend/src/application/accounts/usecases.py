@@ -24,7 +24,7 @@ class UseCaseCreateAccount(UseCase):
         with self.__unit_of_work_provider.get() as unit_of_work:
             validate_email_br = self.__account_br_provider.validate_account_email(unit_of_work)
             if not validate_email_br.execute(account.email):
-                raise InvalidArgumentError("invalid_email", "Email is not valid")
+                raise InvalidArgumentError("Email is not valid")
 
             create_account_br = self.__account_br_provider.create_account(unit_of_work)
             result = create_account_br.execute(account.to_entity())

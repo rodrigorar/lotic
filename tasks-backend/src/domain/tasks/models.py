@@ -63,6 +63,12 @@ class AccountTasks(db.Model):
         self.account_id = str(account_id)
         self.task_id = str(task_id)
 
+    def get_account_id(self):
+        return uuid.UUID(self.account_id)
+
+    def get_task_id(self):
+        return uuid.UUID(self.task_id)
+
     @classmethod
     def from_values(cls, account_id: uuid, task_id: uuid):
         assert account_id is not None, "User Id cannot be empty."

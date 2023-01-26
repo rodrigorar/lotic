@@ -15,14 +15,14 @@ class AccountRepositoryImpl(AccountRepository):
         assert unit_of_work is not None, "Unit of work cannot be empty"
         assert account_id is not None, "Account id cannot be empty"
 
-        query_manager = unit_of_work.get_manager()
+        query_manager = unit_of_work.query()
         return query_manager.query(Account).filter_by(id=str(account_id)).first()
 
     def insert(self, unit_of_work: UnitOfWork, account: Account) -> uuid:
         assert unit_of_work is not None, "Unit of work cannot be empty"
         assert account is not None, "Account cannot be empty"
 
-        query_manager = unit_of_work.get_manager()
+        query_manager = unit_of_work.query()
         query_manager.add(account)
         return account.id
 
@@ -30,7 +30,7 @@ class AccountRepositoryImpl(AccountRepository):
         assert unit_of_work is not None, "Unit of work cannot be empty"
         assert account is not None, "Account cannot be empty"
 
-        query_manager = unit_of_work.get_manager()
+        query_manager = unit_of_work.query()
         entry = query_manager.query(Account).filter_by(id=account.id).first()
         if entry is None:
             raise NotFoundError("No valid accounts was found for id " + str(account.id))

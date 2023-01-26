@@ -54,7 +54,7 @@ class LogProvider:
 
     def set_logger(self, logger: Logger):
         if self._logger is not None:
-            raise ConflictError("Configuration Error", "logger is already configured, failing")
+            raise ConflictError("logger is already configured, failing")
         self._logger = logger
 
     def get(self) -> Logger:

@@ -1,2 +1,2 @@
-from dto import TaskDTO, UserTasksDTO
-from usecases import UseCaseCreateTask, UseCaseUpdateTasks, UseCaseDeleteTasks, UseCaseListTasksForUser
+from src.application.tasks.dto import TaskDTO, UserTasksDTO
+from src.application.tasks.usecases import UseCaseCreateTasks, UseCaseUpdateTasks, UseCaseDeleteTasks, UseCaseListTasksForUser

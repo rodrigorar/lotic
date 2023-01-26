@@ -17,7 +17,7 @@ def create_account():
     try:
         request_data = from_json(CreateAccountRequest, request.get_data())
     except TypeError:
-        raise InvalidArgumentError("invalid_argument", "Unknown field as been sent")
+        raise InvalidArgumentError("Unknown field as been sent")
 
     use_case = AccountUseCaseProvider.create_account()
 

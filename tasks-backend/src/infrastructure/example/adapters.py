@@ -10,7 +10,7 @@ from src.utils import Maybe
 class PersonRepositoryImpl(PersonRepository):
 
     def get_people(self, unit_of_work, limit: int = 100) -> list[Person]:
-        query_manager = unit_of_work.get_manager()
+        query_manager = unit_of_work.query()
         return query_manager.query(Person).limit(limit).all()
 
     def get_by_id(self, unit_of_work, person_id: int) -> Maybe:
@@ -38,7 +38,7 @@ class PersonRepositoryImpl(PersonRepository):
         unit_of_work.get_manager().add(person)
 
     def delete(self, unit_of_work, person_id: int):
-        query_manager = unit_of_work.get_manager()
+        query_manager = unit_of_work.query()
         query_manager.query(Person).filter_by(id=person_id).delete()
 
 
