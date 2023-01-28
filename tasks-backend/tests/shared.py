@@ -21,6 +21,11 @@ class MockDatabase:
     class String:
         ...
 
+    class ForeignKey:
+
+        def __init__(self, *args):
+            self.args = args
+
 
 class UnitOfWorkMockProvider:
 

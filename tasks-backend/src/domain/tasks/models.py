@@ -56,8 +56,8 @@ class Task(db.Model):
 
 class AccountTasks(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    account_id = db.Column(db.String, db.ForeignKey(Account.id), nullable=False)
-    task_id = db.Column(db.String, db.ForeignKey(Task.id), nullable=False)
+    account_id = db.Column(db.String, db.ForeignKey(Account.id))
+    task_id = db.Column(db.String, db.ForeignKey(Task.id))
 
     def __init__(self, account_id: uuid, task_id: uuid):
         self.account_id = str(account_id)

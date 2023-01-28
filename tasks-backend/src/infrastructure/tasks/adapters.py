@@ -11,7 +11,7 @@ from src.infrastructure import UnitOfWorkProviderImpl
 
 class TasksRepositoryImpl(TasksRepository):
 
-    def insert_multiple(self, unit_of_work: UnitOfWork, tasks: list[Task]):
+    def insert_multiple(self, unit_of_work: UnitOfWork, tasks: list[Task]) -> list[uuid]:
         assert unit_of_work is not None, "Unit of work cannot be empty"
         assert tasks is not None, "Tasks list cannot be empty"
 
@@ -21,7 +21,7 @@ class TasksRepositoryImpl(TasksRepository):
 
         return [task.get_id() for task in tasks]
 
-    def update_multiple(self, unit_of_work: UnitOfWork, tasks: list[Task]):
+    def update_multiple(self, unit_of_work: UnitOfWork, tasks: list[Task]) -> list[Task]:
         assert unit_of_work is not None, "Unit of work cannot be empty"
         assert tasks is not None, "Tasks list cannot be empty"
 
@@ -55,7 +55,7 @@ class TasksRepositoryImpl(TasksRepository):
 
 class UserTasksRepositoryImpl(AccountTasksRepository):
 
-    def insert_multiple(self, unit_of_work: UnitOfWork, account_tasks: list[AccountTasks]):
+    def insert_multiple(self, unit_of_work: UnitOfWork, account_tasks: list[AccountTasks]) -> list[(uuid, uuid)]:
         assert unit_of_work is not None, "Unit of work cannot be empty"
         assert account_tasks is not None, "User Tasks cannot be empty"
 

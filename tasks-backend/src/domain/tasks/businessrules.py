@@ -1,27 +1,47 @@
+from functools import reduce
+from typing import List
 import uuid
 
-from src.domain import BaseBusinessRule
-from src.domain.tasks import Task, TasksRepository, AccountTasksRepository
+from src.domain import BaseBusinessRule, reducer_duplicated
+from src.domain.tasks import AccountTasks, Task, TasksRepository, AccountTasksRepository
 
 
 class CreateTasks(BaseBusinessRule):
     __tasks_repository = None
-    __user_tasks_repository = None
+    __account_tasks_repository = None
 
-    def __init__(self, unit_of_work, tasks_repository: TasksRepository, user_tasks_repository: AccountTasksRepository):
+    def __init__(
+            self
+            , unit_of_work
+            , tasks_repository: TasksRepository
+            , user_tasks_repository: AccountTasksRepository):
+
         super().__init__(unit_of_work)
         self.__tasks_repository = tasks_repository
-        self.__user_tasks_repository = user_tasks_repository
+        self.__account_tasks_repository = user_tasks_repository
 
-    def execute(self, port: list[Task]) -> list[uuid]:
-        raise NotImplemented("CreateTask#execute is not implemented.")
+    def execute(self, tasks: list[Task]) -> list[uuid]:
+        assert tasks is not None, "Task list cannot be None"
+        owner_ids = reduce(reducer_duplicated, [task.get_owner_id() for task in tasks])
+        assert len(owner_ids) == 1, "Cannot create tasks for more than one owner at a time"
+
+        task_ids = self.__tasks_repository.insert_multiple(self.unit_of_work, tasks)
+        account_tasks = [AccountTasks(owner_ids, task_id) for task_id in task_ids]
+        self.__account_tasks_repository.insert_multiple(self.unit_of_work, account_tasks)
+
+        return task_ids
 
 
 class UpdateTasks(BaseBusinessRule):
     __tasks_repository = None
     __user_tasks_repository = None
 
-    def __init__(self, unit_of_work, tasks_repository: TasksRepository, user_tasks_repository: AccountTasksRepository):
+    def __init__(
+            self
+            , unit_of_work
+            , tasks_repository: TasksRepository
+            , user_tasks_repository: AccountTasksRepository):
+
         super().__init__(unit_of_work)
         self.__tasks_repository = tasks_repository
         self.__user_tasks_repository = user_tasks_repository
@@ -34,7 +54,12 @@ class DeleteTasks(BaseBusinessRule):
     __tasks_repository = None
     __user_tasks_repository = None
 
-    def __init__(self, unit_of_work, tasks_repository: TasksRepository, user_tasks_repository: AccountTasksRepository):
+    def __init__(
+            self
+            , unit_of_work
+            , tasks_repository: TasksRepository
+            , user_tasks_repository: AccountTasksRepository):
+
         super().__init__(unit_of_work)
         self.__tasks_repository = tasks_repository
         self.__user_tasks_repository = user_tasks_repository
@@ -47,7 +72,12 @@ class ListTasksForUser(BaseBusinessRule):
     __tasks_repository = None
     __user_tasks_repository = None
 
-    def __init__(self, unit_of_work, tasks_repository: TasksRepository, user_tasks_repository: AccountTasksRepository):
+    def __init__(
+            self
+            , unit_of_work
+            , tasks_repository: TasksRepository
+            , user_tasks_repository: AccountTasksRepository):
+
         super().__init__(unit_of_work)
         self.__tasks_repository = tasks_repository
         self.__user_tasks_repository = user_tasks_repository
@@ -60,7 +90,7 @@ class TasksBusinessRulesProvider:
 
     @staticmethod
     def create_tasks(unit_of_work) -> CreateTasks:
-        raise NotImplemented("TasksBusinessRulesPovider#create_tasks is not implemented.")
+        raise NotImplemented("TasksBusinessRulesProvider#create_tasks is not implemented.")
 
     @staticmethod
     def update_tasks(unit_of_work) -> UpdateTasks:
