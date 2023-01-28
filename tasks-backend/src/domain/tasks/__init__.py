@@ -5,4 +5,4 @@ from src.domain.tasks.repositories \
     import TasksRepository, AccountTasksRepository
 
 from src.domain.tasks.businessrules \
-    import TasksBusinessRulesProvider, CreateTasks, DeleteTasks, UpdateTasks, ListTasksForUser
+    import TasksBusinessRulesProvider, CreateTasks, DeleteTasks, UpdateTasks, ListTasksForAccount

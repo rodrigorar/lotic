@@ -5,7 +5,7 @@ from src.application import UnitOfWork
 from src.application.tasks import UseCaseCreateTasks, UseCaseDeleteTasks, UseCaseListTasksForUser, UseCaseUpdateTasks
 from src.domain.errors import NotFoundError
 from src.domain.tasks import TasksRepository, Task, AccountTasksRepository, AccountTasks, TasksBusinessRulesProvider, \
-    ListTasksForUser, DeleteTasks, UpdateTasks, CreateTasks
+    ListTasksForAccount, DeleteTasks, UpdateTasks, CreateTasks
 from src.infrastructure import UnitOfWorkProviderImpl
 
 
@@ -103,8 +103,8 @@ class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):
         return DeleteTasks(unit_of_work, TasksRepositoryImpl(), UserTasksRepositoryImpl())
 
     @staticmethod
-    def list_tasks_for_user(unit_of_work) -> ListTasksForUser:
-        return ListTasksForUser(unit_of_work, TasksRepositoryImpl(), UserTasksRepositoryImpl())
+    def list_tasks_for_user(unit_of_work) -> ListTasksForAccount:
+        return ListTasksForAccount(unit_of_work, TasksRepositoryImpl(), UserTasksRepositoryImpl())
 
 
 unit_of_work_provider = UnitOfWorkProviderImpl()

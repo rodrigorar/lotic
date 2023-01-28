@@ -419,3 +419,33 @@ class TestUpdateTasks(DomainUnitTestsBase):
 
         with pytest.raises(AssertionError):
             under_test.execute(task_list)
+
+
+class TestDeleteTasks(DomainUnitTestsBase):
+
+    def test_should_succeed(self):
+        raise NotImplementedError("TestDeleteTasks#test_should_succeed is not implemented")
+
+    def test_should_fail_no_port(self):
+        raise NotImplementedError("TestDeleteTasks#test_should_fail_no_port is not implemented")
+
+    def test_should_fail_task_repository_error(self):
+        raise NotImplementedError("TestDeleteTasks#test_should_fail_task_repository_error is not implemented")
+
+    def test_should_fail_account_tasks_repository_error(self):
+        raise NotImplementedError("TestDeleteTasks#test_should_fail_account_tasks_repository_error is not implemented")
+
+    def test_should_fail_multiple_owners(self):
+        raise NotImplementedError("TestDeleteTasks#test_should_fail_multiple_owners is not implemented")
+
+
+class TestListTasksForAccount(DomainUnitTestsBase):
+
+    def test_should_succeed(self):
+        raise NotImplementedError("TestListTasksForAccount#test_should_succeed is not implemented")
+
+    def test_should_fail_no_port(self):
+        raise NotImplementedError("TestListTasksForAccount#test_should_fail_no_port is not implemented")
+
+    def test_should_fail_account_tasks_error(self):
+        raise NotImplementedError("TestListTasksForAccount#test_should_fail_account_tasks_error is not implemented")

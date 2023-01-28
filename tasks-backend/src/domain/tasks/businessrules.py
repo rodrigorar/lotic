@@ -66,22 +66,19 @@ class DeleteTasks(BaseBusinessRule):
         self.__tasks_repository = tasks_repository
         self.__user_tasks_repository = user_tasks_repository
 
-    def execute(self, port: list[uuid]):
+    def execute(self, tasks: list[uuid]):
         raise NotImplemented("DeleteTasks#execute is not implemented.")
 
 
-class ListTasksForUser(BaseBusinessRule):
-    __tasks_repository = None
+class ListTasksForAccount(BaseBusinessRule):
     __user_tasks_repository = None
 
     def __init__(
             self
             , unit_of_work
-            , tasks_repository: TasksRepository
             , user_tasks_repository: AccountTasksRepository):
 
         super().__init__(unit_of_work)
-        self.__tasks_repository = tasks_repository
         self.__user_tasks_repository = user_tasks_repository
 
     def execute(self, port):
@@ -103,5 +100,5 @@ class TasksBusinessRulesProvider:
         raise NotImplemented("TasksBusinessRulesProvider#delete_tasks is not implemented.")
 
     @staticmethod
-    def list_tasks_for_user(unit_of_work) -> ListTasksForUser:
+    def list_tasks_for_user(unit_of_work) -> ListTasksForAccount:
         raise NotImplemented("TasksBusinessRulesProvider#list_tasks_for_user is not implemented.")
