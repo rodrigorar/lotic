@@ -21,7 +21,7 @@ class TasksRepositoryImpl(TasksRepository):
 
         return [task.get_id() for task in tasks]
 
-    def update_multiple(self, unit_of_work: UnitOfWork, tasks: list[Task]) -> list[Task]:
+    def update_multiple(self, unit_of_work: UnitOfWork, tasks: list[Task]) -> tuple[list[uuid], list[uuid]]:
         assert unit_of_work is not None, "Unit of work cannot be empty"
         assert tasks is not None, "Tasks list cannot be empty"
 
@@ -40,7 +40,7 @@ class TasksRepositoryImpl(TasksRepository):
                 query.add(entry)
                 updated_list.append(entry.id)
 
-        return updated_list, not_found_list
+        return not_found_list, updated_list
 
     def delete_multiple(self, unit_of_work: UnitOfWork, task_ids: list[uuid]):
         assert unit_of_work is not None, "Unit of work cannot be empty"

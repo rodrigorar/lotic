@@ -21,7 +21,7 @@ class CreateTasks(BaseBusinessRule):
         self.__account_tasks_repository = user_tasks_repository
 
     def execute(self, tasks: list[Task]) -> list[uuid]:
-        assert tasks is not None, "Task list cannot be None"
+        assert tasks is not None, "Task list cannot be null"
         owner_ids = reduce(reducer_duplicated, [task.get_owner_id() for task in tasks])
         assert len(owner_ids) == 1, "Cannot create tasks for more than one owner at a time"
 
@@ -34,20 +34,22 @@ class CreateTasks(BaseBusinessRule):
 
 class UpdateTasks(BaseBusinessRule):
     __tasks_repository = None
-    __user_tasks_repository = None
 
     def __init__(
             self
             , unit_of_work
-            , tasks_repository: TasksRepository
-            , user_tasks_repository: AccountTasksRepository):
+            , tasks_repository: TasksRepository):
 
         super().__init__(unit_of_work)
         self.__tasks_repository = tasks_repository
-        self.__user_tasks_repository = user_tasks_repository
 
-    def execute(self, port: list[Task]):
-        raise NotImplemented("UpdateTasks#execute is not implemented.")
+    def execute(self, tasks: list[Task]):
+        assert tasks is not None, "Tasks cannot be null"
+        owner_ids = reduce(reducer_duplicated, [task.get_owner_id() for task in tasks])
+        assert len(owner_ids) == 1, "Cannot create tasks for more than one owner at a time"
+
+        result = self.__tasks_repository.update_multiple(self.unit_of_work, tasks)
+        return result
 
 
 class DeleteTasks(BaseBusinessRule):
