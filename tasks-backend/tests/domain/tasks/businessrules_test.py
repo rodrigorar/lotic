@@ -1,10 +1,10 @@
 from datetime import datetime
 from uuid import uuid4
 
-from mockito import mock, when
+from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
-from src.domain.errors import ConflictError
+from src.domain.errors import ConflictError, InternalError
 from tests.domain.shared import DomainUnitTestsBase
 from tests.shared import UnitOfWorkMockProvider
 
@@ -75,6 +75,13 @@ class TestCreateTasks(DomainUnitTestsBase):
             if task_id not in result:
                 raise AssertionError("Task Id " + task_id + " should be in the result")
 
+        verify(mocked_task_repository, times=1).insert_multiple(...)
+        verify(mocked_account_tasks_repository, times=1).insert_multiple(...)
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_task_repository
+            , mocked_account_tasks_repository)
+
     def test_should_fail_no_port_provided(self):
         from src.domain.tasks import TasksRepository, AccountTasksRepository, CreateTasks
 
@@ -89,6 +96,11 @@ class TestCreateTasks(DomainUnitTestsBase):
 
         with pytest.raises(AssertionError):
             under_test.execute(None)
+
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_task_repository
+            , mocked_account_tasks_repository)
 
     def test_should_fail_tasks_repository_error(self):
         from src.domain.tasks import Task, TasksRepository, AccountTasksRepository, CreateTasks
@@ -181,6 +193,13 @@ class TestCreateTasks(DomainUnitTestsBase):
         with pytest.raises(ConflictError):
             under_test.execute(task_list)
 
+        verify(mocked_task_repository).insert_multiple(...)
+        verify(mocked_account_tasks_repository).insert_multiple(...)
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_task_repository
+            , mocked_account_tasks_repository)
+
     def test_should_fail_multiple_owners(self):
         from src.domain.tasks import Task, TasksRepository, AccountTasksRepository, CreateTasks
 
@@ -209,16 +228,8 @@ class TestCreateTasks(DomainUnitTestsBase):
         ]
 
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
-
         mocked_task_repository = mock(TasksRepository)
-        when(mocked_task_repository) \
-            .insert_multiple(...) \
-            .thenReturn([task.get_id() for task in task_list])
-
         mocked_account_tasks_repository = mock(AccountTasksRepository)
-        when(mocked_account_tasks_repository) \
-            .insert_multiple(...) \
-            .thenReturn([(task.get_owner_id(), task.get_id()) for task in task_list])
 
         under_test = CreateTasks(
             mocked_unit_of_work
@@ -227,6 +238,11 @@ class TestCreateTasks(DomainUnitTestsBase):
 
         with pytest.raises(AssertionError):
             under_test.execute(task_list)
+
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_task_repository
+            , mocked_account_tasks_repository)
 
 
 class TestUpdateTasks(DomainUnitTestsBase):
@@ -277,6 +293,9 @@ class TestUpdateTasks(DomainUnitTestsBase):
         for task_id in task_id_list:
             if task_id not in result:
                 raise AssertionError("Task Id " + task_id + " should be in the result")
+
+        verify(mocked_task_repository).update_multiple(...)
+        verifyNoMoreInteractions(mocked_unit_of_work, mocked_task_repository)
 
     def test_should_succeed_partial_not_found(self):
         from src.domain.tasks import Task, TasksRepository, UpdateTasks
@@ -329,6 +348,9 @@ class TestUpdateTasks(DomainUnitTestsBase):
         error_list = result[0]
         assert len(error_list) == 1
 
+        verify(mocked_task_repository).update_multiple(...)
+        verifyNoMoreInteractions(mocked_unit_of_work, mocked_task_repository)
+
     def test_should_fail_no_port(self):
         from src.domain.tasks import TasksRepository, UpdateTasks
 
@@ -341,6 +363,8 @@ class TestUpdateTasks(DomainUnitTestsBase):
 
         with pytest.raises(AssertionError):
             under_test.execute(None)
+
+        verifyNoMoreInteractions(mocked_unit_of_work, mocked_task_repository)
 
     def test_should_fail_tasks_repository_error(self):
         from src.domain.tasks import Task, TasksRepository, UpdateTasks
@@ -383,6 +407,9 @@ class TestUpdateTasks(DomainUnitTestsBase):
         with pytest.raises(ConflictError):
             under_test.execute(task_list)
 
+        verify(mocked_task_repository).update_multiple(...)
+        verifyNoMoreInteractions(mocked_unit_of_work, mocked_task_repository)
+
     def test_should_fail_multiple_owners(self):
         from src.domain.tasks import Task, TasksRepository, UpdateTasks
 
@@ -420,23 +447,118 @@ class TestUpdateTasks(DomainUnitTestsBase):
         with pytest.raises(AssertionError):
             under_test.execute(task_list)
 
+        verifyNoMoreInteractions(mocked_unit_of_work, mocked_task_repository)
+
 
 class TestDeleteTasks(DomainUnitTestsBase):
 
     def test_should_succeed(self):
-        raise NotImplementedError("TestDeleteTasks#test_should_succeed is not implemented")
+        from src.domain.tasks import TasksRepository, AccountTasksRepository, DeleteTasks
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+
+        mocked_tasks_repository = mock(TasksRepository)
+        when(mocked_tasks_repository) \
+            .delete_multiple(...) \
+            .thenReturn(None)
+
+        mocked_account_tasks_repository = mock(AccountTasksRepository)
+        when(mocked_account_tasks_repository) \
+            .delete_by_task_id(...) \
+            .thenReturn(None)
+
+        test_input = [uuid4(), uuid4(), uuid4()]
+        under_test = DeleteTasks(
+            mocked_unit_of_work
+            , mocked_tasks_repository
+            , mocked_account_tasks_repository)
+        under_test.execute(test_input)
+
+        verify(mocked_tasks_repository, times=1).delete_multiple(...)
+        verify(mocked_account_tasks_repository, times=3).delete_by_task_id(...)
+
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_tasks_repository
+            , mocked_account_tasks_repository)
 
     def test_should_fail_no_port(self):
-        raise NotImplementedError("TestDeleteTasks#test_should_fail_no_port is not implemented")
+        from src.domain.tasks import TasksRepository, AccountTasksRepository, DeleteTasks
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+        mocked_tasks_repository = mock(TasksRepository)
+        mocked_account_tasks_repository = mock(AccountTasksRepository)
+
+        under_test = DeleteTasks(
+            mocked_unit_of_work
+            , mocked_tasks_repository
+            , mocked_account_tasks_repository)
+
+        with pytest.raises(AssertionError):
+            under_test.execute(None)
+
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_tasks_repository
+            , mocked_account_tasks_repository)
 
     def test_should_fail_task_repository_error(self):
-        raise NotImplementedError("TestDeleteTasks#test_should_fail_task_repository_error is not implemented")
+        from src.domain.tasks import TasksRepository, AccountTasksRepository, DeleteTasks
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+
+        mocked_tasks_repository = mock(TasksRepository)
+        when(mocked_tasks_repository)\
+            .delete_multiple(...)\
+            .thenRaise(InternalError("Something went very wrong here"))
+
+        mocked_account_tasks_repository = mock(AccountTasksRepository)
+
+        test_input = [uuid4(), uuid4(), uuid4()]
+        under_test = DeleteTasks(
+            mocked_unit_of_work
+            , mocked_tasks_repository
+            , mocked_account_tasks_repository)
+
+        with pytest.raises(InternalError):
+            under_test.execute(test_input)
+
+        verify(mocked_tasks_repository, times=1).delete_multiple(...)
+
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_tasks_repository
+            , mocked_account_tasks_repository)
 
     def test_should_fail_account_tasks_repository_error(self):
-        raise NotImplementedError("TestDeleteTasks#test_should_fail_account_tasks_repository_error is not implemented")
+        from src.domain.tasks import TasksRepository, AccountTasksRepository, DeleteTasks
 
-    def test_should_fail_multiple_owners(self):
-        raise NotImplementedError("TestDeleteTasks#test_should_fail_multiple_owners is not implemented")
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+
+        mocked_tasks_repository = mock(TasksRepository)
+        when(mocked_tasks_repository).delete_multiple(...)
+
+        mocked_account_tasks_repository = mock(AccountTasksRepository)
+        when(mocked_account_tasks_repository) \
+            .delete_by_task_id(...) \
+            .thenRaise(InternalError("Something went very wrong here"))
+
+        test_input = [uuid4(), uuid4(), uuid4()]
+        under_test = DeleteTasks(
+            mocked_unit_of_work
+            , mocked_tasks_repository
+            , mocked_account_tasks_repository)
+
+        with pytest.raises(InternalError):
+            under_test.execute(test_input)
+
+        verify(mocked_tasks_repository, times=1).delete_multiple(...)
+        verify(mocked_account_tasks_repository, times=1).delete_by_task_id(...)
+
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_tasks_repository
+            , mocked_account_tasks_repository)
 
 
 class TestListTasksForAccount(DomainUnitTestsBase):
