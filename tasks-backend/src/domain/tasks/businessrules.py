@@ -3,6 +3,7 @@ from typing import List
 import uuid
 
 from src.domain import BaseBusinessRule, reducer_duplicated
+from src.domain.errors import InternalError
 from src.domain.tasks import AccountTasks, Task, TasksRepository, AccountTasksRepository
 
 
@@ -70,18 +71,31 @@ class DeleteTasks(BaseBusinessRule):
 
 
 class ListTasksForAccount(BaseBusinessRule):
-    __user_tasks_repository = None
 
     def __init__(
             self
             , unit_of_work
-            , user_tasks_repository: AccountTasksRepository):
+            , tasks_repository: TasksRepository
+            , account_tasks_repository: AccountTasksRepository):
 
         super().__init__(unit_of_work)
-        self.__user_tasks_repository = user_tasks_repository
+        self.tasks_repository = tasks_repository
+        self.account_tasks_repository = account_tasks_repository
 
-    def execute(self, port):
-        raise NotImplemented("ListTasksForUser#execute is not implemented.")
+    def execute(self, account_id: uuid):
+        assert account_id is not None, "Account id cannot be null"
+
+        result = []
+
+        account_tasks = self.account_tasks_repository.list(self.unit_of_work, account_id)
+        # TODO: Optimize this code so that we don't have this loop
+        for account_task in account_tasks:
+            task = self.tasks_repository.get_by_id(self.unit_of_work, account_task.get_task_id())
+            if task is None:
+                raise InternalError("Invalid data state, cannot recover")
+            result.append(task)
+
+        return result
 
 
 class TasksBusinessRulesProvider:
