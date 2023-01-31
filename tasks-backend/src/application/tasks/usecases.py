@@ -1,4 +1,7 @@
+import uuid
+
 from src.application import UnitOfWorkProvider, UseCase
+from src.application.tasks import TaskDTO
 from src.domain.tasks import TasksBusinessRulesProvider
 
 
@@ -11,8 +14,15 @@ class UseCaseCreateTasks(UseCase):
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
 
-    def execute(self, port):
-        raise NotImplemented("UseCaseCreateTask#execute is not implemented.")
+    def execute(self, tasks: list[TaskDTO]) -> list[uuid]:
+        assert tasks is not None, "No task were provided"
+
+        with self.unit_of_work_provider.get() as unit_of_work:
+            create_tasks_br = self.tasks_br_provider.create_tasks(unit_of_work)
+            result = create_tasks_br.execute([task.to_entity() for task in tasks])
+
+        return result
+
 
 
 class UseCaseUpdateTasks(UseCase):
