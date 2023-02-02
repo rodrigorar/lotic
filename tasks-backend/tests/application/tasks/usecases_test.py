@@ -263,16 +263,61 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
 class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
 
     def test_should_succeed(self):
-        raise NotImplementedError("TestUseCaseDeleteTasks#test_should_succeed is not implemented")
+        when(delete_tasks_br) \
+            .execute(...) \
+            .thenReturn()
+
+        test_input = [TASK_1_ID, TASK_2_ID, TASK_3_ID]
+        under_test = UseCaseDeleteTasks(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
+        under_test.execute(test_input)
+
+        verify(delete_tasks_br).execute(...)
+
+        verifyNoMoreInteractions(delete_tasks_br)
 
     def test_should_succeed_single_task_id(self):
-        raise NotImplementedError("TestUseCaseDeleteTasks#test_should_succeed is not implemented")
+        when(delete_tasks_br) \
+            .execute(...) \
+            .thenReturn()
+
+        test_input = [TASK_1_ID]
+        under_test = UseCaseDeleteTasks(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
+        under_test.execute(test_input)
+
+        verify(delete_tasks_br).execute(...)
+
+        verifyNoMoreInteractions(delete_tasks_br)
 
     def test_should_fail_no_port(self):
-        raise NotImplementedError("TestUseCaseDeleteTasks#test_should_fail_no_port is not implemented")
+        under_test = UseCaseDeleteTasks(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
+
+        with pytest.raises(AssertionError):
+            under_test.execute(None)
+
+        verifyNoMoreInteractions(delete_tasks_br)
 
     def test_should_fail_create_tasks_br_error(self):
-        raise NotImplementedError("TestUseCaseDeleteTasks#test_should_fail_create_tasks_br_error is not implemented")
+        when(delete_tasks_br) \
+            .execute(...) \
+            .thenRaise(InternalError("Something went very very wrong"))
+
+        test_input = [TASK_1_ID, TASK_2_ID, TASK_3_ID]
+        under_test = UseCaseDeleteTasks(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
+
+        with pytest.raises(InternalError):
+            under_test.execute(test_input)
+
+        verify(delete_tasks_br).execute(...)
+
+        verifyNoMoreInteractions(delete_tasks_br)
 
 
 class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):

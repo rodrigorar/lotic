@@ -52,8 +52,12 @@ class UseCaseDeleteTasks(UseCase):
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
 
-    def execute(self, port):
-        raise NotImplemented("UseCaseDeleteTasks#execute is not implemented.")
+    def execute(self, task_ids: list[uuid]):
+        assert task_ids is not None, "Task id list cannot be null"
+
+        with self.unit_of_work_provider.get() as unit_of_work:
+            delete_task = self.tasks_br_provider.delete_tasks(unit_of_work)
+            delete_task.execute(task_ids)
 
 
 class UseCaseListTasksForUser(UseCase):
