@@ -69,5 +69,11 @@ class UseCaseListTasksForUser(UseCase):
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
 
-    def execute(self, port):
-        raise NotImplemented("UseCaseListTasksForUser#execute is not implemented.")
+    def execute(self, account_id: uuid):
+        assert account_id is not None, "Account id cannot be null"
+
+        with self.unit_of_work_provider.get() as unit_of_work:
+            list_account_tasks = self.tasks_br_provider.list_tasks_for_user(unit_of_work)
+            result = list_account_tasks.execute(account_id)
+
+        return [TaskDTO.from_entity(task) for task in result]

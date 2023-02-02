@@ -323,13 +323,91 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
 class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
 
     def test_should_succeed(self):
-        raise NotImplementedError("TestUseCaseDeleteTasks#test_should_succeed is not implemented")
+        br_result = [
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
+            Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
+            Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
+        ]
+        when(list_account_tasks_br) \
+            .execute(...) \
+            .thenReturn(br_result)
+
+        under_test = UseCaseListTasksForUser(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
+        result = under_test.execute(ACCOUNT_ID)
+
+        assert result is not None
+        assert len(result) == 3
+        assert type(result[0]) == TaskDTO
+        task_ids = [task.get_id() for task in br_result]
+        for entry in result:
+            assert entry.id in task_ids
+
+        verify(list_account_tasks_br).execute(...)
+
+        verifyNoMoreInteractions(list_account_tasks_br)
+
+    def test_should_succeed_single_result(self):
+        br_result = [Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID)]
+        when(list_account_tasks_br) \
+            .execute(...) \
+            .thenReturn(br_result)
+
+        under_test = UseCaseListTasksForUser(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
+        result = under_test.execute(ACCOUNT_ID)
+
+        assert result is not None
+        assert len(result) == 1
+        assert type(result[0]) == TaskDTO
+        assert result[0].id == br_result[0].get_id()
+
+        verify(list_account_tasks_br).execute(...)
+
+        verifyNoMoreInteractions(list_account_tasks_br)
 
     def test_should_succeed_no_results(self):
-        raise NotImplementedError("TestUseCaseDeleteTasks#test_should_succeed is not implemented")
+        br_result = []
+        when(list_account_tasks_br) \
+            .execute(...) \
+            .thenReturn(br_result)
+
+        under_test = UseCaseListTasksForUser(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
+        result = under_test.execute(ACCOUNT_ID)
+
+        assert result is not None
+        assert len(result) == 0
+
+        verify(list_account_tasks_br).execute(...)
+
+        verifyNoMoreInteractions(list_account_tasks_br)
 
     def test_should_fail_no_port(self):
-        raise NotImplementedError("TestUseCaseDeleteTasks#test_should_fail_no_port is not implemented")
+        under_test = UseCaseListTasksForUser(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
+
+        with pytest.raises(AssertionError):
+            under_test.execute(None)
+
+        verifyNoMoreInteractions(list_account_tasks_br)
 
     def test_should_fail_create_tasks_br_error(self):
-        raise NotImplementedError("TestUseCaseDeleteTasks#test_should_fail_create_tasks_br_error is not implemented")
+        when(list_account_tasks_br) \
+            .execute(...) \
+            .thenRaise(InternalError("Something as gone very very wrong"))
+
+        under_test = UseCaseListTasksForUser(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
+
+        with pytest.raises(InternalError):
+            under_test.execute(ACCOUNT_ID)
+
+        verify(list_account_tasks_br).execute(...)
+
+        verifyNoMoreInteractions(list_account_tasks_br)

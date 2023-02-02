@@ -24,11 +24,23 @@ class TaskDTO(DTOTranslator):
         self.owner_id = owner_id
 
     def to_entity(self):
-        return Task.from_values(self.id, self.title, self.description, self.created_at, self.updated_at, self.owner_id)
+        return Task.from_values(
+            self.id
+            , self.title
+            , self.description
+            , self.created_at
+            , self.updated_at
+            , self.owner_id)
 
     @classmethod
     def from_entity(cls, entity):
-        return cls(entity.id, entity.title, entity.description, entity.created_at, entity.updated_at, entity.owner_id)
+        return cls(
+            uuid.UUID(entity.id)
+            , entity.title
+            , entity.description
+            , entity.created_at
+            , entity.updated_at
+            , entity.owner_id)
 
 
 class UserTasksDTO(DTOTranslator):
