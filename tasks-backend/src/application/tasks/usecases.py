@@ -24,7 +24,6 @@ class UseCaseCreateTasks(UseCase):
         return result
 
 
-
 class UseCaseUpdateTasks(UseCase):
 
     def __init__(
@@ -34,8 +33,14 @@ class UseCaseUpdateTasks(UseCase):
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
 
-    def execute(self, port):
-        raise NotImplemented("UseCaseUpdateTasks#execute is not implemented.")
+    def execute(self, tasks: list[TaskDTO]):
+        assert tasks is not None, "Tasks cannot be null"
+
+        with self.unit_of_work_provider.get() as unit_of_work:
+            update_tasks_br = self.tasks_br_provider.update_tasks(unit_of_work)
+            result = update_tasks_br.execute([task.to_entity() for task in tasks])
+
+        return result
 
 
 class UseCaseDeleteTasks(UseCase):
