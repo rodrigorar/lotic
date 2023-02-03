@@ -1,5 +1,9 @@
 from logging import Logger
 
+from sqlalchemy.exc import IntegrityError
+
+from src.domain.errors import ConflictError, InternalError
+
 
 class UseCase:
 
@@ -42,12 +46,18 @@ class UnitOfWork:
         return self
 
     def __exit__(self, exc_type, exc_value, tb):
-        if exc_type is None:
-            self.commit()
-            self.__is_closed = True
-        elif exc_type is not None:
-            self.logger.error('Unit of work failed, rolling back', exc_value)
-            self.rollback()
+        try:
+            if exc_type is None:
+                self.commit()
+                self.__is_closed = True
+            elif exc_type is not None:
+                self.logger.error('Unit of work failed, rolling back', exc_value)
+                self.rollback()
+        except IntegrityError:
+            print('In error')
+            raise ConflictError('Database integrity compromised')
+        except Exception:
+            raise InternalError('Something has gone wrong, rolling back')
 
 
 class UnitOfWorkProvider:

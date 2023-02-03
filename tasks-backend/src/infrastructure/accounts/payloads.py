@@ -6,6 +6,7 @@ from src.application.accounts import AccountDTO
 
 
 class CreateAccountRequest:
+
     def __init__(self, email: str, password: str):
         self.email = email
         self.password = password

@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from werkzeug.exceptions import HTTPException
 
-from src.domain.errors import InvalidArgumentError, NotFoundError
+from src.domain.errors import ConflictError, InvalidArgumentError, NotFoundError
 from src.infrastructure import AppProvider, DatabaseSessionProvider, AppConfigurations, to_json
 from logging.config import fileConfig
 
@@ -65,6 +65,16 @@ def handle_generic_error(e):
         "status": "500",
         "detail": e.__str__
     }), 500, {'Content-Type': 'application/problem+json'}
+
+
+@app.errorhandler(ConflictError)
+def handle_not_found_error(e: ConflictError):
+    return to_json({
+        "type": "http://localhost:5000/conflict_error",
+        "title": e.title,
+        "status": "409",
+        "details": e.details
+    }), 409, {'Content-Type': 'application/problem+json'}
 
 
 @app.errorhandler(NotFoundError)

@@ -25,7 +25,7 @@ class CreateTasks(BaseBusinessRule):
         assert len(owner_ids) == 1, "Cannot create tasks for more than one owner at a time"
 
         task_ids = self.tasks_repository.insert_multiple(self.unit_of_work, tasks)
-        account_tasks = [AccountTasks(owner_ids, task_id) for task_id in task_ids]
+        account_tasks = [AccountTasks(owner_ids[0], task_id) for task_id in task_ids]
         self.account_tasks_repository.insert_multiple(self.unit_of_work, account_tasks)
 
         return task_ids
