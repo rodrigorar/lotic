@@ -3,7 +3,7 @@ from typing import List
 import uuid
 
 from src.domain import BaseBusinessRule, reducer_duplicated
-from src.domain.errors import InternalError
+from src.domain.errors import ConflictError, InternalError
 from src.domain.tasks import AccountTasks, Task, TasksRepository, AccountTasksRepository
 
 
@@ -21,8 +21,12 @@ class CreateTasks(BaseBusinessRule):
 
     def execute(self, tasks: list[Task]) -> list[uuid]:
         assert tasks is not None, "Task list cannot be null"
-        owner_ids = reduce(reducer_duplicated, [task.get_owner_id() for task in tasks])
-        assert len(owner_ids) == 1, "Cannot create tasks for more than one owner at a time"
+        owner_ids = [task.get_owner_id() for task in tasks] \
+            if len(tasks) == 1 \
+            else reduce(reducer_duplicated, [task.get_owner_id() for task in tasks])
+
+        if len(owner_ids) > 1:
+            raise ConflictError('Cannot create tasks for more than one owner at a time')
 
         task_ids = self.tasks_repository.insert_multiple(self.unit_of_work, tasks)
         account_tasks = [AccountTasks(owner_ids[0], task_id) for task_id in task_ids]

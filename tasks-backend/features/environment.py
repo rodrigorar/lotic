@@ -1,10 +1,18 @@
 from datetime import datetime
-import os
-from uuid import uuid4
+import uuid
 
 from src.domain import DatabaseProvider
 
 from behave import fixture, use_fixture
+
+JOHN_DOE_ID = uuid.UUID("59dc6d88-d894-4d26-a2d5-dad9c57cde05")
+JOHN_DOE_TASK_1 = uuid.UUID("7dd8eda4-dd7e-404c-a578-84eafdad1086")
+JOHN_DOE_TASK_2 = uuid.UUID("db62fd6b-b958-4cef-8efa-07dce85133b9")
+JOHN_DOE_TASK_3 = uuid.UUID("30fa464f-4692-45aa-a4d2-752dc19fa0cc")
+
+JANE_DOE_ID = uuid.UUID("065c2e09-06d0-4000-a152-e95aebd4a9ca")
+JANE_DOE_TASK_1 = uuid.UUID("fd612110-1f34-4154-b3f2-bf15a12da4e0")
+JANE_DOE_TASK_2 = uuid.UUID("67d32420-cb8c-4c7a-8ecc-fe1862b44e71")
 
 
 @fixture
@@ -16,8 +24,11 @@ def tasks_server(context, timeout=30, **kwargs):
         context.client = app.test_client()
         context.db = DatabaseProvider().get()
         yield context.client
-    finally:
-        os.remove('instance/integration_tests.sqlite')
+        context.app = None
+        context.client = None
+        context.db = None
+    except Exception:
+        print('Something went wrong')
 
 
 tagged_fixtures = {
@@ -40,32 +51,72 @@ def before_scenario(context, scenario):
 
         # John Doe Data
 
-        john_doe_id = uuid4()
-        context.db.session.add(Account(john_doe_id, 'john.doe@mail.not', 'passwd01', datetime.now(), datetime.now()))
+        context.db.session.add(
+            Account(
+                JOHN_DOE_ID
+                , 'john.doe@mail.not'
+                , 'passwd01'
+                , datetime.now()
+                , datetime.now()))
 
-        john_doe_task_1 = uuid4()
-        john_doe_task_2 = uuid4()
-        john_doe_task_3 = uuid4()
-        context.db.session.add(Task(john_doe_task_1, 'John Doe Task #1', 'John Doe Task #1 Description', datetime.now(), datetime.now(), john_doe_id))
-        context.db.session.add(Task(john_doe_task_2, 'John Doe Task #2', 'John Doe Task #2 Description', datetime.now(), datetime.now(), john_doe_id))
-        context.db.session.add(Task(john_doe_task_3, 'John Doe Task #3', 'John Doe Task #3 Description', datetime.now(), datetime.now(), john_doe_id))
+        context.db.session.add(
+            Task(
+                JOHN_DOE_TASK_1
+                , 'John Doe Task #1'
+                , 'John Doe Task #1 Description'
+                , datetime.now()
+                , datetime.now()
+                , JOHN_DOE_ID))
+        context.db.session.add(
+            Task(
+                JOHN_DOE_TASK_2
+                , 'John Doe Task #2'
+                , 'John Doe Task #2 Description'
+                , datetime.now()
+                , datetime.now()
+                , JOHN_DOE_ID))
+        context.db.session.add(
+            Task(
+                JOHN_DOE_TASK_3
+                , 'John Doe Task #3'
+                , 'John Doe Task #3 Description'
+                , datetime.now()
+                , datetime.now()
+                , JOHN_DOE_ID))
 
-        context.db.session.add(AccountTasks(john_doe_id, john_doe_task_1))
-        context.db.session.add(AccountTasks(john_doe_id, john_doe_task_2))
-        context.db.session.add(AccountTasks(john_doe_id, john_doe_task_3))
+        context.db.session.add(AccountTasks(JOHN_DOE_ID, JOHN_DOE_TASK_1))
+        context.db.session.add(AccountTasks(JOHN_DOE_ID, JOHN_DOE_TASK_2))
+        context.db.session.add(AccountTasks(JOHN_DOE_ID, JOHN_DOE_TASK_3))
 
         # Jane Doe Data
 
-        jane_doe_id = uuid4()
-        context.db.session.add(Account(jane_doe_id, 'jane.doe@mail.not', 'passwd02', datetime.now(), datetime.now()))
+        context.db.session.add(
+            Account(
+                JANE_DOE_ID
+                , 'jane.doe@mail.not'
+                , 'passwd02'
+                , datetime.now()
+                , datetime.now()))
 
-        jane_doe_task_1 = uuid4()
-        jane_doe_task_2 = uuid4()
-        context.db.session.add(Task(jane_doe_task_1, 'Jane Doe Task #1', 'Jane Doe Task #1 Description', datetime.now(), datetime.now(), jane_doe_id))
-        context.db.session.add(Task(jane_doe_task_2, 'Jane Doe Task #2', 'Jane Doe Task #2 Description', datetime.now(), datetime.now(), jane_doe_id))
+        context.db.session.add(
+            Task(
+                JANE_DOE_TASK_1
+                , 'Jane Doe Task #1'
+                , 'Jane Doe Task #1 Description'
+                , datetime.now()
+                , datetime.now()
+                , JANE_DOE_ID))
+        context.db.session.add(
+            Task(
+                JANE_DOE_TASK_2
+                , 'Jane Doe Task #2'
+                , 'Jane Doe Task #2 Description'
+                , datetime.now()
+                , datetime.now()
+                , JANE_DOE_ID))
 
-        context.db.session.add(AccountTasks(jane_doe_id, jane_doe_task_1))
-        context.db.session.add(AccountTasks(jane_doe_id, jane_doe_task_2))
+        context.db.session.add(AccountTasks(JANE_DOE_ID, JANE_DOE_TASK_1))
+        context.db.session.add(AccountTasks(JANE_DOE_ID, JANE_DOE_TASK_2))
 
         context.db.session.commit()
 

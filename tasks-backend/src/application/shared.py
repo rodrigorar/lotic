@@ -51,13 +51,10 @@ class UnitOfWork:
                 self.commit()
                 self.__is_closed = True
             elif exc_type is not None:
-                self.logger.error('Unit of work failed, rolling back', exc_value)
+                self.logger.error("Unit of work failed, rolling back")
                 self.rollback()
         except IntegrityError:
-            print('In error')
-            raise ConflictError('Database integrity compromised')
-        except Exception:
-            raise InternalError('Something has gone wrong, rolling back')
+            raise ConflictError("Database integrity compromised")
 
 
 class UnitOfWorkProvider:

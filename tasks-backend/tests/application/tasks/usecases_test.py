@@ -5,12 +5,14 @@ from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
 from src.domain import DatabaseProvider
-from src.domain.errors import InternalError
+from src.domain.errors import InternalError, NotFoundError
 from tests.application.shared import MockedUnitOfWorkProvider
 from tests.shared import MockDatabase
 
 DatabaseProvider().set_database(MockDatabase())
 
+from src.domain.accounts import Account, AccountBusinessRulesProvider, CreateAccount, GetAccount, \
+    ValidateAccountEmail
 from src.domain.tasks import CreateTasks, DeleteTasks, ListTasksForAccount, \
     Task, TasksBusinessRulesProvider, UpdateTasks
 from src.application.tasks import TaskDTO, UseCaseCreateTasks, UseCaseUpdateTasks, \
@@ -20,6 +22,7 @@ global create_tasks_br
 global update_tasks_br
 global delete_tasks_br
 global list_account_tasks_br
+global get_account_br
 
 
 class MockedTasksBusinessRulesProvider(TasksBusinessRulesProvider):
@@ -39,6 +42,21 @@ class MockedTasksBusinessRulesProvider(TasksBusinessRulesProvider):
     @staticmethod
     def list_tasks_for_user(unit_of_work) -> ListTasksForAccount:
         return list_account_tasks_br
+
+
+class MockedAccountBusinessRulesProvider(AccountBusinessRulesProvider):
+
+    @staticmethod
+    def create_account(unit_of_work) -> CreateAccount:
+        raise NotImplementedError('Create account provider is not implemented')
+
+    @staticmethod
+    def validate_account_email(unit_of_work) -> ValidateAccountEmail:
+        raise NotImplementedError('Validate account email provider is not implemented')
+
+    @staticmethod
+    def get_account(unit_of_work) -> GetAccount:
+        return get_account_br
 
 
 ACCOUNT_ID = uuid4()
@@ -72,21 +90,28 @@ class TasksUseCaseBaseTest:
         global update_tasks_br
         global delete_tasks_br
         global list_account_tasks_br
+        global get_account_br
 
         create_tasks_br = mock(CreateTasks)
         update_tasks_br = mock(UpdateTasks)
         delete_tasks_br = mock(DeleteTasks)
         list_account_tasks_br = mock(ListTasksForAccount)
+        get_account_br = mock(GetAccount)
         yield
         create_tasks_br = None
         update_tasks_br = None
         delete_tasks_br = None
         list_account_tasks_br = None
+        get_account_br = None
 
 
 class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
 
     def test_should_succeed(self):
+        when(get_account_br) \
+            .execute(...) \
+            .thenReturn(Account(uuid4(), 'test@mail.com', '123456', NOW, NOW))
+
         br_result = [TASK_1_ID, TASK_2_ID, TASK_3_ID]
         when(create_tasks_br) \
             .execute(...) \
@@ -98,7 +123,10 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
             TaskDTO(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
         ]
 
-        under_test = UseCaseCreateTasks(MockedUnitOfWorkProvider(), MockedTasksBusinessRulesProvider())
+        under_test = UseCaseCreateTasks(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider()
+            , MockedAccountBusinessRulesProvider())
         result = under_test.execute(input_data)
 
         assert result is not None
@@ -106,11 +134,16 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
         for task_id in result:
             assert task_id in br_result
 
+        verify(get_account_br).execute(...)
         verify(create_tasks_br).execute(...)
 
-        verifyNoMoreInteractions(create_tasks_br)
+        verifyNoMoreInteractions(get_account_br, create_tasks_br)
 
     def test_should_succeed_single_task(self):
+        when(get_account_br) \
+            .execute(...) \
+            .thenReturn(Account(uuid4(), 'test@mail.com', '123456', NOW, NOW))
+
         br_result = [TASK_1_ID]
         when(create_tasks_br) \
             .execute(...) \
@@ -118,25 +151,36 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
 
         input_data = [TaskDTO(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID)]
 
-        under_test = UseCaseCreateTasks(MockedUnitOfWorkProvider(), MockedTasksBusinessRulesProvider())
+        under_test = UseCaseCreateTasks(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider()
+            , MockedAccountBusinessRulesProvider())
         result = under_test.execute(input_data)
 
         assert result is not None
         assert len(result) == 1
         assert result[0] == br_result[0]
 
+        verify(get_account_br).execute(...)
         verify(create_tasks_br).execute(...)
 
-        verifyNoMoreInteractions(create_tasks_br)
+        verifyNoMoreInteractions(get_account_br, create_tasks_br)
 
     def test_should_fail_no_port(self):
-        under_test = UseCaseCreateTasks(MockedUnitOfWorkProvider(), MockedTasksBusinessRulesProvider())
+        under_test = UseCaseCreateTasks(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider()
+            , MockedAccountBusinessRulesProvider())
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
         verifyNoMoreInteractions(create_tasks_br)
 
     def test_should_fail_create_tasks_br_error(self):
+        when(get_account_br) \
+            .execute(...) \
+            .thenReturn(Account(uuid4(), 'test@mail.com', '123456', NOW, NOW))
+
         when(create_tasks_br) \
             .execute(...) \
             .thenRaise(InternalError("Something went very wrong here"))
@@ -147,13 +191,40 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
             TaskDTO(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
         ]
 
-        under_test = UseCaseCreateTasks(MockedUnitOfWorkProvider(), MockedTasksBusinessRulesProvider())
+        under_test = UseCaseCreateTasks(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider()
+            , MockedAccountBusinessRulesProvider())
         with pytest.raises(InternalError):
             under_test.execute(input_data)
 
+        verify(get_account_br).execute(...)
         verify(create_tasks_br).execute(...)
 
-        verifyNoMoreInteractions(create_tasks_br)
+        verifyNoMoreInteractions(get_account_br, create_tasks_br)
+
+    def test_should_fail_get_account_br_error(self):
+        when(get_account_br) \
+            .execute(...) \
+            .thenReturn(None)
+
+        input_data = [
+            TaskDTO(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
+        ]
+
+        under_test = UseCaseCreateTasks(
+            MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider()
+            , MockedAccountBusinessRulesProvider())
+
+        with pytest.raises(NotFoundError):
+            under_test.execute(input_data)
+
+        verify(get_account_br).execute(...)
+
+        verifyNoMoreInteractions(get_account_br, create_tasks_br)
 
 
 class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):

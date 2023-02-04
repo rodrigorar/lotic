@@ -1,5 +1,3 @@
-import logging
-
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from werkzeug.exceptions import HTTPException

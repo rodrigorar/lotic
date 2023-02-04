@@ -236,7 +236,7 @@ class TestCreateTasks(DomainUnitTestsBase):
             , mocked_task_repository
             , mocked_account_tasks_repository)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ConflictError):
             under_test.execute(task_list)
 
         verifyNoMoreInteractions(

@@ -13,7 +13,14 @@ class Account(db.Model):
     created_at = db.Column(db.String, nullable=False)
     updated_at = db.Column(db.String, nullable=False)
 
-    def __init__(self, account_id: uuid, email: str, password: str, created_at: datetime, updated_at: datetime):
+    def __init__(
+            self
+            , account_id: uuid
+            , email: str
+            , password: str
+            , created_at: datetime
+            , updated_at: datetime):
+
         self.id = str(account_id)
         self.email = email
         self.password = password

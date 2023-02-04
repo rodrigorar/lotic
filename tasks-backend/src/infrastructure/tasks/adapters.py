@@ -7,6 +7,7 @@ from src.domain.errors import NotFoundError
 from src.domain.tasks import TasksRepository, Task, AccountTasksRepository, AccountTasks, TasksBusinessRulesProvider, \
     ListTasksForAccount, DeleteTasks, UpdateTasks, CreateTasks
 from src.infrastructure import UnitOfWorkProviderImpl
+from src.infrastructure.accounts import AccountBusinessRulesProviderImpl
 
 
 class TasksRepositoryImpl(TasksRepository):
@@ -109,13 +110,17 @@ class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):
 
 unit_of_work_provider = UnitOfWorkProviderImpl()
 tasks_business_rules_provider = TasksBusinessRulesProviderImpl()
+account_business_rules_provider = AccountBusinessRulesProviderImpl()
 
 
 class TasksUseCaseProvider:
 
     @staticmethod
     def create_task():
-        return UseCaseCreateTasks(unit_of_work_provider, tasks_business_rules_provider)
+        return UseCaseCreateTasks(
+            unit_of_work_provider
+            , tasks_business_rules_provider
+            , account_business_rules_provider)
 
     @staticmethod
     def update_tasks():
