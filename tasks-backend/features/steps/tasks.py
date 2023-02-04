@@ -2,6 +2,7 @@ from datetime import datetime
 from uuid import uuid4
 
 from behave import *
+
 from src.utils import URL_PREFIX_V1
 
 
@@ -32,7 +33,6 @@ def step_impl(context):
 
 @when('it tries to create a task')
 def step_impl(context):
-
     with context.app.app_context():
         context.result = uuid4()
         context.response = context.client.post(
@@ -53,7 +53,6 @@ def step_impl(context):
 
 @when('it tries to create multiple tasks')
 def step_impl(context):
-
     with context.app.app_context():
         context.result = [uuid4(), uuid4(), uuid4()]
         context.response = context.client.post(
@@ -90,6 +89,95 @@ def step_impl(context):
                 })
 
 
+@when('it tries to update a single task')
+def step_impl(context):
+    from src.domain.tasks import Task
+
+    with context.app.app_context():
+        data = Task(
+            uuid4()
+            , "Yet another task #1"
+            , "Yet another task description #1"
+            , datetime.now()
+            , datetime.now()
+            , uuid4())
+        context.db.session.add(data)
+        context.db.session.commit()
+
+        context.task_ids = [data.get_id()]
+        context.response = context.client.put(
+                URL_PREFIX_V1 + '/tasks'
+                , json={
+                    "tasks": [
+                        {
+                            "task_id": data.id
+                            , "title": "Yet another task #1 - Updated"
+                            , "description": "Yet another task description #1 - Updated"
+                        }
+                    ]
+                })
+
+
+@when('it tries to update several tasks')
+def step_impl(context):
+    from src.domain.tasks import Task
+
+    with context.app.app_context():
+        owner_id = uuid4()
+        data = [
+            Task(
+                uuid4()
+                , "Yet another task #1"
+                , "Yet another task description #1"
+                , datetime.now()
+                , datetime.now()
+                , owner_id
+            ),
+            Task(
+                uuid4()
+                , "Yet another task #2"
+                , "Yet another task description #2"
+                , datetime.now()
+                , datetime.now()
+                , owner_id
+            ),
+            Task(
+                uuid4()
+                , "Yet another task #3"
+                , "Yet another task description #3"
+                , datetime.now()
+                , datetime.now()
+                , owner_id
+            )
+        ]
+
+        for entry in data:
+            context.db.session.add(entry)
+        context.db.session.commit()
+
+        context.response = context.client.put(
+                URL_PREFIX_V1 + '/tasks'
+                , json={
+                    "tasks": [
+                        {
+                            "task_id": data[0].id
+                            , "title": "Yet another task #1"
+                            , "description": "Yet another task description #1"
+                        },
+                        {
+                            "task_id": data[1].id
+                            , "title": "Yet another task #2"
+                            , "description": "Yet another task description #2"
+                        },
+                        {
+                            "task_id": data[2].id
+                            , "title": "Yet another task #3"
+                            , "description": "Yet another task description #3"
+                        }
+                    ]
+                })
+
+
 # Then
 
 
@@ -120,6 +208,18 @@ def step_impl(context):
         assert len(db_result) == 3
         for task in db_result:
             assert task.get_id() in context.result
+
+
+@then('that task should be successfully updated')
+def step_impl(context):
+    assert context.response is not None
+    assert context.response.status_code == 204
+
+
+@then('those tasks should be successfully updated')
+def step_impl(context):
+    assert context.response is not None
+    assert context.response.status_code == 204
 
 
 @then('an error should happen for multiple users')

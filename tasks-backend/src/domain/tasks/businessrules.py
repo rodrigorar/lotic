@@ -47,11 +47,8 @@ class UpdateTasks(BaseBusinessRule):
 
     def execute(self, tasks: list[Task]):
         assert tasks is not None, "Tasks cannot be null"
-        owner_ids = reduce(reducer_duplicated, [task.get_owner_id() for task in tasks])
-        assert len(owner_ids) == 1, "Cannot create tasks for more than one owner at a time"
 
-        result = self.tasks_repository.update_multiple(self.unit_of_work, tasks)
-        return result
+        self.tasks_repository.update_multiple(self.unit_of_work, tasks)
 
 
 class DeleteTasks(BaseBusinessRule):

@@ -1,3 +1,4 @@
+from datetime import datetime
 import uuid
 
 from dateutil import parser
@@ -48,6 +49,42 @@ class CreateTasksRequest:
                         , task["updated_at"]
                         , task["owner_id"]
                     ))
+        self.tasks = task_entries
+
+    def to_dto(self):
+        return [task.to_dto() for task in self.tasks]
+
+
+class UpdateTaskRequest:
+
+    def __init__(
+            self
+            , task_id: str
+            , title: str
+            , description: str):
+
+        self.id = uuid.UUID(task_id)
+        self.title = title
+        self.description = description
+
+    def to_dto(self):
+        return TaskDTO(
+            self.id
+            , self.title
+            , self.description
+            , None
+            , None
+            , None
+        )
+
+
+class UpdateTasksRequest:
+
+    def __init__(self, tasks):
+        task_entries = []
+        for task in tasks:
+            task_entries \
+                .append(UpdateTaskRequest(task["task_id"], task["title"], task["description"]))
         self.tasks = task_entries
 
     def to_dto(self):

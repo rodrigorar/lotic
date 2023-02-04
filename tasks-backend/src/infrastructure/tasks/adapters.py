@@ -27,21 +27,14 @@ class TasksRepositoryImpl(TasksRepository):
         assert tasks is not None, "Tasks list cannot be empty"
 
         query = unit_of_work.query()
-        not_found_list = []
-        updated_list = []
-        for task in tasks:
-            entry = query.query(Task).filter_by(id=task.id).first()
-            if entry is None:
-                not_found_list.append(task.id)
-            else:
-                entry.title = task.title if task.title is not None else entry.title
-                entry.description = task.description if task.description is not None else entry.description
-                entry.updated_at = datetime.now()
+        existing_tasks = query.query(Task).filter(Task.id.in_([task.id for task in tasks]))
 
-                query.add(entry)
-                updated_list.append(entry.id)
+        for task in existing_tasks:
+            task.title = task.title if task.title is not None else entry.title
+            task.description = task.description if task.description is not None else entry.description
+            task.updated_at = datetime.now()
 
-        return not_found_list, updated_list
+            query.add(task)
 
     def delete_multiple(self, unit_of_work: UnitOfWork, task_ids: list[uuid]):
         assert unit_of_work is not None, "Unit of work cannot be empty"
@@ -97,7 +90,7 @@ class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):
 
     @staticmethod
     def update_tasks(unit_of_work) -> UpdateTasks:
-        return UpdateTasks(unit_of_work, TasksRepositoryImpl(), UserTasksRepositoryImpl())
+        return UpdateTasks(unit_of_work, TasksRepositoryImpl())
 
     @staticmethod
     def delete_tasks(unit_of_work) -> DeleteTasks:

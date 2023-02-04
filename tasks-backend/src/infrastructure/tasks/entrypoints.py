@@ -3,7 +3,7 @@ from src.domain import LogProvider
 from src.domain.errors import InvalidArgumentError
 from src.infrastructure import from_json, to_json
 from src.infrastructure.tasks.adapters import TasksUseCaseProvider
-from src.infrastructure.tasks.payloads import CreateTasksRequest
+from src.infrastructure.tasks.payloads import CreateTasksRequest, UpdateTasksRequest
 from src.utils import URL_PREFIX_V1
 
 logger = LogProvider().get()
@@ -35,12 +35,15 @@ def create_tasks():
 
 @tasks_bp.put("")
 def update_tasks():
-    logger.info("Update tasks has been called")
+    try:
+        request_data = from_json(UpdateTasksRequest, request.get_data())
+    except TypeError:
+        raise InvalidArgumentError("Unknown field sent")
 
-    return to_json({
-        "type": "http://localhost:5000/not_implemented",
-        "details": "Update tasks has not yet been implemented."
-    }), 500, {'Content-Type': 'application/json'}
+    use_case = TasksUseCaseProvider.update_tasks()
+    use_case.execute(request_data.to_dto())
+
+    return "", 204
 
 
 @tasks_bp.delete("/<uuid:task_id>")
