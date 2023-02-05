@@ -88,7 +88,7 @@ class UseCaseListTasksForUser(UseCase):
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
 
-    def execute(self, account_id: uuid):
+    def execute(self, account_id: uuid) -> list[TaskDTO]:
         assert account_id is not None, "Account id cannot be null"
 
         with self.unit_of_work_provider.get() as unit_of_work:

@@ -413,7 +413,7 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
         assert type(result[0]) == TaskDTO
         task_ids = [task.get_id() for task in br_result]
         for entry in result:
-            assert entry.id in task_ids
+            assert entry.get_id() in task_ids
 
         verify(list_account_tasks_br).execute(...)
 
@@ -433,7 +433,7 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
         assert result is not None
         assert len(result) == 1
         assert type(result[0]) == TaskDTO
-        assert result[0].id == br_result[0].get_id()
+        assert result[0].get_id() == br_result[0].get_id()
 
         verify(list_account_tasks_br).execute(...)
 

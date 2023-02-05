@@ -89,3 +89,16 @@ class UpdateTasksRequest:
 
     def to_dto(self):
         return [task.to_dto() for task in self.tasks]
+
+
+class ListAccountTasksResponse:
+
+    def __init__(self, task_id: uuid, title: str, description: str, owner_id: uuid):
+        self.task_id = str(task_id)
+        self.title = title
+        self.description = description
+        self.owner_id = str(owner_id)
+
+    @classmethod
+    def from_dto(cls, dto: TaskDTO):
+        return cls(dto.get_id(), dto.title, dto.description, dto.get_owner_id())

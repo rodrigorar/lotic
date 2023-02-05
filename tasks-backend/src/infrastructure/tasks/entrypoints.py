@@ -3,7 +3,8 @@ from src.domain import LogProvider
 from src.domain.errors import InvalidArgumentError
 from src.infrastructure import from_json, to_json
 from src.infrastructure.tasks.adapters import TasksUseCaseProvider
-from src.infrastructure.tasks.payloads import CreateTasksRequest, UpdateTasksRequest
+from src.infrastructure.tasks.payloads import CreateTasksRequest, ListAccountTasksResponse, \
+    UpdateTasksRequest
 from src.utils import URL_PREFIX_V1
 
 logger = LogProvider().get()
@@ -64,5 +65,5 @@ def list_tasks():
     result = use_case.execute(account_id)
 
     return to_json({
-        "tasks": [to_json(task) for task in result]
+        "tasks": [to_json(ListAccountTasksResponse.from_dto(task)) for task in result]
     }), 200, {'Content-Type': 'application/json'}

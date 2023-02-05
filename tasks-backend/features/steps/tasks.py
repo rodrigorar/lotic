@@ -1,8 +1,10 @@
 from datetime import datetime
+import uuid
 from uuid import uuid4
 
 from behave import *
 
+from src.infrastructure import from_json
 from src.utils import URL_PREFIX_V1
 
 
@@ -15,10 +17,13 @@ def step_impl(context):
 
     context.account_ids = [JOHN_DOE_ID]
 
+    context.invalid_account = False
+
 
 @given('an invalid user')
 def step_impl(context):
     context.account_ids = [uuid4()]
+    context.invalid_account = True
 
 
 @given('several users')
@@ -26,6 +31,7 @@ def step_impl(context):
     from features.environment import JOHN_DOE_ID, JANE_DOE_ID
 
     context.account_ids = [JOHN_DOE_ID, JANE_DOE_ID]
+    context.invalid_account = False
 
 
 # When
@@ -207,14 +213,95 @@ def step_impl(context):
     context.response = context.client.delete(URL_PREFIX_V1 + '/tasks/' + task_id)
 
 
+@when('it tries to get account tasks')
+def step_impl(context):
+    context.owner_id = uuid4()
+    context.response = context.client \
+        .get(URL_PREFIX_V1 + '/tasks?account_id=' + str(context.owner_id))
+
+
 @when('it tries to get the associated task')
 def step_impl(context):
-    raise NotImplementedError('it tries to get the associated task is not implemented')
+    from src.domain.tasks import Task, AccountTasks
+
+    with context.app.app_context():
+        context.task_ids = [uuid4()]
+        context.owner_id = uuid4()
+
+        task_data = Task(
+                context.task_ids[0]
+                , "Yet another task #1"
+                , "Yet another task description #1"
+                , datetime.now()
+                , datetime.now()
+                , context.owner_id
+            )
+
+        account_tasks_data = AccountTasks(context.owner_id, context.task_ids[0])
+
+        context.db.session.add(task_data)
+        context.db.session.add(account_tasks_data)
+        context.db.session.commit()
+
+        context.response = context.client\
+            .get(URL_PREFIX_V1 + '/tasks?account_id=' + str(context.owner_id))
 
 
 @when('it tries to get all associated tasks')
 def step_impl(context):
-    raise NotImplementedError('it tries to get all associated tasks is not implemented')
+    from src.domain.tasks import Task, AccountTasks
+
+    if context.invalid_account:
+        context.response = context.client \
+            .get(URL_PREFIX_V1 + '/tasks?account_id=' + str(context.account_ids[0]))
+
+    with context.app.app_context():
+        context.task_ids = [uuid4(), uuid4(), uuid4()]
+        context.owner_id = uuid4()
+
+        task_data = [
+            Task(
+                context.task_ids[0]
+                , "Yet another task #1"
+                , "Yet another task description #1"
+                , datetime.now()
+                , datetime.now()
+                , context.owner_id
+            ),
+            Task(
+                context.task_ids[1]
+                , "Yet another task #2"
+                , "Yet another task description #2"
+                , datetime.now()
+                , datetime.now()
+                , context.owner_id
+            ),
+            Task(
+                context.task_ids[2]
+                , "Yet another task #3"
+                , "Yet another task description #3"
+                , datetime.now()
+                , datetime.now()
+                , context.owner_id
+            )
+        ]
+
+        account_tasks_data = [
+            AccountTasks(context.owner_id, context.task_ids[0])
+            , AccountTasks(context.owner_id, context.task_ids[1])
+            , AccountTasks(context.owner_id, context.task_ids[2])
+        ]
+
+        for task in task_data:
+            context.db.session.add(task)
+
+        for account_tasks in account_tasks_data:
+            context.db.session.add(account_tasks)
+
+        context.db.session.commit()
+
+        context.response = context.client \
+            .get(URL_PREFIX_V1 + '/tasks?account_id=' + str(context.owner_id))
 
 
 # Then
@@ -224,7 +311,6 @@ def step_impl(context):
 def step_impl(context):
     from src.domain.tasks import Task
 
-    print(context.response)
     assert context.response is not None
     assert context.response.status_code == 200
     with context.app.app_context():
@@ -290,17 +376,64 @@ def step_impl(context):
 
 @then('no tasks should be returned')
 def step_impl(context):
-    raise NotImplementedError('no tasks should be returned is not implemented')
+    from src.infrastructure.tasks import ListAccountTasksResponse
+
+    assert context.response is not None
+    assert context.response.status_code == 200
+    assert context.response.get_data() is not None
+
+    tasks_json = from_json(None, context.response.get_data())["tasks"]
+    task_list = [from_json(ListAccountTasksResponse, task_entry) for task_entry in tasks_json]
+    assert len(task_list) == 0
 
 
 @then('the task should be returned')
 def step_impl(context):
-    raise NotImplementedError('the task should be returned is not implemented')
+    from src.infrastructure.tasks import ListAccountTasksResponse
+
+    assert context.response is not None
+    assert context.response.status_code == 200
+    assert context.response.get_data() is not None
+
+    tasks_json = from_json(None, context.response.get_data())["tasks"]
+    task_list = [from_json(ListAccountTasksResponse, task_entry) for task_entry in tasks_json]
+
+    assert task_list is not None
+    assert task_list[0].task_id == str(context.task_ids[0])
+    assert task_list[0].owner_id == str(context.owner_id)
+    assert task_list[0].title == "Yet another task #1"
+    assert task_list[0].description == "Yet another task description #1"
 
 
 @then('all account tasks should be returned')
 def step_impl(context):
-    raise NotImplementedError('all account tasks should be returned is not implemented')
+    from src.infrastructure.tasks import ListAccountTasksResponse
+
+    assert context.response is not None
+    assert context.response.status_code == 200
+    assert context.response.get_data() is not None
+
+    tasks_json = from_json(None, context.response.get_data())["tasks"]
+    task_list = [from_json(ListAccountTasksResponse, task_entry) for task_entry in tasks_json]
+
+    assert task_list is not None
+    task_1 = task_list[0]
+    assert uuid.UUID(task_1.task_id) in context.task_ids
+    assert task_1.owner_id == str(context.owner_id)
+    assert task_1.title == "Yet another task #1"
+    assert task_1.description == "Yet another task description #1"
+
+    task_2 = task_list[1]
+    assert uuid.UUID(task_2.task_id) in context.task_ids
+    assert task_2.owner_id == str(context.owner_id)
+    assert task_2.title == "Yet another task #2"
+    assert task_2.description == "Yet another task description #2"
+
+    task_3 = task_list[2]
+    assert uuid.UUID(task_3.task_id) in context.task_ids
+    assert task_3.owner_id == str(context.owner_id)
+    assert task_3.title == "Yet another task #3"
+    assert task_3.description == "Yet another task description #3"
 
 
 @then('an error should happen for multiple users')

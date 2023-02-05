@@ -2,7 +2,11 @@ import json
 
 
 def from_json(container, data: str):
-    return container(**json.loads(data))
+    if container is None:
+        result = json.loads(data)
+    else:
+        result = container(**json.loads(data))
+    return result
 
 
 def to_json(data):

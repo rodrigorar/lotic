@@ -30,11 +30,18 @@ class TasksRepositoryImpl(TasksRepository):
         existing_tasks = query.query(Task).filter(Task.id.in_([task.id for task in tasks]))
 
         for task in existing_tasks:
-            task.title = task.title if task.title is not None else entry.title
-            task.description = task.description if task.description is not None else entry.description
+            task.title = task.title if task.title is not None else task.title
+            task.description = task.description if task.description is not None else task.description
             task.updated_at = datetime.now()
 
             query.add(task)
+
+    def get_by_id(self, unit_of_work: UnitOfWork, task_id: uuid):
+        assert unit_of_work is not None, "Unit of work cannot be empty"
+        assert task_id is not None, "Task id cannot be empty"
+
+        query = unit_of_work.query()
+        return query.query(Task).filter_by(id=str(task_id)).first()
 
     def delete_multiple(self, unit_of_work: UnitOfWork, task_ids: list[uuid]):
         assert unit_of_work is not None, "Unit of work cannot be empty"
@@ -64,7 +71,7 @@ class UserTasksRepositoryImpl(AccountTasksRepository):
         assert account_id is not None, "Account id cannot be empty"
 
         query = unit_of_work.query()
-        result = query.select(AccountTasks).filter_by(account_id=account_id)
+        result = query.query(AccountTasks).filter_by(account_id=str(account_id))
 
         if result is None:
             result = []
