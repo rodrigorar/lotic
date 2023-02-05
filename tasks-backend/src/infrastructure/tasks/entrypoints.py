@@ -48,22 +48,21 @@ def update_tasks():
 
 @tasks_bp.delete("/<uuid:task_id>")
 def delete_tasks(task_id):
-    logger.info("Delete tasks has been called with %s", task_id)
+    print(task_id)
 
-    return to_json({
-        "type": "http://localhost:5000/not_implemented",
-        "details": "Delete tasks has not yet been implemented."
-    }), 500, {'Content-Type': 'application/json'}
+    use_case = TasksUseCaseProvider.delete_tasks()
+    use_case.execute([task_id])
+
+    return "", 204
 
 
 @tasks_bp.get("")
 def list_tasks():
-    logger.info("List tasks has been called.")
-    user_id = request.args.get("user_id", default="", type=str)
+    account_id = request.args.get("account_id", default="", type=str)
 
-    logger.info("Query Parameter: %s", user_id)
+    use_case = TasksUseCaseProvider.list_tasks_for_user()
+    result = use_case.execute(account_id)
 
     return to_json({
-        "type": "http://localhost:5000/not_implemented",
-        "details": "List tasks has not yet been implemented"
-    }), 500, {'Content-Type': 'application/json'}
+        "tasks": [to_json(task) for task in result]
+    }), 200, {'Content-Type': 'application/json'}

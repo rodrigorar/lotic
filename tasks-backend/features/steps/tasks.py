@@ -178,6 +178,45 @@ def step_impl(context):
                 })
 
 
+@when('it tries to delete a task')
+def step_impl(context):
+    from src.domain.tasks import Task, AccountTasks
+
+    context.task_id = uuid4()
+    with context.app.app_context():
+        task_data = Task(
+            context.task_id
+            , "Yet another task #1"
+            , "Yet another task description #1"
+            , datetime.now()
+            , datetime.now()
+            , uuid4()
+        )
+        account_task_data = AccountTasks(uuid4(), task_data.get_id())
+        context.db.session.add(task_data)
+        context.db.session.add(account_task_data)
+        context.db.session.commit()
+
+        context.task_ids = [task_data.get_id()]
+        context.response = context.client.delete(URL_PREFIX_V1 + '/tasks/' + task_data.id)
+
+
+@when('it tries to delete a non existent task')
+def step_impl(context):
+    task_id = str(uuid4())
+    context.response = context.client.delete(URL_PREFIX_V1 + '/tasks/' + task_id)
+
+
+@when('it tries to get the associated task')
+def step_impl(context):
+    raise NotImplementedError('it tries to get the associated task is not implemented')
+
+
+@when('it tries to get all associated tasks')
+def step_impl(context):
+    raise NotImplementedError('it tries to get all associated tasks is not implemented')
+
+
 # Then
 
 
@@ -220,6 +259,48 @@ def step_impl(context):
 def step_impl(context):
     assert context.response is not None
     assert context.response.status_code == 204
+
+
+@then('the task should be deleted')
+def step_impl(context):
+    from src.domain.tasks import Task, AccountTasks
+
+    assert context.response is not None
+    assert context.response.status_code == 204
+
+    with context.app.app_context():
+        tasks_result = context.db.session \
+            .query(Task) \
+            .filter_by(id=str(context.task_id)) \
+            .all()
+        assert len(tasks_result) == 0
+
+        account_tasks_result = context.db.session \
+            .query(AccountTasks) \
+            .filter_by(task_id=str(context.task_id)) \
+            .all()
+        assert len(account_tasks_result) == 0
+
+
+@then('a task not found should be returned')
+def step_impl(context):
+    assert context.response is not None
+    assert context.response.status_code == 404
+
+
+@then('no tasks should be returned')
+def step_impl(context):
+    raise NotImplementedError('no tasks should be returned is not implemented')
+
+
+@then('the task should be returned')
+def step_impl(context):
+    raise NotImplementedError('the task should be returned is not implemented')
+
+
+@then('all account tasks should be returned')
+def step_impl(context):
+    raise NotImplementedError('all account tasks should be returned is not implemented')
 
 
 @then('an error should happen for multiple users')

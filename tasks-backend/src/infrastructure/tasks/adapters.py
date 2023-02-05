@@ -42,7 +42,7 @@ class TasksRepositoryImpl(TasksRepository):
 
         query = unit_of_work.query()
         for task_id in task_ids:
-            entry = query.query(Task).filter_by(id=task_id).first()
+            entry = query.query(Task).filter_by(id=str(task_id)).first()
             if entry is not None:
                 query.delete(entry)
 
@@ -76,7 +76,7 @@ class UserTasksRepositoryImpl(AccountTasksRepository):
         assert task_id is not None, "Task id cannot be empty"
 
         query = unit_of_work.query()
-        account_task = query.query(AccountTasks).filter_by(task_id=task_id).first()
+        account_task = query.query(AccountTasks).filter_by(task_id=str(task_id)).first()
         if account_task is None:
             raise NotFoundError("No account task found for deletion")
         query.delete(account_task)
