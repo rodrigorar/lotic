@@ -11,6 +11,7 @@ async function doCall(httpCall) {
         return await httpCall();
     } catch (error) {
         console.log(error.cause);
+        throw error;
     }
 }
 
@@ -18,7 +19,6 @@ const get = async (url) => {
     Logger.trace(`Calling URL: #GET ${url}`);
 
     return await doCall(() =>
-        
         client.get(url, {
             headers: {
                 'Accept': 'application/json'
@@ -29,13 +29,14 @@ const get = async (url) => {
 const post = async (url, data) => {
     Logger.trace(`Calling URL: #POST ${url} with Data: ${JSON.stringify(data)}`);
 
-    return await doCall(() =>
+    const result = await doCall(() =>
         client.post(url, data, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             }
         }));
+    return result;
 };
 
 const put = async (url, data) => {

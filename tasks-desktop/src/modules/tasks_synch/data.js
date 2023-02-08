@@ -6,7 +6,7 @@ async function getLocalAndDirty() {
     let result = [];
 
     await UnitOfWork.begin();
-    const queryResult = UnitOfWork.getDB().all(
+    const queryResult = await UnitOfWork.getDB().all(
         "SELECT * FROM tasks_synch WHERE synch_status = 'LOCAL' OR synch_status = 'DIRTY'",
         []);
     result = queryResult.map(row => new TaskSynch(row.task_synch_id, row.task_id, row.synch_status, new Date(row.created_at), new Date(row.updated_at)));
@@ -35,6 +35,17 @@ function markDirty(taskId) {
         });
 }
 
+function markSynched(taskIds) {
+    UnitOfWork.begin()
+        .then(async (db) => {
+            await db.run(
+                "UPDATE tasks_synch SET synch_status = 'SYNCHED', updated_at = ? WHERE task_id in (?)"
+                , [new Date().toISOString(), taskIds]
+            )
+            db.close();
+        });
+}
+
 function create(taskId) {
     UnitOfWork.begin()
         .then(async (db) => {
@@ -53,6 +64,7 @@ module.exports.TaskSynchRepository = {
     getLocalAndDirty,
     markForRemoval,
     markDirty,
+    markSynched,
     create
 }
 

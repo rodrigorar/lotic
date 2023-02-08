@@ -26,21 +26,18 @@ async function listTasks() {
 
     await UnitOfWork.begin();
     const queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks', []);
-    result = queryResult.map(entry => new Task(entry.task_id, entry.title, entry.state, new Date(entry.created_at), new Date(entry.updatedAt)));
+    result = queryResult.map(entry => new Task(entry.task_id, entry.title, entry.state, new Date(entry.created_at), new Date(entry.updated_at)));
     UnitOfWork.end();
 
     return result;
 }
 
-async function listById(taskIdList = []) {
-    let result = [];
-
-    await UnitOfWork.begin();
-    const queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks WHERE task_id in (?)', [taskIds]);
-    result = queryResult.map(entry => new Task(entry.task_id, entry.title, entry.state, new Date(entry.created_at), new Date(entry.update_at)));
-    UnitOfWork.end();
-
-    return result;
+async function listById(tasksIds = []) {
+    return await UnitOfWork.begin()
+        .then(async (db) => {
+            const queryResult = await db.all('SELECT * FROM tasks WHERE task_id in (' + tasksIds.map(task => '?').join(',') + ')', tasksIds);
+            return queryResult.map(entry => new Task(entry.task_id, entry.title, entry.state, new Date(entry.created_at), new Date(entry.updated_at)));
+        });
 }
 
 function deleteTask(id) {

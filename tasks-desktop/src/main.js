@@ -6,21 +6,12 @@ const { UtilsHandler } = require('./handlers/utils');
 const { TasksHandler } = require('./handlers/tasks');
 const { OSMask } = require('./modules/shared/os-mask');
 const { isDev } = require('./modules/shared/utils');
-const { HttpClient } = require('./modules/shared/http');
 const { SynchManager } = require('./modules/synch-manager');
 
 // Prepare local data directories
 OSMask.prepareDataDirIfNecessary(isDev);
 
 runSchemaMigrations();
-
-HttpClient.get('/persons/1')
-  .then(result => {
-    if (result) {
-      console.log('Backend Call!');
-      console.log(result.data);
-    }
-  });
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({

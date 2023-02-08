@@ -4,8 +4,29 @@ const { TasksRepository, Task, TASK_STATE } = require("./data");
 function create(taskData) {
     Validators.isNotNull(taskData, 'No task data was provided!');
 
-    const task = new Task(taskData.id, taskData.title, TASK_STATE[taskData.state], taskData.createdAt, taskData.updatedAt);
+    const task = 
+        new Task(
+            taskData.id
+            , taskData.title
+            , TASK_STATE[taskData.state]
+            , taskData.createdAt
+            , taskData.updatedAt);
     TasksRepository.createTask(task);
+}
+
+function createMultiple(tasksData) {
+    Validators.isNotNull(tasksData, 'No tasks where provided');
+
+    // TODO: Optimize this so it doesn't call the database so many times
+    tasksData
+        .map(taskData => 
+                new Task(
+                    taskData.id
+                    , taskData.title
+                    , TASK_STATE.IN_TODO
+                    , taskData.createdAt
+                    , taskData.updatedAt))
+        .forEach(task => TasksRepository.createTask(task));
 }
 
 function update(taskId, taskData) {
@@ -20,7 +41,7 @@ async function list() {
 }
 
 async function listById(taskIdList = []) {
-    TasksRepository.listById(taskIdList);
+    return await TasksRepository.listById(taskIdList);
 }
 
 function erase(taskId) {
@@ -29,10 +50,20 @@ function erase(taskId) {
     TasksRepository.deleteTask(taskId);
 }
 
+function eraseMultiple(taskIds) {
+    Validators.isNotNull(taskIds, 'No task ids provided');
+
+    // TODO: Optimize this so it doesn't call the database so many times
+    taskIds
+        .forEach(taskId => TasksRepository.deleteTask(taskId));
+}
+
 module.exports.TaskServices = {
-    create,
-    update,
-    list,
-    listById,
-    erase
+    create
+    , createMultiple
+    , update
+    , list
+    , listById
+    , erase
+    , eraseMultiple
 }

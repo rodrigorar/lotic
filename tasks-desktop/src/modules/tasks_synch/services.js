@@ -22,6 +22,13 @@ function markDirty(taskId) {
     });
 }
 
+function markSynched(taskIds) {
+    ServiceUtils.errorWrapper(() => {
+        Validators.isNotNull(taskIds, 'No task ids were provided');
+        TaskSynchRepository.markSynched(taskIds);
+    });
+}
+
 async function getNonSynched() {
     return await ServiceUtils.asyncErrorWrapper(async () => {
         return await TaskSynchRepository.getLocalAndDirty();
@@ -32,5 +39,6 @@ module.exports.TasksSynchServices = {
     createSynchMonitor,
     markForRemoval,
     markDirty,
+    markSynched,
     getNonSynched
 }
