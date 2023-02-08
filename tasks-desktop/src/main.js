@@ -36,8 +36,6 @@ app.on('ready', () => {
   SynchManager.execute();
 
   app.on('window-all-closed', () => {
-    // Update tasks at Close
-    SynchManager.execute();
     app.quit();
   });
 });

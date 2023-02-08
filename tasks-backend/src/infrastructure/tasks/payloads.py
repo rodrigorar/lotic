@@ -61,11 +61,13 @@ class UpdateTaskRequest:
             self
             , task_id: str
             , title: str
-            , description: str):
+            , description: str
+            , updated_at: str):
 
         self.id = uuid.UUID(task_id)
         self.title = title
         self.description = description
+        self.updated_at = parser.parse(updated_at)
 
     def to_dto(self):
         return TaskDTO(
@@ -73,7 +75,7 @@ class UpdateTaskRequest:
             , self.title
             , self.description
             , None
-            , None
+            , self.updated_at
             , None
         )
 
@@ -84,7 +86,11 @@ class UpdateTasksRequest:
         task_entries = []
         for task in tasks:
             task_entries \
-                .append(UpdateTaskRequest(task["task_id"], task["title"], task["description"]))
+                .append(UpdateTaskRequest(
+                    task["task_id"]
+                    , task["title"]
+                    , task["description"]
+                    , task["updated_at"]))
         self.tasks = task_entries
 
     def to_dto(self):

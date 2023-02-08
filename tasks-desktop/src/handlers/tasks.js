@@ -8,17 +8,26 @@ function handleCreateTask(event, newTask) {
     SynchManager.execute();
 }
 
+let updateTaskCounter = 0;
+
 function handleUpdateTasks(event, taskId, data) {
     TaskServices.update(taskId, data);
     TasksSynchServices.markDirty(taskId);
 
-    // TODO: Synch tasks with backend but it cannot fire for every letter entered by the user
+    // TODO: Find a better way to optimize the synch with the server
+    if (updateTaskCounter >= 40) {
+        SynchManager.execute();
+        updateTaskCounter = 0;
+    } else {
+        updateTaskCounter += 1;
+        console.log('update Task Counter: ' + updateTaskCounter);
+    }
 }
 
 function handleCompletion(event, taskId) {
     TaskServices.erase(taskId);
     TasksSynchServices.markForRemoval(taskId);
-    //SynchManager.execute();
+    SynchManager.execute();
 }
 
 async function handleListTasks(event) {

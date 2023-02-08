@@ -30,11 +30,13 @@ class TasksRepositoryImpl(TasksRepository):
         existing_tasks = query.query(Task).filter(Task.id.in_([task.id for task in tasks]))
 
         for task in existing_tasks:
-            task.title = task.title if task.title is not None else task.title
-            task.description = task.description if task.description is not None else task.description
-            task.updated_at = datetime.now()
+            update_data = list(filter(lambda entry: entry.get_id() == task.get_id(), tasks))
 
-            query.add(task)
+            task.title = update_data[0].title if update_data[0].title is not None else task.title
+            task.description = update_data[0].description if update_data[0].description is not None else task.description
+            task.updated_at = update_data[0].updated_at
+
+        query.flush()
 
     def get_by_id(self, unit_of_work: UnitOfWork, task_id: uuid):
         assert unit_of_work is not None, "Unit of work cannot be empty"
@@ -54,7 +56,7 @@ class TasksRepositoryImpl(TasksRepository):
                 query.delete(entry)
 
 
-class UserTasksRepositoryImpl(AccountTasksRepository):
+class AccountTasksRepositoryImpl(AccountTasksRepository):
 
     def insert_multiple(self, unit_of_work: UnitOfWork, account_tasks: list[AccountTasks]) -> list[(uuid, uuid)]:
         assert unit_of_work is not None, "Unit of work cannot be empty"
@@ -93,7 +95,7 @@ class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):
 
     @staticmethod
     def create_tasks(unit_of_work) -> CreateTasks:
-        return CreateTasks(unit_of_work, TasksRepositoryImpl(), UserTasksRepositoryImpl())
+        return CreateTasks(unit_of_work, TasksRepositoryImpl(), AccountTasksRepositoryImpl())
 
     @staticmethod
     def update_tasks(unit_of_work) -> UpdateTasks:
@@ -101,11 +103,11 @@ class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):
 
     @staticmethod
     def delete_tasks(unit_of_work) -> DeleteTasks:
-        return DeleteTasks(unit_of_work, TasksRepositoryImpl(), UserTasksRepositoryImpl())
+        return DeleteTasks(unit_of_work, TasksRepositoryImpl(), AccountTasksRepositoryImpl())
 
     @staticmethod
     def list_tasks_for_user(unit_of_work) -> ListTasksForAccount:
-        return ListTasksForAccount(unit_of_work, TasksRepositoryImpl(), UserTasksRepositoryImpl())
+        return ListTasksForAccount(unit_of_work, TasksRepositoryImpl(), AccountTasksRepositoryImpl())
 
 
 unit_of_work_provider = UnitOfWorkProviderImpl()

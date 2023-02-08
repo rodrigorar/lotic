@@ -29,7 +29,7 @@ function markDirty(taskId) {
     UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
-                "UPDATE tasks_synch SET synch_status = 'DIRTY', updated_at = ? WHERE task_id = ?",
+                "UPDATE tasks_synch SET synch_status = 'DIRTY', updated_at = ? WHERE task_id = ? AND synch_status != 'LOCAL'",
                 [new Date().toISOString(), taskId]);
             db.close();
         });
@@ -39,8 +39,8 @@ function markSynched(taskIds) {
     UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
-                "UPDATE tasks_synch SET synch_status = 'SYNCHED', updated_at = ? WHERE task_id in (?)"
-                , [new Date().toISOString(), taskIds]
+                "UPDATE tasks_synch SET synch_status = 'SYNCHED', updated_at = ? WHERE task_id in (" + taskIds.map(task => '?').join(',') +")"
+                , [new Date().toISOString(), ...taskIds]
             )
             db.close();
         });

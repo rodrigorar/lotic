@@ -7,13 +7,18 @@ async function createTasks(taskList) {
     const result = await HttpClient.post('/api/v1/tasks', {
         tasks: taskList
     });
+    // TODO: Deal with any 4xx or 5xx that my happend
     return result.data;
 }
 
 async function updateTasks(taskList) {
     Logger.trace('Calling Update Tasks: Not Implemented');
 
-    // TODO: Not implemented
+    const result = await HttpClient.put('/api/v1/tasks', {
+        tasks: taskList
+    });
+    // TODO: Deal with any 4xx or 5xx that my happend
+    return result.data ? result.data : "";
 }
 
 async function listTasks(account_id) {
