@@ -1,3 +1,4 @@
+const { AccountServices } = require("./accounts/services");
 const { TasksRPC } = require("./tasks/rpc");
 const { TaskServices } = require("./tasks/services");
 const { TasksSynchServices } = require("./tasks_synch/services");
@@ -50,9 +51,8 @@ async function execute() {
             .map(taskSynch => taskSynch.taskId)
     if (tasksToCreate.length > 0) {
 
-        console.log('Just before calling create tasks');
-         // TODO: This account id should come from the database
-        await callCreateTasks('d02e1b3b-014c-47a9-ab73-fa2b3366088e', tasksToCreate);
+        const account = await AccountServices.getLoggedAccount();
+        await callCreateTasks(account.email, tasksToCreate);
     }
 
     // Update tasks in server

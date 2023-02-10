@@ -1,5 +1,5 @@
 const { Validators } = require("../shared/utils");
-const { AccountRepository } = require("./data");
+const { AccountRepository, Account } = require("./data");
 
 function create(accountData) {
     Validators.isNotNull(accountData, "No account data provided");
@@ -23,9 +23,14 @@ function logout(email) {
     AccountRepository.setLoginState(email, false);
 }
 
-function getAccount(email) {
+async function getAccount(email) {
     Validators.isNotNull(email, "No email provided");
-    return AccountRepository.getAccount(email);
+    return await AccountRepository.getAccount(email);
+}
+
+async function getLoggedAccount() {
+    // TODO: This account should be the logged in account in the database
+    return new Account('d02e1b3b-014c-47a9-ab73-fa2b3366088e', 'rodrigo.ra.rosa@gmail.com', true);
 }
 
 module.exports.AccountServices = {
@@ -33,4 +38,5 @@ module.exports.AccountServices = {
     , login
     , logout
     , getAccount
+    , getLoggedAccount
 }

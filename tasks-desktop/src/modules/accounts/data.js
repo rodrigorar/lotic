@@ -20,8 +20,8 @@ function setLoginState(email, state) {
         });
 }
 
-function getAccount(email) {
-    UnitOfWork.begin()
+async function getAccount(email) {
+    await UnitOfWork.begin()
         .then(async (db) => {
             const queryResult = await db.first('SELECT * FROM accounts WHERE email = ?', [email]);
             db.close();
