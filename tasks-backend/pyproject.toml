@@ -49,7 +49,7 @@ unit-tests = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov
 unit-tests-no-cov = "test --no-cov {args}"
 integration-tests = "APP_CONFIG_FILE=integration_test.py behave"
 tests = "hatch run unit-tests && hatch run integration-tests"
-server = "APP_CONFIG_FILE=development.py flask --app src/app run"
+server = "APP_CONFIG_FILE=development.py flask --app src/app run -h 0.0.0.0"
 
 [[tool.hatch.envs.test.matrix]]
 python = ["37", "38", "39", "310", "311"]

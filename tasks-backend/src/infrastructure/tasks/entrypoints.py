@@ -49,8 +49,6 @@ def update_tasks():
 
 @tasks_bp.delete("/<uuid:task_id>")
 def delete_tasks(task_id):
-    print(task_id)
-
     use_case = TasksUseCaseProvider.delete_tasks()
     use_case.execute([task_id])
 

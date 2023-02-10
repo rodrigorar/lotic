@@ -65,7 +65,7 @@ class DeleteTasks(BaseBusinessRule):
 
     def execute(self, task_ids: list[uuid]):
         assert task_ids is not None, "Task Ids cannot be null"
-        print(task_ids)
+
         self.tasks_repository.delete_multiple(self.unit_of_work, task_ids)
         for task_id in task_ids:
             self.account_tasks_repository.delete_by_task_id(self.unit_of_work, task_id)
