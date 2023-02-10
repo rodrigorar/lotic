@@ -18,7 +18,7 @@ async function callCreateTasks(account_id, taskIds) {
 
     const result = await TasksRPC.createTasks(tasksRequest);
     if (result != undefined && result.ids.length == tasksRequest.length) {
-        TasksSynchServices.markSynched(taskIds);
+        await TasksSynchServices.markSynched(taskIds);
     }
 } 
 
@@ -35,7 +35,7 @@ async function callUpdateTasks(taskIds) {
 
     const result = await TasksRPC.updateTasks(tasksRequest);
     if (result != undefined) {
-        TasksSynchServices.markSynched(taskIds);
+        await TasksSynchServices.markSynched(taskIds);
     }
 }
 

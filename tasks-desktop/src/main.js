@@ -27,6 +27,8 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html'));
 };
 
+let closeSemaphor = true;
+
 app.on('ready', () => {
   createWindow()
 
@@ -37,6 +39,19 @@ app.on('ready', () => {
 
   app.on('window-all-closed', () => {
     app.quit();
+  });
+
+  app.on('before-quit', (e) => {
+
+    if (closeSemaphor) {
+      e.preventDefault();
+
+      SynchManager.execute()
+        .then(() => {
+          closeSemaphor = false;
+          app.quit();
+        });
+    }
   });
 });
 

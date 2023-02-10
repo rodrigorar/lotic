@@ -15,8 +15,8 @@ async function getLocalAndDirty() {
     return result;
 }
 
-function markForRemoval(taskId) {
-    UnitOfWork.begin()
+async function markForRemoval(taskId) {
+    await UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
                 "UPDATE tasks_synch SET synch_status = 'COMPLETE', updated_at = ? WHERE task_id = ?", 
@@ -25,8 +25,8 @@ function markForRemoval(taskId) {
         });
 }
 
-function markDirty(taskId) {
-    UnitOfWork.begin()
+async function markDirty(taskId) {
+    await UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
                 "UPDATE tasks_synch SET synch_status = 'DIRTY', updated_at = ? WHERE task_id = ? AND synch_status != 'LOCAL'",
@@ -35,8 +35,8 @@ function markDirty(taskId) {
         });
 }
 
-function markSynched(taskIds) {
-    UnitOfWork.begin()
+async function markSynched(taskIds) {
+    await UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
                 "UPDATE tasks_synch SET synch_status = 'SYNCHED', updated_at = ? WHERE task_id in (" + taskIds.map(task => '?').join(',') +")"
@@ -46,8 +46,8 @@ function markSynched(taskIds) {
         });
 }
 
-function create(taskId) {
-    UnitOfWork.begin()
+async function create(taskId) {
+    await UnitOfWork.begin()
         .then(async (db) => {
             const id = generateId();
             const currentDate = new Date();

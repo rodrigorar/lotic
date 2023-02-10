@@ -2,30 +2,30 @@ const { ServiceUtils } = require("../shared/service-utils");
 const { Validators } = require("../shared/utils");
 const { TaskSynchRepository } = require("./data");
 
-function createSynchMonitor(taskId) {
-    ServiceUtils.errorWrapper(() => {
+async function createSynchMonitor(taskId) {
+    await ServiceUtils.asyncErrorWrapper(async () => {
         Validators.isNotNull(taskId, 'No task id was provided!');
-        TaskSynchRepository.create(taskId);
+        await TaskSynchRepository.create(taskId);
     })
 }
 
-function markForRemoval(taskId) {
-    ServiceUtils.errorWrapper(() => {
-        TaskSynchRepository.markForRemoval(taskId);
+async function markForRemoval(taskId) {
+    await ServiceUtils.asyncErrorWrapper(async () => {
+        await TaskSynchRepository.markForRemoval(taskId);
     });
 }
 
-function markDirty(taskId) {
-    ServiceUtils.errorWrapper(() => {
+async function markDirty(taskId) {
+    await ServiceUtils.asyncErrorWrapper(async () => {
         Validators.isNotNull(taskId, 'No task id was provided!');
-        TaskSynchRepository.markDirty(taskId);
+        await TaskSynchRepository.markDirty(taskId);
     });
 }
 
-function markSynched(taskIds) {
-    ServiceUtils.errorWrapper(() => {
+async function markSynched(taskIds) {
+    await ServiceUtils.asyncErrorWrapper(async () => {
         Validators.isNotNull(taskIds, 'No task ids were provided');
-        TaskSynchRepository.markSynched(taskIds);
+        await TaskSynchRepository.markSynched(taskIds);
     });
 }
 
