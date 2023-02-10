@@ -3,6 +3,8 @@ const { TasksRPC } = require("./tasks/rpc");
 const { TaskServices } = require("./tasks/services");
 const { TasksSynchServices } = require("./tasks_synch/services");
 const { TasksSynchData } = require("./tasks_synch/data");
+const { Logger } = require("./shared/logger");
+const { StatusCode } = require("./shared/http");
 
 async function callCreateTasks(account_id, taskIds) {
     const tasks = await TaskServices.listById(taskIds);
@@ -40,6 +42,28 @@ async function callUpdateTasks(taskIds) {
     }
 }
 
+async function callDeleteTasks(taskIds) {
+    const result = [];    
+
+    for (const taskId of taskIds) {
+        if (taskId != undefined) {
+            try {
+                await TasksRPC.deleteTasks(taskId);
+                result.push(taskId);
+            } catch (e) {
+                if (e.response.status == StatusCode.NotFound) {
+                    console.log('Pushing to remove task synch entry');
+                    result.push(taskId);
+                } else {
+                    Logger.error(e);
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
 async function execute() {
     const createdTasksSynch = await TasksSynchServices.getNonSynched();
 
@@ -69,13 +93,14 @@ async function execute() {
 
     const completeTasksSynch = await TasksSynchServices.getComplete();
     if (completeTasksSynch.length > 0) {
-        const tasksToDelete = tasksToDelete.map(task => task.task_id);
-        const success = await callDeleteTasks(tasksToDeleteIds);
-        if (success) {
-            // TODO: Delete task synch entries
-            await TaskServices.deleteMultiple(tasksToDelete)
+        const tasksToDelete = completeTasksSynch.map(task => task.taskId);
+        const tasksSynchToDelete = await callDeleteTasks(tasksToDelete);
+        if (tasksSynchToDelete.length > 0) {
+            await TasksSynchServices.deleteMultipleByTaskId(tasksSynchToDelete);
         }
     }
+
+    console.log('Finished Task Synchornization');
     
 } 
 

@@ -48,6 +48,7 @@ app.on('ready', () => {
 
       SynchManager.execute()
         .then(() => {
+          console.log('Switching sempahor, exiting');
           closeSemaphor = false;
           app.quit();
         });

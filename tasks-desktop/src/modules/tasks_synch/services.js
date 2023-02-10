@@ -9,6 +9,18 @@ async function createSynchMonitor(taskId) {
     })
 }
 
+async function deleteComplete() {
+    return await ServiceUtils.asyncErrorWrapper(async () => {
+        return await TaskSynchRepository.removeComplete();
+    });
+}
+
+async function deleteMultipleByTaskId(taskIds) {
+    return await ServiceUtils.asyncErrorWrapper(async () => {
+        return await TaskSynchRepository.deleteMultipleByTaskId(taskIds);
+    });
+}
+
 async function markForRemoval(taskId) {
     await ServiceUtils.asyncErrorWrapper(async () => {
         await TaskSynchRepository.markForRemoval(taskId);
@@ -43,6 +55,8 @@ async function getComplete() {
 
 module.exports.TasksSynchServices = {
     createSynchMonitor
+    , deleteComplete
+    , deleteMultipleByTaskId
     , markForRemoval
     , markDirty
     , markSynched

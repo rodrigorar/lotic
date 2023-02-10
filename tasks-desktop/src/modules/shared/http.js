@@ -6,6 +6,8 @@ const client = axios.create({
     timeout: 5000
 });
 
+const BASE_URL = "/api/v1"
+
 async function doCall(httpCall) {
     try {
         return await httpCall();
@@ -15,22 +17,22 @@ async function doCall(httpCall) {
     }
 }
 
-const get = async (url) => {
-    Logger.trace(`Calling URL: #GET ${url}`);
+const get = async (path) => {
+    Logger.trace(`Calling URL: #GET ${BASE_URL + path}`);
 
     return await doCall(() =>
-        client.get(url, {
+        client.get(BASE_URL + path, {
             headers: {
                 'Accept': 'application/json'
             }
         }));
 };
 
-const post = async (url, data) => {
-    Logger.trace(`Calling URL: #POST ${url} with Data: ${JSON.stringify(data)}`);
+const post = async (path, data) => {
+    Logger.trace(`Calling URL: #POST ${BASE_URL + path} with Data: ${JSON.stringify(data)}`);
 
     const result = await doCall(() =>
-        client.post(url, data, {
+        client.post(BASE_URL + path, data, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -39,11 +41,11 @@ const post = async (url, data) => {
     return result;
 };
 
-const put = async (url, data) => {
-    Logger.trace(`Calling URL: #PUT ${url} with Data: ${JSON.stringify(data)}`);
+const put = async (path, data) => {
+    Logger.trace(`Calling URL: #PUT ${BASE_URL + path} with Data: ${JSON.stringify(data)}`);
 
     return await doCall(() =>
-        client.put(url, data, {
+        client.put(BASE_URL + path, data, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -51,11 +53,11 @@ const put = async (url, data) => {
         }));
 };
 
-const del = async (url) => {
-    Logger.trace(`Calling URL: #DELETE ${url}`);
+const del = async (path) => {
+    Logger.trace(`Calling URL: #DELETE ${BASE_URL + path}`);
 
     return await doCall(() =>
-        client.delete(url, {
+        client.delete(BASE_URL + path, {
             headers: {
                 'Accept': 'application/json'
             }
@@ -68,3 +70,19 @@ module.exports.HttpClient = {
     put,
     del
 }
+
+const StatusCode = {
+    Ok: 200
+    , Created: 201
+    , NoContent: 204
+    , BadRequest: 400
+    , Unauthorized: 401
+    , Forbidden: 403
+    , NotFound: 404
+    , NotAcceptable: 406
+    , Conflict: 409
+    , ServerError: 500
+    , BadGateway: 504
+}
+
+module.exports.StatusCode = StatusCode;

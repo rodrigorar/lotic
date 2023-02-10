@@ -25,7 +25,7 @@ function handleUpdateTasks(event, taskId, data) {
 }
 
 function handleCompletion(event, taskId) {
-    TaskServices.erase(taskId);
+    TaskServices.deleteTask(taskId);
     TasksSynchServices.markForRemoval(taskId);
     SynchManager.execute();
 }
