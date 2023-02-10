@@ -33,6 +33,8 @@ async function getLoggedAccount() {
     return new Account('d02e1b3b-014c-47a9-ab73-fa2b3366088e', 'rodrigo.ra.rosa@gmail.com', true);
 }
 
+// TODO: Use service utils of all implemented services
+
 module.exports.AccountServices = {
     create
     , login

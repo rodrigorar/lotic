@@ -15,6 +15,19 @@ async function getLocalAndDirty() {
     return result;
 }
 
+async function getComplete() {
+    let result = [];
+
+    await UnitOfWork.begin();
+    const queryResult = await UnitOfWork.getDB().all(
+        "SELECT * FROM tasks_synch WHERE synch_status = 'COMPLETE'",
+        []);
+    result = queryResult.map(row => new TaskSynch(row.task_synch_id, row.task_id, row.synch_status, new Date(row.created_at), new Date(row.updated_at)));
+    UnitOfWork.end();
+
+    return result;
+}
+
 async function markForRemoval(taskId) {
     await UnitOfWork.begin()
         .then(async (db) => {
@@ -61,11 +74,12 @@ async function create(taskId) {
 }
 
 module.exports.TaskSynchRepository = {
-    getLocalAndDirty,
-    markForRemoval,
-    markDirty,
-    markSynched,
-    create
+    getLocalAndDirty
+    , getComplete
+    , markForRemoval
+    , markDirty
+    , markSynched
+    , create
 }
 
 const TASK_SYNCH_STATUS = {

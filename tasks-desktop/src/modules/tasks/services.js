@@ -44,18 +44,18 @@ async function listById(taskIdList = []) {
     return await TasksRepository.listById(taskIdList);
 }
 
-function erase(taskId) {
+function deleteTask(taskId) {
     Validators.isNotNull(taskId, 'No task id was provided!');
 
     TasksRepository.deleteTask(taskId);
 }
 
-function eraseMultiple(taskIds) {
+async function deleteMultiple(taskIds) {
     Validators.isNotNull(taskIds, 'No task ids provided');
 
     // TODO: Optimize this so it doesn't call the database so many times
-    taskIds
-        .forEach(taskId => TasksRepository.deleteTask(taskId));
+    await taskIds
+        .forEach(async taskId => await TasksRepository.deleteTask(taskId));
 }
 
 module.exports.TaskServices = {
@@ -64,6 +64,6 @@ module.exports.TaskServices = {
     , update
     , list
     , listById
-    , erase
-    , eraseMultiple
+    , deleteTask
+    , deleteMultiple
 }

@@ -40,8 +40,8 @@ async function listById(tasksIds = []) {
         });
 }
 
-function deleteTask(id) {
-    UnitOfWork.begin()
+async function deleteTask(id) {
+    await UnitOfWork.begin()
         .then(async (db) => {
             await db.run('DELETE FROM tasks where task_id = ?', [id]);
             db.close();
@@ -58,8 +58,7 @@ module.exports.TasksRepository = {
 
 module.exports.TASK_STATE = {
     IN_TODO: "IN_TODO",
-    COMPLETED: "COMPLETED",
-    DELETED: "DELETED"
+    COMPLETED: "COMPLETED"
 }
 
 class Task {

@@ -35,10 +35,17 @@ async function getNonSynched() {
     });
 }
 
+async function getComplete() {
+    return await ServiceUtils.asyncErrorWrapper(async () => {
+        return await TaskSynchRepository.getComplete();
+    });
+}
+
 module.exports.TasksSynchServices = {
-    createSynchMonitor,
-    markForRemoval,
-    markDirty,
-    markSynched,
-    getNonSynched
+    createSynchMonitor
+    , markForRemoval
+    , markDirty
+    , markSynched
+    , getNonSynched
+    , getComplete
 }

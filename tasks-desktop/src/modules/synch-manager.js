@@ -41,12 +41,12 @@ async function callUpdateTasks(taskIds) {
 }
 
 async function execute() {
-    const tasksSynch = await TasksSynchServices.getNonSynched();
+    const createdTasksSynch = await TasksSynchServices.getNonSynched();
 
     // Created tasks in server
 
     const tasksToCreate = 
-        tasksSynch
+        createdTasksSynch
             .filter(task => task.synchStatus == TasksSynchData.TASK_SYNCH_STATUS.LOCAL)
             .map(taskSynch => taskSynch.taskId)
     if (tasksToCreate.length > 0) {
@@ -58,16 +58,24 @@ async function execute() {
     // Update tasks in server
 
     const tasksToUpdate =
-        tasksSynch
+        createdTasksSynch
             .filter(task => task.synchStatus == TasksSynchData.TASK_SYNCH_STATUS.DIRTY)
             .map(tasksSynch => tasksSynch.taskId);
     if (tasksToUpdate.length > 0) {
         await callUpdateTasks(tasksToUpdate);
     }
 
-    // TODO: Delete tasks in server
+    // Delete completed tasks from the server
 
-    // TODO: Delete completed tasks from the server
+    const completeTasksSynch = await TasksSynchServices.getComplete();
+    if (completeTasksSynch.length > 0) {
+        const tasksToDelete = tasksToDelete.map(task => task.task_id);
+        const success = await callDeleteTasks(tasksToDeleteIds);
+        if (success) {
+            // TODO: Delete task synch entries
+            await TaskServices.deleteMultiple(tasksToDelete)
+        }
+    }
     
 } 
 
