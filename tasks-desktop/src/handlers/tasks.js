@@ -20,7 +20,6 @@ function handleUpdateTasks(event, taskId, data) {
         updateTaskCounter = 0;
     } else {
         updateTaskCounter += 1;
-        console.log('update Task Counter: ' + updateTaskCounter);
     }
 }
 

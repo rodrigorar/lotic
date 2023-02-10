@@ -2,11 +2,11 @@ const { AccountServices } = require("./accounts/services");
 const { TasksRPC } = require("./tasks/rpc");
 const { TaskServices } = require("./tasks/services");
 const { TasksSynchServices } = require("./tasks_synch/services");
-const { TasksSynchData } = require("./tasks_synch/data");
+const { TasksSynchData, TASK_SYNCH_STATUS } = require("./tasks_synch/data");
 const { Logger } = require("./shared/logger");
 const { StatusCode } = require("./shared/http");
 
-async function callCreateTasks(account_id, taskIds) {
+async function callCreateTasks(account, taskIds) {
     const tasks = await TaskServices.listById(taskIds);
 
     const tasksRequest = tasks
@@ -16,7 +16,7 @@ async function callCreateTasks(account_id, taskIds) {
             , description: task.description ? task.description : ""
             , created_at: task.createdAt.toISOString()
             , updated_at: task.updatedAt.toISOString()
-            , owner_id: account_id
+            , owner_id: account.id
         }));
 
     const result = await TasksRPC.createTasks(tasksRequest);
@@ -52,7 +52,6 @@ async function callDeleteTasks(taskIds) {
                 result.push(taskId);
             } catch (e) {
                 if (e.response.status == StatusCode.NotFound) {
-                    console.log('Pushing to remove task synch entry');
                     result.push(taskId);
                 } else {
                     Logger.error(e);
@@ -71,19 +70,19 @@ async function execute() {
 
     const tasksToCreate = 
         createdTasksSynch
-            .filter(task => task.synchStatus == TasksSynchData.TASK_SYNCH_STATUS.LOCAL)
+            .filter(task => task.synchStatus == TASK_SYNCH_STATUS.LOCAL)
             .map(taskSynch => taskSynch.taskId)
     if (tasksToCreate.length > 0) {
 
         const account = await AccountServices.getLoggedAccount();
-        await callCreateTasks(account.email, tasksToCreate);
+        await callCreateTasks(account, tasksToCreate);
     }
 
     // Update tasks in server
 
     const tasksToUpdate =
         createdTasksSynch
-            .filter(task => task.synchStatus == TasksSynchData.TASK_SYNCH_STATUS.DIRTY)
+            .filter(task => task.synchStatus == TASK_SYNCH_STATUS.DIRTY)
             .map(tasksSynch => tasksSynch.taskId);
     if (tasksToUpdate.length > 0) {
         await callUpdateTasks(tasksToUpdate);
@@ -100,7 +99,7 @@ async function execute() {
         }
     }
 
-    console.log('Finished Task Synchornization');
+    Logger.trace('Finished Task Synchornization');
     
 } 
 

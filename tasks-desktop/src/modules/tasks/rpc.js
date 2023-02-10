@@ -7,12 +7,11 @@ async function createTasks(taskList) {
     const result = await HttpClient.post(BASE_PATH, {
         tasks: taskList
     });
-    // TODO: Deal with any 4xx or 5xx that my happend
     return result.data;
 }
 
 async function updateTasks(taskList) {
-    Logger.trace('Calling Update Tasks: Not Implemented');
+    Logger.trace('Calling Update Tasks');
 
     const result = await HttpClient.put(BASE_PATH, {
         tasks: taskList
@@ -27,7 +26,7 @@ async function listTasks(account_id) {
 }
 
 async function deleteTasks(taskId) {
-    Logger.trace('Calling Delete Tasks: Not Implemented');
+    Logger.trace('Calling Delete Tasks');
 
     await HttpClient.del(`${BASE_PATH}/` + taskId)
 }
