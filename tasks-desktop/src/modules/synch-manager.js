@@ -111,13 +111,14 @@ async function execute() {
     if (result.length > 0) {
         const existingTasks = await TaskServices.list();
         const tasksToInsert = result
-                .filter(result => existingTasks.filter(entry => entry.id == result.task_id) == undefined)
+                .filter(result => existingTasks.filter(entry => entry.id == result.task_id).length == 0)
                 .map(taskData => ({
                     id: taskData.task_id
                     , title: taskData.title
                     , createdAt: new Date() // TODO: This should come from the server
                     , updatedAt: new Date() // TODO: This should come from the server
                 }));
+        console.log(tasksToInsert);
         if (tasksToInsert.length > 0) {
             await TaskServices.createMultiple(tasksToInsert);
             result.forEach(async taskData => {
