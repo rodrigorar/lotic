@@ -119,6 +119,7 @@ def step_impl(context):
                             "task_id": data.id
                             , "title": "Yet another task #1 - Updated"
                             , "description": "Yet another task description #1 - Updated"
+                            , "updated_at": "2023-02-10T09:00:00Z"
                         }
                     ]
                 })
@@ -169,16 +170,19 @@ def step_impl(context):
                             "task_id": data[0].id
                             , "title": "Yet another task #1"
                             , "description": "Yet another task description #1"
+                            , "updated_at": "2023-02-01T09:00:00.000Z"
                         },
                         {
                             "task_id": data[1].id
                             , "title": "Yet another task #2"
                             , "description": "Yet another task description #2"
+                            , "updated_at": "2022-01-12T14:53:34.000Z"
                         },
                         {
                             "task_id": data[2].id
                             , "title": "Yet another task #3"
                             , "description": "Yet another task description #3"
+                            , "updated_at": "2022-01-24T23:51:00.000Z"
                         }
                     ]
                 })
