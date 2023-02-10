@@ -1,7 +1,7 @@
 const { UnitOfWork } = require('../shared/database');
 
-function createTask(task) {
-    UnitOfWork.begin()
+async function createTask(task) {
+    await UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
                 `INSERT INTO tasks(task_id, title, state, created_at, updated_at) VALUES(?, ?, ?, ?, ?)`,

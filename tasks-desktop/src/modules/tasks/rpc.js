@@ -21,8 +21,7 @@ async function updateTasks(taskList) {
 }
 
 async function listTasks(account_id) {
-    result = await HttpClient.get(`${BASE_PATH}?account_id=` + account_id);
-    // TODO: Transform the result to a tasks dto
+    return await HttpClient.get(`${BASE_PATH}?account_id=` + account_id);
 }
 
 async function deleteTasks(taskId) {

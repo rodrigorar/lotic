@@ -79,7 +79,8 @@ async function deleteMultipleByTaskId(taskIds) {
         });
 }
 
-async function create(taskId) {
+async function create(taskId, state = undefined) {
+    db_state = state == undefined ? TASK_SYNCH_STATUS['LOCAL'] : state;
     await UnitOfWork.begin()
         .then(async (db) => {
             const id = generateId();
@@ -87,7 +88,7 @@ async function create(taskId) {
 
             await db.run(
                 "INSERT INTO tasks_synch(task_synch_id, task_id, synch_status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)"
-                , [id, taskId, TASK_SYNCH_STATUS['LOCAL'], currentDate.toISOString(), currentDate.toISOString()]);
+                , [id, taskId, db_state , currentDate.toISOString(), currentDate.toISOString()]);
 
             db.close();
         });
@@ -95,7 +96,7 @@ async function create(taskId) {
 
 const TASK_SYNCH_STATUS = {
     LOCAL: "LOCAL", // The task was never synched
-    SYNCHED: "CLEAN", // The task is synched and hasn't been changed locally
+    SYNCHED: "SYNCHED", // The task is synched and hasn't been changed locally
     DIRTY: "DIRTY", // The task is synched but has been changed locally
     COMPLETE: "COMPLETE" // The task is competed and has not been synched with the server yet. 
 }

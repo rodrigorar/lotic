@@ -1,8 +1,9 @@
 const { AccountServices } = require("./accounts/services");
 const { TasksRPC } = require("./tasks/rpc");
 const { TaskServices } = require("./tasks/services");
+const { Task } = require("./tasks/data");
 const { TasksSynchServices } = require("./tasks_synch/services");
-const { TasksSynchData, TASK_SYNCH_STATUS } = require("./tasks_synch/data");
+const { TASK_SYNCH_STATUS } = require("./tasks_synch/data");
 const { Logger } = require("./shared/logger");
 const { StatusCode } = require("./shared/http");
 
@@ -63,18 +64,23 @@ async function callDeleteTasks(taskIds) {
     return result;
 }
 
+async function callListServerTasks(account) {
+    const result = await TasksRPC.listTasks(account.id);
+    return result.data.tasks.map(data => JSON.parse(data));
+}
+
 async function execute() {
-    const createdTasksSynch = await TasksSynchServices.getNonSynched();
+    const account = await AccountServices.getLoggedAccount();
 
     // Created tasks in server
+
+    const createdTasksSynch = await TasksSynchServices.getNonSynched();
 
     const tasksToCreate = 
         createdTasksSynch
             .filter(task => task.synchStatus == TASK_SYNCH_STATUS.LOCAL)
             .map(taskSynch => taskSynch.taskId)
     if (tasksToCreate.length > 0) {
-
-        const account = await AccountServices.getLoggedAccount();
         await callCreateTasks(account, tasksToCreate);
     }
 
@@ -96,6 +102,27 @@ async function execute() {
         const tasksSynchToDelete = await callDeleteTasks(tasksToDelete);
         if (tasksSynchToDelete.length > 0) {
             await TasksSynchServices.deleteMultipleByTaskId(tasksSynchToDelete);
+        }
+    }
+
+    // Get Tasks from server
+
+    const result = await callListServerTasks(account);
+    if (result.length > 0) {
+        const existingTasks = await TaskServices.list();
+        const tasksToInsert = result
+                .filter(result => existingTasks.filter(entry => entry.id == result.task_id) == undefined)
+                .map(taskData => ({
+                    id: taskData.task_id
+                    , title: taskData.title
+                    , createdAt: new Date() // TODO: This should come from the server
+                    , updatedAt: new Date() // TODO: This should come from the server
+                }));
+        if (tasksToInsert.length > 0) {
+            await TaskServices.createMultiple(tasksToInsert);
+            result.forEach(async taskData => {
+                await TasksSynchServices.createSynchMonitor(taskData.task_id, TASK_SYNCH_STATUS.SYNCHED);
+            });
         }
     }
 

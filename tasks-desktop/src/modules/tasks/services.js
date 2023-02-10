@@ -14,11 +14,11 @@ function create(taskData) {
     TasksRepository.createTask(task);
 }
 
-function createMultiple(tasksData) {
+async function createMultiple(tasksData) {
     Validators.isNotNull(tasksData, 'No tasks where provided');
 
     // TODO: Optimize this so it doesn't call the database so many times
-    tasksData
+    await tasksData
         .map(taskData => 
                 new Task(
                     taskData.id
@@ -26,7 +26,7 @@ function createMultiple(tasksData) {
                     , TASK_STATE.IN_TODO
                     , taskData.createdAt
                     , taskData.updatedAt))
-        .forEach(task => TasksRepository.createTask(task));
+        .forEach(async task => await TasksRepository.createTask(task));
 }
 
 function update(taskId, taskData) {

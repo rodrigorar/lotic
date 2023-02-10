@@ -2,10 +2,10 @@ const { ServiceUtils } = require("../shared/service-utils");
 const { Validators } = require("../shared/utils");
 const { TaskSynchRepository } = require("./data");
 
-async function createSynchMonitor(taskId) {
+async function createSynchMonitor(taskId, state = undefined) {
     await ServiceUtils.asyncErrorWrapper(async () => {
         Validators.isNotNull(taskId, 'No task id was provided!');
-        await TaskSynchRepository.create(taskId);
+        await TaskSynchRepository.create(taskId, state);
     })
 }
 
