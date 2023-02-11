@@ -54,7 +54,7 @@ async function createTask() {
 }
 
 async function createTaskWithEvent() {
-    const taskId = createTask();
+    const taskId = await createTask();
 
     tasks.createTask({
         id: taskId,
@@ -92,6 +92,9 @@ async function initUI() {
 }
 
 async function refreshTasks(tasks = undefined) {
+    const activeElementId = document.activeElement.id;
+    logger.trace('Current Active Element Id: ' + activeElementId);
+
     if (tasks != undefined) {
         taskContainer.innerHTML = null;
         emptyTasks = [];
@@ -102,7 +105,7 @@ async function refreshTasks(tasks = undefined) {
             }
             taskContainer.appendChild(createTaskDOM(entry.id, entry.title))
         });
-        setInitialFocus();
+        document.getElementById(activeElementId).focus();
     }
 }
 
@@ -111,7 +114,7 @@ initUI();
 // Add Task
 
 addTaskButton.addEventListener('click', async () => {
-    const taskId = await createTask();
+    const taskId = await createTaskWithEvent();
     emptyTasks.push(taskId);
     document.getElementById('text-input:' + taskId).focus();
 });
@@ -119,7 +122,7 @@ addTaskButton.addEventListener('click', async () => {
 window.addEventListener('keypress', (key) => {
     if (key.code === 'Enter') {
         if (emptyTasks.length == 0) {
-            createTask();
+            createTaskWithEvent();
         }
     }
 });
@@ -148,7 +151,7 @@ function handleCompleteInput(event) {
         event.target.parentElement.remove();
         
         if (document.querySelector('input') == null) {
-            createTask();
+            createTaskWithEvent();
         }
     }
 }

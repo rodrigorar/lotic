@@ -108,9 +108,10 @@ async function doExecute() {
     // Get Tasks from server
 
     const result = await callListServerTasks(account);
+    let tasksToInsert = undefined;
     if (result.length > 0) {
         const existingTasks = await TaskServices.list();
-        const tasksToInsert = result
+        tasksToInsert = result
                 .filter(result => existingTasks.filter(entry => entry.id == result.task_id).length == 0)
                 .map(taskData => ({
                     id: taskData.task_id
@@ -127,7 +128,9 @@ async function doExecute() {
         }
     }
 
-    webContents.getFocusedWebContents().send('tasks:refresh', await TaskServices.list());
+    if (tasksToInsert != undefined && tasksToInsert.length > 0) {
+        webContents.getFocusedWebContents().send('tasks:refresh', await TaskServices.list());
+    }
 
     Logger.trace('Finished Task Synchornization');
 }
