@@ -69,7 +69,7 @@ async function callListServerTasks(account) {
     return result.data.tasks.map(data => JSON.parse(data));
 }
 
-async function execute() {
+async function doExecute() {
     const account = await AccountServices.getLoggedAccount();
 
     // Created tasks in server
@@ -130,7 +130,15 @@ async function execute() {
     webContents.getFocusedWebContents().send('tasks:refresh', await TaskServices.list());
 
     Logger.trace('Finished Task Synchornization');
-    
+}
+
+async function execute() {
+    try {
+        await doExecute();
+    } catch (e) {
+        Logger.error('Failed to properly synch with server');
+        Logger.error(e);
+    }
 } 
 
 module.exports.SynchManager = {
