@@ -38,10 +38,13 @@ app.on('ready', () => {
 
   Menu.setApplicationMenu(null);
 
+  // Run Synch Manager at the start
+  SynchManager.execute(mainWindow.webContents);
+
   // TODO: This cron should come from a config file.
   cron.schedule('*/30 * * * * *', () => {
     SynchManager.execute(mainWindow.webContents);
-  });
+  }).start();
 
   app.on('window-all-closed', () => {
     app.quit();
