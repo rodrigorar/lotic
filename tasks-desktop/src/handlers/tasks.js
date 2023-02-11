@@ -30,7 +30,6 @@ function handleCompletion(event, taskId) {
 }
 
 async function handleListTasks(event) {
-    SynchManager.execute();
     return await TaskServices.list();
 }
 

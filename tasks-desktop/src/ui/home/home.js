@@ -50,15 +50,21 @@ async function createTask() {
 
     document.getElementById('text-input:' + newId).focus();
 
+    return newId;
+}
+
+async function createTaskWithEvent() {
+    const taskId = createTask();
+
     tasks.createTask({
-        id: newId,
+        id: taskId,
         title: '',
         state: 'IN_TODO',
         createdAt: new Date(),
         updatedAt: new Date()
     });
 
-    return newId;
+    return taskId;
 }
 
 function setInitialFocus() {
@@ -69,12 +75,12 @@ function setInitialFocus() {
 
 async function initUI() {
     tasks.listTasks()
-        .then(tasks => {
-            if (tasks.length == 0) {
-                const taskId = createTask();
+        .then(taskList => {
+            if (taskList.length == 0) {
+                const taskId = createTaskWithEvent();
                 uiTasks[taskId] = false;
             } else {
-                tasks.forEach(entry => {
+                taskList.forEach(entry => {
                     if (entry.title === '') {
                         emptyTasks.push(entry.id);
                     }

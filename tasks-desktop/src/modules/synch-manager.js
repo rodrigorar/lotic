@@ -118,7 +118,7 @@ async function doExecute() {
                     , createdAt: new Date() // TODO: This should come from the server
                     , updatedAt: new Date() // TODO: This should come from the server
                 }));
-        console.log(tasksToInsert);
+                
         if (tasksToInsert.length > 0) {
             await TaskServices.createMultiple(tasksToInsert);
             result.forEach(async taskData => {
