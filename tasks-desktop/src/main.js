@@ -1,5 +1,6 @@
+const cron = require('node-cron');
 const { runSchemaMigrations } = require('./modules/shared/database');
-const { app, BrowserWindow, Menu, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, webContents } = require('electron');
 const path = require('path');
 const { LoggerHandler } = require('./handlers/logging');
 const { UtilsHandler } = require('./handlers/utils');
@@ -7,6 +8,7 @@ const { TasksHandler } = require('./handlers/tasks');
 const { OSMask } = require('./modules/shared/os-mask');
 const { isDev } = require('./modules/shared/utils');
 const { SynchManager } = require('./modules/synch-manager');
+const { Logger } = require('./modules/shared/logger');
 
 // Prepare local data directories
 OSMask.prepareDataDirIfNecessary(isDev);
@@ -25,17 +27,21 @@ const createWindow = () => {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html'));
+
+  return mainWindow;
 };
 
 let closeSemaphor = true;
 
 app.on('ready', () => {
-  createWindow()
+  const mainWindow = createWindow()
 
   Menu.setApplicationMenu(null);
 
-  // Update Tasks at Start
-  SynchManager.execute();
+  // TODO: This cron should come from a config file.
+  cron.schedule('*/30 * * * * *', () => {
+    SynchManager.execute(mainWindow.webContents);
+  });
 
   app.on('window-all-closed', () => {
     app.quit();

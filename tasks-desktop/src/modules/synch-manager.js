@@ -69,7 +69,11 @@ async function callListServerTasks(account) {
     return result.data.tasks.map(data => JSON.parse(data));
 }
 
-async function doExecute() {
+async function doExecute(providedWebContents = undefined) {
+    const eventHandler = 
+        providedWebContents != undefined 
+            ? providedWebContents 
+            : webContents.getFocusedWebContents();
     const account = await AccountServices.getLoggedAccount();
 
     // Created tasks in server
@@ -119,25 +123,27 @@ async function doExecute() {
                     , createdAt: new Date() // TODO: This should come from the server
                     , updatedAt: new Date() // TODO: This should come from the server
                 }));
-                
-        if (tasksToInsert.length > 0) {
-            await TaskServices.createMultiple(tasksToInsert);
-            result.forEach(async taskData => {
-                await TasksSynchServices.createSynchMonitor(taskData.task_id, TASK_SYNCH_STATUS.SYNCHED);
-            });
-        }
-    }
 
-    if (tasksToInsert != undefined && tasksToInsert.length > 0) {
-        webContents.getFocusedWebContents().send('tasks:refresh', await TaskServices.list());
+        if (tasksToInsert.length > 0) {
+            await TaskServices
+                .createMultiple(tasksToInsert)
+                .then(async _ => eventHandler.send('tasks:refresh', await TaskServices.list()));
+
+            tasksToInsert
+                .forEach(async taskData => {
+                    await TasksSynchServices.createSynchMonitor(taskData.id, TASK_SYNCH_STATUS.SYNCHED);
+                });            
+        }
+    } else if (result.length == 0) {
+        // TODO: Delete all tasks that exist locally
     }
 
     Logger.trace('Finished Task Synchornization');
 }
 
-async function execute() {
+async function execute(providedWebContents = undefined) {
     try {
-        await doExecute();
+        await doExecute(providedWebContents);
     } catch (e) {
         Logger.error('Failed to properly synch with server');
         Logger.error(e);

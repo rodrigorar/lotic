@@ -1,4 +1,3 @@
-const { Logger } = require("../shared/logger");
 const { HttpClient } = require("../shared/http");
 
 const BASE_PATH = "/tasks";
@@ -11,8 +10,6 @@ async function createTasks(taskList) {
 }
 
 async function updateTasks(taskList) {
-    Logger.trace('Calling Update Tasks');
-
     const result = await HttpClient.put(BASE_PATH, {
         tasks: taskList
     });
@@ -25,8 +22,6 @@ async function listTasks(account_id) {
 }
 
 async function deleteTasks(taskId) {
-    Logger.trace('Calling Delete Tasks');
-
     await HttpClient.del(`${BASE_PATH}/` + taskId)
 }
 
