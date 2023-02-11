@@ -1,11 +1,11 @@
 const { AccountServices } = require("./accounts/services");
 const { TasksRPC } = require("./tasks/rpc");
 const { TaskServices } = require("./tasks/services");
-const { Task } = require("./tasks/data");
 const { TasksSynchServices } = require("./tasks_synch/services");
 const { TASK_SYNCH_STATUS } = require("./tasks_synch/data");
 const { Logger } = require("./shared/logger");
 const { StatusCode } = require("./shared/http");
+const { webContents } = require("electron");
 
 async function callCreateTasks(account, taskIds) {
     const tasks = await TaskServices.listById(taskIds);
@@ -126,6 +126,8 @@ async function execute() {
             });
         }
     }
+
+    webContents.getFocusedWebContents().send('tasks:refresh', await TaskServices.list());
 
     Logger.trace('Finished Task Synchornization');
     

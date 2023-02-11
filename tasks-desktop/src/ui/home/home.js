@@ -85,6 +85,21 @@ async function initUI() {
         });
 }
 
+async function refreshTasks(tasks = undefined) {
+    if (tasks != undefined) {
+        taskContainer.innerHTML = null;
+        emptyTasks = [];
+
+        tasks.forEach(entry => {
+            if (entry.title === '') {
+                emptyTasks.push(entry.id);
+            }
+            taskContainer.appendChild(createTaskDOM(entry.id, entry.title))
+        });
+        setInitialFocus();
+    }
+}
+
 initUI();
 
 // Add Task
@@ -147,3 +162,9 @@ function updateEmptyTasks(taskId, taskTitle = undefined) {
         }
     }
 }
+
+// Event Handlers
+
+tasks.handleRefresh((event, value) => {
+    refreshTasks(value);
+});
