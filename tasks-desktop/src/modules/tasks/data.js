@@ -4,8 +4,8 @@ async function createTask(task) {
     await UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
-                `INSERT INTO tasks(task_id, title, state, created_at, updated_at) VALUES(?, ?, ?, ?, ?)`,
-                [task.id, task.title, task.state, task.createdAt.toISOString(), task.updatedAt.toISOString()]);
+                `INSERT INTO tasks(task_id, title, created_at, updated_at) VALUES(?, ?, ?, ?)`,
+                [task.id, task.title, task.createdAt.toISOString(), task.updatedAt.toISOString()]);
             db.close();
         });
 }
@@ -21,12 +21,13 @@ function updateTask(taskId, data) {
         });
 }
 
+// TODO: Refactor this method to use a more function approach
 async function listTasks() {
     let result = [];
 
     await UnitOfWork.begin();
     const queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks', []);
-    result = queryResult.map(entry => new Task(entry.task_id, entry.title, entry.state, new Date(entry.created_at), new Date(entry.updated_at)));
+    result = queryResult.map(entry => new Task(entry.task_id, entry.title, new Date(entry.created_at), new Date(entry.updated_at)));
     UnitOfWork.end();
 
     return result;
@@ -36,7 +37,7 @@ async function listById(tasksIds = []) {
     return await UnitOfWork.begin()
         .then(async (db) => {
             const queryResult = await db.all('SELECT * FROM tasks WHERE task_id in (' + tasksIds.map(task => '?').join(',') + ')', tasksIds);
-            return queryResult.map(entry => new Task(entry.task_id, entry.title, entry.state, new Date(entry.created_at), new Date(entry.updated_at)));
+            return queryResult.map(entry => new Task(entry.task_id, entry.title, new Date(entry.created_at), new Date(entry.updated_at)));
         });
 }
 
@@ -56,16 +57,10 @@ module.exports.TasksRepository = {
     deleteTask
 }
 
-module.exports.TASK_STATE = {
-    IN_TODO: "IN_TODO",
-    COMPLETED: "COMPLETED"
-}
-
 class Task {
-    constructor(id, title, state, createdAt, updatedAt) {
+    constructor(id, title, createdAt, updatedAt) {
         this.id = id;
         this.title = title;
-        this.state = state;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

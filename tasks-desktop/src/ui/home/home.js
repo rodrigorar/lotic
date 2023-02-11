@@ -59,7 +59,6 @@ async function createTaskWithEvent() {
     tasks.createTask({
         id: taskId,
         title: '',
-        state: 'IN_TODO',
         createdAt: new Date(),
         updatedAt: new Date()
     });

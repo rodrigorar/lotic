@@ -1,14 +1,15 @@
 const { Validators } = require("../shared/utils");
-const { TasksRepository, Task, TASK_STATE } = require("./data");
+const { TasksRepository, Task } = require("./data");
 
 function create(taskData) {
     Validators.isNotNull(taskData, 'No task data was provided!');
+    
+    console.log('Creating a new task');
 
     const task = 
         new Task(
             taskData.id
             , taskData.title
-            , TASK_STATE[taskData.state]
             , taskData.createdAt
             , taskData.updatedAt);
     TasksRepository.createTask(task);
@@ -23,7 +24,6 @@ async function createMultiple(tasksData) {
                 new Task(
                     taskData.id
                     , taskData.title
-                    , TASK_STATE.IN_TODO
                     , taskData.createdAt
                     , taskData.updatedAt))
         .forEach(async task => await TasksRepository.createTask(task));
