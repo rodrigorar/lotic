@@ -13,7 +13,10 @@ const { Logger } = require('./modules/shared/logger');
 // Prepare local data directories
 OSMask.prepareDataDirIfNecessary(isDev);
 
-runSchemaMigrations();
+let schemaMigrationSemaphor = false;
+
+runSchemaMigrations()
+  .then(_ => schemaMigrationSemaphor = true);
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -38,12 +41,16 @@ app.on('ready', () => {
 
   Menu.setApplicationMenu(null);
 
-  // Run Synch Manager at the start
-  SynchManager.execute(mainWindow.webContents);
+  if (schemaMigrationSemaphor) {
+    // Run Synch Manager at the start
+    SynchManager.execute(mainWindow.webContents);
+  }
 
   // TODO: This cron should come from a config file.
   cron.schedule('*/30 * * * * *', () => {
-    SynchManager.execute(mainWindow.webContents);
+    if (schemaMigrationSemaphor) {
+      SynchManager.execute(mainWindow.webContents);
+    }
   }).start();
 
   app.on('window-all-closed', () => {

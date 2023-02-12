@@ -38,6 +38,9 @@ module.exports.runSchemaMigrations = async () => {
     await db.run(createTaskTable, []);
     await db.run(createTaskSyncTable, []);
     await db.run(createAccountsTable, []);
+
+    console.log('After running schema migrations');
+    
     db.close();
 }
 
@@ -65,5 +68,5 @@ const createAccountsTable =
     'CREATE TABLE IF NOT EXISTS accounts (' 
     + 'id TEXT UNIQUE PRIMARY KEY,' 
     + 'email TEXT UNIQUE NOT NULL,'
-    + 'logged_in BOOLEAN NOT NULL' 
+    + 'logged_in INTEGER NOT NULL CHECK (logged_in IN (0, 1))' 
     + ')';

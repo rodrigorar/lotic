@@ -1,31 +1,56 @@
 const { UnitOfWork } = require('../shared/database');
 
-function createAccount(id, email) {
-    UnitOfWork.begin()
+async function createAccount(id, email) {
+    await UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
-                `INSERT INTO accounts(id, email, logged_in) VALUES(?, ?, ?)`,
-                [id, email, false]);
+                `INSERT INTO accounts(id, email, logged_in) VALUES(?, ?, ?)`
+                , [id, email, false]);
             db.close();
         });
 }
 
-function setLoginState(email, state) {
-    UnitOfWork.begin()
+async function setLoginState(email, state) {
+    await UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
-                `UPDATE accounts SET logged_in = ? WHERE email = ?`,
-                [state, email]);
+                `UPDATE accounts SET logged_in = ? WHERE email = ?`
+                , [state, email]);
+            db.close();
+        });
+}
+
+async function loggoutAllAccounts() {
+    await UnitOfWork.begin()
+        .then(async (db) => {
+            await db.run(
+                `UPDATE accounts SET logged_in = false WHERE logged_in IS true`
+                , []);
             db.close();
         });
 }
 
 async function getAccount(email) {
-    await UnitOfWork.begin()
+    return await UnitOfWork.begin()
         .then(async (db) => {
-            const queryResult = await db.first('SELECT * FROM accounts WHERE email = ?', [email]);
+            const queryResult = await db.get(
+                'SELECT * FROM accounts WHERE email = ?'
+                , [email]);
+            const result = new Account(queryResult.id, queryResult.email, queryResult.logged_in == 1);
             db.close();
-            return new Account(queryResult.id, queryResult.email, queryResult.logged_in);
+            return result
+        });
+}
+
+async function getLoggedAccount() {
+    return await UnitOfWork.begin()
+        .then(async (db) => {
+            const queryResult = await db.get(
+                'SELECT * FROM accounts WHERE logged_in is true'
+                , []);
+            const result = new Account(queryResult.id, queryResult.email, queryResult.logged_in == 1);
+            db.close();
+            return result;
         });
 }
 
@@ -41,5 +66,8 @@ module.exports.Account = Account
 module.exports.AccountRepository = {
     createAccount
     , setLoginState
+    , loggoutAllAccounts
     , getAccount
+    , getLoggedAccount
 }
+

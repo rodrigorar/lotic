@@ -15,6 +15,7 @@ function create(accountData) {
 
 function login(email) {
     Validators.isNotNull(email, "No email provided");
+    AccountRepository.loggoutAllAccounts();
     AccountRepository.setLoginState(email, true);
 }
 
@@ -29,11 +30,8 @@ async function getAccount(email) {
 }
 
 async function getLoggedAccount() {
-    // TODO: This account should be the logged in account in the database
-    return new Account('d02e1b3b-014c-47a9-ab73-fa2b3366088e', 'rodrigo.ra.rosa@gmail.com', true);
+    return await AccountRepository.getLoggedAccount();
 }
-
-// TODO: Use service utils of all implemented services
 
 module.exports.AccountServices = {
     create
