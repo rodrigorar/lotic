@@ -35,12 +35,11 @@ module.exports.runSchemaMigrations = async () => {
     Logger.trace('Running schema migrations')
     
     await begin(); 
+    
     await db.run(createTaskTable, []);
     await db.run(createTaskSyncTable, []);
     await db.run(createAccountsTable, []);
 
-    console.log('After running schema migrations');
-    
     db.close();
 }
 

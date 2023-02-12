@@ -76,9 +76,6 @@ async function doExecute(providedWebContents = undefined) {
             : webContents.getFocusedWebContents();
     const account = await AccountServices.getLoggedAccount();
 
-    console.log('Obtained Accounts');
-    console.log(account);
-
     // Created tasks in server
 
     const createdTasksSynch = await TasksSynchServices.getNonSynched();
