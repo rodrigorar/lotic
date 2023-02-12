@@ -22,7 +22,6 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 400,
     height: 500,
-    resizable: false,
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js'),

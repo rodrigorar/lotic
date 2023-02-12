@@ -1,11 +1,77 @@
+
+/* Layout */
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     Arial, sans-serif;
   margin: 0rem;
-  max-width: 21rem;
-  padding: 1rem;
+  width: 90vw;
+  height: 92vh;
+  padding: 2%;
+  margin: 2%;
   overflow: hidden;
 }
+
+.top-header {
+  overflow: hidden;
+  margin: 0%;
+  padding: 0%;
+  width: 100%;
+}
+
+.top-header-left {
+  float: left;
+  margin-left: 0%;
+  padding-left: 0%;
+}
+
+.top-header-right {
+  float: right;
+  margin-right: 0%;
+  padding-right: 0%;
+}
+
+.top-container {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 10%;
+  display: block;
+}
+
+.container {
+  display: block;
+  width: 100%;
+  height: 82%;
+  margin-bottom: 1rem;
+  overflow-y: auto;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+.bottom-container {
+  width: 100%;
+  height: 10%;
+  opacity: 0%;
+}
+
+.button-container {
+  bottom: 5%;
+  right: 8%;
+  opacity: 100%;
+  position: absolute;
+}
+
+.separator {
+  height: 2px;
+  border-width: 0;
+  color: lightgray;
+  background-color: lightgray
+}
+
+/* Text */
 
 .app-font {
   font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
@@ -14,6 +80,17 @@ body {
 .title {
   font-size: x-large;
   font-weight: bolder;
+}
+
+/* Buttons */
+
+.login-button {
+  background-color: yellow;
+  box-shadow: 1px 1px 0 0 darkslategrey;
+  text-align: center;
+  border-radius: 15%;
+  border-style: none;
+  text-shadow: 5px;
 }
 
 .button {
@@ -32,45 +109,6 @@ body {
   background-color: #f7c368;
   text-shadow: 10px;
   border-style: dashed;
-}
-
-.top-container {
-  top: 0;
-  left: 0;
-  width: 23rem;
-  height: 4rem;
-  display: block;
-}
-
-.container {
-  display: block;
-  width: 23rem;
-  height: 19rem;
-  margin-bottom: 1rem;
-  overflow-y: auto;
-}
-
-.container::-webkit-scrollbar {
-  display: none;
-}
-
-.bottom-container {
-  bottom: 0;
-  left: 0;
-  width: 23rem;
-  height: 2rem;
-}
-
-.button-container {
-  float: right;
-  display: table;
-}
-
-.separator {
-  height: 2px;
-  border-width: 0;
-  color: lightgray;
-  background-color: lightgray
 }
 
 /* Inputs */
