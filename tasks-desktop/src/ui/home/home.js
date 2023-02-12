@@ -5,6 +5,7 @@
 
 const taskContainer = document.querySelector("#tasks-container");
 const addTaskButton = document.querySelector("#add-task-button");
+const loginButton = document.querySelector("#login-button");
 
 function createTaskDOM(id, title = undefined) {
     const containerDiv = document.createElement('div');
@@ -116,6 +117,11 @@ addTaskButton.addEventListener('click', async () => {
     const taskId = await createTaskWithEvent();
     emptyTasks.push(taskId);
     document.getElementById('text-input:' + taskId).focus();
+});
+
+loginButton.addEventListener('click', async () => {
+    logger.trace('Click login button');
+    auth.openLogin();
 });
 
 window.addEventListener('keypress', (key) => {

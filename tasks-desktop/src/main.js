@@ -9,6 +9,7 @@ const { OSMask } = require('./modules/shared/os-mask');
 const { isDev } = require('./modules/shared/utils');
 const { SynchManager } = require('./modules/synch-manager');
 const { Logger } = require('./modules/shared/logger');
+const { AuthHandlers } = require('./handlers/auth');
 
 // Prepare local data directories
 OSMask.prepareDataDirIfNecessary(isDev);
@@ -85,3 +86,7 @@ ipcMain.on('tasks:create', TasksHandler.handleCreateTask);
 ipcMain.on('tasks:update', TasksHandler.handleUpdateTasks);
 ipcMain.on('tasks:complete', TasksHandler.handleCompletion);
 ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
+
+// Auth Event Listeners
+ipcMain.on('auth:open:login', AuthHandlers.handleOpenLogin);
+ipcMain.on('auth:login', AuthHandlers.handleLogin);
