@@ -3,6 +3,7 @@ import uuid
 from typing import Optional
 from src.application import UnitOfWork
 from src.application.accounts import UseCaseCreateAccount, UseCaseGetAccount
+from src.domain import LogProvider
 from src.domain.accounts.businessrules import ValidateAccountEmail
 from src.domain.errors import NotFoundError
 from src.domain.accounts import Account, AccountBusinessRulesProvider, GetAccount, CreateAccount, AccountRepository
@@ -65,9 +66,15 @@ class AccountUseCaseProvider:
 
     @staticmethod
     def create_account():
-        return UseCaseCreateAccount(unit_of_work_provider, account_business_rules_provider)
+        return UseCaseCreateAccount(
+            unit_of_work_provider
+            , account_business_rules_provider
+            , LogProvider().get())
 
     @staticmethod
     def get_account():
-        return UseCaseGetAccount(unit_of_work_provider, account_business_rules_provider)
+        return UseCaseGetAccount(
+            unit_of_work_provider
+            , account_business_rules_provider
+            , LogProvider().get())
     

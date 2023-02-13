@@ -1,4 +1,5 @@
 from functools import reduce
+from logging import Logger
 import uuid
 
 from src.domain.errors import ConflictError, NotFoundError
@@ -16,10 +17,13 @@ class UseCaseCreateTasks(UseCase):
             self
             , unit_of_work_provider: UnitOfWorkProvider
             , tasks_br_provider: TasksBusinessRulesProvider
-            , account_br_provider: AccountBusinessRulesProvider):
+            , account_br_provider: AccountBusinessRulesProvider
+            , logger: Logger):
+
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
         self.account_br_provider = account_br_provider
+        self.logger = logger
 
     def execute(self, tasks: list[TaskDTO]) -> list[uuid]:
         assert tasks is not None, "No tasks were provided"
@@ -27,6 +31,8 @@ class UseCaseCreateTasks(UseCase):
         owner_ids = [task.owner_id for task in tasks] \
             if len(tasks) == 1 \
             else reduce(reducer_duplicated, [task.owner_id for task in tasks])
+
+        self.logger.info("UseCase[CreateTasks](" + owner_ids[0] + ")")
 
         if len(owner_ids) > 1:
             raise ConflictError("Cannot create tasks for more than one owner at a time")
@@ -48,12 +54,17 @@ class UseCaseUpdateTasks(UseCase):
     def __init__(
             self
             , unit_of_work_provider: UnitOfWorkProvider
-            , tasks_br_provider: TasksBusinessRulesProvider):
+            , tasks_br_provider: TasksBusinessRulesProvider
+            , logger: Logger):
+
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
+        self.logger = logger
 
     def execute(self, tasks: list[TaskDTO]):
         assert tasks is not None, "Tasks cannot be null"
+
+        self.logger.info("UseCase[UpdateTasks]")
 
         with self.unit_of_work_provider.get() as unit_of_work:
             update_tasks_br = self.tasks_br_provider.update_tasks(unit_of_work)
@@ -67,29 +78,39 @@ class UseCaseDeleteTasks(UseCase):
     def __init__(
             self
             , unit_of_work_provider: UnitOfWorkProvider
-            , tasks_br_provider: TasksBusinessRulesProvider):
+            , tasks_br_provider: TasksBusinessRulesProvider
+            , logger: Logger):
+
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
+        self.logger = logger
 
     def execute(self, task_ids: list[uuid]):
         assert task_ids is not None, "Task id list cannot be null"
+
+        self.logger.info("UseCase[DeleteTasks]")
 
         with self.unit_of_work_provider.get() as unit_of_work:
             delete_task = self.tasks_br_provider.delete_tasks(unit_of_work)
             delete_task.execute(task_ids)
 
 
-class UseCaseListTasksForUser(UseCase):
+class UseCaseListTasksForAccount(UseCase):
 
     def __init__(
             self
             , unit_of_work_provider: UnitOfWorkProvider
-            , tasks_br_provider: TasksBusinessRulesProvider):
+            , tasks_br_provider: TasksBusinessRulesProvider
+            , logger: Logger):
+
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
+        self.logger = logger
 
     def execute(self, account_id: uuid) -> list[TaskDTO]:
         assert account_id is not None, "Account id cannot be null"
+
+        self.logger.info("UseCase[ListTasksForAccount](" + str(account_id) + ")")
 
         with self.unit_of_work_provider.get() as unit_of_work:
             list_account_tasks = self.tasks_br_provider.list_tasks_for_user(unit_of_work)

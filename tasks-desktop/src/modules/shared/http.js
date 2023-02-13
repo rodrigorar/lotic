@@ -2,7 +2,7 @@ const { Logger } = require('./logger');
 const axios = require('axios');
 
 const client = axios.create({
-    baseURL: 'http://localhost:5000',
+    baseURL: 'http://65.20.100.68:8080',
     timeout: 5000
 });
 

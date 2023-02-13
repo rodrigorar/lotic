@@ -2,7 +2,8 @@ from datetime import datetime
 import uuid
 
 from src.application import UnitOfWork
-from src.application.tasks import UseCaseCreateTasks, UseCaseDeleteTasks, UseCaseListTasksForUser, UseCaseUpdateTasks
+from src.application.tasks import UseCaseCreateTasks, UseCaseDeleteTasks, UseCaseListTasksForAccount, UseCaseUpdateTasks
+from src.domain import LogProvider
 from src.domain.errors import NotFoundError
 from src.domain.tasks import TasksRepository, Task, AccountTasksRepository, AccountTasks, TasksBusinessRulesProvider, \
     ListTasksForAccount, DeleteTasks, UpdateTasks, CreateTasks
@@ -122,16 +123,26 @@ class TasksUseCaseProvider:
         return UseCaseCreateTasks(
             unit_of_work_provider
             , tasks_business_rules_provider
-            , account_business_rules_provider)
+            , account_business_rules_provider
+            , LogProvider().get())
 
     @staticmethod
     def update_tasks():
-        return UseCaseUpdateTasks(unit_of_work_provider, tasks_business_rules_provider)
+        return UseCaseUpdateTasks(
+            unit_of_work_provider
+            , tasks_business_rules_provider
+            , LogProvider().get())
 
     @staticmethod
     def delete_tasks():
-        return UseCaseDeleteTasks(unit_of_work_provider, tasks_business_rules_provider)
+        return UseCaseDeleteTasks(
+            unit_of_work_provider
+            , tasks_business_rules_provider
+            , LogProvider().get())
 
     @staticmethod
     def list_tasks_for_user():
-        return UseCaseListTasksForUser(unit_of_work_provider, tasks_business_rules_provider)
+        return UseCaseListTasksForAccount(
+            unit_of_work_provider
+            , tasks_business_rules_provider
+            , LogProvider().get())

@@ -8,11 +8,14 @@ from src.infrastructure.tasks.payloads import CreateTasksRequest, ListAccountTas
 from src.utils import URL_PREFIX_V1
 
 logger = LogProvider().get()
+
 tasks_bp = Blueprint("tasks", __name__, url_prefix=URL_PREFIX_V1 + "/tasks")
 
 
 @tasks_bp.post("")
 def create_tasks():
+    logger.info("Endpoint: Create Tasks");
+
     try:
         request_data = from_json(CreateTasksRequest, request.get_data())
     except TypeError:
@@ -36,6 +39,8 @@ def create_tasks():
 
 @tasks_bp.put("")
 def update_tasks():
+    logger.info("Endpoint: Update tasks")
+
     try:
         request_data = from_json(UpdateTasksRequest, request.get_data())
     except TypeError:
@@ -49,6 +54,8 @@ def update_tasks():
 
 @tasks_bp.delete("/<uuid:task_id>")
 def delete_tasks(task_id):
+    logger.info("Endpoint: Delete task " + str(task_id))
+
     use_case = TasksUseCaseProvider.delete_tasks()
     use_case.execute([task_id])
 
@@ -58,6 +65,8 @@ def delete_tasks(task_id):
 @tasks_bp.get("")
 def list_tasks():
     account_id = request.args.get("account_id", default="", type=str)
+
+    logger.info("Endpoint: List tasks for account " + account_id)
 
     use_case = TasksUseCaseProvider.list_tasks_for_user()
     result = use_case.execute(account_id)

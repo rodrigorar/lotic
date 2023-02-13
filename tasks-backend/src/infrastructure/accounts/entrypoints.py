@@ -8,12 +8,15 @@ from src.infrastructure.accounts.payloads import CreateAccountRequest, GetAccoun
 from src.utils import URL_PREFIX_V1
 
 logger = LogProvider().get()
+
 accounts_bp = Blueprint("accounts", __name__, url_prefix=URL_PREFIX_V1 + "/accounts")
 
 
 # TODO: Refactor parsing of information so that the try/except is not so explicit
 @accounts_bp.post("")
 def create_account():
+    logger.info("Endpoint: Create account")
+
     try:
         request_data = from_json(CreateAccountRequest, request.get_data())
     except TypeError:
@@ -30,6 +33,8 @@ def create_account():
 
 @accounts_bp.get("/<uuid:account_id>")
 def get_account(account_id):
+    logger.info("Endpoint: Get account " + str(account_id))
+
     use_case = AccountUseCaseProvider.get_account()
     result = use_case.execute(account_id)
 

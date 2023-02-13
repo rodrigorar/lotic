@@ -11,8 +11,7 @@ from tests.shared import MockDatabase
 DatabaseProvider().set_database(MockDatabase())
 
 from src.domain.accounts import Account, CreateAccount, ValidateAccountEmail, GetAccount, AccountBusinessRulesProvider
-from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider
-
+from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider, TestLogger
 
 global create_account_br
 global validate_account_email_br
@@ -64,7 +63,10 @@ class TestUseCaseCreateAccount:
         when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(True)
         when(create_account_br).execute(...).thenReturn(ACCOUNT_ID)
 
-        under_test = UseCaseCreateAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
+        under_test = UseCaseCreateAccount(
+            MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider()
+            , TestLogger())
         result = under_test.execute(input_value)
 
         assert result is not None, "Result cannot be None"
@@ -73,7 +75,7 @@ class TestUseCaseCreateAccount:
     def test_should_fail_none_input(self):
         from src.application.accounts import UseCaseCreateAccount
 
-        under_test = UseCaseCreateAccount(None, None)
+        under_test = UseCaseCreateAccount(None, None, TestLogger())
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
@@ -86,7 +88,10 @@ class TestUseCaseCreateAccount:
         when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(True)
         when(create_account_br).execute(...).thenRaise(InternalError("Something went wrong"))
 
-        under_test = UseCaseCreateAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
+        under_test = UseCaseCreateAccount(
+            MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider()
+            , TestLogger())
         with pytest.raises(InternalError):
             under_test.execute(input_value)
 
@@ -97,7 +102,10 @@ class TestUseCaseCreateAccount:
 
         when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(False)
 
-        under_test = UseCaseCreateAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
+        under_test = UseCaseCreateAccount(
+            MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider()
+            , TestLogger())
         with pytest.raises(InvalidArgumentError):
             under_test.execute(input_value)
 
@@ -109,7 +117,10 @@ class TestUseCaseCreateAccount:
         when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(True)
         when(create_account_br).execute(...)  # Will throw error, no need to configure a behaviour
 
-        under_test = UseCaseCreateAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
+        under_test = UseCaseCreateAccount(
+            MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider()
+            , TestLogger())
         with pytest.raises(AssertionError):
             under_test.execute(input_value)
 
@@ -134,7 +145,10 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
 
         when(get_account_br).execute(ACCOUNT_ID).thenReturn(result_value)
 
-        under_test = UseCaseGetAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
+        under_test = UseCaseGetAccount(
+            MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider()
+            , TestLogger())
         result = under_test.execute(ACCOUNT_ID)
 
         assert result is not None, "Result cannot be None"
@@ -146,7 +160,10 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
 
         when(get_account_br).execute(UNKNOWN_ACCOUNT_ID).thenReturn(None)
 
-        under_test = UseCaseGetAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
+        under_test = UseCaseGetAccount(
+            MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider()
+            , TestLogger())
         result = under_test.execute(UNKNOWN_ACCOUNT_ID)
 
         assert result is None, "Result cannot be None"
@@ -157,7 +174,10 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
 
         when(get_account_br).execute(ACCOUNT_ID).thenRaise(InternalError("Something went wrong"))
 
-        under_test = UseCaseGetAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
+        under_test = UseCaseGetAccount(
+            MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider()
+            , TestLogger())
         with pytest.raises(InternalError):
             under_test.execute(ACCOUNT_ID)
 
@@ -166,7 +186,10 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
 
         when(get_account_br).execute(ACCOUNT_ID).thenReturn(None)
 
-        under_test = UseCaseGetAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
+        under_test = UseCaseGetAccount(
+            MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider()
+            , TestLogger())
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
@@ -177,6 +200,9 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
 
         when(get_account_br).execute(ACCOUNT_ID).thenReturn(result_value)
 
-        under_test = UseCaseGetAccount(MockedUnitOfWorkProvider(), MockedAccountBusinessRulesProvider())
+        under_test = UseCaseGetAccount(
+            MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider()
+            , TestLogger())
         with pytest.raises(AssertionError):
             under_test.execute(ACCOUNT_ID)
