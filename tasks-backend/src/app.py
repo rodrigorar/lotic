@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from werkzeug.exceptions import HTTPException
 
-from src.domain.errors import ConflictError, InvalidArgumentError, NotFoundError
+from src.domain import ConflictError, InvalidArgumentError, NotFoundError
 from src.infrastructure import AppProvider, DatabaseSessionProvider, AppConfigurations, to_json
 from logging.config import fileConfig
 

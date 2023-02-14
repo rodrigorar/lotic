@@ -4,7 +4,7 @@ from uuid import uuid4
 from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
-from src.domain.errors import ConflictError, InternalError
+from src.domain import ConflictError, InternalError
 from tests.domain.shared import DomainUnitTestsBase
 from tests.shared import UnitOfWorkMockProvider
 

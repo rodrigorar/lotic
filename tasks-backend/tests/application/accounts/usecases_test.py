@@ -5,7 +5,7 @@ from mockito import mock, when
 import pytest
 
 from src.domain import DatabaseProvider
-from src.domain.errors import InternalError, InvalidArgumentError
+from src.domain import InternalError, InvalidArgumentError
 from tests.shared import MockDatabase
 
 DatabaseProvider().set_database(MockDatabase())

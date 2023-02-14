@@ -5,7 +5,7 @@ from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
 from src.domain import DatabaseProvider
-from src.domain.errors import InternalError, NotFoundError
+from src.domain import InternalError, NotFoundError
 from tests.application.shared import MockedUnitOfWorkProvider, TestLogger
 from tests.shared import MockDatabase
 

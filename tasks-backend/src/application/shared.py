@@ -2,7 +2,7 @@ from logging import Logger
 
 from sqlalchemy.exc import IntegrityError
 
-from src.domain.errors import ConflictError, InternalError
+from src.domain import ConflictError
 
 
 class UseCase:

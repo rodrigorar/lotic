@@ -4,7 +4,7 @@ import uuid
 from src.application import UnitOfWork
 from src.application.tasks import UseCaseCreateTasks, UseCaseDeleteTasks, UseCaseListTasksForAccount, UseCaseUpdateTasks
 from src.domain import LogProvider
-from src.domain.errors import NotFoundError
+from src.domain import NotFoundError
 from src.domain.tasks import TasksRepository, Task, AccountTasksRepository, AccountTasks, TasksBusinessRulesProvider, \
     ListTasksForAccount, DeleteTasks, UpdateTasks, CreateTasks
 from src.infrastructure import UnitOfWorkProviderImpl

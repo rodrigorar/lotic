@@ -3,10 +3,10 @@ import uuid
 from typing import Optional
 from src.application import UnitOfWork
 from src.application.accounts import UseCaseCreateAccount, UseCaseGetAccount
-from src.domain import LogProvider
-from src.domain.accounts.businessrules import ValidateAccountEmail
-from src.domain.errors import NotFoundError
-from src.domain.accounts import Account, AccountBusinessRulesProvider, GetAccount, CreateAccount, AccountRepository
+from src.domain import LogProvider, NotFoundError
+from src.domain.accounts import \
+    Account, AccountBusinessRulesProvider, GetAccount \
+    , CreateAccount, AccountRepository, ValidateAccountEmail
 from src.infrastructure import UnitOfWorkProviderImpl
 from src.infrastructure.auth import EncryptionEngineBCrypt
 

@@ -2,7 +2,7 @@ from functools import reduce
 from logging import Logger
 import uuid
 
-from src.domain.errors import ConflictError, NotFoundError
+from src.domain import ConflictError, NotFoundError
 
 from src.application import UnitOfWorkProvider, UseCase
 from src.application.tasks import TaskDTO

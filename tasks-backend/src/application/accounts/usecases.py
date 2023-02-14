@@ -5,7 +5,7 @@ from logging import Logger
 from src.application import UseCase, UnitOfWorkProvider
 from src.application.accounts import AccountDTO
 from src.domain.accounts import AccountBusinessRulesProvider
-from src.domain.errors import InvalidArgumentError
+from src.domain import InvalidArgumentError
 
 
 class UseCaseCreateAccount(UseCase):

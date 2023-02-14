@@ -1,9 +1,8 @@
 from functools import reduce
-from typing import List
 import uuid
 
 from src.domain import BaseBusinessRule, reducer_duplicated
-from src.domain.errors import ConflictError, InternalError
+from src.domain import ConflictError, InternalError
 from src.domain.tasks import AccountTasks, Task, TasksRepository, AccountTasksRepository
 
 
