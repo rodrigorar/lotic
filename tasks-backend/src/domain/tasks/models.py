@@ -7,6 +7,8 @@ db = DatabaseProvider().get()
 
 
 class Task(db.Model):
+    __tablename__ = "tasks"
+
     id = db.Column(db.String, primary_key=True)
     title = db.Column(db.String)
     description = db.Column(db.String)
@@ -52,6 +54,8 @@ class Task(db.Model):
 
 
 class AccountTasks(db.Model):
+    __tablename__ = "account_tasks"
+
     id = db.Column(db.Integer, primary_key=True)
     account_id = db.Column(db.String, db.ForeignKey(Account.id))
     task_id = db.Column(db.String, db.ForeignKey(Task.id))

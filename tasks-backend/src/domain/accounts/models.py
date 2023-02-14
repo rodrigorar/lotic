@@ -7,6 +7,8 @@ db = DatabaseProvider().get()
 
 
 class Account(db.Model):
+    __tablename__ = "accounts"
+
     id = db.Column(db.String, primary_key=True)
     email = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
