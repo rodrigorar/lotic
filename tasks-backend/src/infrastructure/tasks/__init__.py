@@ -1,5 +1,6 @@
 from src.infrastructure.tasks.adapters \
-    import TasksBusinessRulesProviderImpl, TasksRepositoryImpl, AccountTasksRepositoryImpl
+    import TasksBusinessRulesProviderImpl, TasksRepositoryImpl, AccountTasksRepositoryImpl \
+        , TasksUseCaseProvider
 
 from src.infrastructure.tasks.entrypoints \
     import tasks_bp

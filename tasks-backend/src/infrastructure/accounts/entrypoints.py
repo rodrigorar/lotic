@@ -2,8 +2,8 @@ from flask import Blueprint, request
 
 from src.domain import InvalidArgumentError, LogProvider
 from src.infrastructure import from_json, to_json
-from src.infrastructure.accounts.adapters import AccountUseCaseProvider
-from src.infrastructure.accounts.payloads import CreateAccountRequest, GetAccountResponse
+from src.infrastructure.accounts import CreateAccountRequest, GetAccountResponse \
+    , AccountUseCaseProvider
 from src.utils import URL_PREFIX_V1
 
 logger = LogProvider().get()
