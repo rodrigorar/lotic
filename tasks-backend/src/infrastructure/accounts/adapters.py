@@ -8,6 +8,7 @@ from src.domain.accounts.businessrules import ValidateAccountEmail
 from src.domain.errors import NotFoundError
 from src.domain.accounts import Account, AccountBusinessRulesProvider, GetAccount, CreateAccount, AccountRepository
 from src.infrastructure import UnitOfWorkProviderImpl
+from src.infrastructure.auth import EncryptionEngineBCrypt
 
 
 class AccountRepositoryImpl(AccountRepository):
@@ -43,11 +44,14 @@ class AccountRepositoryImpl(AccountRepository):
         query_manager.add(entry)
 
 
+encryption_engine = EncryptionEngineBCrypt()
+
+
 class AccountBusinessRulesProviderImpl(AccountBusinessRulesProvider):
 
     @staticmethod
     def create_account(unit_of_work) -> CreateAccount:
-        return CreateAccount(unit_of_work, AccountRepositoryImpl())
+        return CreateAccount(unit_of_work, AccountRepositoryImpl(), encryption_engine)
 
     @staticmethod
     def validate_account_email(unit_of_work) -> ValidateAccountEmail:

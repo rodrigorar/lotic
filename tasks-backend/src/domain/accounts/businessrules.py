@@ -3,16 +3,24 @@ import uuid
 
 from src.domain import BaseBusinessRule
 from src.domain.accounts import AccountRepository, Account
+from src.domain.auth import EncryptionEngine
 
 
 class CreateAccount(BaseBusinessRule):
 
-    def __init__(self, unit_of_work, account_repository: AccountRepository):
+    def __init__(
+            self
+            , unit_of_work
+            , account_repository: AccountRepository
+            , encryption_engine: EncryptionEngine):
+
         super().__init__(unit_of_work)
         self.account_repository = account_repository
+        self.encryption_engine = encryption_engine
 
     def execute(self, account: Account):
         assert account is not None, "Account cannot be empty"
+        account.encrypt_password(self.encryption_engine)
         return self.account_repository.insert(self.unit_of_work, account)
 
 

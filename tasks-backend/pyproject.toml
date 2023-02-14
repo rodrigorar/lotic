@@ -42,7 +42,8 @@ dependencies = [
   "flask-sqlalchemy==3.0.2",
   "behave==1.2.6",
   "mockito==1.4.0",
-  "python-dateutil==2.8.2"
+  "python-dateutil==2.8.2",
+  "bcrypt==4.0.1"
 ]
 [tool.hatch.envs.default.scripts]
 unit-tests = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=tasks_server --cov=tests {args}"
