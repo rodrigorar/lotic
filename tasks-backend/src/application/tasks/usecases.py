@@ -2,11 +2,9 @@ from functools import reduce
 from logging import Logger
 import uuid
 
-from src.domain import ConflictError, NotFoundError
-
 from src.application import UnitOfWorkProvider, UseCase
 from src.application.tasks import TaskDTO
-from src.domain import reducer_duplicated
+from src.domain import reducer_duplicated, ConflictError, NotFoundError
 from src.domain.accounts import AccountBusinessRulesProvider
 from src.domain.tasks import TasksBusinessRulesProvider
 
