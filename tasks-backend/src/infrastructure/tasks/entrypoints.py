@@ -1,3 +1,5 @@
+import uuid
+
 from flask import Blueprint, request
 from src.domain import LogProvider
 from src.domain.errors import InvalidArgumentError
@@ -14,7 +16,7 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix=URL_PREFIX_V1 + "/tasks")
 
 @tasks_bp.post("")
 def create_tasks():
-    logger.info("Endpoint: Create Tasks");
+    logger.info("Endpoint: Create Tasks")
 
     try:
         request_data = from_json(CreateTasksRequest, request.get_data())
@@ -69,7 +71,7 @@ def list_tasks():
     logger.info("Endpoint: List tasks for account " + account_id)
 
     use_case = TasksUseCaseProvider.list_tasks_for_user()
-    result = use_case.execute(account_id)
+    result = use_case.execute(uuid.UUID(account_id))
 
     return to_json({
         "tasks": [to_json(ListAccountTasksResponse.from_dto(task)) for task in result]
