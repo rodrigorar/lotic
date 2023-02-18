@@ -1,9 +1,11 @@
 import re
+from typing import Optional
 import uuid
 
 from src.domain import BaseBusinessRule
 from src.domain.accounts import AccountRepository, Account
 from src.domain.auth import EncryptionEngine
+from src.domain.auth.models import AuthToken
 
 
 class CreateAccount(BaseBusinessRule):
@@ -43,6 +45,24 @@ class GetAccount(BaseBusinessRule):
     def execute(self, account_id: uuid):
         assert account_id is not None, "Account id cannot be empty"
         return self.account_repository.get_by_id(self.unit_of_work, account_id)
+
+
+class GetAccountByEmail(BaseBusinessRule):
+
+    def __init__(
+            self
+            , unit_of_work
+            , account_repository: AccountRepository
+            , validate_account_email_br: ValidateAccountEmail):
+
+        super().__init__(unit_of_work)
+        self.account_repository = account_repository
+        self.validate_account_email_br = validate_account_email_br
+
+    def execute(self, email: str) -> Optional[Account]:
+        assert email is not None, "Email cannot be null"
+        assert self.validate_account_email_br.execute(email), "Not a valid email"
+        return self.account_repository.get_by_email(self.unit_of_work, email)
 
 
 class AccountBusinessRulesProvider:

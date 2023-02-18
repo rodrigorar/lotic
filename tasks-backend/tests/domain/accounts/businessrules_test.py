@@ -10,6 +10,8 @@ from tests.shared import UnitOfWorkMockProvider
 
 ACCOUNT_ID = uuid.uuid4()
 ACCOUNT_EMAIL = "john.doe@mail.not"
+ACCOUNT_EMAIL_UNKNOWN = "unknown@mail.not"
+ACCOUNT_EMAIL_INVALID = "llaksiouirekkewoidkoid"
 ACCOUNT_PASSWORD = "passwd01"
 
 
@@ -151,3 +153,146 @@ class TestGetAccount(DomainUnitTestsBase):
         under_test = GetAccount(mocked_unit_of_work, mocked_account_repository)
         with pytest.raises(InternalError):
             under_test.execute(ACCOUNT_ID)
+
+
+class TestGetAccountByEmail(DomainUnitTestsBase):
+
+    def test_should_succeed(self):
+        from src.domain.accounts import Account, ValidateAccountEmail, GetAccountByEmail, \
+            AccountRepository
+
+        repo_return = Account(ACCOUNT_ID, ACCOUNT_EMAIL, "", datetime.now(), datetime.now())
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+        mocked_validate_email_br = mock(ValidateAccountEmail)
+        when(mocked_validate_email_br) \
+            .execute(ACCOUNT_EMAIL) \
+            .thenReturn(True)
+        mocked_account_repository = mock(AccountRepository)
+        when(mocked_account_repository) \
+            .get_by_email(mocked_unit_of_work, ACCOUNT_EMAIL) \
+            .thenReturn(repo_return)
+
+        under_test = GetAccountByEmail(
+            mocked_unit_of_work
+            , mocked_account_repository
+            , mocked_validate_email_br)
+        result = under_test.execute(ACCOUNT_EMAIL)
+
+        assert result is not None
+        assert result.get_id() == ACCOUNT_ID
+        assert result.email == ACCOUNT_EMAIL
+
+        verify(mocked_validate_email_br).execute(ACCOUNT_EMAIL)
+        verify(mocked_account_repository).get_by_email(mocked_unit_of_work, ACCOUNT_EMAIL)
+
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_validate_email_br
+            , mocked_account_repository)
+
+    def test_should_succeed_unknown_email(self):
+        from src.domain.accounts import ValidateAccountEmail, GetAccountByEmail, \
+            AccountRepository
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+        mocked_validate_email_br = mock(ValidateAccountEmail)
+        when(mocked_validate_email_br) \
+            .execute(ACCOUNT_EMAIL_UNKNOWN) \
+            .thenReturn(True)
+        mocked_account_repository = mock(AccountRepository)
+        when(mocked_account_repository) \
+            .get_by_email(mocked_unit_of_work, ACCOUNT_EMAIL_UNKNOWN) \
+            .thenReturn(None)
+
+        under_test = GetAccountByEmail(
+            mocked_unit_of_work
+            , mocked_account_repository
+            , mocked_validate_email_br)
+        result = under_test.execute(ACCOUNT_EMAIL_UNKNOWN)
+
+        assert result is None
+
+        verify(mocked_validate_email_br).execute(ACCOUNT_EMAIL_UNKNOWN)
+        verify(mocked_account_repository).get_by_email(mocked_unit_of_work, ACCOUNT_EMAIL_UNKNOWN)
+
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_validate_email_br
+            , mocked_account_repository)
+
+    def test_should_fail_no_email(self):
+        from src.domain.accounts import ValidateAccountEmail, GetAccountByEmail, \
+            AccountRepository
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+        mocked_validate_email_br = mock(ValidateAccountEmail)
+        mocked_account_repository = mock(AccountRepository)
+
+        under_test = GetAccountByEmail(
+            mocked_unit_of_work
+            , mocked_account_repository
+            , mocked_validate_email_br)
+
+        with pytest.raises(AssertionError):
+            under_test.execute(None)
+
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_validate_email_br
+            , mocked_account_repository)
+
+    def test_should_fail_invalid_email(self):
+        from src.domain.accounts import ValidateAccountEmail, GetAccountByEmail, \
+            AccountRepository
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+        mocked_validate_email_br = mock(ValidateAccountEmail)
+        when(mocked_validate_email_br) \
+            .execute(ACCOUNT_EMAIL_INVALID) \
+            .thenReturn(False)
+        mocked_account_repository = mock(AccountRepository)
+
+        under_test = GetAccountByEmail(
+            mocked_unit_of_work
+            , mocked_account_repository
+            , mocked_validate_email_br)
+
+        with pytest.raises(AssertionError):
+            under_test.execute(ACCOUNT_EMAIL_INVALID)
+
+        verify(mocked_validate_email_br).execute(ACCOUNT_EMAIL_INVALID)
+
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_validate_email_br
+            , mocked_account_repository)
+
+    def test_should_fail_repository_error(self):
+        from src.domain.accounts import Account, ValidateAccountEmail, GetAccountByEmail, \
+            AccountRepository
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+        mocked_validate_email_br = mock(ValidateAccountEmail)
+        when(mocked_validate_email_br) \
+            .execute(ACCOUNT_EMAIL) \
+            .thenReturn(True)
+        mocked_account_repository = mock(AccountRepository)
+        when(mocked_account_repository) \
+            .get_by_email(mocked_unit_of_work, ACCOUNT_EMAIL) \
+            .thenRaise(InternalError)
+
+        under_test = GetAccountByEmail(
+            mocked_unit_of_work
+            , mocked_account_repository
+            , mocked_validate_email_br)
+        with pytest.raises(InternalError):
+            under_test.execute(ACCOUNT_EMAIL)
+
+        verify(mocked_validate_email_br).execute(ACCOUNT_EMAIL)
+        verify(mocked_account_repository).get_by_email(mocked_unit_of_work, ACCOUNT_EMAIL)
+
+        verifyNoMoreInteractions(
+            mocked_unit_of_work
+            , mocked_validate_email_br
+            , mocked_account_repository)

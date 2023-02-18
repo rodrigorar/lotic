@@ -21,6 +21,9 @@ class MockDatabase:
     class String:
         ...
 
+    class DateTime:
+        ...
+
     class ForeignKey:
 
         def __init__(self, *args):

@@ -37,8 +37,8 @@ class AccountRepositoryImpl(AccountRepository):
         if entry is None:
             raise NotFoundError("No valid accounts was found for id " + str(account.id))
 
-        entry.email = account.email if account.email is not None else entry.email
-        entry.password = account.password if account.password is not None else entry.password
+        entry.subject = account.email if account.email is not None else entry.subject
+        entry.secret = account.password if account.password is not None else entry.secret
         entry.updated_at = datetime.now()
 
         query_manager.add(entry)

@@ -1,1 +1,1 @@
-from src.infrastructure.auth.sharedadapters import EncryptionEngineBCrypt
+from src.infrastructure.auth.adapters import EncryptionEngineBCrypt

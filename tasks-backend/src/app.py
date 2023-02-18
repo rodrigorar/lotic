@@ -3,6 +3,7 @@ from flask import Flask
 from werkzeug.exceptions import HTTPException
 
 from src.domain import ConflictError, InvalidArgumentError, NotFoundError
+from src.domain.errors import LoginFailedError
 from src.infrastructure import AppProvider, DatabaseSessionProvider, AppConfigurations, to_json
 from logging.config import fileConfig
 
@@ -58,40 +59,50 @@ print('App started')
 @app.errorhandler(Exception)
 def handle_generic_error(e):
     return to_json({
-        "type": "http://localhost:5000/generic_error",
-        "title": "Internal Service Error",
-        "status": "500",
-        "detail": e.__str__
+        "type": "http://localhost:5000/generic_error"
+        , "title": "Internal Service Error"
+        , "status": "500"
+        , "detail": e.__str__
     }), 500, {'Content-Type': 'application/problem+json'}
 
 
 @app.errorhandler(ConflictError)
 def handle_not_found_error(e: ConflictError):
     return to_json({
-        "type": "http://localhost:5000/conflict_error",
-        "title": e.title,
-        "status": "409",
-        "details": e.details
+        "type": "http://localhost:5000/conflict_error"
+        , "title": e.title
+        , "status": "409"
+        , "details": e.details
     }), 409, {'Content-Type': 'application/problem+json'}
 
 
 @app.errorhandler(NotFoundError)
 def handle_not_found_error(e: NotFoundError):
     return to_json({
-        "type": "http://localhost:5000/not_found_error",
-        "title": e.title,
-        "status": "404",
-        "details": e.details
+        "type": "http://localhost:5000/not_found_error"
+        , "title": e.title
+        , "status": "404"
+        , "details": e.details
     }), 404, {'Content-Type': 'application/problem+json'}
+
+
+@app.errorhandler(LoginFailedError)
+def handle_login_failed_error(e: LoginFailedError):
+    return to_json({
+        "type": "http://localhost:5000/login_failed_error"
+        , "title": e.title
+        , "status": "403"
+        , "details": e.details
+    }), 403, {'Content-Type': 'application/problem+json'}
 
 
 @app.errorhandler(InvalidArgumentError)
 def handle_invalid_argument_error(e: InvalidArgumentError):
     return to_json({
-        "type": "http://localhost:5000/" + e.title,
-        "title": e.title,
-        "status": 400,
-        "details": e.details
+        "type": "http://localhost:5000/" + e.title
+        , "title": e.title
+        , "status": 400
+        , "details": e.details
     }), 400, {'Content-Type': 'application/problem+json'}
 
 
@@ -99,10 +110,10 @@ def handle_invalid_argument_error(e: InvalidArgumentError):
 def handle_http_error(e):
     response = e.get_response()
     response.data = to_json({
-        "type": "http://localhost:5000/http_error",
-        "title": e.name,
-        "status": e.code,
-        "details": e.description
+        "type": "http://localhost:5000/http_error"
+        , "title": e.name
+        , "status": e.code
+        , "details": e.description
     })
     response.content_type = "application/json"
     return response

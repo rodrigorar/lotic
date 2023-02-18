@@ -70,8 +70,8 @@ def step_impl(context):
     with context.app.app_context():
         account = context.db.session.query(Account).filter_by(id=context.result.json["id"]).first()
         assert account is not None
-        assert account.email == context.test_email
-        assert account.password == context.test_password
+        assert account.subject == context.test_email
+        assert account.secret == context.test_password
 
 
 @then('an error is returned informing of the invalid information')
@@ -86,7 +86,7 @@ def step_impl(context):
     assert account_info is not None
     assert account_info.status_code == 200
     assert account_info.json["id"] == str(context.test_account.get_id())
-    assert account_info.json["email"] == context.test_account.email
+    assert account_info.json["email"] == context.test_account.subject
     assert account_info.json["created_at"] == context.test_account.created_at
     assert account_info.json["updated_at"] == context.test_account.updated_at
 
