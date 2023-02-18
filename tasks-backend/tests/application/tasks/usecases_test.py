@@ -6,7 +6,7 @@ import pytest
 
 from src.domain import DatabaseProvider
 from src.domain import InternalError, NotFoundError
-from tests.application.shared import MockedUnitOfWorkProvider, TestLogger
+from tests.application.shared import MockedUnitOfWorkProvider, MockedLogger
 from tests.shared import MockDatabase
 
 DatabaseProvider().set_database(MockDatabase())
@@ -127,7 +127,7 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         result = under_test.execute(input_data)
 
         assert result is not None
@@ -156,7 +156,7 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         result = under_test.execute(input_data)
 
         assert result is not None
@@ -173,7 +173,7 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
@@ -198,7 +198,7 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         with pytest.raises(InternalError):
             under_test.execute(input_data)
 
@@ -222,7 +222,7 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
 
         with pytest.raises(NotFoundError):
             under_test.execute(input_data)
@@ -248,7 +248,7 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
         under_test = UseCaseUpdateTasks(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         result = under_test.execute(test_input)
 
         assert result is not None
@@ -270,7 +270,7 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
         under_test = UseCaseUpdateTasks(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         result = under_test.execute(test_input)
 
         assert result is not None
@@ -296,7 +296,7 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
         under_test = UseCaseUpdateTasks(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         result = under_test.execute(test_input)
 
         assert result is not None
@@ -313,7 +313,7 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
         under_test = UseCaseUpdateTasks(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
@@ -332,7 +332,7 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
         under_test = UseCaseUpdateTasks(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         with pytest.raises(InternalError):
             under_test.execute(test_input)
 
@@ -352,7 +352,7 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
         under_test = UseCaseDeleteTasks(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         under_test.execute(test_input)
 
         verify(delete_tasks_br).execute(...)
@@ -368,7 +368,7 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
         under_test = UseCaseDeleteTasks(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         under_test.execute(test_input)
 
         verify(delete_tasks_br).execute(...)
@@ -379,7 +379,7 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
         under_test = UseCaseDeleteTasks(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
 
         with pytest.raises(AssertionError):
             under_test.execute(None)
@@ -395,7 +395,7 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
         under_test = UseCaseDeleteTasks(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
 
         with pytest.raises(InternalError):
             under_test.execute(test_input)
@@ -420,7 +420,7 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
         under_test = UseCaseListTasksForAccount(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         result = under_test.execute(ACCOUNT_ID)
 
         assert result is not None
@@ -443,7 +443,7 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
         under_test = UseCaseListTasksForAccount(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         result = under_test.execute(ACCOUNT_ID)
 
         assert result is not None
@@ -464,7 +464,7 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
         under_test = UseCaseListTasksForAccount(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         result = under_test.execute(ACCOUNT_ID)
 
         assert result is not None
@@ -478,7 +478,7 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
         under_test = UseCaseListTasksForAccount(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
 
         with pytest.raises(AssertionError):
             under_test.execute(None)
@@ -493,7 +493,7 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
         under_test = UseCaseListTasksForAccount(
             MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
 
         with pytest.raises(InternalError):
             under_test.execute(ACCOUNT_ID)

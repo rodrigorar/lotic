@@ -4,14 +4,13 @@ import uuid
 from mockito import mock, when
 import pytest
 
-from src.domain import DatabaseProvider
-from src.domain import InternalError, InvalidArgumentError
+from src.domain import InternalError, InvalidArgumentError, DatabaseProvider
 from tests.shared import MockDatabase
 
 DatabaseProvider().set_database(MockDatabase())
 
 from src.domain.accounts import Account, CreateAccount, ValidateAccountEmail, GetAccount, AccountBusinessRulesProvider
-from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider, TestLogger
+from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider, MockedLogger
 
 global create_account_br
 global validate_account_email_br
@@ -66,7 +65,7 @@ class TestUseCaseCreateAccount:
         under_test = UseCaseCreateAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         result = under_test.execute(input_value)
 
         assert result is not None, "Result cannot be None"
@@ -75,7 +74,7 @@ class TestUseCaseCreateAccount:
     def test_should_fail_none_input(self):
         from src.application.accounts import UseCaseCreateAccount
 
-        under_test = UseCaseCreateAccount(None, None, TestLogger())
+        under_test = UseCaseCreateAccount(None, None, MockedLogger())
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
@@ -91,7 +90,7 @@ class TestUseCaseCreateAccount:
         under_test = UseCaseCreateAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         with pytest.raises(InternalError):
             under_test.execute(input_value)
 
@@ -105,7 +104,7 @@ class TestUseCaseCreateAccount:
         under_test = UseCaseCreateAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         with pytest.raises(InvalidArgumentError):
             under_test.execute(input_value)
 
@@ -120,7 +119,7 @@ class TestUseCaseCreateAccount:
         under_test = UseCaseCreateAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         with pytest.raises(AssertionError):
             under_test.execute(input_value)
 
@@ -148,7 +147,7 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         under_test = UseCaseGetAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         result = under_test.execute(ACCOUNT_ID)
 
         assert result is not None, "Result cannot be None"
@@ -163,7 +162,7 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         under_test = UseCaseGetAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         result = under_test.execute(UNKNOWN_ACCOUNT_ID)
 
         assert result is None, "Result cannot be None"
@@ -177,7 +176,7 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         under_test = UseCaseGetAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         with pytest.raises(InternalError):
             under_test.execute(ACCOUNT_ID)
 
@@ -189,7 +188,7 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         under_test = UseCaseGetAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
@@ -203,6 +202,6 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         under_test = UseCaseGetAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , TestLogger())
+            , MockedLogger())
         with pytest.raises(AssertionError):
             under_test.execute(ACCOUNT_ID)

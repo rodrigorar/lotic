@@ -42,7 +42,7 @@ class MockedUnitOfWorkProvider(UnitOfWorkProvider):
         return TestUnitOfWorkImpl(mocked_logger)
 
 
-class TestLogger(Logger):
+class MockedLogger(Logger):
     _instance = None
 
     def __new__(cls, *args, **kwargs):

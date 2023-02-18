@@ -1,6 +1,6 @@
 from logging import Logger
 from typing import Optional
-from src.domain import ConflictError
+from src.domain.errors import ConflictError
 
 
 class BaseRepository:
