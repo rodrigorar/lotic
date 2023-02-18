@@ -27,8 +27,8 @@ def tasks_server(context, timeout=30, **kwargs):
         context.app = None
         context.client = None
         context.db = None
-    except Exception:
-        print('Something went wrong')
+    except Exception as e:
+        print(e)
 
 
 tagged_fixtures = {

@@ -3,8 +3,8 @@ import uuid
 from flask import Blueprint, request
 from src.domain import InvalidArgumentError, LogProvider
 from src.infrastructure import from_json, to_json
-from src.infrastructure.tasks import TasksUseCaseProvider, CreateTasksRequest \
-    , ListAccountTasksResponse, UpdateTasksRequest
+from src.infrastructure.tasks.payloads import CreateTasksRequest, ListAccountTasksResponse, UpdateTasksRequest
+from src.infrastructure.tasks import TasksUseCaseProvider
 from src.utils import URL_PREFIX_V1
 
 logger = LogProvider().get()

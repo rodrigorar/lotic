@@ -9,10 +9,8 @@ class AppConfigurations:
         return cls._instance
 
     def set_app_config(self, app_config):
-        if self._app_config is not None:
-            print('App config was already configured')
-            raise AttributeError("App Configuration has already been assigned")
-        self._app_config = app_config
+        if self._app_config is None:
+            self._app_config = app_config
 
     def database_uri(self):
         return self._app_config.get('SQLALCHEMY_DATABASE_URI')

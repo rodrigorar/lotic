@@ -45,7 +45,9 @@ AppProvider().set_app(app)
 config_app()
 setup_providers(app, SQLAlchemy(app))
 setup_blueprints(app)
+print('Blueprints configured')
 start(app)
+print('App started')
 
 
 # Generic Error Handlers
