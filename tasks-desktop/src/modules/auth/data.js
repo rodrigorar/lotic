@@ -21,7 +21,7 @@ async function getAuthToken(account_id) {
                     'SELECT * FROM auth_tokens WHERE account_id = ?'
                     , [account_id]);
 
-            if (queryResult.token == undefined) {
+            if (queryResult == undefined) {
                 return undefined
             }
             
@@ -39,7 +39,7 @@ async function getActiveSession() {
                     'SELECT * FROM auth_tokens LIMIT 1'
                     , []);
             
-            if (queryResult.token == undefined) {
+            if (queryResult == undefined) {
                 return undefined
             }
 

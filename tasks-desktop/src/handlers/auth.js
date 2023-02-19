@@ -5,8 +5,8 @@ const { AuthServices } = require('../modules/auth/services');
 let loginWindow;
 
 
-function handleOpenLogin(event) {
-    const activeSession = AuthServices.getActiveSession();
+async function handleOpenLogin(event) {
+    const activeSession = await AuthServices.getActiveSession();
     loginWindow = new BrowserWindow({
         width: 400,
         height: 200,
@@ -16,7 +16,7 @@ function handleOpenLogin(event) {
         },
     });
       
-
+    console.log(activeSession);
     const authFile = 
         activeSession == undefined 
             ? '../ui/login/login.html' 
