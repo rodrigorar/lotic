@@ -18,7 +18,6 @@ ACCOUNT_PASSWORD = "passwd01"
 class TestCreateAccount(DomainUnitTestsBase):
 
     def test_should_succeed(self):
-        from src.domain.auth import EncryptionEngine
         from src.domain.accounts import Account, CreateAccount, AccountRepository
 
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
@@ -30,48 +29,37 @@ class TestCreateAccount(DomainUnitTestsBase):
             .insert(mocked_unit_of_work, test_input) \
             .thenReturn(ACCOUNT_ID)
 
-        mocked_encryption_engine = mock(EncryptionEngine)
-        when(mocked_encryption_engine).encrypt(...).thenReturn('hashed-passwd')
-
         under_test = CreateAccount(
             mocked_unit_of_work
-            , mocked_account_repository
-            , mocked_encryption_engine)
+            , mocked_account_repository)
         result = under_test.execute(test_input)
 
         assert result is not None, "Result cannot be None"
         assert result == ACCOUNT_ID, "Result as equal " + str(ACCOUNT_ID)
 
         verify(mocked_account_repository).insert(mocked_unit_of_work, test_input)
-        verify(mocked_encryption_engine).encrypt(...)
 
         verifyNoMoreInteractions(
             mocked_unit_of_work
-            , mocked_account_repository
-            , mocked_encryption_engine)
+            , mocked_account_repository)
 
     def test_should_fail_no_port_provided(self):
-        from src.domain.auth import EncryptionEngine
         from src.domain.accounts import CreateAccount, AccountRepository
 
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
         mocked_account_repository = mock(AccountRepository)
-        mocked_encryption_engine = mock(EncryptionEngine)
 
         under_test = CreateAccount(
             mocked_unit_of_work
-            , mocked_account_repository
-            , mocked_encryption_engine)
+            , mocked_account_repository)
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
         verifyNoMoreInteractions(
             mocked_unit_of_work
-            , mocked_account_repository
-            , mocked_encryption_engine)
+            , mocked_account_repository)
 
     def test_should_fail_repository_error(self):
-        from src.domain.auth import EncryptionEngine
         from src.domain.accounts import Account, CreateAccount, AccountRepository
 
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
@@ -79,27 +67,19 @@ class TestCreateAccount(DomainUnitTestsBase):
         mocked_account_repository = mock(AccountRepository)
         when(mocked_account_repository).insert(mocked_unit_of_work, ...).thenRaise(InternalError)
 
-        mocked_encryption_engine = mock(EncryptionEngine)
-        when(mocked_encryption_engine) \
-            .encrypt(...) \
-            .thenReturn('hashed-passwd')
-
         test_input = Account.from_values(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 
         under_test = CreateAccount(
             mocked_unit_of_work
-            , mocked_account_repository
-            , mocked_encryption_engine)
+            , mocked_account_repository)
         with pytest.raises(InternalError):
             under_test.execute(test_input)
 
         verify(mocked_account_repository).insert(mocked_unit_of_work, ...)
-        verify(mocked_encryption_engine).encrypt(...)
 
         verifyNoMoreInteractions(
             mocked_unit_of_work
-            , mocked_account_repository
-            , mocked_encryption_engine)
+            , mocked_account_repository)
 
 
 class TestGetAccount(DomainUnitTestsBase):

@@ -4,8 +4,6 @@ import uuid
 
 from src.domain import BaseBusinessRule
 from src.domain.accounts import AccountRepository, Account
-from src.domain.auth import EncryptionEngine
-from src.domain.auth.models import AuthToken
 
 
 class CreateAccount(BaseBusinessRule):
@@ -13,16 +11,13 @@ class CreateAccount(BaseBusinessRule):
     def __init__(
             self
             , unit_of_work
-            , account_repository: AccountRepository
-            , encryption_engine: EncryptionEngine):
+            , account_repository: AccountRepository):
 
         super().__init__(unit_of_work)
         self.account_repository = account_repository
-        self.encryption_engine = encryption_engine
 
     def execute(self, account: Account):
         assert account is not None, "Account cannot be empty"
-        account.encrypt_password(self.encryption_engine)
         return self.account_repository.insert(self.unit_of_work, account)
 
 
@@ -78,3 +73,7 @@ class AccountBusinessRulesProvider:
     @staticmethod
     def get_account(unit_of_work) -> GetAccount:
         raise NotImplemented("AccountBusinessRulesProvider#get_account is not implemented.")
+
+    @staticmethod
+    def get_account_by_email(unit_of_work) -> GetAccountByEmail:
+        raise NotImplemented("AccountBusinessRulesProvider#get_account_by_email is not implemented")

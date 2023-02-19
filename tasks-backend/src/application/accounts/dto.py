@@ -15,7 +15,12 @@ class AccountDTO(DTOTranslator):
         self.updated_at = updated_at
 
     def to_entity(self):
-        return Account.from_values(self.id, self.email, self.password, self.created_at, self.updated_at)
+        return Account.from_values(
+            self.id
+            , self.email
+            , self.password
+            , self.created_at
+            , self.updated_at)
 
     def equals(self, other):
         return self.id == other.id \

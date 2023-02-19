@@ -6,6 +6,7 @@ from src.application import UseCase, UnitOfWorkProvider
 from src.application.accounts import AccountDTO
 from src.domain.accounts import AccountBusinessRulesProvider
 from src.domain import InvalidArgumentError
+from src.domain.auth import EncryptionEngine
 
 
 class UseCaseCreateAccount(UseCase):
@@ -14,10 +15,12 @@ class UseCaseCreateAccount(UseCase):
             self
             , unit_of_work_provider: UnitOfWorkProvider
             , account_business_rules_provider: AccountBusinessRulesProvider
+            , encryption_engine: EncryptionEngine
             , logger: Logger):
 
         self.unit_of_work_provider = unit_of_work_provider
         self.account_br_provider = account_business_rules_provider
+        self.encryption_engine = encryption_engine
         self.logger = logger
 
     def execute(self, account: AccountDTO):
@@ -31,6 +34,7 @@ class UseCaseCreateAccount(UseCase):
                 raise InvalidArgumentError("Email is not valid")
 
             create_account_br = self.account_br_provider.create_account(unit_of_work)
+            account.password = self.encryption_engine.encrypt(account.password)
             result = create_account_br.execute(account.to_entity())
         return result
 

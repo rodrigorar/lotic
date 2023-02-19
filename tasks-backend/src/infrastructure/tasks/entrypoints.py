@@ -8,7 +8,6 @@ from src.infrastructure.tasks import TasksUseCaseProvider
 from src.utils import URL_PREFIX_V1
 
 logger = LogProvider().get()
-
 tasks_bp = Blueprint("tasks", __name__, url_prefix=URL_PREFIX_V1 + "/tasks")
 
 

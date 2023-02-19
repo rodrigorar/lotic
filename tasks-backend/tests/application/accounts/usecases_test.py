@@ -1,7 +1,7 @@
 from datetime import datetime
 import uuid
 
-from mockito import mock, when
+from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
 from src.domain import InternalError, InvalidArgumentError, DatabaseProvider
@@ -36,6 +36,7 @@ ACCOUNT_ID = uuid.uuid4()
 UNKNOWN_ACCOUNT_ID = uuid.uuid4()
 ACCOUNT_EMAIL = "john.doe@mail.not"
 ACCOUNT_PASSWORD = "passwd01"
+ACCOUNT_ENCRYPTED_PASSWORD = "uiskjdiuytrn4"
 
 
 class TestUseCaseCreateAccount:
@@ -56,72 +57,129 @@ class TestUseCaseCreateAccount:
 
     def test_should_succeed(self):
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
+        from src.domain.auth import EncryptionEngine
 
         input_value = AccountDTO(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 
         when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(True)
         when(create_account_br).execute(...).thenReturn(ACCOUNT_ID)
 
+        mocked_encryption_engine = mock(EncryptionEngine)
+        when(mocked_encryption_engine) \
+            .encrypt(...) \
+            .thenReturn(ACCOUNT_ENCRYPTED_PASSWORD)
+
         under_test = UseCaseCreateAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
+            , mocked_encryption_engine
             , MockedLogger())
         result = under_test.execute(input_value)
 
         assert result is not None, "Result cannot be None"
         assert result == ACCOUNT_ID, "Result differs from expected"
 
+        verify(validate_account_email_br).execute(ACCOUNT_EMAIL)
+        verify(create_account_br).execute(...)
+        verify(mocked_encryption_engine).encrypt(...)
+
+        verifyNoMoreInteractions(
+            validate_account_email_br
+            , create_account_br
+            , mocked_encryption_engine)
+
     def test_should_fail_none_input(self):
         from src.application.accounts import UseCaseCreateAccount
 
-        under_test = UseCaseCreateAccount(None, None, MockedLogger())
+        under_test = UseCaseCreateAccount(None, None, None, MockedLogger())
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
     # br = business_rule
     def test_should_fail_create_account_br_error(self):
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
+        from src.domain.auth import EncryptionEngine
 
         input_value = AccountDTO(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 
         when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(True)
         when(create_account_br).execute(...).thenRaise(InternalError("Something went wrong"))
 
+        mocked_encryption_engine = mock(EncryptionEngine)
+        when(mocked_encryption_engine) \
+            .encrypt(...) \
+            .thenReturn(ACCOUNT_ENCRYPTED_PASSWORD)
+
         under_test = UseCaseCreateAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
+            , mocked_encryption_engine
             , MockedLogger())
         with pytest.raises(InternalError):
             under_test.execute(input_value)
 
+        verify(validate_account_email_br).execute(ACCOUNT_EMAIL)
+        verify(create_account_br).execute(...)
+        verify(mocked_encryption_engine).encrypt(...)
+
+        verifyNoMoreInteractions(
+            validate_account_email_br
+            , create_account_br
+            , mocked_encryption_engine)
+
     def test_should_fail_validate_account_email_br_error(self):
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
+        from src.domain.auth import EncryptionEngine
 
         input_value = AccountDTO(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 
         when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(False)
 
+        mocked_encryption_engine = mock(EncryptionEngine)
+
         under_test = UseCaseCreateAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
+            , mocked_encryption_engine
             , MockedLogger())
         with pytest.raises(InvalidArgumentError):
             under_test.execute(input_value)
 
+        verify(validate_account_email_br).execute(ACCOUNT_EMAIL)
+
+        verifyNoMoreInteractions(
+            validate_account_email_br
+            , mocked_encryption_engine)
+
     def test_should_fail_dto_to_entity_error(self, setup_mocks_aspect):
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
+        from src.domain.auth import EncryptionEngine
 
         input_value = AccountDTO(None, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 
         when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(True)
         when(create_account_br).execute(...)  # Will throw error, no need to configure a behaviour
 
+        mocked_encryption_engine = mock(EncryptionEngine)
+        when(mocked_encryption_engine) \
+            .encrypt(...) \
+            .thenReturn(ACCOUNT_ENCRYPTED_PASSWORD)
+
         under_test = UseCaseCreateAccount(
             MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
+            , mocked_encryption_engine
             , MockedLogger())
         with pytest.raises(AssertionError):
             under_test.execute(input_value)
+
+        verify(validate_account_email_br).execute(ACCOUNT_EMAIL)
+        verify(mocked_encryption_engine).encrypt(...)
+
+        verifyNoMoreInteractions(
+            validate_account_email_br
+            , create_account_br
+            , mocked_encryption_engine)
 
 
 class TestUseCaseGetAccount(ApplicationUnitTestsBase):

@@ -27,9 +27,11 @@ def setup_providers(flask, db):
 def setup_blueprints(app_context: Flask):
     from src.infrastructure.accounts import accounts_bp
     from src.infrastructure.tasks import tasks_bp
+    from src.infrastructure.auth import auth_bp
 
     app_context.register_blueprint(accounts_bp)
     app_context.register_blueprint(tasks_bp)
+    app_context.register_blueprint(auth_bp)
 
 
 def start(flask: Flask):
@@ -46,9 +48,7 @@ AppProvider().set_app(app)
 config_app()
 setup_providers(app, SQLAlchemy(app))
 setup_blueprints(app)
-print('Blueprints configured')
 start(app)
-print('App started')
 
 
 # Generic Error Handlers

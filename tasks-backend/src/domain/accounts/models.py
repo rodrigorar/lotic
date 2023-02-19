@@ -2,7 +2,6 @@ import uuid
 from datetime import datetime
 
 from src.domain import DatabaseProvider
-from src.domain.auth import EncryptionEngine
 
 db = DatabaseProvider().get()
 
@@ -32,9 +31,6 @@ class Account(db.Model):
 
     def get_id(self):
         return uuid.UUID(self.id)
-
-    def encrypt_password(self, encryption_engine: EncryptionEngine):
-        self.password = encryption_engine.encrypt(self.password)
 
     @classmethod
     def from_values(cls, account_id, email, password, created_at, updated_at):

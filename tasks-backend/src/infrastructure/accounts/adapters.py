@@ -6,7 +6,7 @@ from src.application.accounts import UseCaseCreateAccount, UseCaseGetAccount
 from src.domain import LogProvider, NotFoundError
 from src.domain.accounts import \
     Account, AccountBusinessRulesProvider, GetAccount \
-    , CreateAccount, AccountRepository, ValidateAccountEmail
+    , CreateAccount, AccountRepository, GetAccountByEmail, ValidateAccountEmail
 from src.infrastructure import UnitOfWorkProviderImpl
 from src.infrastructure.auth import EncryptionEngineBCrypt
 
@@ -19,6 +19,13 @@ class AccountRepositoryImpl(AccountRepository):
 
         query_manager = unit_of_work.query()
         return query_manager.query(Account).filter_by(id=str(account_id)).first()
+
+    def get_by_email(self, unit_of_work, email: str) -> Optional[Account]:
+        assert unit_of_work is not None, "Unit of work cannot be empty"
+        assert email is not None, "Email cannot be empty"
+
+        query_manager = unit_of_work.query()
+        return query_manager.query(Account).filter_by(email=email).first()
 
     def insert(self, unit_of_work: UnitOfWork, account: Account) -> uuid:
         assert unit_of_work is not None, "Unit of work cannot be empty"
@@ -44,14 +51,11 @@ class AccountRepositoryImpl(AccountRepository):
         query_manager.add(entry)
 
 
-encryption_engine = EncryptionEngineBCrypt()
-
-
 class AccountBusinessRulesProviderImpl(AccountBusinessRulesProvider):
 
     @staticmethod
     def create_account(unit_of_work) -> CreateAccount:
-        return CreateAccount(unit_of_work, AccountRepositoryImpl(), encryption_engine)
+        return CreateAccount(unit_of_work, AccountRepositoryImpl())
 
     @staticmethod
     def validate_account_email(unit_of_work) -> ValidateAccountEmail:
@@ -60,6 +64,10 @@ class AccountBusinessRulesProviderImpl(AccountBusinessRulesProvider):
     @staticmethod
     def get_account(unit_of_work) -> GetAccount:
         return GetAccount(unit_of_work, AccountRepositoryImpl())
+
+    @staticmethod
+    def get_account_by_email(unit_of_work) -> GetAccountByEmail:
+        return GetAccountByEmail(unit_of_work, AccountRepositoryImpl(), ValidateAccountEmail(unit_of_work))
 
 
 account_business_rules_provider = AccountBusinessRulesProviderImpl()
@@ -73,6 +81,7 @@ class AccountUseCaseProvider:
         return UseCaseCreateAccount(
             unit_of_work_provider
             , account_business_rules_provider
+            , EncryptionEngineBCrypt()
             , LogProvider().get())
 
     @staticmethod
