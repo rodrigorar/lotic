@@ -20,6 +20,9 @@ def login():
         raise InvalidArgumentError("Unkown field sent")
 
     use_case = AuthUseCaseProvider.login()
-    response = use_case.execute(request_data.to_dto())
-    print("Token: " + response.token + " Account_id: " + response.account_id)
-    return to_json(response), 200, {'Content-Type': 'application/json'}
+    result = use_case.execute(request_data.to_dto())
+    return to_json({
+        "token": result.token
+        , "account_id": str(result.account_id)
+        , "expires_at": result.expires_at.astimezone().isoformat()
+    }), 200, {'Content-Type': 'application/json'}

@@ -16,9 +16,10 @@ class Principal:
 
 class AuthToken:
 
-    def __init__(self, token: str, account_id: str):
+    def __init__(self, token: str, account_id: uuid, expires_at: datetime):
         self.token = token
         self.account_id = account_id
+        self.expires_at = expires_at
 
 
 class AuthSession(db.Model):

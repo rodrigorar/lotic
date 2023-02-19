@@ -43,7 +43,7 @@ class Login(BaseBusinessRule):
                 , current_time + timedelta(hours=1))
             self.auth_session_repository.insert(self.unit_of_work, auth_session)
 
-        return AuthToken(auth_session.id, account.id)
+        return AuthToken(auth_session.id, account.get_id(), auth_session.expires_at)
 
 
 class AuthBusinessRulesProvider:
