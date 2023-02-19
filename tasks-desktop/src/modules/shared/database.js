@@ -51,8 +51,8 @@ const createTaskTable =
     'CREATE TABLE IF NOT EXISTS tasks (' 
     + 'task_id TEXT UNIQUE PRIMARY KEY,' 
     + 'title TEXT,' 
-    + 'created_at TEXT NOT NULL,' 
-    + 'updated_at TEXT NOT NULL' 
+    + 'created_at DATETIME NOT NULL,' 
+    + 'updated_at DATETIME NOT NULL' 
     + ')';
 
 const createTaskSyncTable = 
@@ -60,21 +60,19 @@ const createTaskSyncTable =
     + 'task_synch_id TEXT UNIQUE PRIMARY KEY,' 
     + 'task_id TEXT UNIQUE NOT NULL,' 
     + 'synch_status TEXT NOT NULL,' 
-    + 'created_at TEXT NOT NULL,' 
-    + 'updated_at TEXT NOT NULL' 
+    + 'created_at DATETIME NOT NULL,' 
+    + 'updated_at DATETIME  NOT NULL' 
     + ')';
 
 const createAccountsTable = 
     'CREATE TABLE IF NOT EXISTS accounts (' 
     + 'id TEXT UNIQUE PRIMARY KEY,' 
-    + 'email TEXT UNIQUE NOT NULL,'
-    + 'logged_in INTEGER NOT NULL CHECK (logged_in IN (0, 1))' 
+    + 'email TEXT UNIQUE NOT NULL'
     + ')';
 
 const createAuthSessionsTable =
-    'CREATE TABLE IF NOT EXISTS auth_sessions ('
+    'CREATE TABLE IF NOT EXISTS auth_tokens ('
     + 'id INTEGER PRIMARY KEY AUTOINCREMENT,'
     + 'token TEXT UNIQUE NOT NULL,'
-    + 'account_id TEXT UNIQUE NOT NULL,'
-    + 'expires_at TEXT NOT NULL'
+    + 'account_id TEXT NOT NULL'
     + ')'

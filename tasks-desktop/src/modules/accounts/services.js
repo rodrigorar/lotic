@@ -6,10 +6,9 @@ function create(accountData) {
 
     AccountRepository
         .createAccount(
-            new Task(
+            new Account(
                 accountData.id
                 , accountData.email
-                , true
             ))
 }
 
@@ -18,12 +17,13 @@ async function getAccount(email) {
     return await AccountRepository.getAccount(email);
 }
 
-async function getLoggedAccount() {
-    return await AccountRepository.getLoggedAccount();
+async function getAccountById(account_id) {
+    Validators.isNotNull(account_id, "No account_id provided");
+    return await AccountRepository.getAccountById(account_id);
 }
 
 module.exports.AccountServices = {
     create
     , getAccount
-    , getLoggedAccount
+    , getAccountById
 }

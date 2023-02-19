@@ -1,30 +1,51 @@
 const { UnitOfWork } = require("../shared/database")
 
-async function persistAuthSession(authToken) {
+async function persistAuthToken(authToken) {
     await UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
-                'INSERT INTO auth_sessions(token, account_id, expires_at) VALUES(?, ?, ?)'
-                , [authToken.token, authToken.account_id, authToken.expires_at])
+                'DELETE FROM auth_tokens WHERE account_id = ?'
+                , [authToken.account_id]);
+            await db.run(
+                'INSERT INTO auth_tokens(token, account_id) VALUES (?, ?)'
+                , [authToken.token, authToken.account_id])
             db.close();
         });
 }
 
-async function getActiveAuthSession(account_id) {
+async function getAuthToken(account_id) {
     return await UnitOfWork.begin()
         .then(async (db) => {
             const queryResult =
-                db.run(
-                    'SELECT token, account_id FROM auth_sessions WHERE account_id = ? AND expires_at > ?'
-                    , [account_id, new Date()])
+                await db.get(
+                    'SELECT * FROM auth_tokens WHERE account_id = ?'
+                    , [account_id]);
 
             if (queryResult.token == undefined) {
                 return undefined
             }
             
-            const result = new AuthToken(queryResult.token, queryResult.account_id, queryResult.expires_at);
+            const result = new AuthToken(queryResult.token, queryResult.account_id);
             db.close();
             return result
+        });
+}
+
+async function getActiveSession() {
+    return await UnitOfWork.begin()
+        .then(async (db) => {
+            const queryResult =
+                await db.get(
+                    'SELECT * FROM auth_tokens LIMIT 1'
+                    , []);
+            
+            if (queryResult.token == undefined) {
+                return undefined
+            }
+
+            const result = new AuthToken(queryResult.token, queryResult.account_id);
+            db.close();
+            return result;
         });
 }
 
@@ -38,6 +59,7 @@ class AuthToken {
 }
 
 module.exports.AuthRepository = {
-    persistAuthSession
-    , getActiveAuthSession
+    persistAuthToken
+    , getAuthToken
+    , getActiveSession
 }

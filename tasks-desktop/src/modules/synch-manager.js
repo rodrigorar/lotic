@@ -1,4 +1,5 @@
 const { AccountServices } = require("./accounts/services");
+const { AuthServices } = require("./auth/services");
 const { TasksRPC } = require("./tasks/rpc");
 const { TaskServices } = require("./tasks/services");
 const { TasksSynchServices } = require("./tasks_synch/services");
@@ -74,7 +75,15 @@ async function doExecute(providedWebContents = undefined) {
         providedWebContents != undefined 
             ? providedWebContents 
             : webContents.getFocusedWebContents();
-    const account = await AccountServices.getLoggedAccount();
+    
+    const authToken = await AuthServices.getActiveSession();
+    console.log(authToken);
+    if (authToken == undefined) {
+        Logger.info("Unable to run Synch Manager, no account logged in");
+        return;
+    }
+    const account = await AccountServices.getAccountById(authToken.account_id);
+    console.log(account);
 
     // Created tasks in server
 

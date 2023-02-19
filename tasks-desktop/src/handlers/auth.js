@@ -6,8 +6,7 @@ let loginWindow;
 
 
 function handleOpenLogin(event) {
-    console.log('Handling open login');
-
+    const activeSession = AuthServices.getActiveSession();
     loginWindow = new BrowserWindow({
         width: 400,
         height: 200,
@@ -17,13 +16,16 @@ function handleOpenLogin(event) {
         },
     });
       
-    loginWindow.loadFile(path.join(__dirname, '../ui/login/login.html'));
+
+    const authFile = 
+        activeSession == undefined 
+            ? '../ui/login/login.html' 
+            : '../ui/login/logged_in.html';
+    loginWindow.loadFile(path.join(__dirname, authFile));
 }
 
 function handleLogin(event, loginData) {
-    console.log('Login in');
-    console.log(loginData);
-
+    loginWindow.destroy();
     AuthServices.login(loginData);
 }
 

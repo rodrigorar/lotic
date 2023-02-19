@@ -120,7 +120,6 @@ addTaskButton.addEventListener('click', async () => {
 });
 
 loginButton.addEventListener('click', async () => {
-    logger.trace('Click login button');
     auth.openLogin();
 });
 

@@ -4,8 +4,6 @@ const { TasksRepository, Task } = require("./data");
 function create(taskData) {
     Validators.isNotNull(taskData, 'No task data was provided!');
     
-    console.log('Creating a new task');
-
     const task = 
         new Task(
             taskData.id

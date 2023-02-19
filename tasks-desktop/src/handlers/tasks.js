@@ -3,8 +3,6 @@ const { TaskServices } = require('../modules/tasks/services');
 const { TasksSynchServices } = require('../modules/tasks_synch/services');
 
 function handleCreateTask(event, newTask) {
-    console.log('Received create task event');
-    
     TaskServices.create(newTask);
     TasksSynchServices.createSynchMonitor(newTask.id);
     SynchManager.execute();

@@ -1,24 +1,29 @@
 const { Validators } = require("../shared/utils");
 const { AuthRepository } = require("./data");
+const { AccountServices } = require("../accounts/services");
 const { AuthRPC } = require("./rpc");
  
-let currentSession;
-
-
 async function login(principal) {
     Validators.isNotNull(principal.email, "No email provided");
 
-    const activeSession = await AuthRepository.getActiveAuthSession();
-    if (activeSession) {
-        currentSession = activeSession
-        return;
+    const account = await AccountServices.getAccount(principal.email);
+
+    let authToken = undefined;
+    if (account != undefined) {
+        authToken = await AuthRepository.getAuthToken(account.id);
     }
 
-    console.log('AuthRPC being called');
-    const authToken = await AuthRPC.login(principal);
-    console.log('Calling Auth Repository');
-    await AuthRepository.persistAuthSession(authToken);
-    currentSession = authToken;
+    if (authToken == undefined) {
+        authToken = await AuthRPC.login(principal);
+
+        if (account == undefined) {
+            await AccountServices.create({
+                id: authToken.account_id
+                , email: principal.email
+            });
+        }
+        await AuthRepository.persistAuthToken(authToken);
+    }
 }
 
 function logout(email) {
@@ -27,7 +32,7 @@ function logout(email) {
 }
 
 function getActiveSession() {
-    return currentSession;
+    return AuthRepository.getActiveSession();
 }
 
 module.exports.AuthServices = {
