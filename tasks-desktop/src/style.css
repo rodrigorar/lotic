@@ -100,6 +100,10 @@
   display: inherit;
   width: 100%;
   margin: 0 auto;
+  border-color: lightgray;
+  border-style: solid;
+  box-shadow: none;
+  border-radius: 10px
 }
 
 .login-input:not(:last-child) {
@@ -135,31 +139,32 @@
 
 /* Buttons */
 
-.login-button {
-  float: right; 
-  background-color: orange;
-  box-shadow: 1px 1px 0 0 darkslategrey;
+.general-button {
+  background-color: lightblue;
   text-align: center;
   font-weight: bold;
+  border-radius: 10px;
+}
+
+.general-button:hover {
+  background-color: #f7c368;
+  text-shadow: 10px;
+  border-style: dashed;
+}
+
+.login-button {
+  float: right; 
+  box-shadow: 1px 1px 0 0 darkslategrey;
   padding: 5%;
-  border-radius: 15%;
   text-shadow: 5px;
 }
 
-.button {
-  background-color: orange;
+.add-task-button {
   box-shadow: 1px 1px 0 0 darkslategrey;
   padding: 0%;
   -moz-border-radius: 50%;
   -webkit-border-radius: 50%;
-  border-radius: 50%;
-  border-style: none;
-}
-
-.button:hover {
-  background-color: #f7c368;
-  text-shadow: 10px;
-  border-style: dashed;
+  border-radius: 75px;
 }
 
 /* Inputs */

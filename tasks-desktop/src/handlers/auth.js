@@ -1,5 +1,6 @@
 const { BrowserWindow } = require('electron');
 const path = require('path');
+const { AuthServices } = require('../modules/auth/services');
 
 let loginWindow;
 
@@ -23,9 +24,7 @@ function handleLogin(event, loginData) {
     console.log('Login in');
     console.log(loginData);
 
-    loginWindow.webContents.destroy();
-    loginWindow = undefined;
-
+    AuthServices.login(loginData);
 }
 
 module.exports.AuthHandlers = {

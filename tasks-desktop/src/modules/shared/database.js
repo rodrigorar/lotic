@@ -39,6 +39,7 @@ module.exports.runSchemaMigrations = async () => {
     await db.run(createTaskTable, []);
     await db.run(createTaskSyncTable, []);
     await db.run(createAccountsTable, []);
+    await db.run(createAuthSessionsTable, []);
 
     db.close();
 }
@@ -69,3 +70,11 @@ const createAccountsTable =
     + 'email TEXT UNIQUE NOT NULL,'
     + 'logged_in INTEGER NOT NULL CHECK (logged_in IN (0, 1))' 
     + ')';
+
+const createAuthSessionsTable =
+    'CREATE TABLE IF NOT EXISTS auth_sessions ('
+    + 'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+    + 'token TEXT UNIQUE NOT NULL,'
+    + 'account_id TEXT UNIQUE NOT NULL,'
+    + 'expires_at TEXT NOT NULL'
+    + ')'
