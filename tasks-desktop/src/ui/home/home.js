@@ -179,5 +179,6 @@ function updateEmptyTasks(taskId, taskTitle = undefined) {
 // Event Handlers
 
 tasks.handleRefresh((event, value) => {
+    logger.info("Doing a refresh");
     refreshTasks(value);
 });

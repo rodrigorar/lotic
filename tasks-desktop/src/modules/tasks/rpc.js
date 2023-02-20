@@ -6,7 +6,7 @@ async function createTasks(taskList) {
     const result = await HttpClient.post(BASE_PATH, {
         tasks: taskList
     });
-    return result.data;
+    return result.data != undefined ? result.data : result.response.data;
 }
 
 async function updateTasks(taskList) {

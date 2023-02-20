@@ -22,7 +22,10 @@ async function callCreateTasks(account, taskIds) {
         }));
 
     const result = await TasksRPC.createTasks(tasksRequest);
-    if (result != undefined && result.ids.length == tasksRequest.length) {
+    if (result != undefined && 'ids' in result && result.ids.length == tasksRequest.length) {
+        await TasksSynchServices.markSynched(taskIds);
+    } else if ('status' in result && result.status === '409') {
+        console.log('Marking as synched');
         await TasksSynchServices.markSynched(taskIds);
     }
 } 
@@ -77,13 +80,11 @@ async function doExecute(providedWebContents = undefined) {
             : webContents.getFocusedWebContents();
     
     const authToken = await AuthServices.getActiveSession();
-    console.log(authToken);
     if (authToken == undefined) {
         Logger.info("Unable to run Synch Manager, no account logged in");
         return;
     }
     const account = await AccountServices.getAccountById(authToken.account_id);
-    console.log(account);
 
     // Created tasks in server
 
@@ -134,10 +135,6 @@ async function doExecute(providedWebContents = undefined) {
                 }));
 
         if (tasksToInsert.length > 0) {
-            await TaskServices
-                .createMultiple(tasksToInsert)
-                .then(async _ => eventHandler.send('tasks:refresh', await TaskServices.list()));
-
             tasksToInsert
                 .forEach(async taskData => {
                     await TasksSynchServices.createSynchMonitor(taskData.id, TASK_SYNCH_STATUS.SYNCHED);
@@ -146,6 +143,10 @@ async function doExecute(providedWebContents = undefined) {
     } else if (result.length == 0) {
         // TODO: Delete all tasks that exist locally
     }
+
+    await TaskServices
+        .createMultiple(tasksToInsert)
+        .then(async _ => eventHandler.send('tasks:refresh', await TaskServices.list()));
 
     Logger.trace('Finished Task Synchornization');
 }

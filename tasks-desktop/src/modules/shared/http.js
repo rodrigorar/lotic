@@ -12,7 +12,7 @@ async function doCall(httpCall) {
     try {
         return await httpCall();
     } catch (error) {
-        throw error;
+        return error;
     }
 }
 
