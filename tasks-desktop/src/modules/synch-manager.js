@@ -133,13 +133,6 @@ async function doExecute(providedWebContents = undefined) {
                     , createdAt: new Date() // TODO: This should come from the server
                     , updatedAt: new Date() // TODO: This should come from the server
                 }));
-
-        if (tasksToInsert.length > 0) {
-            tasksToInsert
-                .forEach(async taskData => {
-                    await TasksSynchServices.createSynchMonitor(taskData.id, TASK_SYNCH_STATUS.SYNCHED);
-                });            
-        }
     } else if (result.length == 0) {
         // TODO: Delete all tasks that exist locally
     }

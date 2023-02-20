@@ -5,7 +5,7 @@ async function createTask(task) {
         .then(async (db) => {
             await db.run(
                 `INSERT INTO tasks(task_id, title, created_at, updated_at) VALUES(?, ?, ?, ?)`,
-                [task.id, task.title, task.createdAt.toISOString(), task.updatedAt.toISOString()]);
+                [task.id, task.title, task.createdAt, task.updatedAt]);
             db.close();
         });
 }

@@ -10,16 +10,6 @@ async function createAccount(account) {
         });
 }
 
-async function setLoginState(email, state) {
-    await UnitOfWork.begin()
-        .then(async (db) => {
-            await db.run(
-                `UPDATE accounts SET logged_in = ? WHERE email = ?`
-                , [state, email]);
-            db.close();
-        });
-}
-
 async function getAccount(email) {
     return await UnitOfWork.begin()
         .then(async (db) => {
@@ -60,7 +50,6 @@ class Account {
 module.exports.Account = Account
 module.exports.AccountRepository = {
     createAccount
-    , setLoginState
     , getAccount
     , getAccountById
 }
