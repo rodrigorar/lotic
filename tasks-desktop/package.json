@@ -1,11 +1,11 @@
 {
   "name": "tasks-desktop",
-  "productName": "Tasks",
+  "productName": "tasks-desktop",
   "version": "1.0.0",
-  "description": "Tasks and Todos",
+  "description": "Todos and Daily Planner",
   "main": "src/main.js",
   "scripts": {
-    "start": "NODE_ENV=development electron-forge start",
+    "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "lint": "echo \"No linting configured\""
@@ -19,14 +19,14 @@
     "axios": "1.2.1",
     "electron-squirrel-startup": "1.0.0",
     "hidefile": "3.0.0",
+    "node-cron": "3.0.2",
     "sqlite": "4.1.2",
     "sqlite3": "5.1.4",
-    "uuid": "9.0.0",
-    "node-cron": "3.0.2"
+    "uuid": "9.0.0"
   },
   "devDependencies": {
-    "@electron-forge/cli": "6.0.4",
-    "@electron-forge/maker-deb": "6.0.4",
+    "@electron-forge/cli": "6.0.5",
+    "@electron-forge/maker-deb": "6.0.5",
     "@electron-forge/maker-dmg": "6.0.4",
     "electron": "22.0.0"
   }

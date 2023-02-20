@@ -1,7 +1,5 @@
 module.exports = {
-  packagerConfig: {
-    executableName: "tasks-desktop"
-  },
+  packagerConfig: {},
   rebuildConfig: {},
   makers: [
     {
@@ -9,15 +7,15 @@ module.exports = {
       config: {
         options: {
           maintainer: 'rodrigorar',
-          homepage: 'https://ants.dev'
+          homepage: 'https://github.com/rodrigorar'
         }
       },
     },
     {
       name: '@electron-forge/maker-dmg',
       config: {
-        //icon: `${iconPath}.icns`,
-      },
-    },
+        format: 'ULFO'
+      }
+    }
   ],
 };
