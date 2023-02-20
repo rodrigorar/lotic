@@ -7,8 +7,6 @@ from src.domain import LogProvider, NotFoundError
 from src.domain.accounts import \
     Account, AccountBusinessRulesProvider, GetAccount \
     , CreateAccount, AccountRepository, GetAccountByEmail, ValidateAccountEmail
-from src.infrastructure import UnitOfWorkProviderImpl
-from src.infrastructure.auth import EncryptionEngineBCrypt
 
 
 class AccountRepositoryImpl(AccountRepository):
@@ -70,24 +68,25 @@ class AccountBusinessRulesProviderImpl(AccountBusinessRulesProvider):
         return GetAccountByEmail(unit_of_work, AccountRepositoryImpl(), ValidateAccountEmail(unit_of_work))
 
 
-account_business_rules_provider = AccountBusinessRulesProviderImpl()
-unit_of_work_provider = UnitOfWorkProviderImpl()
-
-
 class AccountUseCaseProvider:
 
     @staticmethod
     def create_account():
+        from src.infrastructure.auth import EncryptionEngineBCrypt
+        from src.infrastructure import UnitOfWorkProviderImpl
+
         return UseCaseCreateAccount(
-            unit_of_work_provider
-            , account_business_rules_provider
+            UnitOfWorkProviderImpl()
+            , AccountBusinessRulesProviderImpl()
             , EncryptionEngineBCrypt()
             , LogProvider().get())
 
     @staticmethod
     def get_account():
+        from src.infrastructure import UnitOfWorkProviderImpl
+
         return UseCaseGetAccount(
-            unit_of_work_provider
-            , account_business_rules_provider
+            UnitOfWorkProviderImpl()
+            , AccountBusinessRulesProviderImpl()
             , LogProvider().get())
     

@@ -1,4 +1,4 @@
-from src.domain.auth import Principal
+from src.application.auth import Principal
 
 
 class LoginRequest:

@@ -49,6 +49,10 @@ def before_scenario(context, scenario):
 
     with context.app.app_context():
 
+        # Clear database
+
+        clear_database(context)
+
         # John Doe Data
 
         context.db.session.add(
@@ -121,22 +125,17 @@ def before_scenario(context, scenario):
         context.db.session.commit()
 
 
-def after_scenario(context, scenario):
+def clear_database(context):
     from src.domain.accounts import Account
     from src.domain.tasks import AccountTasks, Task
 
+    context.db.session.query(AccountTasks).delete()
+    context.db.session.query(Account).delete()
+    context.db.session.query(Task).delete()
+
+
+def after_scenario(context, scenario):
     with context.app.app_context():
-
-        account_tasks_result = context.db.session.query(AccountTasks).all()
-        for entry in account_tasks_result:
-            context.db.session.remove(entry)
-
-        accounts_result = context.db.session.query(Account).all()
-        for entry in accounts_result:
-            context.db.session.remove(entry)
-
-        tasks_result = context.db.session.query(Task).all()
-        for entry in tasks_result:
-            context.db.session.remove(entry)
-
+        clear_database(context)
         context.db.session.commit()
+

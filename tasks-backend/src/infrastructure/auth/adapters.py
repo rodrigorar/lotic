@@ -6,13 +6,8 @@ import bcrypt
 from sqlalchemy import and_
 
 from src.application import UnitOfWork
-from src.application.auth.providers import AuthTokenStorage
-from src.application.auth.usecases import UseCaseAuthenticate
 from src.domain import NotFoundError
-from src.domain.auth import EncryptionEngine
-from src.domain.auth.businessrules import AuthBusinessRulesProvider, Login
-from src.application.auth.models import AuthSession
-from src.domain.auth.repositories import AuthSessionRepository
+from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseAuthenticate, AuthSession
 from src.infrastructure import UnitOfWorkProviderImpl
 
 
@@ -75,19 +70,6 @@ class AuthTokenStorageImpl(AuthTokenStorage):
         query_manager.remove(auth_session)
 
 
-class AuthBusinessRulesProviderImpl(AuthBusinessRulesProvider):
-
-    @staticmethod
-    def login(unit_of_work) -> Login:
-        from src.infrastructure.accounts import AccountBusinessRulesProviderImpl
-
-        return Login(
-            unit_of_work
-            , AccountBusinessRulesProviderImpl.get_account_by_email(unit_of_work)
-            , AuthTokenStorageImpl()
-            , EncryptionEngineBCrypt())
-
-
 unit_of_work_provider = UnitOfWorkProviderImpl()
 
 
@@ -95,4 +77,10 @@ class AuthUseCaseProvider:
 
     @staticmethod
     def login():
-        return UseCaseAuthenticate(unit_of_work_provider, AuthBusinessRulesProviderImpl())
+        from src.infrastructure.accounts import AccountBusinessRulesProviderImpl
+
+        return UseCaseAuthenticate(
+            unit_of_work_provider
+            , AccountBusinessRulesProviderImpl()
+            , AuthTokenStorageImpl()
+            , EncryptionEngineBCrypt())
