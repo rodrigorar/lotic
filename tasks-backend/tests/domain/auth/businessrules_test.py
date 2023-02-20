@@ -53,7 +53,7 @@ class TestLogin(DomainUnitTestsBase):
 
         assert result is not None
         assert result.token is not None
-        assert result.account_id == str(ACCOUNT_ID)
+        assert result.account_id == ACCOUNT_ID
 
         verify(mocked_get_account_by_email).execute(ACCOUNT_EMAIL)
         verify(mocked_auth_session_repository).get_by_account_id(dummy_unit_of_work, ACCOUNT_ID)
@@ -99,7 +99,7 @@ class TestLogin(DomainUnitTestsBase):
 
         assert result is not None
         assert result.token == auth_session.id
-        assert result.account_id == auth_session.account_id
+        assert result.account_id == auth_session.get_account_id()
 
         verify(mocked_get_account_by_email).execute(ACCOUNT_EMAIL)
         verify(mocked_auth_session_repository).get_by_account_id(dummy_unit_of_work, ACCOUNT_ID)
