@@ -141,7 +141,7 @@ async function doExecute(providedWebContents = undefined) {
         .createMultiple(tasksToInsert)
         .then(async _ => eventHandler.send('tasks:refresh', await TaskServices.list()));
 
-    Logger.trace('Finished Task Synchornization');
+    Logger.trace('Finished Task Synchornization, Refreshing');
 }
 
 async function execute(providedWebContents = undefined) {
