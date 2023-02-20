@@ -129,14 +129,14 @@ def after_scenario(context, scenario):
 
         account_tasks_result = context.db.session.query(AccountTasks).all()
         for entry in account_tasks_result:
-            context.db.session.delete(entry)
+            context.db.session.remove(entry)
 
         accounts_result = context.db.session.query(Account).all()
         for entry in accounts_result:
-            context.db.session.delete(entry)
+            context.db.session.remove(entry)
 
         tasks_result = context.db.session.query(Task).all()
         for entry in tasks_result:
-            context.db.session.delete(entry)
+            context.db.session.remove(entry)
 
         context.db.session.commit()

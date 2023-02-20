@@ -208,13 +208,13 @@ def step_impl(context):
         context.db.session.commit()
 
         context.task_ids = [task_data.get_id()]
-        context.response = context.client.delete(URL_PREFIX_V1 + '/tasks/' + task_data.id)
+        context.response = context.client.remove(URL_PREFIX_V1 + '/tasks/' + task_data.id)
 
 
 @when('it tries to delete a non existent task')
 def step_impl(context):
     task_id = str(uuid4())
-    context.response = context.client.delete(URL_PREFIX_V1 + '/tasks/' + task_id)
+    context.response = context.client.remove(URL_PREFIX_V1 + '/tasks/' + task_id)
 
 
 @when('it tries to get account tasks')

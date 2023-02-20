@@ -3,14 +3,15 @@ from typing import Optional
 import uuid
 
 import bcrypt
-from sqlalchemy import and_, column
+from sqlalchemy import and_
 
 from src.application import UnitOfWork
+from src.application.auth.providers import AuthTokenStorage
 from src.application.auth.usecases import UseCaseAuthenticate
 from src.domain import NotFoundError
 from src.domain.auth import EncryptionEngine
 from src.domain.auth.businessrules import AuthBusinessRulesProvider, Login
-from src.domain.auth.models import AuthSession
+from src.application.auth.models import AuthSession
 from src.domain.auth.repositories import AuthSessionRepository
 from src.infrastructure import UnitOfWorkProviderImpl
 
@@ -30,9 +31,9 @@ class EncryptionEngineBCrypt(EncryptionEngine):
         raise NotImplementedError('EncryptionEngineBCrypt#decrypt is not implemented')
 
 
-class AuthSessionRepositoryImpl(AuthSessionRepository):
+class AuthTokenStorageImpl(AuthTokenStorage):
 
-    def get_by_account_id(self, unit_of_work: UnitOfWork, account_id: uuid) -> Optional[AuthSession]:
+    def find_by_account_id(self, unit_of_work: UnitOfWork, account_id: uuid) -> Optional[AuthSession]:
         assert unit_of_work is not None, "Unit of Work cannot be null"
         assert account_id is not None, "Account id cannot be null"
 
@@ -44,7 +45,7 @@ class AuthSessionRepositoryImpl(AuthSessionRepository):
                 , AuthSession.expires_at > datetime.now())) \
             .first()
 
-    def get_by_id(self, unit_of_work: UnitOfWork, auth_session_id: uuid) -> Optional[AuthSession]:
+    def find_by_id(self, unit_of_work: UnitOfWork, auth_session_id: uuid) -> Optional[AuthSession]:
         assert unit_of_work is not None, "Unit of Work cannot be null"
         assert auth_session_id is not None, "Auth session id cannot be null"
 
@@ -55,7 +56,7 @@ class AuthSessionRepositoryImpl(AuthSessionRepository):
                 , AuthSession.expires_at > datetime.now())) \
             .first()
 
-    def insert(self, unit_of_work: UnitOfWork, auth_session: AuthSession) -> uuid:
+    def store(self, unit_of_work: UnitOfWork, auth_session: AuthSession) -> uuid:
         assert unit_of_work is not None, "Unit of Work cannot be null"
         assert auth_session is not None, "Auth session cannot be null"
 
@@ -63,10 +64,7 @@ class AuthSessionRepositoryImpl(AuthSessionRepository):
         query_manager.add(auth_session)
         return auth_session.get_id()
 
-    def update(self, unit_of_work, auth_session: AuthSession) -> None:
-        raise NotImplementedError("AuthSessionRepositoryImpl#update is not implemented")
-
-    def delete(self, unit_of_work: UnitOfWork, auth_session_id: uuid) -> None:
+    def remove(self, unit_of_work: UnitOfWork, auth_session_id: uuid) -> None:
         assert unit_of_work is not None, "Unit of Work cannot be null"
         assert auth_session_id is not None, "Auth Session id cannot be null"
 
@@ -74,7 +72,7 @@ class AuthSessionRepositoryImpl(AuthSessionRepository):
         auth_session = query_manager.query(AuthSession).filter_by(id=str(auth_session_id)).first()
         if auth_session is None:
             raise NotFoundError("No Auth Session found for id " + str(auth_session_id))
-        query_manager.delete(auth_session)
+        query_manager.remove(auth_session)
 
 
 class AuthBusinessRulesProviderImpl(AuthBusinessRulesProvider):
@@ -86,7 +84,7 @@ class AuthBusinessRulesProviderImpl(AuthBusinessRulesProvider):
         return Login(
             unit_of_work
             , AccountBusinessRulesProviderImpl.get_account_by_email(unit_of_work)
-            , AuthSessionRepositoryImpl()
+            , AuthTokenStorageImpl()
             , EncryptionEngineBCrypt())
 
 

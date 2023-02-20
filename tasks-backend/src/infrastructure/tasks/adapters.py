@@ -52,7 +52,7 @@ class TasksRepositoryImpl(TasksRepository):
         for task_id in task_ids:
             entry = query.query(Task).filter_by(id=str(task_id)).first()
             if entry is not None:
-                query.delete(entry)
+                query.remove(entry)
 
 
 class AccountTasksRepositoryImpl(AccountTasksRepository):
@@ -87,7 +87,7 @@ class AccountTasksRepositoryImpl(AccountTasksRepository):
         account_task = query.query(AccountTasks).filter_by(task_id=str(task_id)).first()
         if account_task is None:
             raise NotFoundError("No account task found for deletion")
-        query.delete(account_task)
+        query.remove(account_task)
 
 
 class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):

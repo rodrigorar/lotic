@@ -6,7 +6,7 @@ from src.application import UseCase, UnitOfWorkProvider
 from src.application.accounts import AccountDTO
 from src.domain.accounts import AccountBusinessRulesProvider
 from src.domain import InvalidArgumentError
-from src.domain.auth import EncryptionEngine
+from src.application.auth import EncryptionEngine
 
 
 class UseCaseCreateAccount(UseCase):
