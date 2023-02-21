@@ -23,6 +23,7 @@ def login():
     result = use_case.execute(request_data.to_dto())
     return to_json({
         "token": result.token
+        , "refresh_token": result.refresh_token
         , "account_id": str(result.account_id)
         , "expires_at": result.expires_at.astimezone().isoformat()
     }), 200, {'Content-Type': 'application/json'}

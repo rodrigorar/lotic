@@ -78,8 +78,18 @@ class TestUseCaseAuthenticate:
         from src.domain.accounts import AccountBusinessRulesProvider, GetAccountByEmail, Account
         from src.application.auth import EncryptionEngine, Principal, AuthSession, AuthTokenStorage, UseCaseAuthenticate
 
-        account = Account(ACCOUNT_ID, ACCOUNT_EMAIL, ENCRYPTED_PASSWORD, datetime.now(), datetime.now())
-        auth_session = AuthSession(uuid4(), ACCOUNT_ID, datetime.now(), datetime.now() + timedelta(hours=1))
+        account = Account(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ENCRYPTED_PASSWORD
+            , datetime.now()
+            , datetime.now())
+        auth_session = AuthSession(
+            uuid4()
+            , str(uuid4())
+            , ACCOUNT_ID
+            , datetime.now()
+            , datetime.now() + timedelta(hours=1))
 
         mocked_get_account_by_email = mock(GetAccountByEmail)
         when(mocked_get_account_by_email) \

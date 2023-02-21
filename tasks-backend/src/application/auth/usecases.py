@@ -43,10 +43,15 @@ class UseCaseAuthenticate(UseCase):
                 current_time = datetime.now()
                 auth_session = AuthSession(
                     uuid4()
+                    , str(uuid4())
                     , account.get_id()
                     , current_time
                     , current_time + timedelta(hours=1))
                 self.auth_token_storage.store(unit_of_work, auth_session)
 
-            return AuthToken(auth_session.id, account.get_id(), auth_session.expires_at)
+            return AuthToken(
+                auth_session.id
+                , auth_session.refresh_token
+                , account.get_id()
+                , auth_session.expires_at)
 
