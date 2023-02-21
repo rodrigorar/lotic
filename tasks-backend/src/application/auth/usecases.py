@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import uuid
 from uuid import uuid4
 
 from src.application import UnitOfWorkProvider, UseCase
@@ -10,7 +11,7 @@ from src.domain.accounts import AccountBusinessRulesProvider
 from src.domain.errors import LoginFailedError
 
 
-class UseCaseAuthenticate(UseCase):
+class UseCaseLogin(UseCase):
 
     def __init__(
             self
@@ -40,6 +41,8 @@ class UseCaseAuthenticate(UseCase):
 
             auth_session = self.auth_token_storage.find_by_account_id(unit_of_work, account.get_id())
             if auth_session is None:
+                self.auth_token_storage.remove_all_for_account_id(unit_of_work, account.get_id())
+
                 current_time = datetime.now()
                 auth_session = AuthSession(
                     uuid4()
@@ -55,3 +58,16 @@ class UseCaseAuthenticate(UseCase):
                 , account.get_id()
                 , auth_session.expires_at)
 
+
+class UseCaseRefresh(UseCase):
+
+    def execute(self, refresh_token: uuid):
+        raise NotImplementedError("UseCaseRefresh#execute is not implemented")
+
+        # TODO: Get the last auth session and verify if the refresh token matches
+
+        # TODO: If the refresh token matches, erase all existing auth sessions for account
+
+        # TODO: If the refresh token matches, re-login account
+
+        # TODO: Return the new auth token

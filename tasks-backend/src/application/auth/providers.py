@@ -18,3 +18,6 @@ class AuthTokenStorage:
 
     def remove(self, unit_of_work: UnitOfWork, auth_session_id: uuid) -> None:
         raise NotImplementedError("AuthTokenStorage#delete is not implemented")
+
+    def remove_all_for_account_id(self, unit_of_work: UnitOfWork, account_id: uuid) -> None:
+        raise NotImplementedError("AuthTokenStorage#remove_all_for_account_id is not implemented")

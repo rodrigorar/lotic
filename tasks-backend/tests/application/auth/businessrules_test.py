@@ -16,7 +16,7 @@ ACCOUNT_PASSWORD_INVALID = "123456"
 ENCRYPTED_PASSWORD = "testencryptedpassword"
 
 
-class TestUseCaseAuthenticate:
+class TestUseCaseLogin:
 
     @pytest.fixture(autouse=True)
     def database_provider_aspect(self):
@@ -26,7 +26,7 @@ class TestUseCaseAuthenticate:
 
     def test_should_succeed_login(self):
         from src.domain.accounts import AccountBusinessRulesProvider, GetAccountByEmail, Account
-        from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseAuthenticate
+        from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseLogin
         from src.application.auth.models import Principal
 
         account = Account(ACCOUNT_ID, ACCOUNT_EMAIL, ENCRYPTED_PASSWORD, datetime.now(), datetime.now())
@@ -35,6 +35,7 @@ class TestUseCaseAuthenticate:
         when(mocked_get_account_by_email) \
             .execute(ACCOUNT_EMAIL) \
             .thenReturn(account)
+
         mocked_account_br_provider = mock(AccountBusinessRulesProvider)
         when(mocked_account_br_provider) \
             .get_account_by_email(...) \
@@ -44,14 +45,17 @@ class TestUseCaseAuthenticate:
             .find_by_account_id(...) \
             .thenReturn(None)
         when(mocked_auth_token_storage) \
+            .remove_all_for_account_id(...)
+        when(mocked_auth_token_storage) \
             .store(...)
+
         mocked_encryption_engine = mock(EncryptionEngine)
         when(mocked_encryption_engine) \
             .check(...) \
             .thenReturn(True)
 
         principal = Principal(ACCOUNT_EMAIL, ACCOUNT_PASSWORD)
-        under_test = UseCaseAuthenticate(
+        under_test = UseCaseLogin(
             MockedUnitOfWorkProvider()
             , mocked_account_br_provider
             , mocked_auth_token_storage
@@ -65,6 +69,7 @@ class TestUseCaseAuthenticate:
         verify(mocked_get_account_by_email).execute(ACCOUNT_EMAIL)
         verify(mocked_account_br_provider).get_account_by_email(...)
         verify(mocked_auth_token_storage).find_by_account_id(...)
+        verify(mocked_auth_token_storage).remove_all_for_account_id(...)
         verify(mocked_auth_token_storage).store(...)
         verify(mocked_encryption_engine).check(...)
 
@@ -76,7 +81,7 @@ class TestUseCaseAuthenticate:
 
     def test_should_succeed_already_logged_in(self):
         from src.domain.accounts import AccountBusinessRulesProvider, GetAccountByEmail, Account
-        from src.application.auth import EncryptionEngine, Principal, AuthSession, AuthTokenStorage, UseCaseAuthenticate
+        from src.application.auth import EncryptionEngine, Principal, AuthSession, AuthTokenStorage, UseCaseLogin
 
         account = Account(
             ACCOUNT_ID
@@ -110,7 +115,7 @@ class TestUseCaseAuthenticate:
             .thenReturn(True)
 
         principal = Principal(ACCOUNT_EMAIL, ACCOUNT_PASSWORD)
-        under_test = UseCaseAuthenticate(
+        under_test = UseCaseLogin(
             MockedUnitOfWorkProvider()
             , mocked_account_br_provider
             , mocked_auth_session_repository
@@ -134,13 +139,13 @@ class TestUseCaseAuthenticate:
 
     def test_should_fail_no_principal(self):
         from src.domain.accounts import AccountBusinessRulesProvider
-        from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseAuthenticate
+        from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseLogin
 
         mocked_account_br_provider = mock(AccountBusinessRulesProvider)
         mocked_auth_session_repository = mock(AuthTokenStorage)
         mocked_encryption_engine = mock(EncryptionEngine)
 
-        under_test = UseCaseAuthenticate(
+        under_test = UseCaseLogin(
             MockedUnitOfWorkProvider()
             , mocked_account_br_provider
             , mocked_auth_session_repository
@@ -155,7 +160,7 @@ class TestUseCaseAuthenticate:
 
     def test_should_fail_unknown_account(self):
         from src.domain.accounts import AccountBusinessRulesProvider, GetAccountByEmail
-        from src.application.auth import EncryptionEngine, Principal, AuthTokenStorage, UseCaseAuthenticate
+        from src.application.auth import EncryptionEngine, Principal, AuthTokenStorage, UseCaseLogin
 
         mocked_get_account_by_email = mock(GetAccountByEmail)
         when(mocked_get_account_by_email) \
@@ -170,7 +175,7 @@ class TestUseCaseAuthenticate:
         mocked_encryption_engine = mock(EncryptionEngine)
 
         principal = Principal(ACCOUNT_EMAIL, ACCOUNT_PASSWORD)
-        under_test = UseCaseAuthenticate(
+        under_test = UseCaseLogin(
             MockedUnitOfWorkProvider()
             , mocked_account_br_provider
             , mocked_auth_session_repository
@@ -189,7 +194,7 @@ class TestUseCaseAuthenticate:
 
     def test_should_fail_wrong_password(self):
         from src.domain.accounts import AccountBusinessRulesProvider, GetAccountByEmail, Account
-        from src.application.auth import EncryptionEngine, Principal, AuthTokenStorage, UseCaseAuthenticate
+        from src.application.auth import EncryptionEngine, Principal, AuthTokenStorage, UseCaseLogin
 
         account = Account(ACCOUNT_ID, ACCOUNT_EMAIL, ENCRYPTED_PASSWORD, datetime.now(), datetime.now())
 
@@ -209,7 +214,7 @@ class TestUseCaseAuthenticate:
             .thenReturn(False)
 
         principal = Principal(ACCOUNT_EMAIL, ACCOUNT_PASSWORD)
-        under_test = UseCaseAuthenticate(
+        under_test = UseCaseLogin(
             MockedUnitOfWorkProvider()
             , mocked_account_br_provider
             , mocked_auth_session_repository

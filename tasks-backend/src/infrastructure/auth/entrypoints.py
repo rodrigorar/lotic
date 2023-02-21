@@ -27,3 +27,10 @@ def login():
         , "account_id": str(result.account_id)
         , "expires_at": result.expires_at.astimezone().isoformat()
     }), 200, {'Content-Type': 'application/json'}
+
+
+@auth_bp.post("/refresh/<uuid:refresh_token>")
+def refresh(refresh_token):
+    logger.info("Endpoint: refresh")
+
+    # TODO: Call re

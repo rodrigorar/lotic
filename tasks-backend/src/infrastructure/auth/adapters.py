@@ -7,7 +7,7 @@ from sqlalchemy import and_
 
 from src.application import UnitOfWork
 from src.domain import NotFoundError
-from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseAuthenticate, AuthSession
+from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseLogin, AuthSession
 from src.infrastructure import UnitOfWorkProviderImpl
 
 
@@ -69,6 +69,13 @@ class AuthTokenStorageImpl(AuthTokenStorage):
             raise NotFoundError("No Auth Session found for id " + str(auth_session_id))
         query_manager.remove(auth_session)
 
+    def remove_all_for_account_id(self, unit_of_work: UnitOfWork, account_id: uuid) -> None:
+        assert unit_of_work is not None, "Unit of Work cannot be null"
+        assert account_id is not None, "Account id cannot be null"
+
+        query_manager = unit_of_work.query()
+        query_manager.query(AuthSession).filter_by(account_id=str(account_id)).delete()
+
 
 unit_of_work_provider = UnitOfWorkProviderImpl()
 
@@ -79,7 +86,7 @@ class AuthUseCaseProvider:
     def login():
         from src.infrastructure.accounts import AccountBusinessRulesProviderImpl
 
-        return UseCaseAuthenticate(
+        return UseCaseLogin(
             unit_of_work_provider
             , AccountBusinessRulesProviderImpl()
             , AuthTokenStorageImpl()
