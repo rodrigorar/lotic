@@ -51,6 +51,13 @@ class AuthTokenStorageImpl(AuthTokenStorage):
                 , AuthSession.expires_at > datetime.now())) \
             .first()
 
+    def find_by_refresh_token(self, unit_of_work: UnitOfWork, refresh_token: str) -> Optional[AuthSession]:
+        assert unit_of_work is not None, "Unit of Work cannot be null"
+        assert refresh_token is not None, "Refresh token cannot be null"
+
+        query_manager = unit_of_work.query()
+        return query_manager.query(AuthSession).filter_by(refresh_token=refresh_token).first()
+
     def store(self, unit_of_work: UnitOfWork, auth_session: AuthSession) -> uuid:
         assert unit_of_work is not None, "Unit of Work cannot be null"
         assert auth_session is not None, "Auth session cannot be null"

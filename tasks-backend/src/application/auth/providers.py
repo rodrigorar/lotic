@@ -13,6 +13,9 @@ class AuthTokenStorage:
     def find_by_id(self, unit_of_work: UnitOfWork, auth_session_id: uuid) -> Optional[AuthSession]:
         raise NotImplementedError("AuthTokenStorage#get_by_id is not implemented")
 
+    def find_by_refresh_token(self, unit_of_work: UnitOfWork, refresh_token: str) -> Optional[AuthSession]:
+        raise NotImplementedError("AuthTokenStorage#find_by_refresh_token is not implemented")
+
     def store(self, unit_of_work: UnitOfWork, auth_session: AuthSession) -> uuid:
         raise NotImplementedError("AuthTokenStorage#insert is not implemented")
 

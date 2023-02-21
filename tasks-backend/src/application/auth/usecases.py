@@ -61,13 +61,37 @@ class UseCaseLogin(UseCase):
 
 class UseCaseRefresh(UseCase):
 
+    def __init__(
+            self
+            , unit_of_work_provider: UnitOfWorkProvider
+            , auth_token_storage: AuthTokenStorage):
+
+        self.unit_of_work_provider = unit_of_work_provider
+        self.auth_token_storage = auth_token_storage
+
     def execute(self, refresh_token: uuid):
-        raise NotImplementedError("UseCaseRefresh#execute is not implemented")
+        assert refresh_token is not None, "No refresh token provided"
 
-        # TODO: Get the last auth session and verify if the refresh token matches
+        with self.unit_of_work_provider.get() as unit_of_work:
+            current_auth_session = self.auth_token_storage.find_by_refresh_token(unit_of_work, str(refresh_token))
+            if current_auth_session is None:
+                raise NotFoundError("No auth session found for refresh token: " + str(refresh_token))
 
-        # TODO: If the refresh token matches, erase all existing auth sessions for account
+            self.auth_token_storage.remove_all_for_account_id(
+                unit_of_work
+                , current_auth_session.get_account_id())
 
-        # TODO: If the refresh token matches, re-login account
+            current_time = datetime.now()
+            new_auth_session = AuthSession(
+                uuid4()
+                , str(uuid4())
+                , current_auth_session.get_account_id()
+                , current_time
+                , current_time + timedelta(hours=1))
+            self.auth_token_storage.store(unit_of_work, new_auth_session)
 
-        # TODO: Return the new auth token
+            return AuthToken(
+                new_auth_session.id
+                , new_auth_session.refresh_token
+                , new_auth_session.get_account_id()
+                , new_auth_session.expires_at)
