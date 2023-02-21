@@ -3,7 +3,7 @@ from flask import Blueprint, request
 from src.domain import InvalidArgumentError, LogProvider
 from src.infrastructure import from_json, to_json
 from src.infrastructure.auth.adapters import AuthUseCaseProvider
-from src.infrastructure.auth.payloads import LoginRequest
+from src.infrastructure.auth.payloads import AuthTokenResponse, LoginRequest
 from src.utils import URL_PREFIX_V1
 
 logger = LogProvider().get()
@@ -21,16 +21,13 @@ def login():
 
     use_case = AuthUseCaseProvider.login()
     result = use_case.execute(request_data.to_dto())
-    return to_json({
-        "token": result.token
-        , "refresh_token": result.refresh_token
-        , "account_id": str(result.account_id)
-        , "expires_at": result.expires_at.astimezone().isoformat()
-    }), 200, {'Content-Type': 'application/json'}
+    return to_json(AuthTokenResponse.from_dto(result)), 200, {'Content-Type': 'application/json'}
 
 
 @auth_bp.post("/refresh/<uuid:refresh_token>")
 def refresh(refresh_token):
     logger.info("Endpoint: refresh")
 
-    # TODO: Call re
+    use_case = AuthUseCaseProvider.refresh()
+    result = use_case.execute(refresh_token)
+    return to_json(AuthTokenResponse.from_dto(result)), 200, {'Content-Type': 'application/json'}
