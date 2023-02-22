@@ -24,7 +24,7 @@ class AuthToken:
 
 
 class AuthSession(db.Model):
-    __tablename__ = "auth_session"
+    __tablename__ = "auth_sessions"
 
     id = db.Column(db.String, primary_key=True)
     refresh_token = db.Column(db.String, nullable=False)
