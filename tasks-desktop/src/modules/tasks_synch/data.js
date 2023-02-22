@@ -1,5 +1,5 @@
-const { generateId } = require('../shared/utils');
-const { UnitOfWork } = require("../shared/database");
+const { generateId } = require('../../shared/utils/utils');
+const { UnitOfWork } = require("../../shared/persistence/database");
 
 
 async function getLocalAndDirty() {

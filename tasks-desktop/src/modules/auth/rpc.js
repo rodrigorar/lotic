@@ -1,4 +1,4 @@
-const { HttpClient } = require("../shared/http");
+const { HttpClient } = require("../../shared/http/http");
 
 const BASE_PATH = "/auth";
 

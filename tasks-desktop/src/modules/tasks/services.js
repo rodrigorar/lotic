@@ -1,4 +1,4 @@
-const { Validators } = require("../shared/utils");
+const { Validators } = require("../../shared/utils/utils");
 const { TasksRepository, Task } = require("./data");
 
 function create(taskData) {

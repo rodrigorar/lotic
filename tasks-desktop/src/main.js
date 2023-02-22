@@ -1,14 +1,14 @@
 const cron = require('node-cron');
-const { runSchemaMigrations } = require('./modules/shared/database');
+const { runSchemaMigrations } = require('./shared/persistence/database');
 const { app, BrowserWindow, Menu, ipcMain, webContents } = require('electron');
 const path = require('path');
-const { LoggerHandler } = require('./modules/shared/handler_logging');
-const { UtilsHandler } = require('./modules/shared/handler_utils');
+const { LoggerHandler } = require('./shared/logging/handler_logging');
+const { UtilsHandler } = require('./shared/utils/handler_utils');
 const { TasksHandler } = require('./modules/tasks/handler_tasks');
-const { OSMask } = require('./modules/shared/os-mask');
-const { isDev } = require('./modules/shared/utils');
+const { OSMask } = require('./shared/os/os-mask');
+const { isDev } = require('./shared/utils/utils');
 const { SynchManager } = require('./modules/synch-manager');
-const { Logger } = require('./modules/shared/logger');
+const { Logger } = require('./shared/logging/logger');
 const { AuthHandlers } = require('./modules/auth/handler_auth');
 
 // Prepare local data directories

@@ -4,8 +4,8 @@ const { TasksRPC } = require("./tasks/rpc");
 const { TaskServices } = require("./tasks/services");
 const { TasksSynchServices } = require("./tasks_synch/services");
 const { TASK_SYNCH_STATUS } = require("./tasks_synch/data");
-const { Logger } = require("./shared/logger");
-const { StatusCode } = require("./shared/http");
+const { Logger } = require("../shared/logging/logger");
+const { StatusCode } = require("../shared/http/http");
 const { webContents } = require("electron");
 
 async function callCreateTasks(account, taskIds) {

@@ -1,4 +1,4 @@
-const { Logger } = require("./logger");
+const { Logger } = require("../logging/logger");
 
 function errorWrapper(service) {
     try {

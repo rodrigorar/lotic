@@ -1,5 +1,5 @@
-const { ServiceUtils } = require("../shared/service-utils");
-const { Validators } = require("../shared/utils");
+const { ServiceUtils } = require("../../shared/utils/service-utils");
+const { Validators } = require("../../shared/utils/utils");
 const { TaskSynchRepository } = require("./data");
 
 async function createSynchMonitor(taskId, state = undefined) {

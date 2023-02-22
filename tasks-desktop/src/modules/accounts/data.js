@@ -1,4 +1,4 @@
-const { UnitOfWork } = require('../shared/database');
+const { UnitOfWork } = require('../../shared/persistence/database');
 
 async function createAccount(account) {
     await UnitOfWork.begin()

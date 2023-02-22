@@ -1,7 +1,7 @@
 const { hideSync } = require('hidefile');
 const fs = require('fs');
 const Path = require('path');
-const { Logger } = require('./logger');
+const { Logger } = require('../logging/logger');
 
 const homedir = require('os').homedir();
 const DATA_FILE = 'tasks_db.sqlite';

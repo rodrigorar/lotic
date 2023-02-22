@@ -1,4 +1,4 @@
-const { UnitOfWork } = require("../shared/database")
+const { UnitOfWork } = require("../../shared/persistence/database")
 
 async function persistAuthToken(authToken) {
     await UnitOfWork.begin()

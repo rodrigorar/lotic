@@ -1,4 +1,4 @@
-const { Validators } = require("../shared/utils");
+const { Validators } = require("../../shared/utils/utils");
 const { AuthRepository } = require("./data");
 const { AccountServices } = require("../accounts/services");
 const { AuthRPC } = require("./rpc");
