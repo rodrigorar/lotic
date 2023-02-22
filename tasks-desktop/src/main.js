@@ -9,7 +9,7 @@ const { OSMask } = require('./modules/shared/os-mask');
 const { isDev } = require('./modules/shared/utils');
 const { SynchManager } = require('./modules/synch-manager');
 const { Logger } = require('./modules/shared/logger');
-const { AuthHandlers } = require('./handlers/auth');
+const { AuthHandlers } = require('./modules/auth/handler_auth');
 
 // Prepare local data directories
 OSMask.prepareDataDirIfNecessary(isDev);
