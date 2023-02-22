@@ -17,6 +17,9 @@ async function handleOpenLogin(event) {
                 preload: path.join(__dirname, '../preload.js'),
             },
         });
+        loginWindow.on('closed', () => {
+            loginWindow = undefined;
+        });
         
         const authFile = 
             activeSession == undefined 

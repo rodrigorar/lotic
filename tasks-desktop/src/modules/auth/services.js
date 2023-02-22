@@ -15,6 +15,7 @@ async function login(principal) {
 
     if (authToken == undefined) {
         authToken = await AuthRPC.login(principal);
+        console.log(authToken);
 
         if (account == undefined) {
             await AccountServices.create({
