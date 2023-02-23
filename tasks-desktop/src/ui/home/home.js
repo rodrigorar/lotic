@@ -86,7 +86,7 @@ async function initUI() {
 async function refreshTasks(tasks = undefined) {
     const activeElementId = document.activeElement.id;
 
-    logger.info('Refreshing tasks');
+    logger.trace('Refreshing tasks');
 
     if (tasks != undefined) {
         taskContainer.innerHTML = null;

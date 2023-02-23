@@ -25,7 +25,6 @@ async function callCreateTasks(account, taskIds) {
     if (result != undefined && 'ids' in result && result.ids.length == tasksRequest.length) {
         await TasksSynchServices.markSynched(taskIds);
     } else if ('status' in result && result.status === '409') {
-        console.log('Marking as synched');
         await TasksSynchServices.markSynched(taskIds);
     }
 } 
@@ -84,7 +83,7 @@ async function doExecute(providedWebContents = undefined) {
         Logger.info("Unable to run Synch Manager, no account logged in");
         return;
     }
-    const account = await AccountServices.getAccountById(authToken.account_id);
+    const account = await AccountServices.getAccountById(authToken.accountId);
 
     // Created tasks in server
 

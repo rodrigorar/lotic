@@ -13,7 +13,15 @@ class NullArgumentError extends Error {
     }
 }
 
+class UnknownAccountError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'UnknownAccountError';
+    }
+}
+
 module.exports.Errors = {
-    InvalidArgumentError,
-    NullArgumentError
+    InvalidArgumentError
+    , NullArgumentError
+    , UnknownAccountError
 }

@@ -1,10 +1,10 @@
 const { Validators } = require("../../shared/utils/utils");
 const { AccountRepository, Account } = require("./data");
 
-function create(accountData) {
+async function create(accountData) {
     Validators.isNotNull(accountData, "No account data provided");
 
-    AccountRepository
+    await AccountRepository
         .createAccount(
             new Account(
                 accountData.id

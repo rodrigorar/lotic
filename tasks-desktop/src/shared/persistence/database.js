@@ -74,5 +74,7 @@ const createAuthSessionsTable =
     'CREATE TABLE IF NOT EXISTS auth_tokens ('
     + 'id INTEGER PRIMARY KEY AUTOINCREMENT,'
     + 'token TEXT UNIQUE NOT NULL,'
-    + 'account_id TEXT NOT NULL'
+    + 'refresh_token TEXT UNIQUE NOT NULL,'
+    + 'account_id TEXT NOT NULL,'
+    + 'expires_at DATETIME NOT NULL'
     + ')'

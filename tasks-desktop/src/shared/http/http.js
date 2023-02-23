@@ -1,17 +1,23 @@
 const { Logger } = require('../logging/logger');
-const axios = require('axios');
-
-const client = axios.create({
-    baseURL: 'http://65.20.100.68:8080',
-    timeout: 5000
-});
-
-const BASE_URL = "/api/v1"
+const { AuthServices } = require('../../modules/auth/services');
+const { Client, BASE_URL } = require('./client');
 
 async function doCall(httpCall) {
+    const activeSession = await AuthServices.getActiveSession();
     try {
-        return await httpCall();
+        return await httpCall(activeSession.token);
     } catch (error) {
+        if (error.response.status == StatusCode.Unauthorized) {
+            // TODO: Abstract Auth Services from here, this is deeply wrong
+            await AuthServices.refresh(activeSession.accountId);
+
+            const newActiveSession = AuthServices.getActiveSession();
+            try {
+                return await httpCall(newActiveSession.token);
+            } catch (error) {
+                return error;
+            }
+        }
         return error;
     }
 }
@@ -20,21 +26,24 @@ const get = async (path) => {
     Logger.trace(`Calling URL: #GET ${BASE_URL + path}`);
 
     return await doCall(() =>
-        client.get(BASE_URL + path, {
+        Client.get(BASE_URL + path, {
             headers: {
                 'Accept': 'application/json'
             }
         }));
 };
 
+// TODO: Improve the autorization code, so we don't hve to add it to every request
+
 const post = async (path, data) => {
     Logger.trace(`Calling URL: #POST ${BASE_URL + path} with Data: ${JSON.stringify(data)}`);
 
-    const result = await doCall(() =>
-        client.post(BASE_URL + path, data, {
+    const result = await doCall((authToken) =>
+        Client.post(BASE_URL + path, data, {
             headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Content-Type': 'application/json'
+                , 'Accept': 'application/json'
+                , 'Authorization': authToken
             }
         }));
     return result;
@@ -43,11 +52,12 @@ const post = async (path, data) => {
 const put = async (path, data) => {
     Logger.trace(`Calling URL: #PUT ${BASE_URL + path} with Data: ${JSON.stringify(data)}`);
 
-    return await doCall(() =>
-        client.put(BASE_URL + path, data, {
+    return await doCall((authToken) =>
+        Client.put(BASE_URL + path, data, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
+                , 'Authrozation': authToken
             }
         }));
 };
@@ -55,10 +65,11 @@ const put = async (path, data) => {
 const del = async (path) => {
     Logger.trace(`Calling URL: #DELETE ${BASE_URL + path}`);
 
-    return await doCall(() =>
-        client.delete(BASE_URL + path, {
+    return await doCall((authToken) =>
+        Client.delete(BASE_URL + path, {
             headers: {
                 'Accept': 'application/json'
+                , 'Authorization': authToken
             }
         }));
 };
