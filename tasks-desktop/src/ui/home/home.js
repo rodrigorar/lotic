@@ -40,36 +40,27 @@ function createTaskDOM(id, title = undefined) {
     return containerDiv;
 }
 
-let emptyTasks = [];
+let emptyTask = undefined;
+let emptyTaskElement = undefined;
 
 async function createTask() {
-    const newId = await utils.generateId();
-    emptyTasks.push(newId);
-    
-    const newTaskDOM = createTaskDOM(newId);
-    taskContainer.appendChild(newTaskDOM);
+    if (emptyTask == undefined) {
+        const newId = await utils.generateId();
+        
+        const newTaskDOM = createTaskDOM(newId);
+        taskContainer.appendChild(newTaskDOM);
+        
+        updateEmptyTask(newId, newTaskDOM);
 
-    document.getElementById('text-input:' + newId).focus();
+        document.getElementById('text-input:' + newId).focus();
+    }
 
-    return newId;
-}
-
-async function createTaskWithEvent() {
-    const taskId = await createTask();
-
-    tasks.createTask({
-        id: taskId,
-        title: '',
-        createdAt: new Date(),
-        updatedAt: new Date()
-    });
-
-    return taskId;
+    return emptyTask;
 }
 
 function setInitialFocus() {
-    if (emptyTasks.length > 0) {
-        document.getElementById('text-input:' + emptyTasks.pop()).focus();
+    if (emptyTask != undefined) {
+        document.getElementById('text-input:' + emptyTask.focus());
     }
 }
 
@@ -77,14 +68,15 @@ async function initUI() {
     tasks.listTasks()
         .then(taskList => {
             if (taskList.length == 0) {
-                const taskId = createTaskWithEvent();
+                const taskId = createTask();
                 uiTasks[taskId] = false;
             } else {
                 taskList.forEach(entry => {
+                    const taskElement = createTaskDOM(entry.id, entry.title)
                     if (entry.title === '') {
-                        emptyTasks.push(entry.id);
+                        updateEmptyTask(entry.id, taskElement);
                     }
-                    taskContainer.appendChild(createTaskDOM(entry.id, entry.title))
+                    taskContainer.appendChild(taskElement);
                 });
             }
             setInitialFocus();
@@ -93,15 +85,19 @@ async function initUI() {
 
 async function refreshTasks(tasks = undefined) {
     const activeElementId = document.activeElement.id;
-    logger.trace('Current Active Element Id: ' + activeElementId);
+
+    logger.info('Refreshing tasks');
 
     if (tasks != undefined) {
         taskContainer.innerHTML = null;
-        emptyTasks = [];
+
+        updateEmptyTask();
 
         tasks.forEach(entry => {
-            if (entry.title === '') {
-                emptyTasks.push(entry.id);
+            if (entry.title === '' && emptyTask == undefined) {
+                emptyTask = entry.id;
+            } else if (entry.title == '' && emptyTask != undefined) {
+                tasks.completeTask(entry.id);
             }
             taskContainer.appendChild(createTaskDOM(entry.id, entry.title))
         });
@@ -114,9 +110,10 @@ initUI();
 // Add Task
 
 addTaskButton.addEventListener('click', async () => {
-    const taskId = await createTaskWithEvent();
-    emptyTasks.push(taskId);
-    document.getElementById('text-input:' + taskId).focus();
+    if (emptyTask == undefined) {
+        const taskId = await createTask();
+        document.getElementById('text-input:' + taskId).focus();
+    }
 });
 
 loginButton.addEventListener('click', async () => {
@@ -125,8 +122,8 @@ loginButton.addEventListener('click', async () => {
 
 window.addEventListener('keypress', (key) => {
     if (key.code === 'Enter') {
-        if (emptyTasks.length == 0) {
-            createTaskWithEvent();
+        if (emptyTask == undefined) {
+            createTask();
         }
     }
 });
@@ -136,12 +133,23 @@ window.addEventListener('keypress', (key) => {
 function handleTextInput(event) {
     const taskId = extractId(event.target.id);
 
-    updateEmptyTasks(taskId, event.target.value);
+    if (taskId == emptyTask) {
+        tasks.createTask({
+            id: taskId
+            , title: event.target.value
+            , createdAt: new Date()
+            , updatedAt: new Date()
+        })
+
+        updateEmptyTask();
+        
+        return;
+    }
     
     tasks.updateTask(taskId, {
-        id: taskId,
-        title: event.target.value,
-        updatedAt: new Date()
+        id: taskId
+        , title: event.target.value
+        , updatedAt: new Date()
     });
 }
 
@@ -149,13 +157,16 @@ function handleCompleteInput(event) {
     if (event.target.checked) {
         const taskId = extractId(event.target.parentElement.id);
 
-        updateEmptyTasks(taskId);
+        if (taskId == emptyTask) {
+            updateEmptyTask();
+            return;
+        }
 
         tasks.completeTask(taskId);
         event.target.parentElement.remove();
         
         if (document.querySelector('input') == null) {
-            createTaskWithEvent();
+            createTask();
         }
     }
 }
@@ -166,14 +177,9 @@ function extractId(value) {
     return value.replace(/.*\:/, "");
 }
 
-function updateEmptyTasks(taskId, taskTitle = undefined) {
-    if (taskTitle === '') {
-        emptyTasks.push(taskId);
-    } else {
-        if (emptyTasks.length > 0) {
-            emptyTasks = emptyTasks.filter(id => taskId !== id);
-        }
-    }
+function updateEmptyTask(taskId = undefined, taskElement = undefined) {
+    emptyTask = taskId;
+    emptyTaskElement = taskElement;
 }
 
 // Event Handlers
