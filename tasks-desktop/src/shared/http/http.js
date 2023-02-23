@@ -1,6 +1,6 @@
 const { Logger } = require('../logging/logger');
 const { AuthServices } = require('../../modules/auth/services');
-const { Client, BASE_URL } = require('./client');
+const { Client, BASE_URL, Headers, ContentTypes } = require('./client');
 
 async function doCall(httpCall) {
     const activeSession = await AuthServices.getActiveSession();
@@ -24,11 +24,11 @@ async function doCall(httpCall) {
 
 const get = async (path) => {
     Logger.trace(`Calling URL: #GET ${BASE_URL + path}`);
-
-    return await doCall(() =>
+    return await doCall((authToken) =>
         Client.get(BASE_URL + path, {
             headers: {
-                'Accept': 'application/json'
+                [Headers.Accept]: [ContentTypes.ApplicationJson]
+                , [Headers.XAuthorization]: authToken
             }
         }));
 };
@@ -41,9 +41,9 @@ const post = async (path, data) => {
     const result = await doCall((authToken) =>
         Client.post(BASE_URL + path, data, {
             headers: {
-                'Content-Type': 'application/json'
-                , 'Accept': 'application/json'
-                , 'Authorization': authToken
+                [Headers.ContentType]: [ContentTypes.ApplicationJson]
+                , [Headers.Accept]: [ContentTypes.ApplicationJson]
+                , [Headers.XAuthorization]: authToken
             }
         }));
     return result;
@@ -55,9 +55,9 @@ const put = async (path, data) => {
     return await doCall((authToken) =>
         Client.put(BASE_URL + path, data, {
             headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-                , 'Authrozation': authToken
+                [Headers.ContentType]: [ContentTypes.ApplicationJson]
+                , [Headers.Accept]: [ContentTypes.ApplicationJson]
+                , [Headers.XAuthorization]: authToken
             }
         }));
 };
@@ -68,8 +68,8 @@ const del = async (path) => {
     return await doCall((authToken) =>
         Client.delete(BASE_URL + path, {
             headers: {
-                'Accept': 'application/json'
-                , 'Authorization': authToken
+                [Headers.Accept]: [ContentTypes.ApplicationJson]
+                , [Headers.XAuthorization]: authToken
             }
         }));
 };
