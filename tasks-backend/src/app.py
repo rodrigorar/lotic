@@ -51,6 +51,14 @@ setup_blueprints(app)
 start(app)
 
 
+# Healthcheck
+
+
+@app.get("/health")
+def health():
+    return {"status": "alive"}, 200, {"Content-Type": "application/json"}
+
+
 # Generic Error Handlers
 
 # TODO: Refactor these error handler to be easier to implement
