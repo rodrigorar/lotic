@@ -80,7 +80,7 @@ class ListTasks(BaseBusinessRule):
         self.tasks_repository = tasks_repository
 
     def execute(self, tasks_ids: list[uuid]):
-        return self.tasks_repository.list(self.unit_of_work, tasks_ids)
+        return self.tasks_repository.list_tasks(self.unit_of_work, tasks_ids)
 
 
 class ListTasksForAccount(BaseBusinessRule):

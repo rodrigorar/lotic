@@ -13,24 +13,28 @@ from src.utils import URL_PREFIX_V1
 
 @given('a valid user')
 def step_impl(context):
-    from features.environment import JOHN_DOE_ID
+    from features.environment import JOHN_DOE_ID, JOHN_DOE_AUTH_TOKEN \
+        , JOHN_DOE_TASK_1, JOHN_DOE_TASK_2, JOHN_DOE_TASK_3
 
     context.account_ids = [JOHN_DOE_ID]
-
+    context.auth_tokens = [str(JOHN_DOE_AUTH_TOKEN)]
+    context.task_ids = [JOHN_DOE_TASK_1, JOHN_DOE_TASK_2, JOHN_DOE_TASK_3]
     context.invalid_account = False
 
 
 @given('an invalid user')
 def step_impl(context):
     context.account_ids = [uuid4()]
+    context.auth_tokens = [str(uuid4())]
     context.invalid_account = True
 
 
 @given('several users')
 def step_impl(context):
-    from features.environment import JOHN_DOE_ID, JANE_DOE_ID
+    from features.environment import JOHN_DOE_ID, JOHN_DOE_AUTH_TOKEN, JANE_DOE_ID, JANE_DOE_AUTH_TOKEN
 
     context.account_ids = [JOHN_DOE_ID, JANE_DOE_ID]
+    context.auth_tokens = [str(JOHN_DOE_AUTH_TOKEN), str(JANE_DOE_AUTH_TOKEN)]
     context.invalid_account = False
 
 
@@ -54,6 +58,9 @@ def step_impl(context):
                             , "owner_id": str(context.account_ids[0])
                         }
                     ]
+                }
+                , headers={
+                    'XAuthorization': context.auth_tokens[0]
                 })
 
 
@@ -92,12 +99,15 @@ def step_impl(context):
                                               else context.account_ids[1])
                         }
                     ]
+                }
+                , headers={
+                    'XAuthorization': context.auth_tokens[0]
                 })
 
 
 @when('it tries to update a single task')
 def step_impl(context):
-    from src.domain.tasks import Task
+    from src.domain.tasks import Task, AccountTasks
 
     with context.app.app_context():
         data = Task(
@@ -106,7 +116,8 @@ def step_impl(context):
             , "Yet another task description #1"
             , datetime.now()
             , datetime.now()
-            , uuid4())
+            , context.account_ids[0])
+        account_task_data = AccountTasks(context.account_ids[0], data.get_id())
         context.db.session.add(data)
         context.db.session.commit()
 
@@ -122,15 +133,17 @@ def step_impl(context):
                             , "updated_at": "2023-02-10T09:00:00Z"
                         }
                     ]
+                }
+                , headers={
+                    'XAuthorization': context.auth_tokens[0]
                 })
 
 
 @when('it tries to update several tasks')
 def step_impl(context):
-    from src.domain.tasks import Task
+    from src.domain.tasks import Task, AccountTasks
 
     with context.app.app_context():
-        owner_id = uuid4()
         data = [
             Task(
                 uuid4()
@@ -138,7 +151,7 @@ def step_impl(context):
                 , "Yet another task description #1"
                 , datetime.now()
                 , datetime.now()
-                , owner_id
+                , context.account_ids[0]
             ),
             Task(
                 uuid4()
@@ -146,7 +159,7 @@ def step_impl(context):
                 , "Yet another task description #2"
                 , datetime.now()
                 , datetime.now()
-                , owner_id
+                , context.account_ids[0]
             ),
             Task(
                 uuid4()
@@ -154,11 +167,18 @@ def step_impl(context):
                 , "Yet another task description #3"
                 , datetime.now()
                 , datetime.now()
-                , owner_id
+                , context.account_ids[0]
             )
+        ]
+        account_task_data = [
+            AccountTasks(data[0].get_id(), context.account_ids[0]),
+            AccountTasks(data[1].get_id(), context.account_ids[0]),
+            AccountTasks(data[2].get_id(), context.account_ids[0])
         ]
 
         for entry in data:
+            context.db.session.add(entry)
+        for entry in account_task_data:
             context.db.session.add(entry)
         context.db.session.commit()
 
@@ -185,6 +205,9 @@ def step_impl(context):
                             , "updated_at": "2022-01-24T23:51:00.000Z"
                         }
                     ]
+                }
+                , headers={
+                    'XAuthorization': context.auth_tokens[0]
                 })
 
 
@@ -200,28 +223,45 @@ def step_impl(context):
             , "Yet another task description #1"
             , datetime.now()
             , datetime.now()
-            , uuid4()
+            , context.account_ids[0]
         )
-        account_task_data = AccountTasks(uuid4(), task_data.get_id())
+        account_task_data = AccountTasks(context.account_ids[0], task_data.get_id())
         context.db.session.add(task_data)
         context.db.session.add(account_task_data)
         context.db.session.commit()
 
         context.task_ids = [task_data.get_id()]
-        context.response = context.client.delete(URL_PREFIX_V1 + '/tasks/' + task_data.id)
+        context.response = context.client.delete(
+            URL_PREFIX_V1 + '/tasks/' + task_data.id
+            , headers={
+                'XAuthorization': context.auth_tokens[0]
+            })
 
 
 @when('it tries to delete a non existent task')
 def step_impl(context):
     task_id = str(uuid4())
-    context.response = context.client.delete(URL_PREFIX_V1 + '/tasks/' + task_id)
+    context.response = context.client.delete(
+        URL_PREFIX_V1 + '/tasks/' + task_id
+        , headers={
+            'XAuthorization': context.auth_tokens[0]
+        })
 
 
 @when('it tries to get account tasks')
 def step_impl(context):
-    context.owner_id = uuid4()
-    context.response = context.client \
-        .get(URL_PREFIX_V1 + '/tasks?account_id=' + str(context.owner_id))
+    from src.domain.tasks import Task, AccountTasks
+
+    with context.app.app_context():
+        for task_id in context.task_ids:
+            context.db.session.query(Task).filter_by(id=str(task_id)).delete()
+            context.db.session.query(AccountTasks).filter_by(task_id=str(task_id)).delete()
+        context.db.session.commit()
+        context.response = context.client.get(
+            URL_PREFIX_V1 + '/tasks?account_id=' + str(context.account_ids[0])
+            , headers={
+                'XAuthorization': context.auth_tokens[0]
+            })
 
 
 @when('it tries to get the associated task')
@@ -229,83 +269,30 @@ def step_impl(context):
     from src.domain.tasks import Task, AccountTasks
 
     with context.app.app_context():
-        context.task_ids = [uuid4()]
-        context.owner_id = uuid4()
-
-        task_data = Task(
-                context.task_ids[0]
-                , "Yet another task #1"
-                , "Yet another task description #1"
-                , datetime.now()
-                , datetime.now()
-                , context.owner_id
-            )
-
-        account_tasks_data = AccountTasks(context.owner_id, context.task_ids[0])
-
-        context.db.session.add(task_data)
-        context.db.session.add(account_tasks_data)
+        context.db.session.query(Task).filter_by(id=str(context.task_ids[0])).delete()
+        context.db.session.query(AccountTasks).filter_by(task_id=str(context.task_ids[0])).delete()
+        context.db.session.query(Task).filter_by(id=str(context.task_ids[1])).delete()
+        context.db.session.query(AccountTasks).filter_by(task_id=str(context.task_ids[1])).delete()
         context.db.session.commit()
 
-        context.response = context.client\
-            .get(URL_PREFIX_V1 + '/tasks?account_id=' + str(context.owner_id))
+        context.response = context.client.get(
+                URL_PREFIX_V1 + '/tasks?account_id=' + str(context.account_ids[0])
+                , headers={
+                    'XAuthorization': context.auth_tokens[0]
+                })
 
 
 @when('it tries to get all associated tasks')
 def step_impl(context):
-    from src.domain.tasks import Task, AccountTasks
-
     if context.invalid_account:
         context.response = context.client \
             .get(URL_PREFIX_V1 + '/tasks?account_id=' + str(context.account_ids[0]))
-
-    with context.app.app_context():
-        context.task_ids = [uuid4(), uuid4(), uuid4()]
-        context.owner_id = uuid4()
-
-        task_data = [
-            Task(
-                context.task_ids[0]
-                , "Yet another task #1"
-                , "Yet another task description #1"
-                , datetime.now()
-                , datetime.now()
-                , context.owner_id
-            ),
-            Task(
-                context.task_ids[1]
-                , "Yet another task #2"
-                , "Yet another task description #2"
-                , datetime.now()
-                , datetime.now()
-                , context.owner_id
-            ),
-            Task(
-                context.task_ids[2]
-                , "Yet another task #3"
-                , "Yet another task description #3"
-                , datetime.now()
-                , datetime.now()
-                , context.owner_id
-            )
-        ]
-
-        account_tasks_data = [
-            AccountTasks(context.owner_id, context.task_ids[0])
-            , AccountTasks(context.owner_id, context.task_ids[1])
-            , AccountTasks(context.owner_id, context.task_ids[2])
-        ]
-
-        for task in task_data:
-            context.db.session.add(task)
-
-        for account_tasks in account_tasks_data:
-            context.db.session.add(account_tasks)
-
-        context.db.session.commit()
-
-        context.response = context.client \
-            .get(URL_PREFIX_V1 + '/tasks?account_id=' + str(context.owner_id))
+    else:
+        context.response = context.client.get(
+            URL_PREFIX_V1 + '/tasks?account_id=' + str(context.account_ids[0])
+            , headers={
+                'XAuthorization': context.auth_tokens[0]
+            })
 
 
 # Then
@@ -347,6 +334,7 @@ def step_impl(context):
 
 @then('those tasks should be successfully updated')
 def step_impl(context):
+    print(context.response)
     assert context.response is not None
     assert context.response.status_code == 204
 
@@ -354,6 +342,8 @@ def step_impl(context):
 @then('the task should be deleted')
 def step_impl(context):
     from src.domain.tasks import Task, AccountTasks
+
+    print(context.response)
 
     assert context.response is not None
     assert context.response.status_code == 204
@@ -403,10 +393,8 @@ def step_impl(context):
     task_list = [from_json(ListAccountTasksResponse, task_entry) for task_entry in tasks_json]
 
     assert task_list is not None
-    assert task_list[0].task_id == str(context.task_ids[0])
-    assert task_list[0].owner_id == str(context.owner_id)
-    assert task_list[0].title == "Yet another task #1"
-    assert task_list[0].description == "Yet another task description #1"
+    assert task_list[0].task_id == str(context.task_ids[2])
+    assert task_list[0].owner_id == str(context.account_ids[0])
 
 
 @then('all account tasks should be returned')
@@ -423,21 +411,15 @@ def step_impl(context):
     assert task_list is not None
     task_1 = task_list[0]
     assert uuid.UUID(task_1.task_id) in context.task_ids
-    assert task_1.owner_id == str(context.owner_id)
-    assert task_1.title == "Yet another task #1"
-    assert task_1.description == "Yet another task description #1"
+    assert task_1.owner_id == str(context.account_ids[0])
 
     task_2 = task_list[1]
     assert uuid.UUID(task_2.task_id) in context.task_ids
-    assert task_2.owner_id == str(context.owner_id)
-    assert task_2.title == "Yet another task #2"
-    assert task_2.description == "Yet another task description #2"
+    assert task_2.owner_id == str(context.account_ids[0])
 
     task_3 = task_list[2]
     assert uuid.UUID(task_3.task_id) in context.task_ids
-    assert task_3.owner_id == str(context.owner_id)
-    assert task_3.title == "Yet another task #3"
-    assert task_3.description == "Yet another task description #3"
+    assert task_3.owner_id == str(context.account_ids[0])
 
 
 @then('an error should happen for multiple users')
@@ -449,4 +431,4 @@ def step_impl(context):
 @then('an error should happen for user not found')
 def step_impl(context):
     assert context.response is not None
-    assert context.response.status_code == 404
+    assert context.response.status_code == 401

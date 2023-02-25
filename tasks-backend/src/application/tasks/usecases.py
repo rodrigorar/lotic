@@ -28,7 +28,7 @@ class UseCaseCreateTasks(UseCase):
     def execute(self, tasks: list[TaskDTO]) -> list[uuid]:
         assert tasks is not None, "No tasks were provided"
 
-        owner_ids = [task.owner_id for task in tasks] \
+        owner_ids = [task.get_owner_id() for task in tasks] \
             if len(tasks) == 1 \
             else reduce(reducer_duplicated, [task.owner_id for task in tasks])
 
@@ -36,7 +36,7 @@ class UseCaseCreateTasks(UseCase):
                 and not AuthorizationContext.is_known_account():
             raise AuthorizationError('Unauthorized operation')
 
-        self.logger.info("UseCase[CreateTasks](" + owner_ids[0] + ")")
+        self.logger.info("UseCase[CreateTasks](" + str(owner_ids[0]) + ")")
 
         if len(owner_ids) > 1:
             raise ConflictError("Cannot create tasks for more than one owner at a time")
@@ -72,9 +72,12 @@ class UseCaseUpdateTasks(UseCase):
             list_tasks_br = self.tasks_br_provider.list_tasks(unit_of_work)
             task_entities = list_tasks_br.execute([entry.get_id() for entry in tasks])
 
-            owner_ids = [task.owner_id for task in task_entities] \
+            if len(task_entities) == 0:
+                raise NotFoundError('No tasks found')
+
+            owner_ids = [task.get_owner_id() for task in task_entities] \
                 if len(task_entities) == 1 \
-                else reduce(reducer_duplicated, [task.owner_id for task in task_entities])
+                else reduce(reducer_duplicated, [task.get_owner_id() for task in task_entities])
             if len(owner_ids) > 1 or not AuthorizationContext.is_matching_account(owner_ids[0]):
                 raise AuthorizationError('Unauthorized operation')
 
@@ -107,7 +110,10 @@ class UseCaseDeleteTasks(UseCase):
             list_tasks_br = self.tasks_br_provider.list_tasks(unit_of_work)
             task_entities = list_tasks_br.execute(task_ids)
 
-            owner_ids = [task.owner_id for task in task_entities] \
+            if len(task_entities) == 0:
+                raise NotFoundError('No tasks found')
+
+            owner_ids = [task.get_owner_id() for task in task_entities] \
                 if len(task_entities) == 1 \
                 else reduce(reducer_duplicated, [task.owner_id for task in task_entities])
             if len(owner_ids) > 1 or not AuthorizationContext.is_matching_account(owner_ids[0]):

@@ -27,15 +27,15 @@ class AuthorizationContext:
         g.account_id = account_id
 
     @staticmethod
-    def get_token():
+    def get_token() -> str:
         return g.auth_token
 
     @staticmethod
-    def get_refresh_token():
+    def get_refresh_token() -> str:
         return g.refresh_token
 
     @staticmethod
-    def get_account_id():
+    def get_account_id() -> uuid:
         return g.account_id
 
     @staticmethod

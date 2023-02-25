@@ -50,7 +50,7 @@ class TasksRepositoryImpl(TasksRepository):
         assert task_ids is not None, "Task ids cannot be null"
 
         query_manager = unit_of_work.query()
-        query_result = query_manager.query(Task).filter(Task.id.in_(task_ids)).all()
+        query_result = query_manager.query(Task).filter(Task.id.in_([str(task_id) for task_id in task_ids])).all()
         return [
             Task(
                 entry.get_id()

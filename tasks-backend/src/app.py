@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request
 from werkzeug.exceptions import HTTPException
 
-from src.application.errors import AuthorizationError, LoginFailedError
+from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
 from src.domain import ConflictError, InvalidArgumentError, NotFoundError
 from src.infrastructure import AppProvider, DatabaseSessionProvider, AppConfigurations, to_json
 from logging.config import fileConfig
@@ -62,12 +62,12 @@ def authorization_constructor():
 
     authorization_token = request.headers.get('XAuthorization')
 
-    print(authorization_token)
-
     if authorization_token is not None:
         unit_of_work_provider = UnitOfWorkProviderImpl()
         with unit_of_work_provider.get() as unit_of_work:
             auth_session = AuthTokenStorageImpl().find_by_id(unit_of_work, authorization_token)
+            if auth_session is None:
+                raise InvalidAuthorizationError("Unknown authorization")
             AuthorizationContext.create_context(
                 authorization_token
                 , auth_session.refresh_token
@@ -128,6 +128,16 @@ def handle_not_found_error(e: NotFoundError):
 def handle_login_failed_error(e: LoginFailedError):
     return to_json({
         "type": "http://localhost:5000/login_failed_error"
+        , "title": e.title
+        , "status": "401"
+        , "details": e.details
+    }), 401, {'Content-Type': 'application/problem+json'}
+
+
+@app.errorhandler(InvalidAuthorizationError)
+def handle_login_failed_error(e: InvalidAuthorizationError):
+    return to_json({
+        "type": "http://localhost:5000/invalid_authorization_error"
         , "title": e.title
         , "status": "401"
         , "details": e.details
