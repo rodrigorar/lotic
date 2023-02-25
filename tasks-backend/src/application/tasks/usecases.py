@@ -30,10 +30,9 @@ class UseCaseCreateTasks(UseCase):
 
         owner_ids = [task.get_owner_id() for task in tasks] \
             if len(tasks) == 1 \
-            else reduce(reducer_duplicated, [task.owner_id for task in tasks])
+            else reduce(reducer_duplicated, [task.get_owner_id() for task in tasks])
 
-        if AuthorizationContext.is_matching_account(owner_ids[0]) \
-                and not AuthorizationContext.is_known_account():
+        if not AuthorizationContext.is_matching_account(owner_ids[0]):
             raise AuthorizationError('Unauthorized operation')
 
         self.logger.info("UseCase[CreateTasks](" + str(owner_ids[0]) + ")")
