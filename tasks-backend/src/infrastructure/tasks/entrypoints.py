@@ -4,7 +4,7 @@ from flask import Blueprint, request
 
 from src.domain import InvalidArgumentError, LogProvider
 from src.infrastructure import from_json, to_json
-from src.infrastructure.tasks.payloads import CreateTasksRequest, ListAccountTasksResponse, UpdateTasksRequest
+from src.infrastructure.tasks.payloads import CreateTasksRequest, UpdateTasksRequest
 from src.infrastructure.tasks import TasksUseCaseProvider
 from src.utils import URL_PREFIX_V1
 
@@ -72,5 +72,10 @@ def list_tasks():
     result = use_case.execute(uuid.UUID(account_id))
 
     return to_json({
-        "tasks": [to_json(ListAccountTasksResponse.from_dto(task)) for task in result]
+        "tasks": [{
+            "task_id": task.id
+            , "title": task.title
+            , "description": task.description
+            , "owner_id": task.owner_id
+        } for task in result]
     }), 200, {'Content-Type': 'application/json'}
