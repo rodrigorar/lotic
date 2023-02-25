@@ -75,7 +75,7 @@ class UseCaseUpdateTasks(UseCase):
             owner_ids = [task.owner_id for task in task_entities] \
                 if len(task_entities) == 1 \
                 else reduce(reducer_duplicated, [task.owner_id for task in task_entities])
-            if len(owner_ids) > 1 and not AuthorizationContext.is_matching_account(owner_ids[0]):
+            if len(owner_ids) > 1 or not AuthorizationContext.is_matching_account(owner_ids[0]):
                 raise AuthorizationError('Unauthorized operation')
 
             self.logger.info("UseCase[UpdateTasks]")
@@ -101,8 +101,6 @@ class UseCaseDeleteTasks(UseCase):
     def execute(self, task_ids: list[uuid]):
         assert task_ids is not None, "Task id list cannot be null"
 
-        # TODO: Implement an authorization safe guard
-
         self.logger.info("UseCase[DeleteTasks]")
 
         with self.unit_of_work_provider.get() as unit_of_work:
@@ -112,7 +110,7 @@ class UseCaseDeleteTasks(UseCase):
             owner_ids = [task.owner_id for task in task_entities] \
                 if len(task_entities) == 1 \
                 else reduce(reducer_duplicated, [task.owner_id for task in task_entities])
-            if len(owner_ids) > 1 and not AuthorizationContext.is_matching_account(owner_ids[0]):
+            if len(owner_ids) > 1 or not AuthorizationContext.is_matching_account(owner_ids[0]):
                 raise AuthorizationError('Unauthorized operation')
 
             delete_task = self.tasks_br_provider.delete_tasks(unit_of_work)

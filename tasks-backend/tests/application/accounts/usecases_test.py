@@ -1,5 +1,6 @@
 from datetime import datetime
-import uuid
+from unittest.mock import MagicMock, patch
+from uuid import uuid4
 
 from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
@@ -11,6 +12,7 @@ DatabaseProvider().set_database(MockDatabase())
 
 from src.domain.accounts import Account, CreateAccount, ValidateAccountEmail, GetAccount, AccountBusinessRulesProvider
 from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider, MockedLogger
+from src.application.auth import AuthorizationContext
 
 global create_account_br
 global validate_account_email_br
@@ -32,8 +34,8 @@ class MockedAccountBusinessRulesProvider(AccountBusinessRulesProvider):
         return get_account_br
 
 
-ACCOUNT_ID = uuid.uuid4()
-UNKNOWN_ACCOUNT_ID = uuid.uuid4()
+ACCOUNT_ID = uuid4()
+UNKNOWN_ACCOUNT_ID = uuid4()
 ACCOUNT_EMAIL = "john.doe@mail.not"
 ACCOUNT_PASSWORD = "passwd01"
 ACCOUNT_ENCRYPTED_PASSWORD = "uiskjdiuytrn4"
@@ -195,6 +197,7 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         create_account_br = None
         get_account_br = None
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_with_result(self):
         from src.application.accounts import UseCaseGetAccount, AccountDTO
 
@@ -212,6 +215,7 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
 
         assert result.equals(AccountDTO.from_entity(result_value)), "Not the expected account"
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_with_no_result(self):
         from src.application.accounts import UseCaseGetAccount
 
@@ -225,7 +229,7 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
 
         assert result is None, "Result cannot be None"
 
-    # br = business rule
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_get_account_br_failure(self):
         from src.application.accounts import UseCaseGetAccount
 
@@ -238,6 +242,7 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         with pytest.raises(InternalError):
             under_test.execute(ACCOUNT_ID)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_no_account_id(self):
         from src.application.accounts import UseCaseGetAccount
 
@@ -250,6 +255,7 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_entity_to_dto_error(self):
         from src.application.accounts import UseCaseGetAccount
 

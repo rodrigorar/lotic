@@ -1,4 +1,5 @@
 from datetime import datetime
+from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 from mockito import mock, verify, verifyNoMoreInteractions, when
@@ -14,14 +15,16 @@ DatabaseProvider().set_database(MockDatabase())
 from src.domain.accounts import Account, AccountBusinessRulesProvider, CreateAccount, GetAccount, \
     ValidateAccountEmail
 from src.domain.tasks import CreateTasks, DeleteTasks, ListTasksForAccount, \
-    Task, TasksBusinessRulesProvider, UpdateTasks
+    Task, TasksBusinessRulesProvider, UpdateTasks, ListTasks
 from src.application.tasks import TaskDTO, UseCaseCreateTasks, UseCaseUpdateTasks, \
     UseCaseDeleteTasks, UseCaseListTasksForAccount
+from src.application.auth import AuthorizationContext
 
 global create_tasks_br
 global update_tasks_br
 global delete_tasks_br
 global list_account_tasks_br
+global list_tasks_br
 global get_account_br
 
 
@@ -42,6 +45,10 @@ class MockedTasksBusinessRulesProvider(TasksBusinessRulesProvider):
     @staticmethod
     def list_tasks_for_user(unit_of_work) -> ListTasksForAccount:
         return list_account_tasks_br
+
+    @staticmethod
+    def list_tasks(unit_of_work) -> ListTasks:
+        return list_tasks_br
 
 
 class MockedAccountBusinessRulesProvider(AccountBusinessRulesProvider):
@@ -90,23 +97,28 @@ class TasksUseCaseBaseTest:
         global update_tasks_br
         global delete_tasks_br
         global list_account_tasks_br
+        global list_tasks_br
         global get_account_br
 
         create_tasks_br = mock(CreateTasks)
         update_tasks_br = mock(UpdateTasks)
         delete_tasks_br = mock(DeleteTasks)
         list_account_tasks_br = mock(ListTasksForAccount)
+        list_tasks_br = mock(ListTasks)
         get_account_br = mock(GetAccount)
         yield
         create_tasks_br = None
         update_tasks_br = None
         delete_tasks_br = None
         list_account_tasks_br = None
+        list_tasks_br = None
         get_account_br = None
 
 
 class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
+    @patch.object(AuthorizationContext, 'is_known_account', MagicMock(return_value=True))
     def test_should_succeed(self):
         when(get_account_br) \
             .execute(...) \
@@ -140,6 +152,8 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
 
         verifyNoMoreInteractions(get_account_br, create_tasks_br)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
+    @patch.object(AuthorizationContext, 'is_known_account', MagicMock(return_value=True))
     def test_should_succeed_single_task(self):
         when(get_account_br) \
             .execute(...) \
@@ -179,6 +193,8 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
 
         verifyNoMoreInteractions(create_tasks_br)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
+    @patch.object(AuthorizationContext, 'is_known_account', MagicMock(return_value=True))
     def test_should_fail_create_tasks_br_error(self):
         when(get_account_br) \
             .execute(...) \
@@ -207,6 +223,8 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
 
         verifyNoMoreInteractions(get_account_br, create_tasks_br)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
+    @patch.object(AuthorizationContext, 'is_known_account', MagicMock(return_value=True))
     def test_should_fail_get_account_br_error(self):
         when(get_account_br) \
             .execute(...) \
@@ -234,11 +252,21 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
 
 class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed(self):
-        br_result = [TASK_1_ID, TASK_2_ID, TASK_3_ID]
+        list_task_br_result = [
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(), ACCOUNT_ID)
+            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, datetime.now(), datetime.now(), ACCOUNT_ID)
+            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, datetime.now(), datetime.now(), ACCOUNT_ID)
+        ]
+        when(list_tasks_br) \
+            .execute(...) \
+            .thenReturn(list_task_br_result)
+
+        update_br_result = [TASK_1_ID, TASK_2_ID, TASK_3_ID]
         when(update_tasks_br) \
             .execute(...) \
-            .thenReturn(br_result)
+            .thenReturn(update_br_result)
 
         test_input = [
             TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
@@ -254,17 +282,27 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
         assert result is not None
         assert len(result) == 3
         for task_id in result:
-            assert task_id in br_result
+            assert task_id in update_br_result
 
+        verify(list_tasks_br).execute(...)
         verify(update_tasks_br).execute(...)
 
-        verifyNoMoreInteractions(update_tasks_br)
+        verifyNoMoreInteractions(list_tasks_br, update_tasks_br)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_single_task(self):
-        br_result = [TASK_1_ID]
+        list_task_br_result = [
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
+                 ACCOUNT_ID)
+        ]
+        when(list_tasks_br) \
+            .execute(...) \
+            .thenReturn(list_task_br_result)
+
+        update_tasks_br_result = [TASK_1_ID]
         when(update_tasks_br) \
             .execute(...) \
-            .thenReturn(br_result)
+            .thenReturn(update_tasks_br_result)
 
         test_input = [TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID)]
         under_test = UseCaseUpdateTasks(
@@ -275,18 +313,32 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
 
         assert result is not None
         assert len(result) == 1
-        assert result[0] == br_result[0]
+        assert result[0] == update_tasks_br_result[0]
 
+        verify(list_tasks_br).execute(...)
         verify(update_tasks_br).execute(...)
 
-        verifyNoMoreInteractions(update_tasks_br)
+        verifyNoMoreInteractions(list_tasks_br, update_tasks_br)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_with_partial_errors(self):
-        br_result = [TASK_1_ID, TASK_2_ID]
-        br_not_found_result = [TASK_3_ID]
+        list_task_br_result = [
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
+                 ACCOUNT_ID)
+            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, datetime.now(), datetime.now(),
+                   ACCOUNT_ID)
+            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, datetime.now(), datetime.now(),
+                   ACCOUNT_ID)
+        ]
+        when(list_tasks_br) \
+            .execute(...) \
+            .thenReturn(list_task_br_result)
+
+        update_tasks_br_result = [TASK_1_ID, TASK_2_ID]
+        update_tasks_br_not_found_result = [TASK_3_ID]
         when(update_tasks_br) \
             .execute(...) \
-            .thenReturn((br_not_found_result, br_result))
+            .thenReturn((update_tasks_br_not_found_result, update_tasks_br_result))
 
         test_input = [
             TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
@@ -302,12 +354,13 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
         assert result is not None
         assert len(result[1]) == 2
         for task_id in result[1]:
-            assert task_id in br_result
+            assert task_id in update_tasks_br_result
         assert len(result[0]) == 1
 
+        verify(list_tasks_br).execute(...)
         verify(update_tasks_br).execute(...)
 
-        verifyNoMoreInteractions(update_tasks_br)
+        verifyNoMoreInteractions(list_tasks_br, update_tasks_br)
 
     def test_should_fail_no_port(self):
         under_test = UseCaseUpdateTasks(
@@ -319,7 +372,20 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
 
         verifyNoMoreInteractions(update_tasks_br)
 
-    def test_should_fail_create_tasks_br_error(self):
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
+    def test_should_fail_update_tasks_br_error(self):
+        list_task_br_result = [
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
+                 ACCOUNT_ID)
+            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, datetime.now(), datetime.now(),
+                   ACCOUNT_ID)
+            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, datetime.now(), datetime.now(),
+                   ACCOUNT_ID)
+        ]
+        when(list_tasks_br) \
+            .execute(...) \
+            .thenReturn(list_task_br_result)
+
         when(update_tasks_br) \
             .execute(...) \
             .thenRaise(InternalError("Something went very very wrong"))
@@ -336,14 +402,28 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
         with pytest.raises(InternalError):
             under_test.execute(test_input)
 
+        verify(list_tasks_br).execute(...)
         verify(update_tasks_br).execute(...)
 
-        verifyNoMoreInteractions(update_tasks_br)
+        verifyNoMoreInteractions(list_tasks_br, update_tasks_br)
 
 
 class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed(self):
+        list_task_br_result = [
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
+                 ACCOUNT_ID)
+            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, datetime.now(), datetime.now(),
+                   ACCOUNT_ID)
+            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, datetime.now(), datetime.now(),
+                   ACCOUNT_ID)
+        ]
+        when(list_tasks_br) \
+            .execute(...) \
+            .thenReturn(list_task_br_result)
+
         when(delete_tasks_br) \
             .execute(...) \
             .thenReturn()
@@ -355,11 +435,21 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
             , MockedLogger())
         under_test.execute(test_input)
 
+        verify(list_tasks_br).execute(...)
         verify(delete_tasks_br).execute(...)
 
-        verifyNoMoreInteractions(delete_tasks_br)
+        verifyNoMoreInteractions(list_tasks_br, delete_tasks_br)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_single_task_id(self):
+        list_task_br_result = [
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
+                 ACCOUNT_ID)
+        ]
+        when(list_tasks_br) \
+            .execute(...) \
+            .thenReturn(list_task_br_result)
+
         when(delete_tasks_br) \
             .execute(...) \
             .thenReturn()
@@ -371,9 +461,10 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
             , MockedLogger())
         under_test.execute(test_input)
 
+        verify(list_tasks_br).execute(...)
         verify(delete_tasks_br).execute(...)
 
-        verifyNoMoreInteractions(delete_tasks_br)
+        verifyNoMoreInteractions(list_tasks_br, delete_tasks_br)
 
     def test_should_fail_no_port(self):
         under_test = UseCaseDeleteTasks(
@@ -386,7 +477,20 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
 
         verifyNoMoreInteractions(delete_tasks_br)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_create_tasks_br_error(self):
+        list_task_br_result = [
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
+                 ACCOUNT_ID)
+            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, datetime.now(), datetime.now(),
+                   ACCOUNT_ID)
+            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, datetime.now(), datetime.now(),
+                   ACCOUNT_ID)
+        ]
+        when(list_tasks_br) \
+            .execute(...) \
+            .thenReturn(list_task_br_result)
+
         when(delete_tasks_br) \
             .execute(...) \
             .thenRaise(InternalError("Something went very very wrong"))
@@ -400,13 +504,15 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
         with pytest.raises(InternalError):
             under_test.execute(test_input)
 
+        verify(list_tasks_br).execute(...)
         verify(delete_tasks_br).execute(...)
 
-        verifyNoMoreInteractions(delete_tasks_br)
+        verifyNoMoreInteractions(list_tasks_br, delete_tasks_br)
 
 
 class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed(self):
         br_result = [
             Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
@@ -434,6 +540,7 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
 
         verifyNoMoreInteractions(list_account_tasks_br)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_single_result(self):
         br_result = [Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID)]
         when(list_account_tasks_br) \
@@ -455,6 +562,7 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
 
         verifyNoMoreInteractions(list_account_tasks_br)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_no_results(self):
         br_result = []
         when(list_account_tasks_br) \
@@ -474,6 +582,7 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
 
         verifyNoMoreInteractions(list_account_tasks_br)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_no_port(self):
         under_test = UseCaseListTasksForAccount(
             MockedUnitOfWorkProvider()
@@ -485,6 +594,7 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
 
         verifyNoMoreInteractions(list_account_tasks_br)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_create_tasks_br_error(self):
         when(list_account_tasks_br) \
             .execute(...) \

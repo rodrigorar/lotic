@@ -5,7 +5,7 @@ from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
 from src.domain import NotFoundError
-from src.domain.errors import LoginFailedError
+from src.application.errors import LoginFailedError
 from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider
 
 ACCOUNT_ID = uuid4()

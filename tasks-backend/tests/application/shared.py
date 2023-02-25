@@ -1,11 +1,12 @@
 from logging import Logger
 from typing import Mapping
+from unittest.mock import patch
 
 from mockito import mock, when
 import pytest
 
 from src.application import UnitOfWork, UnitOfWorkProvider
-from src.domain import DatabaseProvider, LogProvider
+from src.domain import DatabaseProvider
 from tests.shared import MockDatabase
 
 
