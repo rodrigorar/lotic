@@ -26,6 +26,8 @@ class UseCaseCreateAccount(UseCase):
     def execute(self, account: AccountDTO):
         assert account is not None, "User cannot be empty"
 
+        # TODO: Implement an authorization safe guard
+
         self.logger.info("UseCase[CreateAccount](" + str(account.id) + ")")
 
         with self.unit_of_work_provider.get() as unit_of_work:
@@ -53,6 +55,8 @@ class UseCaseGetAccount(UseCase):
 
     def execute(self, account_id: uuid):
         assert account_id is not None, "Account id cannot be empty"
+
+        # TODO: Implement an authorization safe guard
 
         self.logger.info("UseCase[GetAccount](" + str(account_id) + ")")
 

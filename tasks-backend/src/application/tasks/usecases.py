@@ -26,6 +26,8 @@ class UseCaseCreateTasks(UseCase):
     def execute(self, tasks: list[TaskDTO]) -> list[uuid]:
         assert tasks is not None, "No tasks were provided"
 
+        # TODO: Implement authorization safe guard
+
         owner_ids = [task.owner_id for task in tasks] \
             if len(tasks) == 1 \
             else reduce(reducer_duplicated, [task.owner_id for task in tasks])
@@ -62,6 +64,8 @@ class UseCaseUpdateTasks(UseCase):
     def execute(self, tasks: list[TaskDTO]):
         assert tasks is not None, "Tasks cannot be null"
 
+        # TODO: Implement an authorization safe guard
+
         self.logger.info("UseCase[UpdateTasks]")
 
         with self.unit_of_work_provider.get() as unit_of_work:
@@ -86,6 +90,8 @@ class UseCaseDeleteTasks(UseCase):
     def execute(self, task_ids: list[uuid]):
         assert task_ids is not None, "Task id list cannot be null"
 
+        # TODO: Implement an authorization safe guard
+
         self.logger.info("UseCase[DeleteTasks]")
 
         with self.unit_of_work_provider.get() as unit_of_work:
@@ -107,6 +113,8 @@ class UseCaseListTasksForAccount(UseCase):
 
     def execute(self, account_id: uuid) -> list[TaskDTO]:
         assert account_id is not None, "Account id cannot be null"
+
+        # TODO: Implement an authorization safe guard
 
         self.logger.info("UseCase[ListTasksForAccount](" + str(account_id) + ")")
 

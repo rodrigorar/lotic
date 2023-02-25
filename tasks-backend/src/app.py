@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask
+from flask import Flask, request
 from werkzeug.exceptions import HTTPException
 
 from src.domain import ConflictError, InvalidArgumentError, NotFoundError
@@ -49,6 +49,23 @@ config_app()
 setup_providers(app, SQLAlchemy(app))
 setup_blueprints(app)
 start(app)
+
+
+# Authorization code
+
+@app.before_request
+def authorization_constructor():
+    from src.application.auth import SessionTokenProvider
+
+    authorization_token = request.headers.get('XAuthorization')
+    SessionTokenProvider.store_token(authorization_token)
+
+
+@app.after_request
+def authorization_destructor(response):
+    from src.application.auth import SessionTokenProvider
+    SessionTokenProvider.store_token(None)
+    return response
 
 
 # Healthcheck

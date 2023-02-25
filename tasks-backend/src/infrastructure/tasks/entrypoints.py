@@ -1,6 +1,7 @@
 import uuid
 
 from flask import Blueprint, request
+
 from src.domain import InvalidArgumentError, LogProvider
 from src.infrastructure import from_json, to_json
 from src.infrastructure.tasks.payloads import CreateTasksRequest, ListAccountTasksResponse, UpdateTasksRequest
