@@ -40,9 +40,15 @@ class AuthorizationContext:
 
     @staticmethod
     def is_matching_account(account_id: uuid):
-        context_account_id = AuthorizationContext.get_account_id()
-        return context_account_id == account_id
+        try:
+            context_account_id = AuthorizationContext.get_account_id()
+            return context_account_id == account_id
+        except Exception:
+            return False
 
     @staticmethod
     def is_known_account():
-        return g.account_id is not None and g.auth_token is not None
+        try:
+            return g.account_id is not None and g.auth_token is not None
+        except Exception:
+            return False

@@ -1,9 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, request
+from flask import Flask, g, request
 from werkzeug.exceptions import HTTPException
 
 from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
-from src.domain import ConflictError, InvalidArgumentError, NotFoundError
+from src.domain import ConflictError, InvalidArgumentError, LogProvider, NotFoundError
 from src.infrastructure import AppProvider, DatabaseSessionProvider, AppConfigurations, to_json
 from logging.config import fileConfig
 
@@ -61,7 +61,6 @@ def authorization_constructor():
     from src.infrastructure.auth import AuthTokenStorageImpl
 
     authorization_token = request.headers.get('XAuthorization')
-
     if authorization_token is not None:
         unit_of_work_provider = UnitOfWorkProviderImpl()
         with unit_of_work_provider.get() as unit_of_work:
@@ -72,14 +71,6 @@ def authorization_constructor():
                 authorization_token
                 , auth_session.refresh_token
                 , auth_session.get_account_id())
-
-
-@app.after_request
-def authorization_destructor(response):
-    from src.application.auth import AuthorizationContext
-    AuthorizationContext.create_context(None, None, None)
-    return response
-
 
 # Healthcheck
 
