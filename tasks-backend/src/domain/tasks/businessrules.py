@@ -69,6 +69,20 @@ class DeleteTasks(BaseBusinessRule):
             self.account_tasks_repository.delete_by_task_id(self.unit_of_work, task_id)
 
 
+class ListTasks(BaseBusinessRule):
+
+    def __init__(
+            self
+            , unit_of_work
+            , tasks_repository: TasksRepository):
+
+        super().__init__(unit_of_work)
+        self.tasks_repository = tasks_repository
+
+    def execute(self, tasks_ids: list[uuid]):
+        return self.tasks_repository.list(self.unit_of_work, tasks_ids)
+
+
 class ListTasksForAccount(BaseBusinessRule):
 
     def __init__(
@@ -86,7 +100,7 @@ class ListTasksForAccount(BaseBusinessRule):
 
         result = []
 
-        account_tasks = self.account_tasks_repository.list(self.unit_of_work, account_id)
+        account_tasks = self.account_tasks_repository.list_account_tasks(self.unit_of_work, account_id)
         # TODO: Optimize this code so that we don't have this loop
         for account_task in account_tasks:
             task = self.tasks_repository.get_by_id(self.unit_of_work, account_task.get_task_id())
@@ -110,6 +124,10 @@ class TasksBusinessRulesProvider:
     @staticmethod
     def delete_tasks(unit_of_work) -> DeleteTasks:
         raise NotImplemented("TasksBusinessRulesProvider#delete_tasks is not implemented.")
+
+    @staticmethod
+    def list_tasks(unit_of_work) -> ListTasks:
+        raise NotImplementedError("TasksBusinessRulesProvider#list_tasks is not implemented")
 
     @staticmethod
     def list_tasks_for_user(unit_of_work) -> ListTasksForAccount:

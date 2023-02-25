@@ -539,7 +539,7 @@ class TestListTasksForAccount(DomainUnitTestsBase):
         ]
         mocked_account_tasks_repository = mock(AccountTasksRepository)
         when(mocked_account_tasks_repository) \
-            .list(...) \
+            .list_account_tasks(...) \
             .thenReturn(account_tasks)
 
         under_test = ListTasksForAccount(
@@ -557,7 +557,7 @@ class TestListTasksForAccount(DomainUnitTestsBase):
         verify(mocked_tasks_repository, times=1).get_by_id(mocked_unit_of_work, task_1_id)
         verify(mocked_tasks_repository, times=1).get_by_id(mocked_unit_of_work, task_2_id)
         verify(mocked_tasks_repository, times=1).get_by_id(mocked_unit_of_work, task_3_id)
-        verify(mocked_account_tasks_repository, times=1).list(...)
+        verify(mocked_account_tasks_repository, times=1).list_account_tasks(...)
 
         verifyNoMoreInteractions(
             mocked_unit_of_work
@@ -607,7 +607,7 @@ class TestListTasksForAccount(DomainUnitTestsBase):
         ]
         mocked_account_tasks_repository = mock(AccountTasksRepository)
         when(mocked_account_tasks_repository) \
-            .list(...) \
+            .list_account_tasks(...) \
             .thenReturn(account_tasks)
 
         under_test = ListTasksForAccount(
@@ -619,7 +619,7 @@ class TestListTasksForAccount(DomainUnitTestsBase):
             under_test.execute(account_id)
 
         verify(mocked_tasks_repository, times=1).get_by_id(mocked_unit_of_work, task_1_id)
-        verify(mocked_account_tasks_repository, times=1).list(...)
+        verify(mocked_account_tasks_repository, times=1).list_account_tasks(...)
 
         verifyNoMoreInteractions(
             mocked_unit_of_work
@@ -637,7 +637,7 @@ class TestListTasksForAccount(DomainUnitTestsBase):
 
         mocked_account_tasks_repository = mock(AccountTasksRepository)
         when(mocked_account_tasks_repository) \
-            .list(...) \
+            .list_account_tasks(...) \
             .thenRaise(InternalError("Something very wrong has happened here"))
 
         under_test = ListTasksForAccount(
@@ -648,7 +648,7 @@ class TestListTasksForAccount(DomainUnitTestsBase):
         with pytest.raises(InternalError):
             under_test.execute(account_id)
 
-        verify(mocked_account_tasks_repository, times=1).list(...)
+        verify(mocked_account_tasks_repository, times=1).list_account_tasks(...)
 
         verifyNoMoreInteractions(
             mocked_unit_of_work

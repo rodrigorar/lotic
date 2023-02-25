@@ -5,6 +5,7 @@ from src.application.tasks import UseCaseCreateTasks, UseCaseDeleteTasks, UseCas
 from src.domain import LogProvider, NotFoundError
 from src.domain.tasks import TasksRepository, Task, AccountTasksRepository, AccountTasks \
     , TasksBusinessRulesProvider, ListTasksForAccount, DeleteTasks, UpdateTasks, CreateTasks
+from src.domain.tasks.businessrules import ListTasks
 from src.infrastructure import UnitOfWorkProviderImpl
 from src.infrastructure.accounts import AccountBusinessRulesProviderImpl
 
@@ -44,6 +45,22 @@ class TasksRepositoryImpl(TasksRepository):
         query = unit_of_work.query()
         return query.query(Task).filter_by(id=str(task_id)).first()
 
+    def list_tasks(self, unit_of_work, task_ids: list[uuid]):
+        assert unit_of_work is not None, "Unit of work cannot be empty"
+        assert task_ids is not None, "Task ids cannot be null"
+
+        query_manager = unit_of_work.query()
+        query_result = query_manager.query(Task).filter(Task.id.in_(task_ids)).all()
+        return [
+            Task(
+                entry.get_id()
+                , entry.title
+                , entry.description
+                , entry.created_at
+                , entry.updated_at
+                , entry.get_owner_id()
+            ) for entry in query_result]
+
     def delete_multiple(self, unit_of_work: UnitOfWork, task_ids: list[uuid]):
         assert unit_of_work is not None, "Unit of work cannot be empty"
         assert task_ids is not None, "Task ids cannot be empty"
@@ -67,7 +84,7 @@ class AccountTasksRepositoryImpl(AccountTasksRepository):
 
         return [(user_task.get_account_id(), user_task.get_task_id()) for user_task in account_tasks]
 
-    def list(self, unit_of_work: UnitOfWork, account_id: uuid) -> list[AccountTasks]:
+    def list_account_tasks(self, unit_of_work: UnitOfWork, account_id: uuid) -> list[AccountTasks]:
         assert unit_of_work is not None, "Unit of work cannot be empty"
         assert account_id is not None, "Account id cannot be empty"
 
@@ -107,6 +124,10 @@ class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):
     @staticmethod
     def list_tasks_for_user(unit_of_work) -> ListTasksForAccount:
         return ListTasksForAccount(unit_of_work, TasksRepositoryImpl(), AccountTasksRepositoryImpl())
+
+    @staticmethod
+    def list_tasks(unit_of_work) -> ListTasks:
+        return ListTasks(unit_of_work, TasksRepositoryImpl())
 
 
 unit_of_work_provider = UnitOfWorkProviderImpl()
