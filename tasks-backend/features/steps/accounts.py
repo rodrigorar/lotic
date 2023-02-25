@@ -65,7 +65,7 @@ def step_impl(context):
         context.result = context.client.get(
             URL_PREFIX_V1 + '/accounts/' + str(context.test_account_id)
             , headers={
-                "XAuthorization": context.test_auth_token
+                "X-Authorization": context.test_auth_token
             })
 
 

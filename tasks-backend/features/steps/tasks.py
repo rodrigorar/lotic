@@ -60,7 +60,7 @@ def step_impl(context):
                     ]
                 }
                 , headers={
-                    'XAuthorization': context.auth_tokens[0]
+                    'X-Authorization': context.auth_tokens[0]
                 })
 
 
@@ -101,7 +101,7 @@ def step_impl(context):
                     ]
                 }
                 , headers={
-                    'XAuthorization': context.auth_tokens[0]
+                    'X-Authorization': context.auth_tokens[0]
                 })
 
 
@@ -117,7 +117,6 @@ def step_impl(context):
             , datetime.now()
             , datetime.now()
             , context.account_ids[0])
-        account_task_data = AccountTasks(context.account_ids[0], data.get_id())
         context.db.session.add(data)
         context.db.session.commit()
 
@@ -135,7 +134,7 @@ def step_impl(context):
                     ]
                 }
                 , headers={
-                    'XAuthorization': context.auth_tokens[0]
+                    'X-Authorization': context.auth_tokens[0]
                 })
 
 
@@ -207,7 +206,7 @@ def step_impl(context):
                     ]
                 }
                 , headers={
-                    'XAuthorization': context.auth_tokens[0]
+                    'X-Authorization': context.auth_tokens[0]
                 })
 
 
@@ -234,7 +233,7 @@ def step_impl(context):
         context.response = context.client.delete(
             URL_PREFIX_V1 + '/tasks/' + task_data.id
             , headers={
-                'XAuthorization': context.auth_tokens[0]
+                'X-Authorization': context.auth_tokens[0]
             })
 
 
@@ -244,7 +243,7 @@ def step_impl(context):
     context.response = context.client.delete(
         URL_PREFIX_V1 + '/tasks/' + task_id
         , headers={
-            'XAuthorization': context.auth_tokens[0]
+            'X-Authorization': context.auth_tokens[0]
         })
 
 
@@ -260,7 +259,7 @@ def step_impl(context):
         context.response = context.client.get(
             URL_PREFIX_V1 + '/tasks?account_id=' + str(context.account_ids[0])
             , headers={
-                'XAuthorization': context.auth_tokens[0]
+                'X-Authorization': context.auth_tokens[0]
             })
 
 
@@ -278,7 +277,7 @@ def step_impl(context):
         context.response = context.client.get(
                 URL_PREFIX_V1 + '/tasks?account_id=' + str(context.account_ids[0])
                 , headers={
-                    'XAuthorization': context.auth_tokens[0]
+                    'X-Authorization': context.auth_tokens[0]
                 })
 
 
@@ -291,7 +290,7 @@ def step_impl(context):
         context.response = context.client.get(
             URL_PREFIX_V1 + '/tasks?account_id=' + str(context.account_ids[0])
             , headers={
-                'XAuthorization': context.auth_tokens[0]
+                'X-Authorization': context.auth_tokens[0]
             })
 
 

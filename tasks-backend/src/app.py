@@ -60,7 +60,7 @@ def authorization_constructor():
     from src.application.auth import AuthorizationContext
     from src.infrastructure.auth import AuthTokenStorageImpl
 
-    authorization_token = request.headers.get('XAuthorization')
+    authorization_token = request.headers.get('X-Authorization')
     if authorization_token is not None:
         unit_of_work_provider = UnitOfWorkProviderImpl()
         with unit_of_work_provider.get() as unit_of_work:
