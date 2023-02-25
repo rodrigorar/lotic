@@ -370,56 +370,48 @@ def step_impl(context):
 
 @then('no tasks should be returned')
 def step_impl(context):
-    from src.infrastructure.tasks import ListAccountTasksResponse
 
     assert context.response is not None
     assert context.response.status_code == 200
     assert context.response.get_data() is not None
 
     tasks_json = from_json(None, context.response.get_data())["tasks"]
-    task_list = [from_json(ListAccountTasksResponse, task_entry) for task_entry in tasks_json]
-    assert len(task_list) == 0
+    assert len(tasks_json) == 0
 
 
 @then('the task should be returned')
 def step_impl(context):
-    from src.infrastructure.tasks import ListAccountTasksResponse
-
     assert context.response is not None
     assert context.response.status_code == 200
     assert context.response.get_data() is not None
 
     tasks_json = from_json(None, context.response.get_data())["tasks"]
-    task_list = [from_json(ListAccountTasksResponse, task_entry) for task_entry in tasks_json]
 
-    assert task_list is not None
-    assert task_list[0].task_id == str(context.task_ids[2])
-    assert task_list[0].owner_id == str(context.account_ids[0])
+    assert tasks_json is not None
+    assert tasks_json[0]["task_id"] == str(context.task_ids[2])
+    assert tasks_json[0]["owner_id"] == str(context.account_ids[0])
 
 
 @then('all account tasks should be returned')
 def step_impl(context):
-    from src.infrastructure.tasks import ListAccountTasksResponse
-
     assert context.response is not None
     assert context.response.status_code == 200
     assert context.response.get_data() is not None
 
     tasks_json = from_json(None, context.response.get_data())["tasks"]
-    task_list = [from_json(ListAccountTasksResponse, task_entry) for task_entry in tasks_json]
 
-    assert task_list is not None
-    task_1 = task_list[0]
-    assert uuid.UUID(task_1.task_id) in context.task_ids
-    assert task_1.owner_id == str(context.account_ids[0])
+    assert tasks_json is not None
+    task_1 = tasks_json[0]
+    assert uuid.UUID(task_1["task_id"]) in context.task_ids
+    assert task_1["owner_id"] == str(context.account_ids[0])
 
-    task_2 = task_list[1]
-    assert uuid.UUID(task_2.task_id) in context.task_ids
-    assert task_2.owner_id == str(context.account_ids[0])
+    task_2 = tasks_json[1]
+    assert uuid.UUID(task_2["task_id"]) in context.task_ids
+    assert task_2["owner_id"] == str(context.account_ids[0])
 
-    task_3 = task_list[2]
-    assert uuid.UUID(task_3.task_id) in context.task_ids
-    assert task_3.owner_id == str(context.account_ids[0])
+    task_3 = tasks_json[2]
+    assert uuid.UUID(task_3["task_id"]) in context.task_ids
+    assert task_3["owner_id"] == str(context.account_ids[0])
 
 
 @then('an error should happen for multiple users')
