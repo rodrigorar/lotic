@@ -34,30 +34,47 @@ class AuthTokenStorageImpl(AuthTokenStorage):
         assert account_id is not None, "Account id cannot be null"
 
         query_manager = unit_of_work.query()
-
-        return query_manager.query(AuthSession) \
+        result = query_manager.query(AuthSession) \
             .filter(and_(
                 AuthSession.account_id == str(account_id)
                 , AuthSession.expires_at > datetime.now())) \
             .first()
+        return AuthSession(
+            result.id
+            , result.refresh_token
+            , result.account_id
+            , result.created_at
+            , result.expires_at) if result is not None else None
 
     def find_by_id(self, unit_of_work: UnitOfWork, auth_session_id: uuid) -> Optional[AuthSession]:
         assert unit_of_work is not None, "Unit of Work cannot be null"
         assert auth_session_id is not None, "Auth session id cannot be null"
 
         query_manager = unit_of_work.query()
-        return query_manager.query(AuthSession) \
+        result = query_manager.query(AuthSession) \
             .filter(and_(
                 AuthSession.id == str(auth_session_id)
                 , AuthSession.expires_at > datetime.now())) \
             .first()
+        return AuthSession(
+            result.id
+            , result.refresh_token
+            , result.account_id
+            , result.created_at
+            , result.expires_at) if result is not None else None
 
     def find_by_refresh_token(self, unit_of_work: UnitOfWork, refresh_token: str) -> Optional[AuthSession]:
         assert unit_of_work is not None, "Unit of Work cannot be null"
         assert refresh_token is not None, "Refresh token cannot be null"
 
         query_manager = unit_of_work.query()
-        return query_manager.query(AuthSession).filter_by(refresh_token=refresh_token).first()
+        result = query_manager.query(AuthSession).filter_by(refresh_token=refresh_token).first()
+        return AuthSession(
+            result.id
+            , result.refresh_token
+            , result.account_id
+            , result.created_at
+            , result.expires_at) if result is not None else None
 
     def store(self, unit_of_work: UnitOfWork, auth_session: AuthSession) -> uuid:
         assert unit_of_work is not None, "Unit of Work cannot be null"
