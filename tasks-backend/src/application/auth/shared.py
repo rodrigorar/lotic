@@ -1,4 +1,6 @@
-import threading
+import uuid
+
+from flask import g
 
 
 class EncryptionEngine:
@@ -16,12 +18,27 @@ class EncryptionEngine:
         raise NotImplementedError('EncryptionEngine#decrypt is not implemented')
 
 
-class SessionTokenProvider:
+class AuthorizationContext:
 
     @staticmethod
-    def store_token(auth_token: str):
-        threading.local().auth_token = auth_token
+    def create_context(auth_token: str, refresh_token: str, account_id: uuid):
+        g.auth_token = auth_token
+        g.refresh_token = refresh_token
+        g.account_id = account_id
 
     @staticmethod
     def get_token():
-        return getattr(threading.local(), 'auth_token', None)
+        return g.auth_token
+
+    @staticmethod
+    def get_refresh_token():
+        return g.refresh_token
+
+    @staticmethod
+    def get_account_id():
+        return g.account_id
+
+    @staticmethod
+    def is_matching_account(account_id: uuid):
+        context_account_id = AuthorizationContext.get_account_id()
+        return context_account_id == account_id

@@ -2,16 +2,17 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request
 from werkzeug.exceptions import HTTPException
 
+from src.application.errors import AuthorizationError, LoginFailedError
 from src.domain import ConflictError, InvalidArgumentError, NotFoundError
-from src.domain.errors import LoginFailedError
 from src.infrastructure import AppProvider, DatabaseSessionProvider, AppConfigurations, to_json
 from logging.config import fileConfig
 
 
-def config_app():
+def config_app(flask):
     app_config = AppConfigurations()
-    app_config.set_app_config(app.config)
+    app_config.set_app_config(flask.config)
     fileConfig(app_config.config_file())
+    flask.secret_key = app_config.secret_key()
 
 
 def setup_providers(flask, db):
@@ -45,7 +46,7 @@ app = Flask(__name__, instance_relative_config=True)
 app.config.from_envvar('APP_CONFIG_FILE')
 AppProvider().set_app(app)
 
-config_app()
+config_app(app)
 setup_providers(app, SQLAlchemy(app))
 setup_blueprints(app)
 start(app)
@@ -55,16 +56,28 @@ start(app)
 
 @app.before_request
 def authorization_constructor():
-    from src.application.auth import SessionTokenProvider
+    from src.infrastructure import UnitOfWorkProviderImpl
+    from src.application.auth import AuthorizationContext
+    from src.infrastructure.auth import AuthTokenStorageImpl
 
     authorization_token = request.headers.get('XAuthorization')
-    SessionTokenProvider.store_token(authorization_token)
+
+    print(authorization_token)
+
+    if authorization_token is not None:
+        unit_of_work_provider = UnitOfWorkProviderImpl()
+        with unit_of_work_provider.get() as unit_of_work:
+            auth_session = AuthTokenStorageImpl().find_by_id(unit_of_work, authorization_token)
+            AuthorizationContext.create_context(
+                authorization_token
+                , auth_session.refresh_token
+                , auth_session.get_account_id())
 
 
 @app.after_request
 def authorization_destructor(response):
-    from src.application.auth import SessionTokenProvider
-    SessionTokenProvider.store_token(None)
+    from src.application.auth import AuthorizationContext
+    AuthorizationContext.create_context(None, None, None)
     return response
 
 
@@ -115,6 +128,16 @@ def handle_not_found_error(e: NotFoundError):
 def handle_login_failed_error(e: LoginFailedError):
     return to_json({
         "type": "http://localhost:5000/login_failed_error"
+        , "title": e.title
+        , "status": "401"
+        , "details": e.details
+    }), 401, {'Content-Type': 'application/problem+json'}
+
+
+@app.errorhandler(AuthorizationError)
+def handle_authorization_error(e: AuthorizationError):
+    return to_json({
+        "type": "http://localhost:5000/authorization_error"
         , "title": e.title
         , "status": "403"
         , "details": e.details

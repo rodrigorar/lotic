@@ -4,9 +4,10 @@ from logging import Logger
 
 from src.application import UseCase, UnitOfWorkProvider
 from src.application.accounts import AccountDTO
+from src.application.errors import AuthorizationError
 from src.domain.accounts import AccountBusinessRulesProvider
 from src.domain import InvalidArgumentError
-from src.application.auth import EncryptionEngine
+from src.application.auth import AuthorizationContext, EncryptionEngine
 
 
 class UseCaseCreateAccount(UseCase):
@@ -56,7 +57,8 @@ class UseCaseGetAccount(UseCase):
     def execute(self, account_id: uuid):
         assert account_id is not None, "Account id cannot be empty"
 
-        # TODO: Implement an authorization safe guard
+        if not AuthorizationContext.is_matching_account(account_id):
+            raise AuthorizationError('Invalid authorization token provided')
 
         self.logger.info("UseCase[GetAccount](" + str(account_id) + ")")
 

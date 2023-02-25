@@ -8,7 +8,7 @@ from src.application.auth.providers import AuthTokenStorage
 from src.application.auth.shared import EncryptionEngine
 from src.domain import NotFoundError
 from src.domain.accounts import AccountBusinessRulesProvider
-from src.domain.errors import LoginFailedError
+from src.application.errors import LoginFailedError
 
 
 class UseCaseLogin(UseCase):
