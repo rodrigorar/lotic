@@ -46,6 +46,7 @@ def step_impl(context):
 @then("it should receive a valid authorization token")
 def step_impl(context):
     from src.infrastructure.auth.payloads import AuthTokenResponse
+    from src.application.auth import AuthSession
     from features.environment import JOHN_DOE_ID
 
     assert context.response is not None
@@ -56,6 +57,14 @@ def step_impl(context):
     assert auth_response.refresh_token is not None
     assert uuid.UUID(auth_response.account_id) == JOHN_DOE_ID
     assert parser.parse(auth_response.expires_at) > datetime.now().astimezone()
+
+    with context.app.app_context():
+        db_entry = context.db.session.query(AuthSession).filter_by(id=auth_response.token).first()
+        assert db_entry is not None
+        assert db_entry.id == auth_response.token
+        assert db_entry.refresh_token == auth_response.refresh_token
+        assert db_entry.account_id == auth_response.account_id
+        assert db_entry.expires_at.astimezone() == parser.parse(auth_response.expires_at)
 
 
 @then("it should receive a not found error")
