@@ -4,22 +4,19 @@ Feature: Auth operations
   # Login
 
   Scenario: Login successfully
-    # TODO: Not implemented
-    #Given a valid user
-    #When it tries to login
-    #Then it should receive a valid authorization token
+    Given a valid account
+    When it tries to login
+    Then it should receive a valid authorization token
 
   Scenario: Login with unknown account
-    # TODO: Not implemented
-    #Given an unknown account
-    #When it tries to login
-    #Then it should receive a not found error
+    Given an unknown account
+    When it tries to login
+    Then it should receive a not found error
 
   Scenario: Login with wrong secret
-    # TODO: Not implemented
-    #Given a valid user
-    #When it tries to login with the wrong secret
-    #Then it should receive a forbidden error
+    Given a valid account with a wrong secret
+    When it tries to login
+    Then it should receive a forbidden error
 
   # Refresh
 
