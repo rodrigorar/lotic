@@ -17,7 +17,7 @@ async function createMultiple(tasksData) {
     Validators.isNotNull(tasksData, 'No tasks where provided');
 
     // TODO: Optimize this so it doesn't call the database so many times
-    await tasksData
+    tasksData
         .map(taskData => 
                 new Task(
                     taskData.id

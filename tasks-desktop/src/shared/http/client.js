@@ -8,18 +8,18 @@ const client = axios.create({
 
 // Logging filters
 
-client.interceptors.request.use(contents => {
-    console.log(contents);
-    return contents;
-});
+// client.interceptors.request.use(contents => {
+//     console.log(contents);
+//     return contents;
+// });
 
-client.interceptors.response.use(contents => {
-    console.log(contents);
-    return contents;
-}, error => {
-    console.log(error);
-    return error;
-})
+// client.interceptors.response.use(contents => {
+//     console.log(contents);
+//     return contents;
+// }, error => {
+//     console.log(error);
+//     return error;
+// })
 
 module.exports.Client = client;
 module.exports.BASE_URL = "/api/v1"

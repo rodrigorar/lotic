@@ -3,7 +3,7 @@ const { AuthServices } = require("./auth/services");
 const { TasksRPC } = require("./tasks/rpc");
 const { TaskServices } = require("./tasks/services");
 const { TasksSynchServices } = require("./tasks_synch/services");
-const { TASK_SYNCH_STATUS } = require("./tasks_synch/data");
+const { TASK_SYNCH_STATUS, TaskSynchRepository } = require("./tasks_synch/data");
 const { Logger } = require("../shared/logging/logger");
 const { StatusCode } = require("../shared/http/http");
 const { webContents } = require("electron");
@@ -68,8 +68,13 @@ async function callDeleteTasks(taskIds) {
 }
 
 async function callListServerTasks(account) {
-    const result = await TasksRPC.listTasks(account.id);
-    return result.data.tasks.map(data => JSON.parse(data));
+    result = await TasksRPC.listTasks(account.id);
+    return result.data.tasks.map(entry => ({
+        task_id: entry.task_id
+        , title: entry.title
+        , description: entry.description
+        , owner_id: entry.owner_id
+    }));
 }
 
 async function doExecute(providedWebContents = undefined) {
@@ -132,13 +137,23 @@ async function doExecute(providedWebContents = undefined) {
                     , createdAt: new Date() // TODO: This should come from the server
                     , updatedAt: new Date() // TODO: This should come from the server
                 }));
+        TaskServices
+            .createMultiple(tasksToInsert)
+            .then(async _ => {
+                let taskList = [];
+                do {
+                    taskList = await TaskServices.list();
+                } while (taskList.length == 0 && tasksToInsert.length != 0)
+                
+                eventHandler.send('tasks:refresh', taskList);
+            });
+        tasksToInsert.forEach(entry => {
+            console.log(entry);
+            TasksSynchServices.createSynchMonitor(entry.id, TASK_SYNCH_STATUS['SYNCHED'])
+        })
     } else if (result.length == 0) {
-        // TODO: Delete all tasks that exist locally
+        Logger.info('Nothing to synch, continuing');
     }
-
-    await TaskServices
-        .createMultiple(tasksToInsert)
-        .then(async _ => eventHandler.send('tasks:refresh', await TaskServices.list()));
 
     Logger.trace('Finished Task Synchornization, Refreshing');
 }
