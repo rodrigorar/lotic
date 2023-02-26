@@ -1,4 +1,4 @@
-const { Client, BASE_URL } = require("../../shared/http/client");
+const { Client, BASE_URL, ContentTypes, Headers } = require("../../shared/http/client");
 const { Logger } = require("../../shared/logging/logger");
 
 const BASE_PATH = BASE_URL + "/auth";
@@ -23,8 +23,8 @@ async function login(principal) {
                 , secret: principal.password
             }, {
             headers: {
-                'Content-Type': 'application/json'
-                , 'Accept': 'application/json'
+                [Headers.ContentType]: ContentTypes.ApplicationJson
+                , [Headers.Accept]: ContentTypes.ApplicationJson
             }
         });
     });
@@ -40,16 +40,34 @@ async function refresh(refreshToken) {
             , {}
             , {
                 headers: {
-                    'Content-Type': 'application/json'
-                    , 'Accept': 'application/json'
+                    [Headers.ContentType]: ContentTypes.ApplicationJson
+                    , [Headers.Accept]: ContentTypes.ApplicationJson 
                 }
             });
     });
     return result.data;
 }
 
-async function logout(principal) {
+async function logout(accountId) {
+    Logger.trace(`Calling URL: #POST ${BASE_PATH}/logout`);
 
+    const activeSession = await AuthServices.getActiveSession();
+
+    const result = await doCall(async () => {
+        return await Client.post(
+            BASE_PATH + "/logout"
+            , {
+                account_id: accountId
+            }
+            , {
+                headers: {
+                    [Headers.ContentType]: ContentTypes.ApplicationJson
+                    , [Headers.Accept]: ContentTypes.ApplicationJson 
+                    , [Headers.XAuthorization]: activeSession.token 
+                }
+            });
+    });
+    return result.data;
 }
 
 module.exports.AuthRPC = {

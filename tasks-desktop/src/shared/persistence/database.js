@@ -52,7 +52,8 @@ const createTaskTable =
     + 'task_id TEXT UNIQUE PRIMARY KEY,' 
     + 'title TEXT,' 
     + 'created_at DATETIME NOT NULL,' 
-    + 'updated_at DATETIME NOT NULL' 
+    + 'updated_at DATETIME NOT NULL,'
+    + 'owner_id TEXT NOT NULL' 
     + ')';
 
 const createTaskSyncTable = 

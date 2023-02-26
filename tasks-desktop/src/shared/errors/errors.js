@@ -20,8 +20,16 @@ class UnknownAccountError extends Error {
     }
 }
 
+class LoginFailedError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'LoginFailedError';
+    }
+}
+
 module.exports.Errors = {
     InvalidArgumentError
     , NullArgumentError
     , UnknownAccountError
+    , LoginFailedError
 }

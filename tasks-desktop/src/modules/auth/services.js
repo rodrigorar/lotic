@@ -16,6 +16,10 @@ async function login(principal) {
 
     if (authToken == undefined) {
         loginResult = await AuthRPC.login(principal);
+        if (loginResult.hasOwnProperty('status')) {
+            throw new Errors.LoginFailedError('Failed to login account');
+        }
+        
         authToken = new AuthToken(
             loginResult.token
             , loginResult.refresh_token
@@ -58,9 +62,9 @@ async function refresh(accountId) {
     return authToken;
 }
 
-function logout(email) {
-    Validators.isNotNull(email, "No email provided");
-    AccountRepository.setLoginState(email, false);
+async function logout(accountId) {
+    Validators.isNotNull(accountId, "No accountId provided");
+    await AuthRepository.eraseAuthSessionsForAccount(accountId)
 }
 
 function getActiveSession() {

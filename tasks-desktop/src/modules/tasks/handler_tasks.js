@@ -1,10 +1,17 @@
 const { SynchManager } = require('../synch-manager');
 const { TaskServices } = require('./services');
 const { TasksSynchServices } = require('../tasks_synch/services');
+const { AuthServices } = require('../auth/services');
 
-function handleCreateTask(event, newTask) {
+async function handleCreateTask(event, newTask) {
+    const activeSession = await AuthServices.getActiveSession();
+    if (activeSession != undefined) {
+        newTask.ownerId = activeSession.accountId;
+    }
+
     TaskServices.create(newTask);
     TasksSynchServices.createSynchMonitor(newTask.id);
+    
     SynchManager.execute();
 }
 
@@ -30,7 +37,10 @@ function handleCompletion(event, taskId) {
 }
 
 async function handleListTasks(event) {
-    return await TaskServices.list();
+    const activeSession = await AuthServices.getActiveSession();
+    if (activeSession != undefined) {
+        return await TaskServices.list(activeSession.accountId);
+    }
 }
 
 module.exports.TasksHandler = {

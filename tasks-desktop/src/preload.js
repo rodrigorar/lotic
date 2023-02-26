@@ -30,4 +30,8 @@ contextBridge.exposeInMainWorld('tasks', {
 contextBridge.exposeInMainWorld('auth', {
     openLogin: () => ipcRenderer.send('auth:open:login')
     , login: (loginData) => ipcRenderer.send('auth:login', loginData)
+    , logout: () => ipcRenderer.send('auth:logout')
+    , isLoggedIn: () => ipcRenderer.invoke('auth:is_logged_in')
+    , handleLoggedIn: (callback) => ipcRenderer.on('auth:logged_in', callback)
+    , handleLoggedOut: (callback) => ipcRenderer.on('auth:logged_out', callback)
 });

@@ -9,7 +9,8 @@ function create(taskData) {
             taskData.id
             , taskData.title
             , taskData.createdAt
-            , taskData.updatedAt);
+            , taskData.updatedAt
+            , taskData.ownerId);
     TasksRepository.createTask(task);
 }
 
@@ -23,7 +24,8 @@ async function createMultiple(tasksData) {
                     taskData.id
                     , taskData.title
                     , taskData.createdAt
-                    , taskData.updatedAt))
+                    , taskData.updatedAt
+                    , taskData.ownerId))
         .forEach(async task => await TasksRepository.createTask(task));
 }
 
@@ -34,8 +36,9 @@ function update(taskId, taskData) {
     TasksRepository.updateTask(taskId, taskData);
 }
 
-async function list() {
-    return await TasksRepository.listTasks();
+async function list(accountId) {
+    Validators.isNotNull(accountId, 'No accountId provided');
+    return await TasksRepository.listTasks(accountId);
 }
 
 async function listById(taskIdList = []) {

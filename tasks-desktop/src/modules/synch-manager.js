@@ -8,7 +8,7 @@ const { Logger } = require("../shared/logging/logger");
 const { StatusCode } = require("../shared/http/http");
 const { webContents } = require("electron");
 
-async function callCreateTasks(account, taskIds) {
+async function callCreateTasks(authToken, account, taskIds) {
     const tasks = await TaskServices.listById(taskIds);
 
     const tasksRequest = tasks
@@ -18,7 +18,7 @@ async function callCreateTasks(account, taskIds) {
             , description: task.description ? task.description : ""
             , created_at: task.createdAt.toISOString()
             , updated_at: task.updatedAt.toISOString()
-            , owner_id: account.id
+            , owner_id: authToken.accountId
         }));
 
     const result = await TasksRPC.createTasks(tasksRequest);
@@ -99,7 +99,7 @@ async function doExecute(providedWebContents = undefined) {
             .filter(task => task.synchStatus == TASK_SYNCH_STATUS.LOCAL)
             .map(taskSynch => taskSynch.taskId)
     if (tasksToCreate.length > 0) {
-        await callCreateTasks(account, tasksToCreate);
+        await callCreateTasks(authToken, account, tasksToCreate);
     }
 
     // Update tasks in server
@@ -128,7 +128,7 @@ async function doExecute(providedWebContents = undefined) {
     const result = await callListServerTasks(account);
     let tasksToInsert = undefined;
     if (result.length > 0) {
-        const existingTasks = await TaskServices.list();
+        const existingTasks = await TaskServices.list(account.id);
         tasksToInsert = result
                 .filter(result => existingTasks.filter(entry => entry.id == result.task_id).length == 0)
                 .map(taskData => ({
@@ -136,19 +136,19 @@ async function doExecute(providedWebContents = undefined) {
                     , title: taskData.title
                     , createdAt: new Date() // TODO: This should come from the server
                     , updatedAt: new Date() // TODO: This should come from the server
+                    , ownerId: authToken.accountId
                 }));
         TaskServices
             .createMultiple(tasksToInsert)
             .then(async _ => {
                 let taskList = [];
                 do {
-                    taskList = await TaskServices.list();
+                    taskList = await TaskServices.list(authToken.accountId);
                 } while (taskList.length == 0 && tasksToInsert.length != 0)
                 
                 eventHandler.send('tasks:refresh', taskList);
             });
         tasksToInsert.forEach(entry => {
-            console.log(entry);
             TasksSynchServices.createSynchMonitor(entry.id, TASK_SYNCH_STATUS['SYNCHED'])
         })
     } else if (result.length == 0) {

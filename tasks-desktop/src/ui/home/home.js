@@ -5,7 +5,8 @@
 
 const taskContainer = document.querySelector("#tasks-container");
 const addTaskButton = document.querySelector("#add-task-button");
-const loginButton = document.querySelector("#login-button");
+
+// DOM Create / Management
 
 function createTaskDOM(id, title = undefined) {
     const containerDiv = document.createElement('div');
@@ -40,6 +41,41 @@ function createTaskDOM(id, title = undefined) {
     return containerDiv;
 }
 
+function createLogoutButtonDOM() {
+    const logoutButton = document.createElement('button');
+    
+    logoutButton.id = 'logout-button';
+    logoutButton.classList.add('login-button');
+    logoutButton.classList.add('general-button');
+    logoutButton.innerText = 'Logout';
+    
+    logoutButton.addEventListener('click', () => {
+        auth.logout();
+    });
+
+    const authButtonContainer = document.querySelector('#auth-button-container');
+    authButtonContainer.appendChild(logoutButton);
+
+    return logoutButton;
+}
+
+function createLoginButtonDOM() {
+    const loginButton = document.createElement('button');
+
+    loginButton.id = 'login-button';
+    loginButton.classList.add('login-button');
+    loginButton.classList.add('general-button');
+    loginButton.innerText = 'Login';
+    
+    loginButton.addEventListener('click', async () => {
+        auth.openLogin();
+    });
+
+    const authButtonContainer = document.querySelector('#auth-button-container');
+    authButtonContainer.appendChild(loginButton);
+
+}
+
 let emptyTask = undefined;
 let emptyTaskElement = undefined;
 
@@ -58,18 +94,30 @@ async function createTask() {
     return emptyTask;
 }
 
+// UI Initialization
+
 function setInitialFocus() {
     if (emptyTask != undefined) {
         document.getElementById('text-input:' + emptyTask.focus());
     }
 }
 
+async function initLoginUI() {
+    const isLoggedIn = await auth.isLoggedIn();
+    if (isLoggedIn) {
+        createLogoutButtonDOM();
+    } else {
+        createLoginButtonDOM();
+    }
+}
+
 async function initUI() {
+    await initLoginUI();
+
     tasks.listTasks()
         .then(taskList => {
-            if (taskList.length == 0) {
-                const taskId = createTask();
-                uiTasks[taskId] = false;
+            if (taskList == undefined || taskList.length == 0) {
+                createTask();
             } else {
                 taskList.forEach(entry => {
                     const taskElement = createTaskDOM(entry.id, entry.title)
@@ -83,41 +131,15 @@ async function initUI() {
         });
 }
 
-async function refreshTasks(tasks = undefined) {
-    const activeElementId = document.activeElement.id;
-
-    logger.trace('Refreshing tasks');
-
-    if (tasks != undefined) {
-        taskContainer.innerHTML = null;
-
-        updateEmptyTask();
-
-        tasks.forEach(entry => {
-            if (entry.title === '' && emptyTask == undefined) {
-                emptyTask = entry.id;
-            } else if (entry.title == '' && emptyTask != undefined) {
-                tasks.completeTask(entry.id);
-            }
-            taskContainer.appendChild(createTaskDOM(entry.id, entry.title))
-        });
-        document.getElementById(activeElementId).focus();
-    }
-}
-
 initUI();
 
-// Add Task
+// Template Event Handlers
 
 addTaskButton.addEventListener('click', async () => {
     if (emptyTask == undefined) {
         const taskId = await createTask();
         document.getElementById('text-input:' + taskId).focus();
     }
-});
-
-loginButton.addEventListener('click', async () => {
-    auth.openLogin();
 });
 
 window.addEventListener('keypress', (key) => {
@@ -128,7 +150,7 @@ window.addEventListener('keypress', (key) => {
     }
 });
 
-// Handlers
+// UI Handlers
 
 function handleTextInput(event) {
     const taskId = extractId(event.target.id);
@@ -171,6 +193,48 @@ function handleCompleteInput(event) {
     }
 }
 
+// Event Handlers
+
+tasks.handleRefresh((event, tasks) => {
+    const activeElementId = document.activeElement.id;
+
+    logger.trace('Refreshing tasks');
+
+    if (tasks != undefined) {
+        taskContainer.innerHTML = null;
+
+        updateEmptyTask();
+
+        tasks.forEach(entry => {
+            if (entry.title === '' && emptyTask == undefined) {
+                emptyTask = entry.id;
+            } else if (entry.title == '' && emptyTask != undefined) {
+                tasks.completeTask(entry.id);
+            }
+            taskContainer.appendChild(createTaskDOM(entry.id, entry.title))
+        });
+        document.getElementById(activeElementId).focus();
+    }
+});
+
+auth.handleLoggedIn(event => {
+    logger.trace('Handling logged in event');
+
+    createLogoutButtonDOM();
+    document.querySelector("#login-button").remove();
+});
+
+auth.handleLoggedOut(event => {
+    logger.trace('Handling logged out event');
+
+    createLoginButtonDOM();
+    document.querySelector('#logout-button').remove();
+
+    document.querySelector('#tasks-container').innerHTML = '';
+    updateEmptyTask();
+    createTask();
+});
+
 // Helper functions
 
 function extractId(value) {
@@ -181,9 +245,3 @@ function updateEmptyTask(taskId = undefined, taskElement = undefined) {
     emptyTask = taskId;
     emptyTaskElement = taskElement;
 }
-
-// Event Handlers
-
-tasks.handleRefresh((event, value) => {
-    refreshTasks(value);
-});

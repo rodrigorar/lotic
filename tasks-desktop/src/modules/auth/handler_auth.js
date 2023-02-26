@@ -1,4 +1,4 @@
-const { BrowserWindow } = require('electron');
+const { BrowserWindow, webContents } = require('electron');
 const path = require('path');
 const { AuthServices } = require('./services');
 const { SynchManager } = require('../synch-manager');
@@ -26,6 +26,8 @@ async function handleOpenLogin(event) {
                 ? '../../ui/login/login.html' 
                 : '../../ui/login/logged_in.html';
         loginWindow.loadFile(path.join(__dirname, authFile));
+    } else {
+        loginWindow.focus();
     }
 }
 
@@ -35,9 +37,25 @@ async function handleLogin(event, loginData) {
 
     await AuthServices.login(loginData);
     await SynchManager.execute();
+
+    webContents.getFocusedWebContents().send('auth:logged_in');
+}
+
+async function handleLogout(event) {
+    const activeSession = await AuthServices.getActiveSession();
+    await AuthServices.logout(activeSession.accountId);
+
+    webContents.getFocusedWebContents().send('auth:logged_out');
+}
+
+async function handleIsLoggedIn(event) {
+    const activeSession = await AuthServices.getActiveSession();
+    return activeSession != undefined;
 }
 
 module.exports.AuthHandlers = {
     handleOpenLogin
     , handleLogin
+    , handleLogout
+    , handleIsLoggedIn
 }

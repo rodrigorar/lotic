@@ -90,3 +90,5 @@ ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
 // Auth Event Listeners
 ipcMain.on('auth:open:login', AuthHandlers.handleOpenLogin);
 ipcMain.on('auth:login', AuthHandlers.handleLogin);
+ipcMain.on('auth:logout', AuthHandlers.handleLogout)
+ipcMain.handle('auth:is_logged_in', AuthHandlers.handleIsLoggedIn)

@@ -4,8 +4,8 @@ async function createTask(task) {
     await UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
-                `INSERT INTO tasks(task_id, title, created_at, updated_at) VALUES(?, ?, ?, ?)`,
-                [task.id, task.title, task.createdAt, task.updatedAt]);
+                `INSERT INTO tasks(task_id, title, created_at, updated_at, owner_id) VALUES(?, ?, ?, ?, ?)`,
+                [task.id, task.title, task.createdAt, task.updatedAt, task.ownerId]);
             db.close();
         });
 }
@@ -22,12 +22,12 @@ function updateTask(taskId, data) {
 }
 
 // TODO: Refactor this method to use a more function approach
-async function listTasks() {
+async function listTasks(accountId) {
     let result = [];
 
     await UnitOfWork.begin();
-    const queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks', []);
-    result = queryResult.map(entry => new Task(entry.task_id, entry.title, new Date(entry.created_at), new Date(entry.updated_at)));
+    const queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks t WHERE owner_id = ?', [accountId]);
+    result = queryResult.map(entry => new Task(entry.task_id, entry.title, new Date(entry.created_at), new Date(entry.updated_at), entry.owner_id));
     UnitOfWork.end();
 
     return result;
@@ -37,7 +37,7 @@ async function listById(tasksIds = []) {
     return await UnitOfWork.begin()
         .then(async (db) => {
             const queryResult = await db.all('SELECT * FROM tasks WHERE task_id in (' + tasksIds.map(task => '?').join(',') + ')', tasksIds);
-            return queryResult.map(entry => new Task(entry.task_id, entry.title, new Date(entry.created_at), new Date(entry.updated_at)));
+            return queryResult.map(entry => new Task(entry.task_id, entry.title, new Date(entry.created_at), new Date(entry.updated_at), entry.owner_id));
         });
 }
 
@@ -58,11 +58,12 @@ module.exports.TasksRepository = {
 }
 
 class Task {
-    constructor(id, title, createdAt, updatedAt) {
+    constructor(id, title, createdAt, updatedAt, ownerId) {
         this.id = id;
         this.title = title;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.ownerId = ownerId;
     }
 }
 module.exports.Task = Task;
