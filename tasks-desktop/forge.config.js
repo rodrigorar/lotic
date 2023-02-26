@@ -7,14 +7,16 @@ module.exports = {
       config: {
         options: {
           maintainer: 'rodrigorar',
-          homepage: 'https://github.com/rodrigorar'
+          homepage: 'https://github.com/rodrigorar',
+          icon: 'images/icon.png'
         }
       },
     },
     {
       name: '@electron-forge/maker-dmg',
       config: {
-        format: 'ULFO'
+        format: 'ULFO',
+        icon: 'images/icon.icns'
       }
     }
   ],

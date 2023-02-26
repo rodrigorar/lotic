@@ -11,6 +11,8 @@ const { SynchManager } = require('./modules/synch-manager');
 const { Logger } = require('./shared/logging/logger');
 const { AuthHandlers } = require('./modules/auth/handler_auth');
 
+app.setName('Tasks');
+
 // Prepare local data directories
 OSMask.prepareDataDirIfNecessary(isDev);
 
