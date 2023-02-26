@@ -7,7 +7,8 @@ from sqlalchemy import and_
 
 from src.application import UnitOfWork
 from src.domain import NotFoundError
-from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseLogin, UseCaseRefresh, AuthSession
+from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseLogin, UseCaseLogout, \
+    UseCaseRefresh, AuthSession
 from src.infrastructure import UnitOfWorkProviderImpl
 
 
@@ -119,3 +120,7 @@ class AuthUseCaseProvider:
     @staticmethod
     def refresh():
         return UseCaseRefresh(unit_of_work_provider, AuthTokenStorageImpl())
+
+    @staticmethod
+    def logout():
+        return UseCaseLogout(unit_of_work_provider, AuthTokenStorageImpl())

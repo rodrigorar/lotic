@@ -1,3 +1,5 @@
+import uuid
+
 from src.application.auth import AuthToken, Principal
 
 
@@ -9,6 +11,15 @@ class LoginRequest:
 
     def to_dto(self):
         return Principal(self.subject, self.secret)
+
+
+class LogoutRequest:
+
+    def __init__(self, account_id: str):
+        self.account_id = uuid.UUID(account_id)
+
+    def to_dto(self):
+        return self.account_id
 
 
 class AuthTokenResponse:
