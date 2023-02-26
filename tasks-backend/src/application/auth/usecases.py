@@ -5,10 +5,10 @@ from uuid import uuid4
 from src.application import UnitOfWorkProvider, UseCase
 from src.application.auth.models import AuthSession, AuthToken, Principal
 from src.application.auth.providers import AuthTokenStorage
-from src.application.auth.shared import EncryptionEngine
+from src.application.auth.shared import AuthorizationContext, EncryptionEngine
 from src.domain import NotFoundError
 from src.domain.accounts import AccountBusinessRulesProvider
-from src.application.errors import LoginFailedError
+from src.application.errors import AuthorizationError, LoginFailedError
 
 
 class UseCaseLogin(UseCase):
@@ -69,7 +69,7 @@ class UseCaseRefresh(UseCase):
         self.unit_of_work_provider = unit_of_work_provider
         self.auth_token_storage = auth_token_storage
 
-    def execute(self, refresh_token: uuid):
+    def execute(self, refresh_token: uuid) -> AuthToken:
         assert refresh_token is not None, "No refresh token provided"
 
         with self.unit_of_work_provider.get() as unit_of_work:
@@ -95,3 +95,22 @@ class UseCaseRefresh(UseCase):
                 , new_auth_session.refresh_token
                 , new_auth_session.get_account_id()
                 , new_auth_session.expires_at)
+
+
+class UseCaseLogout(UseCase):
+
+    def __init__(
+            self
+            , unit_of_work_provider: UnitOfWorkProvider
+            , auth_token_storage: AuthTokenStorage):
+        self.unit_of_work_provider = unit_of_work_provider
+        self.auth_token_storage = auth_token_storage
+
+    def execute(self, account_id: uuid) -> None:
+        assert account_id is not None, "Account id cannot be null"
+
+        if not AuthorizationContext.is_matching_account(account_id):
+            raise AuthorizationError("Unauthorized operation")
+
+        with self.unit_of_work_provider.get() as unit_of_work:
+            self.auth_token_storage.remove_all_for_account_id(unit_of_work, account_id)

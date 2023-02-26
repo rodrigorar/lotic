@@ -115,6 +115,7 @@ class TasksUseCaseBaseTest:
         get_account_br = None
 
 
+# TODO: Should test authorization code as well, not only the happy path
 class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
@@ -250,6 +251,7 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
         verifyNoMoreInteractions(get_account_br, create_tasks_br)
 
 
+# TODO: Should test authorization code as well, not only the happy path
 class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
@@ -408,6 +410,7 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
         verifyNoMoreInteractions(list_tasks_br, update_tasks_br)
 
 
+# TODO: Should test authorization code as well, not only the happy path
 class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
@@ -510,6 +513,7 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
         verifyNoMoreInteractions(list_tasks_br, delete_tasks_br)
 
 
+# TODO: Should test authorization code as well, not only the happy path
 class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))

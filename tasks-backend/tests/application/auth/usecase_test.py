@@ -1,12 +1,18 @@
 from datetime import datetime, timedelta
+from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
-from src.domain import NotFoundError
-from src.application.errors import LoginFailedError
+from src.domain import DatabaseProvider, NotFoundError
+from src.application.errors import AuthorizationError, LoginFailedError
 from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider
+from tests.shared import MockDatabase
+
+DatabaseProvider().set_database(MockDatabase())
+
+from src.application.auth import AuthorizationContext
 
 ACCOUNT_ID = uuid4()
 ACCOUNT_EMAIL = "test.account@mail.not"
@@ -234,8 +240,7 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
 class TestUseCaseRefresh(ApplicationUnitTestsBase):
 
     def test_should_succeed_refresh(self):
-        from src.application.auth import AuthTokenStorage, AuthSession
-        from src.application.auth.usecases import UseCaseRefresh
+        from src.application.auth import AuthTokenStorage, AuthSession, UseCaseRefresh
 
         current_auth_session = AuthSession(
             uuid4()
@@ -268,8 +273,7 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         verifyNoMoreInteractions(mocked_auth_storage)
 
     def test_should_fail_no_auth_session_found(self):
-        from src.application.auth import AuthTokenStorage, AuthSession
-        from src.application.auth.usecases import UseCaseRefresh
+        from src.application.auth import AuthTokenStorage, AuthSession, UseCaseRefresh
 
         current_auth_session = AuthSession(
             uuid4()
@@ -302,8 +306,7 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         verifyNoMoreInteractions(mocked_auth_storage)
 
     def test_should_fail_no_refresh_token(self):
-        from src.application.auth import AuthTokenStorage, AuthSession
-        from src.application.auth.usecases import UseCaseRefresh
+        from src.application.auth import AuthTokenStorage, UseCaseRefresh
 
         mocked_auth_storage = mock(AuthTokenStorage)
 
@@ -314,8 +317,7 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         verifyNoMoreInteractions(mocked_auth_storage)
 
     def test_should_fail_no_auth_session(self):
-        from src.application.auth import AuthTokenStorage, AuthSession
-        from src.application.auth.usecases import UseCaseRefresh
+        from src.application.auth import AuthTokenStorage, UseCaseRefresh
 
         mocked_auth_storage = mock(AuthTokenStorage)
         when(mocked_auth_storage) \
@@ -329,3 +331,45 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         verify(mocked_auth_storage).find_by_refresh_token(...)
 
         verifyNoMoreInteractions(mocked_auth_storage)
+
+
+class TestUseCaseLogout(ApplicationUnitTestsBase):
+
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
+    def test_should_succeed_logout(self):
+        from src.application.auth import AuthTokenStorage, UseCaseLogout
+
+        mocked_auth_token_storage = mock(AuthTokenStorage)
+        when(mocked_auth_token_storage) \
+            .remove_all_for_account_id(...)
+
+        under_test = UseCaseLogout(MockedUnitOfWorkProvider(), mocked_auth_token_storage)
+        under_test.execute(ACCOUNT_ID)
+
+        verify(mocked_auth_token_storage).remove_all_for_account_id(...)
+
+        verifyNoMoreInteractions(mocked_auth_token_storage)
+
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=False))
+    def test_should_fail_no_authorization(self):
+        from src.application.auth import AuthTokenStorage, UseCaseLogout
+
+        mocked_auth_token_storage = mock(AuthTokenStorage)
+
+        under_test = UseCaseLogout(MockedUnitOfWorkProvider(), mocked_auth_token_storage)
+        with pytest.raises(AuthorizationError):
+            under_test.execute(ACCOUNT_ID)
+
+        verifyNoMoreInteractions(mocked_auth_token_storage)
+
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
+    def test_should_fail_no_account_id(self):
+        from src.application.auth import AuthTokenStorage, UseCaseLogout
+
+        mocked_auth_token_storage = mock(AuthTokenStorage)
+
+        under_test = UseCaseLogout(MockedUnitOfWorkProvider(), mocked_auth_token_storage)
+        with pytest.raises(AssertionError):
+            under_test.execute(None)
+
+        verifyNoMoreInteractions(mocked_auth_token_storage)

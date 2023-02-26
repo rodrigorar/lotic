@@ -6,9 +6,8 @@ import bcrypt
 from sqlalchemy import and_
 
 from src.application import UnitOfWork
-from src.application.auth.usecases import UseCaseRefresh
 from src.domain import NotFoundError
-from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseLogin, AuthSession
+from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseLogin, UseCaseRefresh, AuthSession
 from src.infrastructure import UnitOfWorkProviderImpl
 
 

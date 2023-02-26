@@ -184,6 +184,7 @@ class TestUseCaseCreateAccount:
             , mocked_encryption_engine)
 
 
+# TODO: Should test authorization code as well, not only the happy path
 class TestUseCaseGetAccount(ApplicationUnitTestsBase):
 
     @pytest.fixture(autouse=True)
