@@ -5,6 +5,7 @@ from uuid import uuid4
 from behave import *
 from dateutil import parser
 
+from features.environment import JOHN_DOE_ID
 from src.infrastructure import from_json
 from src.utils import URL_PREFIX_V1
 
@@ -27,6 +28,23 @@ def step_impl(context):
 
     context.subject = JOHN_DOE_EMAIL
     context.secret = "wrong-password"
+
+
+@given("a valid account with no sessions")
+def step_impl(context):
+    from features.environment import JOHN_DOE_EMAIL, JOHN_DOE_PASSWORD, JOHN_DOE_REFRESH_TOKEN, \
+        JOHN_DOE_AUTH_TOKEN, JOHN_DOE_ID
+    from src.application.auth import AuthSession
+
+    context.account_id = JOHN_DOE_ID
+    context.subject = JOHN_DOE_EMAIL
+    context.secret = JOHN_DOE_PASSWORD
+    context.refresh_token = JOHN_DOE_REFRESH_TOKEN
+    context.auth_token = JOHN_DOE_AUTH_TOKEN
+
+    with context.app.app_context():
+        context.db.session.query(AuthSession).filter_by(account_id=str(JOHN_DOE_ID)).delete()
+        context.db.session.commit()
 
 
 @given("an invalid account")
@@ -63,6 +81,30 @@ def step_impl(context):
         URL_PREFIX_V1 + "/auth/refresh/" + str(context.refresh_token)
         , headers={
             'X-Authorization': context.auth_token
+        })
+
+
+@when("it tries to logout")
+def step_impl(context):
+    context.response = context.client.post(
+        URL_PREFIX_V1 + "/auth/logout"
+        , json={
+            "account_id": context.account_id
+        }
+        , headers={
+            "X-Authorization": context.auth_token
+        })
+
+
+@when("it tries to logout with an invalid auth token")
+def step_impl(context):
+    context.response = context.client.post(
+        URL_PREFIX_V1 + "/auth/logout"
+        , json={
+            "account_id": context.account_id
+        }
+        , headers={
+            "X-Authorization": str(uuid4())
         })
 
 
@@ -125,3 +167,20 @@ def step_impl(context):
         assert db_entry.account_id == auth_response.account_id
         assert db_entry.expires_at.astimezone() == parser.parse(auth_response.expires_at)
 
+
+@then("it should successfully be logged out")
+def step_impl(context):
+    from src.application.auth import AuthSession
+
+    assert context.response is not None
+    assert context.response.status_code == 204
+
+    with context.app.app_context():
+        db_entries = context.db.session.query(AuthSession).filter_by(account_id=str(context.account_id)).all()
+        assert len(db_entries) == 0
+
+
+@then("it should continue logged in")
+def step_impl(context):
+    assert context.response is not None
+    assert context.response.status_code == 401

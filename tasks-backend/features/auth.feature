@@ -35,19 +35,16 @@ Feature: Auth operations
   # Logout
 
   Scenario: Logout successfully
-    # TODO: Not implemented
-    #Given a valid account
-    #When it tries to logout
-    #Then it should successfully be logged out
+    Given a valid account
+    When it tries to logout
+    Then it should successfully be logged out
 
   Scenario: Logout invalid authorization token
-    # TODO: Not implemented
-    #Given a valid account
-    #When it tries to logout with an invalid auth token
-    #Then it should continue logged in
+    Given a valid account
+    When it tries to logout with an invalid auth token
+    Then it should continue logged in
 
   Scenario: Logout no auth sessions
-    # TODO: Not implemented
-    #Given a valid account with no sessions
-    #When it tries to logout
-    #Then it should succeed
+    Given a valid account with no sessions
+    When it tries to logout
+    Then it should receive a forbidden error
