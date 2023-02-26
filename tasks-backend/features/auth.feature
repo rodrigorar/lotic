@@ -22,15 +22,15 @@ Feature: Auth operations
 
   Scenario: Refresh successfully
     # TODO: Not implemented
-    #Given a valid user
-    #When it tries to refresh its token
-    #Then it should receive a new valid authorization token
+    Given a valid account
+    When it tries to refresh its token
+    Then it should receive a new valid authorization token
 
   Scenario: Refresh with unknown token
     # TODO: Not implemented
-    #Given an invalid user
-    #When it tries to refresh its token
-    #Then it should receive a not found error
+    Given an invalid account
+    When it tries to refresh its token
+    Then it should receive a forbidden error
 
   # Logout
 
