@@ -167,9 +167,11 @@ async function doExecute(providedWebContents = undefined) {
                 , updatedAt: new Date() // FIXME: This should come from the server
                 , ownerId: entry.owner_id
             }))
-
-        const refreshedTasks = await TaskServices.list(account.id);
-        eventHandler.send('tasks:refresh', refreshedTasks);
+        
+        setTimeout(async () => {
+            const refreshedTasks = await TaskServices.list(account.id);
+            eventHandler.send('tasks:refresh', refreshedTasks);
+        }, 500);
     }
 
     const existingTasks = await TaskServices.list(account.id);
@@ -204,9 +206,11 @@ async function doExecute(providedWebContents = undefined) {
             if (tasksToDelete.length > 0) {
                 await TaskServices.deleteMultiple(tasksToDelete);
                 await TasksSynchServices.deleteMultipleByTaskId(tasksToDelete);
-
-                const refreshedTasks = await TaskServices.list(account.id);
-                eventHandler.send('tasks:refresh', refreshedTasks); 
+                
+                setTimeout(async () => {
+                    const refreshedTasks = await TaskServices.list(account.id);
+                    eventHandler.send('tasks:refresh', refreshedTasks); 
+                }, 500);
             }
         });
     }

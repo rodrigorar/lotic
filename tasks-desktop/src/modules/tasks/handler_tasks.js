@@ -43,9 +43,16 @@ async function handleListTasks(event) {
     }
 }
 
+async function handleLogout(event, accountId) {
+    // Order mathers, we need tasks to delete tasks synch
+    await TasksSynchServices.deleteAllForAccount(accountId);
+    await TaskServices.deleteAllForAccount(accountId);
+}
+
 module.exports.TasksHandler = {
-    handleCreateTask,
-    handleUpdateTasks,
-    handleCompletion,
-    handleListTasks
+    handleCreateTask
+    , handleUpdateTasks
+    , handleCompletion
+    , handleListTasks
+    , handleLogout
 }

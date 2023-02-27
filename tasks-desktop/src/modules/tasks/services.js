@@ -59,6 +59,11 @@ async function deleteMultiple(taskIds) {
         .forEach(async taskId => await TasksRepository.deleteTask(taskId));
 }
 
+async function deleteAllForAccount(accountId) {
+    Validators.isNotNull(accountId, 'No account id is provided');
+    await TasksRepository.deleteAllForAccount(accountId);
+}
+
 module.exports.TaskServices = {
     create
     , createMultiple
@@ -67,4 +72,5 @@ module.exports.TaskServices = {
     , listById
     , deleteTask
     , deleteMultiple
+    , deleteAllForAccount
 }

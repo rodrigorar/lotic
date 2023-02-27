@@ -19,7 +19,7 @@ getDB = () => {
 }
 
 end = () => {
-    // Nothing to close for now!
+    // TODO: The db.close() should called here, not on the methods
 }
 
 

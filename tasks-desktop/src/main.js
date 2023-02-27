@@ -10,6 +10,8 @@ const { isDev } = require('./shared/utils/utils');
 const { SynchManager } = require('./modules/synch-manager');
 const { Logger } = require('./shared/logging/logger');
 const { AuthHandlers } = require('./modules/auth/handler_auth');
+const { AuthServices } = require('./modules/auth/services');
+const { TasksSynchServices } = require('./modules/tasks_synch/services');
 
 app.setName('Tasks');
 
@@ -92,5 +94,9 @@ ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
 // Auth Event Listeners
 ipcMain.on('auth:open:login', AuthHandlers.handleOpenLogin);
 ipcMain.on('auth:login', AuthHandlers.handleLogin);
-ipcMain.on('auth:logout', AuthHandlers.handleLogout)
-ipcMain.handle('auth:is_logged_in', AuthHandlers.handleIsLoggedIn)
+ipcMain.on('auth:logout', async (event) => {
+  const activeSession = await AuthServices.getActiveSession();
+  await TasksHandler.handleLogout(event, activeSession.accountId);
+  await AuthHandlers.handleLogout(event); // This one has to be last, we need to know which account is logging out
+});
+ipcMain.handle('auth:is_logged_in', AuthHandlers.handleIsLoggedIn);

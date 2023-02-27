@@ -79,6 +79,15 @@ async function deleteMultipleByTaskId(taskIds) {
         });
 }
 
+async function deleteAllForAccount(accountId) {
+    await UnitOfWork.begin()
+        .then(async (db) => {
+            await db.run(
+                'DELETE FROM tasks_synch WHERE task_id in (SELECT task_id FROM tasks WHERE owner_id = ?)'
+                , [accountId])
+        });
+}
+
 async function create(taskId, state = undefined) {
     db_state = state == undefined ? TASK_SYNCH_STATUS['LOCAL'] : state;
     await UnitOfWork.begin()
@@ -136,5 +145,6 @@ module.exports.TaskSynchRepository = {
     , create
     , deleteComplete
     , deleteMultipleByTaskId
+    , deleteAllForAccount
     , getSynchStatus
 }

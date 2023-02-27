@@ -21,6 +21,12 @@ async function deleteMultipleByTaskId(taskIds) {
     });
 }
 
+async function deleteAllForAccount(accountId) {
+    return await ServiceUtils.asyncErrorWrapper(async () => {
+        return await TaskSynchRepository.deleteAllForAccount(accountId);
+    });
+}
+
 async function markForRemoval(taskId) {
     await ServiceUtils.asyncErrorWrapper(async () => {
         await TaskSynchRepository.markForRemoval(taskId);
@@ -63,6 +69,7 @@ module.exports.TasksSynchServices = {
     createSynchMonitor
     , deleteComplete
     , deleteMultipleByTaskId
+    , deleteAllForAccount
     , markForRemoval
     , markDirty
     , markSynched

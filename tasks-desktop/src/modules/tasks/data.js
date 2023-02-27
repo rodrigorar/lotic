@@ -44,17 +44,27 @@ async function listById(tasksIds = []) {
 async function deleteTask(id) {
     await UnitOfWork.begin()
         .then(async (db) => {
-            await db.run('DELETE FROM tasks where task_id = ?', [id]);
+            await db.run('DELETE FROM tasks WHERE task_id = ?', [id]);
+            // FIXME: This close should be done in the Unit of Work, not here
             db.close();
         })
 }
 
+async function deleteAllForAccount(accountId) {
+    await UnitOfWork.begin()
+        .then(async (db) => {
+            await db.run('DELETE FROM tasks WHERE owner_id = ?', [accountId]);
+            db.close();
+        });
+}
+
 module.exports.TasksRepository = {
-    createTask,
-    updateTask,
-    listTasks,
-    listById, 
-    deleteTask
+    createTask
+    , updateTask
+    , listTasks
+    , listById
+    , deleteTask
+    , deleteAllForAccount
 }
 
 class Task {
