@@ -201,7 +201,6 @@ async function doExecute(providedWebContents = undefined) {
                         && entry.taskSynchStatus != TASK_SYNCH_STATUS['LOCAL'];
                 })
                 .map(entry => entry.id);
-            console.log(tasksToDelete);
             if (tasksToDelete.length > 0) {
                 await TaskServices.deleteMultiple(tasksToDelete);
                 await TasksSynchServices.deleteMultipleByTaskId(tasksToDelete);
