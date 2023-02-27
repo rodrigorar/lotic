@@ -94,6 +94,20 @@ async function create(taskId, state = undefined) {
         });
 }
 
+async function getSynchStatus(taskId) {
+    return await UnitOfWork.begin()
+        .then(async (db) => {
+            const row = await db.get(
+                "SELECT * FROM tasks_synch WHERE task_id = ?"
+                , [taskId]);
+            
+            if (row != undefined) {
+                return new TaskSynch(row.task_synch_id, row.task_id, row.synch_status, new Date(row.created_at), new Date(row.updated_at))
+            }  
+            return undefined;
+        });
+}
+
 const TASK_SYNCH_STATUS = {
     LOCAL: "LOCAL", // The task was never synched
     SYNCHED: "SYNCHED", // The task is synched and hasn't been changed locally
@@ -122,4 +136,5 @@ module.exports.TaskSynchRepository = {
     , create
     , deleteComplete
     , deleteMultipleByTaskId
+    , getSynchStatus
 }

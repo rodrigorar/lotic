@@ -11,7 +11,7 @@ async function createSynchMonitor(taskId, state = undefined) {
 
 async function deleteComplete() {
     return await ServiceUtils.asyncErrorWrapper(async () => {
-        return await TaskSynchRepository.removeComplete();
+        return await TaskSynchRepository.deleteComplete();
     });
 }
 
@@ -53,6 +53,12 @@ async function getComplete() {
     });
 }
 
+async function getSynchStatus(taskId) {
+    return await ServiceUtils.asyncErrorWrapper(async () => {
+        return await TaskSynchRepository.getSynchStatus(taskId);
+    });
+}
+
 module.exports.TasksSynchServices = {
     createSynchMonitor
     , deleteComplete
@@ -62,4 +68,5 @@ module.exports.TasksSynchServices = {
     , markSynched
     , getNonSynched
     , getComplete
+    , getSynchStatus
 }

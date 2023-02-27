@@ -134,26 +134,57 @@ async function doExecute(providedWebContents = undefined) {
                 .map(taskData => ({
                     id: taskData.task_id
                     , title: taskData.title
-                    , createdAt: new Date() // TODO: This should come from the server
-                    , updatedAt: new Date() // TODO: This should come from the server
+                    , createdAt: new Date() // FIXME: This should come from the server
+                    , updatedAt: new Date() // FIXME: This should come from the server
                     , ownerId: authToken.accountId
                 }));
-        TaskServices
-            .createMultiple(tasksToInsert)
-            .then(async _ => {
-                let taskList = [];
-                do {
-                    taskList = await TaskServices.list(authToken.accountId);
-                } while (taskList.length == 0 && tasksToInsert.length != 0)
-                
-                eventHandler.send('tasks:refresh', taskList);
-            });
+        await TaskServices.createMultiple(tasksToInsert);
         tasksToInsert.forEach(entry => {
             TasksSynchServices.createSynchMonitor(entry.id, TASK_SYNCH_STATUS['SYNCHED'])
         })
-    } else if (result.length == 0) {
-        Logger.info('Nothing to synch, continuing');
+
+        result.map(entry => TaskServices.update(
+            entry.task_id
+            , {
+                id: entry.task_id
+                , title: entry.title
+                , createdAt: new Date() // FIXME: This should come from the server
+                , updatedAt: new Date() // FIXME: This should come from the server
+                , ownerId: entry.owner_id
+            }))
     }
+
+    // TODO: Deletion is not working so good, we need to revise how to deal with
+    // the deletion process of tasks
+
+    // const existingTasks = await TaskServices.list(account.id);
+    // if (existingTasks.length != 0) { 
+    //     console.log('Deleting stuff');
+    //     let tasksToDelete = [];
+    //     if (result.length > 0) {
+    //          tasksToDelete = existingTasks
+    //             .filter(async entry => {
+    //                 const taskSynchStatus = await TasksSynchServices.getSynchStatus(entry.id);
+    //                 console.log(taskSynchStatus.synchStatus);
+    //                 return result.filter(value => value.task_id == entry.id) == 0
+    //                     && taskSynchStatus.synchStatus != TASK_SYNCH_STATUS['LOCAL'];
+    //             });
+    //     } else {
+    //         tasksToDelete = existingTasks.map(async entry => {
+    //             const taskSynchStatus = await TasksSynchServices.getSynchStatus(entry.id);
+    //             console.log(taskSynchStatus.synchStatus);
+    //             return taskSynchStatus.synchStatus != TASK_SYNCH_STATUS['LOCAL'];
+    //         });
+    //     }
+    //     console.log(tasksToDelete);
+
+    //     const taskIdsToDelete = tasksToDelete.map(entry => entry.id);
+    //     await TaskServices.deleteMultiple(taskIdsToDelete);
+    //     await TasksSynchServices.deleteMultipleByTaskId(taskIdsToDelete);
+    // }
+
+    const refreshedTasks = await TaskServices.list(account.id);
+    eventHandler.send('tasks:refresh', refreshedTasks);
 
     Logger.trace('Finished Task Synchornization, Refreshing');
 }
