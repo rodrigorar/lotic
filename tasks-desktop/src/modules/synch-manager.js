@@ -143,6 +143,7 @@ async function doExecute(providedWebContents = undefined) {
             TasksSynchServices.createSynchMonitor(entry.id, TASK_SYNCH_STATUS['SYNCHED'])
         })
 
+        // FIXME: Update only tasks that need updating
         result.map(entry => TaskServices.update(
             entry.task_id
             , {
@@ -152,39 +153,50 @@ async function doExecute(providedWebContents = undefined) {
                 , updatedAt: new Date() // FIXME: This should come from the server
                 , ownerId: entry.owner_id
             }))
+
+        const refreshedTasks = await TaskServices.list(account.id);
+        eventHandler.send('tasks:refresh', refreshedTasks);
     }
 
-    // TODO: Deletion is not working so good, we need to revise how to deal with
-    // the deletion process of tasks
+    const existingTasks = await TaskServices.list(account.id);
+    if (existingTasks.length != 0) { 
+        let tasksWithSynchStatus = [];
+        if (result.length > 0) {
+            tasksWithSynchStatus = existingTasks
+                .map(async entry => {
+                    const synchStatus = await TasksSynchServices.getSynchStatus(entry.id);
+                    return {
+                        id: entry.id
+                        , taskSynchStatus: synchStatus.synchStatus
+                    };
+                });
+        } else {
+            tasksWithSynchStatus = existingTasks.map(async entry => {
+                const synchStatus = await TasksSynchServices.getSynchStatus(entry.id);
+                return {
+                    id: entry.id
+                    , tasksSynchStatus: synchStatus
+                }
+            });
+        }
 
-    // const existingTasks = await TaskServices.list(account.id);
-    // if (existingTasks.length != 0) { 
-    //     console.log('Deleting stuff');
-    //     let tasksToDelete = [];
-    //     if (result.length > 0) {
-    //          tasksToDelete = existingTasks
-    //             .filter(async entry => {
-    //                 const taskSynchStatus = await TasksSynchServices.getSynchStatus(entry.id);
-    //                 console.log(taskSynchStatus.synchStatus);
-    //                 return result.filter(value => value.task_id == entry.id) == 0
-    //                     && taskSynchStatus.synchStatus != TASK_SYNCH_STATUS['LOCAL'];
-    //             });
-    //     } else {
-    //         tasksToDelete = existingTasks.map(async entry => {
-    //             const taskSynchStatus = await TasksSynchServices.getSynchStatus(entry.id);
-    //             console.log(taskSynchStatus.synchStatus);
-    //             return taskSynchStatus.synchStatus != TASK_SYNCH_STATUS['LOCAL'];
-    //         });
-    //     }
-    //     console.log(tasksToDelete);
+        Promise.all(tasksWithSynchStatus).then(async values => {
+            const tasksToDelete = values
+                .filter(entry => {
+                    return result.filter(value => value.task_id == entry.id) == 0
+                        && entry.taskSynchStatus != TASK_SYNCH_STATUS['LOCAL'];
+                })
+                .map(entry => entry.id);
+            console.log(tasksToDelete);
+            if (tasksToDelete.length > 0) {
+                await TaskServices.deleteMultiple(tasksToDelete);
+                await TasksSynchServices.deleteMultipleByTaskId(tasksToDelete);
 
-    //     const taskIdsToDelete = tasksToDelete.map(entry => entry.id);
-    //     await TaskServices.deleteMultiple(taskIdsToDelete);
-    //     await TasksSynchServices.deleteMultipleByTaskId(taskIdsToDelete);
-    // }
-
-    const refreshedTasks = await TaskServices.list(account.id);
-    eventHandler.send('tasks:refresh', refreshedTasks);
+                const refreshedTasks = await TaskServices.list(account.id);
+                eventHandler.send('tasks:refresh', refreshedTasks); 
+            }
+        });
+    }
 
     Logger.trace('Finished Task Synchornization, Refreshing');
 }
