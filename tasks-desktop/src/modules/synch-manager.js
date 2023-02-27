@@ -8,6 +8,20 @@ const { Logger } = require("../shared/logging/logger");
 const { StatusCode } = require("../shared/http/http");
 const { webContents } = require("electron");
 
+/***
+ * HOW THE SYNCH SHOULD FUNCTION
+ * 
+ * 1. Insert new tasks to the server
+ * 2. Update dirty tasks to server
+ * 3. Get Tasks from Server
+ * 4. Insert tasks that do not exist locally
+ * 5. Update local tasks with server values
+ * 6. Delete tasks that exist locally (non LOCAL) but do not exist in the server
+ */
+
+// TODO: Improve the design of the synch manager, and if possible, make it less 
+// good functiony than this. rodrigorar - 27/02/2023
+
 async function callCreateTasks(authToken, account, taskIds) {
     const tasks = await TaskServices.listById(taskIds);
 
