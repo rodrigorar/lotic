@@ -23,6 +23,7 @@ class CreateTasks(BaseBusinessRule):
             if len(tasks) == 1 \
             else reduce(reducer_duplicated, [task.get_owner_id() for task in tasks])
 
+        # FIXME: Use assert instead of if
         if len(owner_ids) > 1:
             raise ConflictError('Cannot create tasks for more than one owner at a time')
 
