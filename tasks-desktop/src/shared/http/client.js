@@ -2,7 +2,7 @@ const { default: axios } = require("axios");
 
 
 const client = axios.create({
-    baseURL: 'http://65.20.100.68:8080',
+    baseURL: 'http://lotic.eu:8080',
     timeout: 5000
 });
 
