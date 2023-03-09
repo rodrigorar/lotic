@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.rodrigorar.tasks'
+    namespace 'com.lotic.tasks'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.rodrigorar.tasks"
+        applicationId "com.lotic.tasks"
         minSdk 21
         targetSdk 33
         versionCode 1
