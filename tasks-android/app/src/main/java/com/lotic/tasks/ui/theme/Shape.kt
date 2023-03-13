@@ -1,4 +1,4 @@
-package com.rodrigorar.tasks.ui.theme
+package com.lotic.tasks.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

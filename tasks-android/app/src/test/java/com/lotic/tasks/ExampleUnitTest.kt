@@ -1,4 +1,4 @@
-package com.rodrigorar.tasks
+package com.lotic.tasks
 
 import org.junit.Test
 
