@@ -32,6 +32,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
             OutlinedButton(
                 onClick = { /* TODO */ }
                 , shape = RoundedCornerShape(25)
+                , modifier = modifier.padding(15.dp)
             ) {
                 Text(text = stringResource(R.string.login_btn))
             }
@@ -53,9 +54,9 @@ fun MainScreen(modifier: Modifier = Modifier) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly
                         , modifier = modifier.fillMaxWidth()) {
-
                         TextField(
                             value = task
+                            , colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
                             , onValueChange = { /* TODO  */ })
                         Checkbox(
                             checked = false
