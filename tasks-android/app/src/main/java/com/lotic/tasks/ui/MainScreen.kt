@@ -5,14 +5,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,8 +24,8 @@ import com.lotic.tasks.R
 import com.lotic.tasks.ui.theme.TasksTheme
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
-    val tasks = listOf("Task #1", "Task #2", "Task #3")
+fun MainScreen(modifier: Modifier = Modifier, viewModel: TasksViewModel = viewModel()) {
+    val uiState by viewModel.uiState.collectAsState()
 
     Column {
         Row(
@@ -32,6 +34,8 @@ fun MainScreen(modifier: Modifier = Modifier) {
             OutlinedButton(
                 onClick = { /* TODO */ }
                 , shape = RoundedCornerShape(25)
+                , colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.secondary)
                 , modifier = modifier.padding(15.dp)
             ) {
                 Text(text = stringResource(R.string.login_btn))
@@ -50,12 +54,12 @@ fun MainScreen(modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .padding(2.dp)) {
             LazyColumn {
-                items(tasks) {task ->
+                items(uiState.taskList) {task ->
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly
                         , modifier = modifier.fillMaxWidth()) {
                         TextField(
-                            value = task
+                            value = task.title
                             , colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
                             , onValueChange = { /* TODO  */ })
                         Checkbox(
@@ -75,7 +79,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
                     .size(100.dp, 100.dp)
                     .padding(15.dp)) {
 
-                Icon(Icons.Default.Add, contentDescription = "Add tasks", tint = Color.Blue)
+                Icon(Icons.Default.Add, contentDescription = "Add tasks", tint = MaterialTheme.colors.secondary)
             }
             }
         }
