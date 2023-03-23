@@ -12,6 +12,7 @@ object AuthTokenProvider : Provider<AuthToken> {
         return AuthToken(
             UUID.randomUUID().toString()
             , UUID.randomUUID().toString()
-            , ZonedDateTime.now().plusHours(1))
+            , UUID.randomUUID()
+            , ZonedDateTime.now().plusHours(1).toString())
     }
 }
