@@ -21,10 +21,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lotic.tasks.R
+import com.lotic.tasks.ui.login.LoginViewModel
 import com.lotic.tasks.ui.theme.TasksTheme
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier, viewModel: TasksViewModel = viewModel()) {
+fun MainScreen(
+    modifier: Modifier = Modifier
+    , viewModel: TasksViewModel = viewModel()
+    // XXX: This should not live here, it should be used only on the LoginScreen
+    , loginViewModel: LoginViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsState()
 
     Column {
@@ -32,7 +37,8 @@ fun MainScreen(modifier: Modifier = Modifier, viewModel: TasksViewModel = viewMo
             modifier = modifier.fillMaxWidth()
             , horizontalArrangement = Arrangement.End) {
             OutlinedButton(
-                onClick = { /* TODO */ }
+                // XXX: This should be called on the login screen
+                onClick = { loginViewModel.login("rodrigo.ra.rosa@gmail.com", "qwerty") }
                 , shape = RoundedCornerShape(25)
                 , colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.colors.secondary)
