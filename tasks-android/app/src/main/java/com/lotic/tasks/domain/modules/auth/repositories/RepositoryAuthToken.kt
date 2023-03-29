@@ -3,9 +3,6 @@ package com.lotic.tasks.domain.modules.auth.repositories
 import com.lotic.tasks.domain.modules.auth.data.DAOAuthToken
 import com.lotic.tasks.domain.modules.auth.dto.AuthToken
 import com.lotic.tasks.domain.persistence.Repository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import java.util.*
 
 class RepositoryAuthToken(private val daoAuthToken: DAOAuthToken) : Repository<Int, AuthToken> {
@@ -26,6 +23,10 @@ class RepositoryAuthToken(private val daoAuthToken: DAOAuthToken) : Repository<I
         return daoAuthToken.getByAccountId(accountId).let { result ->
             result?.let { AuthToken.fromEntity(it) }
         }
+    }
+
+    suspend fun deleteAllForAccount(accountId: UUID) {
+        daoAuthToken.deleteAllForAccount(accountId)
     }
 
     override suspend fun delete(id: Int) {

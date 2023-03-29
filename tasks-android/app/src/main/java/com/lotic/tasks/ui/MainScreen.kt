@@ -17,19 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lotic.tasks.R
-import com.lotic.tasks.ui.login.LoginViewModel
-import com.lotic.tasks.ui.theme.TasksTheme
 
 @Composable
 fun MainScreen(
-    modifier: Modifier = Modifier
-    , viewModel: TasksViewModel = viewModel()
-    // XXX: This should not live here, it should be used only on the LoginScreen
-    , loginViewModel: LoginViewModel = viewModel()) {
+    loginNavigation: () -> Unit
+    , modifier: Modifier = Modifier
+    , viewModel: TasksViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsState()
 
     Column {
@@ -38,10 +34,10 @@ fun MainScreen(
             , horizontalArrangement = Arrangement.End) {
             OutlinedButton(
                 // XXX: This should be called on the login screen
-                onClick = { loginViewModel.login("rodrigo.ra.rosa@gmail.com", "qwerty") }
-                , shape = RoundedCornerShape(25)
+                onClick = { loginNavigation() }
+                , shape = MaterialTheme.shapes.medium
                 , colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.secondary)
+                    backgroundColor = MaterialTheme.colors.primary)
                 , modifier = modifier.padding(15.dp)
             ) {
                 Text(text = stringResource(R.string.login_btn))
@@ -89,13 +85,5 @@ fun MainScreen(
             }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun MainScreenPreview() {
-    TasksTheme {
-        MainScreen()
     }
 }

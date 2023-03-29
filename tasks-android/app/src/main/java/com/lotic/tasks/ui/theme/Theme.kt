@@ -14,11 +14,11 @@ private val DarkColorPalette = darkColors(
 )
 
 private val LightColorPalette = lightColors(
-    primary = White
+    primary = LightBlue400
     , onPrimary = Black
     , primaryVariant = LightBlue50
-    , secondary = LightBlue400
-    , onSecondary = Black
+    , secondary = Color.DarkGray
+    , onSecondary = White
     , background = White
     , surface = White
 )

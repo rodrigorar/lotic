@@ -1,7 +1,6 @@
 package com.lotic.tasks.domain.http
 
 import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import com.lotic.tasks.domain.http.adapters.ZonedTypeTimeDeserializer
 import com.lotic.tasks.domain.modules.auth.AuthTokenProvider
 import com.lotic.tasks.domain.shared.Provider

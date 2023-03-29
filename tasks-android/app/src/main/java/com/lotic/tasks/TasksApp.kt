@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lotic.tasks.ui.MainScreen
+import com.lotic.tasks.ui.login.LoginScreen
 
 enum class TasksScreen {
     Main
@@ -25,10 +26,10 @@ fun TasksApp(modifier: Modifier = Modifier, viewModel: TasksViewModel = viewMode
         navController
         , startDestination = TasksScreen.Main.name) {
         composable(route = TasksScreen.Main.name) {
-            MainScreen()
+            MainScreen(loginNavigation = { navController.navigate(TasksScreen.Login.name) })
         }
         composable(route = TasksScreen.Login.name) {
-            // TODO: Call and configure the login screen
+            LoginScreen(signInNavigation = { navController.navigate(TasksScreen.Main.name) })
         }
     }
 }
