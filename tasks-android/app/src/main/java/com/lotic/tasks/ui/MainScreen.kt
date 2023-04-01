@@ -1,5 +1,6 @@
 package com.lotic.tasks.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,11 +21,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lotic.tasks.R
+import com.lotic.tasks.ui.shared.SharedViewModel
+
+fun doLoginOrLogout(sharedViewModel: SharedViewModel, loginNavigation: () -> Unit) {
+    if (sharedViewModel.uiState.isLoggedIn) {
+        loginNavigation()
+    } else {
+        Log.d("Login", "Will logout eventually")
+    }
+}
 
 @Composable
 fun MainScreen(
     loginNavigation: () -> Unit
     , modifier: Modifier = Modifier
+    , sharedViewModel: SharedViewModel = SharedViewModel
     , viewModel: TasksViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -34,13 +45,17 @@ fun MainScreen(
             , horizontalArrangement = Arrangement.End) {
             OutlinedButton(
                 // XXX: This should be called on the login screen
-                onClick = { loginNavigation() }
+                onClick = {
+                    if (sharedViewModel.uiState.isLoggedIn) Log.d("MainScreen", "Will logout eventually")
+                    else loginNavigation()
+                }
                 , shape = MaterialTheme.shapes.medium
                 , colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.colors.primary)
                 , modifier = modifier.padding(15.dp)
             ) {
-                Text(text = stringResource(R.string.login_btn))
+                if (sharedViewModel.uiState.isLoggedIn) Text(text = stringResource(R.string.logout_btn))
+                else Text(text = stringResource(R.string.login_btn))
             }
         }
         Row(modifier = modifier

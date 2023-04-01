@@ -9,4 +9,5 @@
     <string name="upcoming_title">Upcoming</string>
     <string name="sign_in_btn">Sign In</string>
     <string name="sign_in_title">Sign In</string>
+    <string name="logout_btn">Logout</string>
 </resources>

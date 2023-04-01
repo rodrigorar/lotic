@@ -8,9 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.lotic.tasks.domain.modules.auth.operations.Login
 import com.lotic.tasks.domain.modules.auth.dto.Credentials
 import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
+import com.lotic.tasks.ui.shared.SharedViewModel
 import kotlinx.coroutines.launch
 
 class LoginViewModel() : ViewModel() {
+    val sharedViewModel: SharedViewModel = SharedViewModel
     var uiState by mutableStateOf(LoginUIState())
         private set
 
@@ -28,5 +30,6 @@ class LoginViewModel() : ViewModel() {
         viewModelScope.launch {
             loginOperation.execute(Credentials(subject, secret))
         }
+        sharedViewModel.setLoggedIn()
     }
 }

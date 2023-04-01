@@ -14,8 +14,8 @@ class Login(private val repositoryAuthToken: RepositoryAuthToken) : Consumer<Cre
 
         val result: AuthToken? = authClient?.login(input)
         result?.also {
-            repositoryAuthToken.deleteAllForAccount(result.accountId)
-            repositoryAuthToken.insert(result)
+            repositoryAuthToken.deleteAllForAccount(it.accountId)
+            repositoryAuthToken.insert(it)
         }
     }
 }
