@@ -20,9 +20,11 @@ class RepositoryAuthToken(private val daoAuthToken: DAOAuthToken) : Repository<I
     }
 
     suspend fun getByAccountId(accountId: UUID): AuthToken? {
-        return daoAuthToken.getByAccountId(accountId).let { result ->
-            result?.let { AuthToken.fromEntity(it) }
-        }
+        return daoAuthToken.getByAccountId(accountId)?.let { AuthToken.fromEntity(it) }
+    }
+
+    suspend fun getActiveAuthSession(): AuthToken? {
+        return daoAuthToken.getActiveAuthSession()?.let { AuthToken.fromEntity(it) }
     }
 
     suspend fun deleteAllForAccount(accountId: UUID) {

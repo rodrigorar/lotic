@@ -39,4 +39,12 @@ object AuthOperationsProvider : OperationsProvider {
             , this.accountOperationsProvider.getAccountByEmail()
             , this.accountOperationsProvider.newAccount())
     }
+
+    fun logout(): Logout {
+        return Logout(repositoryAuthToken, currentActiveAuthSessionProvider())
+    }
+
+    fun currentActiveAuthSessionProvider(): CurrentActiveAuthSessionProvider {
+        return CurrentActiveAuthSessionProvider(repositoryAuthToken)
+    }
 }

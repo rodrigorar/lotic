@@ -19,6 +19,10 @@ interface DAOAuthToken {
     @Query("SELECT * FROM auth_tokens WHERE id = :id")
     suspend fun getById(id: Int): EntityAuthToken?
 
+    // We can do this, because we only have 1 logged in account at a time
+    @Query("SELECT * FROM auth_tokens LIMIT 1")
+    suspend fun getActiveAuthSession(): EntityAuthToken?
+
     @Query("DELETE FROM auth_tokens WHERE account_id = :accountId")
     suspend fun deleteAllForAccount(accountId: UUID)
 

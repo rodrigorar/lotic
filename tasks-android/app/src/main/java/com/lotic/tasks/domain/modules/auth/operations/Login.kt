@@ -2,7 +2,7 @@ package com.lotic.tasks.domain.modules.auth.operations
 
 import com.lotic.tasks.domain.http.RetrofitClientProvider
 import com.lotic.tasks.domain.modules.accounts.dto.Account
-import com.lotic.tasks.domain.modules.auth.AuthClient
+import com.lotic.tasks.domain.modules.auth.client.AuthClient
 import com.lotic.tasks.domain.modules.auth.dto.AuthToken
 import com.lotic.tasks.domain.modules.auth.dto.Credentials
 import com.lotic.tasks.domain.shared.Command

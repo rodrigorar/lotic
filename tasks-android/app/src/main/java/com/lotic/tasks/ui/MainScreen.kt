@@ -1,11 +1,9 @@
 package com.lotic.tasks.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -21,13 +19,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lotic.tasks.R
+import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
 import com.lotic.tasks.ui.shared.SharedViewModel
 
-fun doLoginOrLogout(sharedViewModel: SharedViewModel, loginNavigation: () -> Unit) {
-    if (sharedViewModel.uiState.isLoggedIn) {
+fun doLoginOrLogout(
+    sharedViewModel: SharedViewModel
+    , loginNavigation: () -> Unit) {
+
+    if (! sharedViewModel.uiState.isLoggedIn) {
         loginNavigation()
     } else {
-        Log.d("Login", "Will logout eventually")
+        sharedViewModel.logout()
     }
 }
 
@@ -45,10 +47,7 @@ fun MainScreen(
             , horizontalArrangement = Arrangement.End) {
             OutlinedButton(
                 // XXX: This should be called on the login screen
-                onClick = {
-                    if (sharedViewModel.uiState.isLoggedIn) Log.d("MainScreen", "Will logout eventually")
-                    else loginNavigation()
-                }
+                onClick = { doLoginOrLogout(sharedViewModel, loginNavigation) }
                 , shape = MaterialTheme.shapes.medium
                 , colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.colors.primary)

@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
 
 object SharedViewModel : ViewModel() {
     var uiState by mutableStateOf(SharedUIState())
@@ -13,7 +14,8 @@ object SharedViewModel : ViewModel() {
         this.uiState = this.uiState.copy(isLoggedIn = true)
     }
 
-    fun setLoggedOut() {
+    fun logout() {
+        AuthOperationsProvider.logout()
         this.uiState = this.uiState.copy(isLoggedIn = false)
     }
 }
