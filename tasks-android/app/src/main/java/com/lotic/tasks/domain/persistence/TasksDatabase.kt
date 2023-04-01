@@ -8,18 +8,23 @@ import com.lotic.tasks.domain.modules.accounts.data.DAOAccounts
 import com.lotic.tasks.domain.modules.accounts.data.EntityAccount
 import com.lotic.tasks.domain.modules.auth.data.DAOAuthToken
 import com.lotic.tasks.domain.modules.auth.data.EntityAuthToken
+import com.lotic.tasks.domain.modules.tasks.data.DAOTasks
+import com.lotic.tasks.domain.modules.tasks.data.EntityTask
 
 @Database(
     entities = [
         EntityAuthToken::class
-        , EntityAccount::class]
-    , version = 2
+        , EntityAccount::class
+       , EntityTask::class]
+    , version = 3
     , exportSchema = false
 )
 abstract class TasksDatabase : RoomDatabase() {
 
     abstract fun daoAuthToken(): DAOAuthToken
     abstract fun daoAccounts(): DAOAccounts
+
+    abstract fun daoTasks(): DAOTasks
 
     companion object {
         @Volatile

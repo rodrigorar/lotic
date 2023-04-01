@@ -20,7 +20,6 @@ enum class TasksScreen {
 @Composable
 fun TasksApp(modifier: Modifier = Modifier, viewModel: TasksViewModel = viewModel()) {
     val navController = rememberNavController()
-    val uiState by viewModel.uiState.collectAsState()
 
     NavHost(
         navController

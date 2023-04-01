@@ -9,8 +9,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,7 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lotic.tasks.R
-import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
 import com.lotic.tasks.ui.shared.SharedViewModel
 
 fun doLoginOrLogout(
@@ -39,7 +36,9 @@ fun MainScreen(
     , modifier: Modifier = Modifier
     , sharedViewModel: SharedViewModel = SharedViewModel
     , viewModel: TasksViewModel = viewModel()) {
-    val uiState by viewModel.uiState.collectAsState()
+
+    // FIXME: This needs to be removed, the UI should be updated everytime the synch manager runs
+    viewModel.getAccountTasks()
 
     Column {
         Row(
@@ -70,7 +69,7 @@ fun MainScreen(
             .fillMaxWidth()
             .padding(2.dp)) {
             LazyColumn {
-                items(uiState.taskList) {task ->
+                items(viewModel.uiState.taskList) {task ->
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly
                         , modifier = modifier.fillMaxWidth()) {
@@ -88,15 +87,16 @@ fun MainScreen(
                 verticalAlignment = Alignment.Bottom
                 , horizontalArrangement = Arrangement.End
                 , modifier = modifier.fillMaxSize()) {
-            IconButton(
-                onClick = { /*TODO*/ }
-                , modifier = Modifier
-                    .clip(CircleShape)
-                    .size(100.dp, 100.dp)
-                    .padding(15.dp)) {
 
-                Icon(Icons.Default.Add, contentDescription = "Add tasks", tint = MaterialTheme.colors.secondary)
-            }
+                IconButton(
+                    onClick = { /*TODO*/ }
+                    , modifier = Modifier
+                        .clip(CircleShape)
+                        .size(100.dp, 100.dp)
+                        .padding(15.dp)) {
+
+                    Icon(Icons.Default.Add, contentDescription = "Add tasks", tint = MaterialTheme.colors.secondary)
+                }
             }
         }
     }

@@ -2,7 +2,7 @@ package com.lotic.tasks.domain.http
 
 import com.google.gson.GsonBuilder
 import com.lotic.tasks.domain.http.adapters.ZonedTypeTimeDeserializer
-import com.lotic.tasks.domain.modules.auth.AuthTokenProvider
+import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
 import com.lotic.tasks.domain.shared.Provider
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -20,7 +20,7 @@ object RetrofitClientProvider : Provider<Retrofit?> {
         synchronized(semaphor) {
             if (this.client == null) {
                 val httpClient = OkHttpClient.Builder()
-                    .addInterceptor(AuthorizationInterceptor(AuthTokenProvider))
+                    .addInterceptor(AuthorizationInterceptor(AuthOperationsProvider.currentActiveAuthSessionProvider()))
                     .build()
 
                 val gson = GsonBuilder()

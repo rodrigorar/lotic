@@ -8,7 +8,6 @@ import com.lotic.tasks.domain.persistence.TasksDatabase
 import com.lotic.tasks.domain.shared.OperationsProvider
 import com.lotic.tasks.domain.shared.Provider
 
-@SuppressLint("StaticFieldLeak")
 object AuthOperationsProvider : OperationsProvider {
 
     private lateinit var contextProvider: Provider<Context>
@@ -40,11 +39,19 @@ object AuthOperationsProvider : OperationsProvider {
             , this.accountOperationsProvider.newAccount())
     }
 
+    fun refresh(): Refresh {
+        return Refresh(repositoryAuthToken)
+    }
+
     fun logout(): Logout {
         return Logout(repositoryAuthToken, currentActiveAuthSessionProvider())
     }
 
     fun currentActiveAuthSessionProvider(): CurrentActiveAuthSessionProvider {
         return CurrentActiveAuthSessionProvider(repositoryAuthToken)
+    }
+
+    fun clearSessions(): ClearSessions {
+        return ClearSessions(repositoryAuthToken)
     }
 }
