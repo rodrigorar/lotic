@@ -16,7 +16,7 @@ object RetrofitClientProvider : Provider<Retrofit?> {
     @Volatile
     private var semaphor: Any = ""
 
-    override fun execute(): Retrofit? {
+    override fun get(): Retrofit? {
         synchronized(semaphor) {
             if (this.client == null) {
                 val httpClient = OkHttpClient.Builder()

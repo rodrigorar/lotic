@@ -7,7 +7,7 @@ import java.util.*
 
 class ListTasks() : Provider<List<Task>> {
 
-    override fun execute(): List<Task> {
+    override fun get(): List<Task> {
         val ownerId = UUID.randomUUID()
         return listOf(
             Task(

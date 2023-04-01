@@ -7,7 +7,7 @@ import java.util.*
 
 object AuthTokenProvider : Provider<AuthToken> {
 
-    override fun execute(): AuthToken {
+    override fun get(): AuthToken {
         // TODO: Not implemented, fake token returned
         return AuthToken(
             UUID.randomUUID().toString()

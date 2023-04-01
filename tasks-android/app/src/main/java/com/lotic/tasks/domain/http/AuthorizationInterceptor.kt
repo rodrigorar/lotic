@@ -8,7 +8,7 @@ import okhttp3.Response
 class AuthorizationInterceptor(private val authTokenProvider: AuthTokenProvider) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val accessToken = this.authTokenProvider.execute().token
+        val accessToken = this.authTokenProvider.get().token
         val updatedRequest = chain.request()
             .newBuilder()
             .header("Authorization", accessToken)

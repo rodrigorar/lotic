@@ -4,13 +4,22 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.lotic.tasks.domain.modules.accounts.data.DAOAccounts
+import com.lotic.tasks.domain.modules.accounts.data.EntityAccount
 import com.lotic.tasks.domain.modules.auth.data.DAOAuthToken
 import com.lotic.tasks.domain.modules.auth.data.EntityAuthToken
 
-@Database(entities = [EntityAuthToken::class], version = 1, exportSchema = false)
+@Database(
+    entities = [
+        EntityAuthToken::class
+        , EntityAccount::class]
+    , version = 2
+    , exportSchema = false
+)
 abstract class TasksDatabase : RoomDatabase() {
 
     abstract fun daoAuthToken(): DAOAuthToken
+    abstract fun daoAccounts(): DAOAccounts
 
     companion object {
         @Volatile
@@ -19,6 +28,7 @@ abstract class TasksDatabase : RoomDatabase() {
         fun getDatabase(context: Context): TasksDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, TasksDatabase::class.java, "tasks_database")
+                    .fallbackToDestructiveMigration() // FIXME: This should not go into production
                     .build()
                     .also { Instance = it }
             }

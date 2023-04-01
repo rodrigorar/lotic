@@ -1,5 +1,5 @@
 package com.lotic.tasks.domain.shared
 
-interface Consumer<I> : Service {
+interface Command<I> : Service {
     suspend fun execute(input: I)
 }

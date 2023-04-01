@@ -14,14 +14,14 @@ data class TasksUIState(val taskList: List<Task> = listOf()) {
 
 class TasksViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(
-        TasksUIState(taskList = listTasksProvider().execute())
+        TasksUIState(taskList = listTasksProvider().get())
     )
     val uiState: StateFlow<TasksUIState> = _uiState.asStateFlow()
 
     fun getAccountTasks() {
         val listTasksService = listTasksProvider()
         _uiState.update { currentState ->
-            currentState.copy(taskList = listTasksService.execute())
+            currentState.copy(taskList = listTasksService.get())
         }
     }
 }

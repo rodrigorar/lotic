@@ -1,5 +1,5 @@
 package com.lotic.tasks.domain.shared
 
-interface Provider<O> : Service {
-    fun execute(): O
+fun interface Provider<O> : Service {
+    fun get(): O
 }
