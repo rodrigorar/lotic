@@ -25,7 +25,9 @@ fun TasksApp(modifier: Modifier = Modifier, viewModel: TasksViewModel = viewMode
         navController
         , startDestination = TasksScreen.Main.name) {
         composable(route = TasksScreen.Main.name) {
-            MainScreen(loginNavigation = { navController.navigate(TasksScreen.Login.name) })
+            MainScreen(loginNavigation = {
+                navController.navigate(TasksScreen.Login.name)
+            })
         }
         composable(route = TasksScreen.Login.name) {
             LoginScreen(signInNavigation = { navController.navigate(TasksScreen.Main.name) })

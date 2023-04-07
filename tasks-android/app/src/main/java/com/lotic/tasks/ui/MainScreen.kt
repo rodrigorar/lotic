@@ -1,17 +1,25 @@
 package com.lotic.tasks.ui
 
+import android.util.Log
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -20,7 +28,8 @@ import com.lotic.tasks.R
 import com.lotic.tasks.ui.shared.SharedViewModel
 
 fun doLoginOrLogout(
-    sharedViewModel: SharedViewModel
+    viewModel: TasksViewModel
+    , sharedViewModel: SharedViewModel
     , loginNavigation: () -> Unit) {
 
     if (! sharedViewModel.uiState.isLoggedIn) {
@@ -38,15 +47,15 @@ fun MainScreen(
     , viewModel: TasksViewModel = viewModel()) {
 
     // FIXME: This needs to be removed, the UI should be updated everytime the synch manager runs
-    viewModel.getAccountTasks()
+    sharedViewModel.getTaskList()
 
     Column {
         Row(
             modifier = modifier.fillMaxWidth()
             , horizontalArrangement = Arrangement.End) {
             OutlinedButton(
-                // XXX: This should be called on the login screen
-                onClick = { doLoginOrLogout(sharedViewModel, loginNavigation) }
+                // FIXME: This should be called on the login screen
+                onClick = { doLoginOrLogout(viewModel, sharedViewModel, loginNavigation) }
                 , shape = MaterialTheme.shapes.medium
                 , colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.colors.primary)
@@ -65,21 +74,35 @@ fun MainScreen(
                 , fontSize = 24.sp
             )
         }
+
         Box(modifier = modifier
-            .fillMaxWidth()
             .padding(2.dp)) {
             LazyColumn {
-                items(viewModel.uiState.taskList) {task ->
+                items(sharedViewModel.uiState.taskList) {task ->
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly
-                        , modifier = modifier.fillMaxWidth()) {
+                        , modifier = modifier
+                            .padding(2.dp)) {
                         TextField(
                             value = task.title
-                            , colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
-                            , onValueChange = { /* TODO  */ })
+                            , onValueChange = { /* TODO  */ }
+                            , modifier = modifier
+                                .width(320.dp)
+                                .wrapContentWidth(align = Alignment.Start, unbounded = false)
+                                .horizontalScroll(rememberScrollState()))
+                        var checkedState by remember { mutableStateOf(false) }
                         Checkbox(
-                            checked = false
-                            , onCheckedChange = { /* TODO */ })
+                            checked = checkedState
+                            , colors = CheckboxDefaults.colors(uncheckedColor = Color.Black)
+                            , onCheckedChange = {
+                                checkedState = it
+                                Log.d("MainScreen", "Updating the checkbox state")
+                                if (it) {
+                                    sharedViewModel.markComplete(task.id)
+                                }
+                            }
+                        , modifier = modifier
+                                .wrapContentWidth(Alignment.End))
                     }
                 }
             }
@@ -92,7 +115,7 @@ fun MainScreen(
                     onClick = { /*TODO*/ }
                     , modifier = Modifier
                         .clip(CircleShape)
-                        .size(100.dp, 100.dp)
+                        .size(250.dp, 250.dp)
                         .padding(15.dp)) {
 
                     Icon(Icons.Default.Add, contentDescription = "Add tasks", tint = MaterialTheme.colors.secondary)
