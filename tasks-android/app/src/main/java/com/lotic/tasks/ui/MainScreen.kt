@@ -3,6 +3,7 @@ package com.lotic.tasks.ui
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,7 +12,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.*
-import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
@@ -77,6 +77,14 @@ fun MainScreen(
                 , fontSize = 24.sp
             )
         }
+
+        Divider(
+            color = MaterialTheme.colors.onBackground
+            , thickness = 1.dp
+            , startIndent = 10.dp
+            , modifier = modifier
+                .padding(bottom = 10.dp)
+                .width(300.dp))
 
         Box(modifier = modifier
             .padding(2.dp)) {

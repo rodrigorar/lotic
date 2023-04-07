@@ -10,13 +10,15 @@ import com.lotic.tasks.domain.modules.auth.data.DAOAuthToken
 import com.lotic.tasks.domain.modules.auth.data.EntityAuthToken
 import com.lotic.tasks.domain.modules.tasks.data.DAOTasks
 import com.lotic.tasks.domain.modules.tasks.data.EntityTask
+import com.lotic.tasks.domain.modules.tasks.data.EntityTasksSync
 
 @Database(
     entities = [
         EntityAuthToken::class
         , EntityAccount::class
-       , EntityTask::class]
-    , version = 3
+        , EntityTask::class
+        , EntityTasksSync::class]
+    , version = 4
     , exportSchema = false
 )
 abstract class TasksDatabase : RoomDatabase() {
