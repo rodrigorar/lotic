@@ -36,6 +36,7 @@ fun doLoginOrLogout(
         loginNavigation()
     } else {
         sharedViewModel.logout()
+        Log.d("MainScreen", "Have logged out")
     }
 }
 
@@ -45,10 +46,7 @@ fun MainScreen(
     , modifier: Modifier = Modifier
     , sharedViewModel: SharedViewModel = SharedViewModel
     , viewModel: TasksViewModel = viewModel()) {
-
-    // FIXME: This needs to be removed, the UI should be updated everytime the synch manager runs
-    sharedViewModel.getTaskList()
-
+    
     Column {
         Row(
             modifier = modifier.fillMaxWidth()
@@ -61,8 +59,14 @@ fun MainScreen(
                     backgroundColor = MaterialTheme.colors.primary)
                 , modifier = modifier.padding(15.dp)
             ) {
-                if (sharedViewModel.uiState.isLoggedIn) Text(text = stringResource(R.string.logout_btn))
-                else Text(text = stringResource(R.string.login_btn))
+                if (sharedViewModel.uiState.isLoggedIn) {
+                    Log.d("MainScreen", "Is logged in")
+                    Text(text = stringResource(R.string.logout_btn))
+                }
+                else {
+                    Log.d("MainScreen", "Is not logged in")
+                    Text(text = stringResource(R.string.login_btn))
+                }
             }
         }
         Row(modifier = modifier
@@ -78,30 +82,30 @@ fun MainScreen(
         Box(modifier = modifier
             .padding(2.dp)) {
             LazyColumn {
-                items(sharedViewModel.uiState.taskList) {task ->
+                items(viewModel.uiState.taskList) { task ->
                     Row(
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                        , modifier = modifier
-                            .padding(2.dp)) {
+                        horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier
+                            .padding(2.dp)
+                    ) {
                         TextField(
-                            value = task.title
-                            , onValueChange = { /* TODO  */ }
-                            , modifier = modifier
+                            value = task.title,
+                            onValueChange = { /* TODO  */ },
+                            modifier = modifier
                                 .width(320.dp)
                                 .wrapContentWidth(align = Alignment.Start, unbounded = false)
                                 .horizontalScroll(rememberScrollState()))
                         var checkedState by remember { mutableStateOf(false) }
                         Checkbox(
-                            checked = checkedState
-                            , colors = CheckboxDefaults.colors(uncheckedColor = Color.Black)
-                            , onCheckedChange = {
+                            checked = checkedState,
+                            colors = CheckboxDefaults.colors(uncheckedColor = Color.Black),
+                            onCheckedChange = {
                                 checkedState = it
                                 Log.d("MainScreen", "Updating the checkbox state")
                                 if (it) {
                                     sharedViewModel.markComplete(task.id)
                                 }
-                            }
-                        , modifier = modifier
+                            },
+                            modifier = modifier
                                 .wrapContentWidth(Alignment.End))
                     }
                 }

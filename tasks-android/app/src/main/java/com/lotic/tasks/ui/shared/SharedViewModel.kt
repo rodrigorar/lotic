@@ -9,35 +9,44 @@ import androidx.lifecycle.viewModelScope
 import com.lotic.tasks.domain.modules.auth.dto.AuthToken
 import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.TasksOperationsProvider
-import com.lotic.tasks.domain.modules.tasks.dtos.Task
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
 object SharedViewModel : ViewModel() {
-    var uiState by mutableStateOf(SharedUIState())
+    var uiState by mutableStateOf(SharedUIState(isLoggedIn = false))
         private set
 
     init {
         viewModelScope.launch {
             val authToken: AuthToken? = AuthOperationsProvider.currentActiveAuthSessionProvider().get()
-            uiState = uiState.copy(isLoggedIn = authToken != null)
+            Log.d("SharedViewModel", "Are we logged in?")
+            authToken?.also { Log.d("SharedViewModel", it.token) }
+            val taskList = TasksOperationsProvider.listTasks().get()
+            uiState = uiState.copy(isLoggedIn = authToken != null, taskList = taskList)
         }
     }
 
-    fun setLoggedIn() {
-        this.uiState = this.uiState.copy(isLoggedIn = true)
-    }
-
     fun logout() {
-        AuthOperationsProvider.logout()
-        this.uiState = this.uiState.copy(isLoggedIn = false)
+        viewModelScope.launch {
+            val currentActiveAuthSessionProvider = AuthOperationsProvider.currentActiveAuthSessionProvider()
+            currentActiveAuthSessionProvider.get()?.let {
+                Log.d("SharedViewModel", "Logging out")
+                TasksOperationsProvider.clearTasksForAccount().execute(it.accountId)
+            }
+            AuthOperationsProvider.logout().execute()
+            val taskList = TasksOperationsProvider.listTasks().get()
+            uiState = uiState.copy(isLoggedIn = false, taskList = taskList)
+        }
     }
 
-    fun getTaskList() {
+    fun refresh() {
         viewModelScope.launch {
-            val listTaskOperations = TasksOperationsProvider.listTasks()
-            uiState = uiState.copy(taskList = listTaskOperations.get())
+            val authToken: AuthToken? = AuthOperationsProvider.currentActiveAuthSessionProvider().get()
+            Log.d("SharedViewModel", "Are we logged in?")
+            authToken?.also { Log.d("SharedViewModel", it.token) }
+            val taskList = TasksOperationsProvider.listTasks().get()
+            uiState = uiState.copy(isLoggedIn = authToken != null, taskList = taskList)
         }
     }
 

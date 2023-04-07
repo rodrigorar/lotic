@@ -1,6 +1,5 @@
 package com.lotic.tasks.domain.modules.auth.operations
 
-import android.annotation.SuppressLint
 import android.content.Context
 import com.lotic.tasks.domain.modules.accounts.operations.AccountsOperationProvider
 import com.lotic.tasks.domain.modules.auth.repositories.RepositoryAuthToken

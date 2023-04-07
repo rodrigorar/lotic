@@ -71,10 +71,7 @@ fun LoginScreen(
             , keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
             , keyboardActions = KeyboardActions(onDone = { doLogin(
                 uiState = uiState
-                , signInNavigation = {
-                    signInNavigation()
-                    SharedViewModel.getTaskList()
-                }
+                , signInNavigation = signInNavigation
                 , viewModel = loginViewModel) })
             , shape = MaterialTheme.shapes.medium)
         Spacer(modifier = modifier.padding(10.dp))

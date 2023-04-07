@@ -35,4 +35,11 @@ class TasksRepository(private val tasksDAO: DAOTasks) : Repository<UUID, Task> {
         throw NotImplementedError("TasksRepository#delete not implemented")
     }
 
+    suspend fun deleteMultiple(idList: List<UUID>) {
+        val taskEntities: List<EntityTask> = this.tasksDAO.getByIds(idList)
+        taskEntities.forEach {
+            this.tasksDAO.delete(it)
+        }
+    }
+
 }

@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
             .init()
         TasksOperationsProvider
             .setContextProvider(contextProvider)
-            .setAuthOperationsProvider(authOperationsProvider)
+            .setAuthOperationsProvider(authOperationsProvider = authOperationsProvider)
             .init()
 
         WorkManager

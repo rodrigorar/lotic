@@ -1,7 +1,9 @@
 package com.lotic.tasks.domain.modules.auth.client
 
+import com.google.gson.JsonObject
 import com.lotic.tasks.domain.modules.auth.dto.AuthToken
 import com.lotic.tasks.domain.modules.auth.dto.Credentials
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -17,5 +19,5 @@ interface AuthClient {
     suspend fun refresh(@Path("refresh_token") refreshToken: String): AuthToken
 
     @POST("$AUTH_URL/logout")
-    suspend fun logout(@Body request: AccountIdRequest)
+    suspend fun logout(@Body request: AccountIdRequest): Response<Unit>
 }

@@ -2,6 +2,7 @@ package com.lotic.tasks.domain.modules.tasks
 
 import android.content.Context
 import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
+import com.lotic.tasks.domain.modules.tasks.operations.ClearTasksForAccount
 import com.lotic.tasks.domain.modules.tasks.operations.CreateTasks
 import com.lotic.tasks.domain.modules.tasks.operations.ListTasks
 import com.lotic.tasks.domain.modules.tasks.repositories.TasksRepository
@@ -40,5 +41,9 @@ object TasksOperationsProvider : OperationsProvider {
 
     fun createTasks(): CreateTasks {
         return CreateTasks(this.tasksRepository)
+    }
+
+    fun clearTasksForAccount(): ClearTasksForAccount {
+        return ClearTasksForAccount(this.tasksRepository)
     }
 }
