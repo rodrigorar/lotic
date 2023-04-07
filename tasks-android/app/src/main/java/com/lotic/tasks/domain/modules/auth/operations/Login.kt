@@ -1,5 +1,8 @@
 package com.lotic.tasks.domain.modules.auth.operations
 
+import com.lotic.tasks.domain.events.Event
+import com.lotic.tasks.domain.events.EventBus
+import com.lotic.tasks.domain.events.EventType
 import com.lotic.tasks.domain.http.RetrofitClientProvider
 import com.lotic.tasks.domain.modules.accounts.dto.Account
 import com.lotic.tasks.domain.modules.auth.client.AuthClient
@@ -26,11 +29,13 @@ class Login(
                     newAccountCommand.execute(Account(it.accountId, input.subject))
                 }
             }
+            EventBus.post(Event(EventType.LOGIN_SUCCESS))
         } catch (e: Exception) {
             val localAccount: Account? = getAccountByEmailQuery.execute(input.subject)
             localAccount?.also {
                 repositoryAuthToken.deleteAllForAccount(it.id)
             }
+            EventBus.post(Event(EventType.LOGIN_FAILURE))
         }
     }
 }

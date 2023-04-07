@@ -23,12 +23,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lotic.tasks.R
-import com.lotic.tasks.ui.shared.SharedViewModel
 
 private fun doLogin(uiState: LoginUIState, signInNavigation: () -> Unit, viewModel: LoginViewModel) {
     viewModel.login(uiState.subject.toLowerCase(Locale.current), uiState.secret)
