@@ -4,12 +4,15 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -89,24 +92,28 @@ fun MainScreen(
         Box(modifier = modifier
             .padding(2.dp)) {
             LazyColumn {
-
                 items(viewModel.uiState.taskList) { task ->
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly
                         , modifier = modifier
                             .padding(2.dp)
                     ) {
+                        var title by remember { mutableStateOf(task.title) }
                         TextField(
-                            value = task.title
-                            , onValueChange = { /* TODO  */ }
+                            value = title
+                            , onValueChange = {
+                                title = it
+                                viewModel.updateTaskTitle(task, it)
+                            }
                             , singleLine = true
+                            , keyboardOptions = KeyboardOptions(autoCorrect = true)
                             , colors = TextFieldDefaults.textFieldColors(
                                 backgroundColor = MaterialTheme.colors.background
+                                , textColor = MaterialTheme.colors.onBackground
                                 , unfocusedIndicatorColor = Color.Transparent)
                             , modifier = modifier
                                 .weight(5f)
-                                .wrapContentWidth(align = Alignment.Start, unbounded = false)
-                                .horizontalScroll(rememberScrollState()))
+                                .wrapContentWidth(align = Alignment.Start, unbounded = false))
                         var checkedState by remember { mutableStateOf(false) }
                         Checkbox(
                             checked = checkedState,

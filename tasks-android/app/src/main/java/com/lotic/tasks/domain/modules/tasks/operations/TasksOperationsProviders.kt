@@ -5,6 +5,7 @@ import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.operations.ClearTasksForAccount
 import com.lotic.tasks.domain.modules.tasks.operations.CreateTasks
 import com.lotic.tasks.domain.modules.tasks.operations.ListTasks
+import com.lotic.tasks.domain.modules.tasks.operations.UpdateTask
 import com.lotic.tasks.domain.modules.tasks.repositories.TasksRepository
 import com.lotic.tasks.domain.persistence.TasksDatabase
 import com.lotic.tasks.domain.shared.OperationsProvider
@@ -41,6 +42,10 @@ object TasksOperationsProvider : OperationsProvider {
 
     fun createTasks(): CreateTasks {
         return CreateTasks(this.tasksRepository)
+    }
+
+    fun updateTask(): UpdateTask {
+        return UpdateTask(this.tasksRepository)
     }
 
     fun clearTasksForAccount(): ClearTasksForAccount {

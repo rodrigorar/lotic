@@ -32,6 +32,7 @@ class TasksViewModel : ViewModel(), EventObserver {
         EventBus.subscribe(EventType.SYNC_SUCCESS, this)
         EventBus.subscribe(EventType.LOGIN_SUCCESS, this)
         EventBus.subscribe(EventType.LOGOUT_SUCCESS, this)
+        EventBus.subscribe(EventType.TASKS_UPDATED, this)
 
         viewModelScope.launch {
             verifyIfLoggedIn()
@@ -49,6 +50,13 @@ class TasksViewModel : ViewModel(), EventObserver {
         }
     }
 
+    fun updateTaskTitle(task: Task, newTaskTitle: String) {
+        viewModelScope.launch {
+            val updateTaskOperation = TasksOperationsProvider.updateTask()
+            updateTaskOperation.execute(task.copy(title = newTaskTitle))
+        }
+    }
+
     fun markComplete(id: UUID) {
         Log.d("TasksViewModel", "Mark Complete called, do nothing")
     }
@@ -63,7 +71,7 @@ class TasksViewModel : ViewModel(), EventObserver {
     }
 
     override fun notify(event: Event) {
-        if (event.isOfType(EventType.SYNC_SUCCESS)) {
+        if (event.isOfType(EventType.SYNC_SUCCESS) || event.isOfType(EventType.TASKS_UPDATED)) {
             viewModelScope.launch {
                 refreshTaskList()
             }

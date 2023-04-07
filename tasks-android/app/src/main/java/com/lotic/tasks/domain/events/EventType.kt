@@ -7,4 +7,5 @@ enum class EventType {
     , LOGOUT_FAILURE
     , SYNC_SUCCESS
     , SYNC_FAILURE
+    , TASKS_UPDATED
 }

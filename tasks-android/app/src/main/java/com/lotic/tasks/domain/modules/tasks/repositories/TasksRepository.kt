@@ -4,6 +4,7 @@ import com.lotic.tasks.domain.modules.tasks.data.DAOTasks
 import com.lotic.tasks.domain.modules.tasks.data.EntityTask
 import com.lotic.tasks.domain.modules.tasks.dtos.Task
 import com.lotic.tasks.domain.persistence.Repository
+import java.time.ZonedDateTime
 import java.util.*
 
 class TasksRepository(private val tasksDAO: DAOTasks) : Repository<UUID, Task> {
@@ -17,7 +18,14 @@ class TasksRepository(private val tasksDAO: DAOTasks) : Repository<UUID, Task> {
     }
 
     override suspend fun update(id: UUID, entity: Task) {
-        throw NotImplementedError("TasksRepository#update is not implemented")
+        val currentTask :EntityTask? = this.tasksDAO.getById(id)
+        val updatedTask: EntityTask? = currentTask?.let {
+            it.copy(
+                title = if (entity.title != it.title) entity.title else it.title
+                , description = if (entity.description != it.description) entity.description else it.description
+                , updatedAt = ZonedDateTime.now().toString())
+        }
+        updatedTask?.also { this.tasksDAO.update(it) }
     }
 
     override suspend fun getById(id: UUID): Task? {
