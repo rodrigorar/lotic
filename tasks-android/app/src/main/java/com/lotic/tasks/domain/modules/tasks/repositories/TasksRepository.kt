@@ -1,5 +1,6 @@
 package com.lotic.tasks.domain.modules.tasks.repositories
 
+import android.util.Log
 import com.lotic.tasks.domain.modules.tasks.data.DAOTasks
 import com.lotic.tasks.domain.modules.tasks.data.EntityTask
 import com.lotic.tasks.domain.modules.tasks.dtos.Task
@@ -10,7 +11,7 @@ import java.util.*
 class TasksRepository(private val tasksDAO: DAOTasks) : Repository<UUID, Task> {
 
     override suspend fun insert(entity: Task) {
-        throw NotImplementedError("TasksRepository#insert is not implemented")
+        this.tasksDAO.insert(entity.toEntity())
     }
 
     suspend fun insertMultiple(entities: List<Task>) {
@@ -40,7 +41,12 @@ class TasksRepository(private val tasksDAO: DAOTasks) : Repository<UUID, Task> {
     }
 
     override suspend fun delete(id: UUID) {
-        throw NotImplementedError("TasksRepository#delete not implemented")
+        val result: EntityTask? = this.tasksDAO.getById(id)
+        result?.also {
+            Log.d("TasksRepository", it.id.toString())
+            Log.d("TasksRepository", it.title)
+            this.tasksDAO.delete(it)
+        }
     }
 
     suspend fun deleteMultiple(idList: List<UUID>) {

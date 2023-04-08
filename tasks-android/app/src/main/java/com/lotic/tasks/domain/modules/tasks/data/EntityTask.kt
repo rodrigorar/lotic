@@ -13,4 +13,4 @@ data class EntityTask(
     , @ColumnInfo(name = "description") @NotNull val description: String
     , @ColumnInfo(name = "created_at") @NotNull val createdAt: String
     , @ColumnInfo(name = "updated_at") @NotNull val updatedAt: String
-    , @ColumnInfo(name = "owner_id") @NotNull val ownerId: UUID)
+    , @ColumnInfo(name = "owner_id") val ownerId: UUID?)

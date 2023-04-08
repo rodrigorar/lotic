@@ -12,7 +12,7 @@ data class Task(
     , val description: String = ""
     , val createdAt: ZonedDateTime
     , val updatedAt: ZonedDateTime
-    , val ownerId: UUID) : ToEntity<EntityTask> {
+    , val ownerId: UUID?) : ToEntity<EntityTask> {
 
     companion object : FromEntity<Task, EntityTask> {
 

@@ -14,13 +14,13 @@ import com.lotic.tasks.domain.modules.auth.dto.AuthToken
 import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.TasksOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.dtos.Task
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.ZonedDateTime
 import java.util.*
 
 // TODO: Remove the list
-data class TasksUIState(
-    val taskList: List<Task> = listOf()
-    , val isLoggedIn: Boolean) {
+data class TasksUIState(val taskList: List<Task> = listOf(), val isLoggedIn: Boolean) {
     // Do nothing for now
 }
 
@@ -29,10 +29,16 @@ class TasksViewModel : ViewModel(), EventObserver {
         private set
 
     init {
-        EventBus.subscribe(EventType.SYNC_SUCCESS, this)
-        EventBus.subscribe(EventType.LOGIN_SUCCESS, this)
-        EventBus.subscribe(EventType.LOGOUT_SUCCESS, this)
-        EventBus.subscribe(EventType.TASKS_UPDATED, this)
+        EventBus.subscribe(
+            eventTypes = listOf(
+                EventType.SYNC_SUCCESS
+                , EventType.LOGIN_SUCCESS
+                , EventType.LOGOUT_SUCCESS
+                , EventType.TASKS_UPDATED
+                , EventType.TASKS_CREATED
+                , EventType.TASKS_COMPLETED)
+            , observer = this
+        )
 
         viewModelScope.launch {
             verifyIfLoggedIn()
@@ -50,6 +56,23 @@ class TasksViewModel : ViewModel(), EventObserver {
         }
     }
 
+    fun createNewTask() {
+        // FIXME: It makes no sense to have a database call to create a new task
+        viewModelScope.launch {
+            val currentActiveAuthSessionProvider = AuthOperationsProvider.currentActiveAuthSessionProvider()
+            val createTaskOperation = TasksOperationsProvider.createTask()
+
+            createTaskOperation.execute(
+                Task(
+                    id = UUID.randomUUID()
+                    , title = ""
+                    , description = ""
+                    , createdAt = ZonedDateTime.now()
+                    , updatedAt = ZonedDateTime.now()
+                    , ownerId = currentActiveAuthSessionProvider.get()?.accountId))
+        }
+    }
+
     fun updateTaskTitle(task: Task, newTaskTitle: String) {
         viewModelScope.launch {
             val updateTaskOperation = TasksOperationsProvider.updateTask()
@@ -57,8 +80,11 @@ class TasksViewModel : ViewModel(), EventObserver {
         }
     }
 
-    fun markComplete(id: UUID) {
-        Log.d("TasksViewModel", "Mark Complete called, do nothing")
+    fun markComplete(task: Task) {
+        viewModelScope.launch {
+            val completeTaskOperation = TasksOperationsProvider.completeTasks()
+            completeTaskOperation.execute(task.id)
+        }
     }
 
     private suspend fun verifyIfLoggedIn() {
@@ -67,12 +93,18 @@ class TasksViewModel : ViewModel(), EventObserver {
     }
 
     private suspend fun refreshTaskList() {
-        uiState = uiState.copy(taskList = TasksOperationsProvider.listTasks().get())
+        val taskList = TasksOperationsProvider.listTasks().get()
+        uiState = uiState.copy(taskList = taskList)
     }
 
     override fun notify(event: Event) {
-        if (event.isOfType(EventType.SYNC_SUCCESS) || event.isOfType(EventType.TASKS_UPDATED)) {
+        if (event.isOfType(EventType.SYNC_SUCCESS)
+            || event.isOfType(EventType.TASKS_UPDATED)
+            || event.isOfType(EventType.TASKS_CREATED)
+            || event.isOfType(EventType.TASKS_COMPLETED)) {
+            Log.d("TasksViewModel", "Refreshing the UI")
             viewModelScope.launch {
+                delay(200)
                 refreshTaskList()
             }
         } else if (event.isOfType(EventType.LOGIN_SUCCESS)) {
@@ -80,6 +112,7 @@ class TasksViewModel : ViewModel(), EventObserver {
         } else if (event.isOfType(EventType.LOGOUT_SUCCESS)) {
             this.uiState = this.uiState.copy(isLoggedIn = false)
             viewModelScope.launch {
+                delay(100)
                 refreshTaskList()
             }
         }

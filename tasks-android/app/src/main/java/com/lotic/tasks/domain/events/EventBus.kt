@@ -1,7 +1,5 @@
 package com.lotic.tasks.domain.events
 
-import android.util.Log
-
 object EventBus {
     private val observers: MutableMap<EventType, MutableList<EventObserver>> = mutableMapOf()
 
@@ -13,7 +11,6 @@ object EventBus {
 
     fun post(event: Event) {
         synchronized(this) {
-            Log.d("EventBus", "Posting Event")
             observers[event.type]?.forEach { it.notify(event) }
         }
     }
@@ -22,7 +19,15 @@ object EventBus {
         synchronized(this) {
             // TODO: We should make sure that we don't have the same observer twice
             // for the same event type
-            observers[eventType]?.add(observer)
+            this.observers[eventType]?.add(observer)
+        }
+    }
+
+    fun subscribe(eventTypes: List<EventType>, observer: EventObserver) {
+        synchronized(this) {
+            eventTypes.forEach {
+                this.observers[it]?.add(observer)
+            }
         }
     }
 }

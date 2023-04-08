@@ -10,6 +10,8 @@ class CreateTasks(private val tasksRepository: TasksRepository) : Command<List<T
     override suspend fun execute(input: List<Task>) {
         Log.d("CreateTasks", "Persisting received tasks")
         this.tasksRepository.insertMultiple(input)
+
+        // TODO: Create Task Sync entry
     }
 
 }

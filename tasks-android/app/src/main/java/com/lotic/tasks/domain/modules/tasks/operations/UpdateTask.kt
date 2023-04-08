@@ -12,6 +12,8 @@ class UpdateTask(private val tasksRepository: TasksRepository) : Command<Task> {
     override suspend fun execute(input: Task) {
         this.tasksRepository.update(input.id, input)
 
+        // TODO: Update task sync entry
+
         EventBus.post(Event(EventType.TASKS_UPDATED))
     }
 
