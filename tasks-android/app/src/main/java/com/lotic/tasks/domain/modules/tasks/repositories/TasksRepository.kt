@@ -42,11 +42,7 @@ class TasksRepository(private val tasksDAO: DAOTasks) : Repository<UUID, Task> {
 
     override suspend fun delete(id: UUID) {
         val result: EntityTask? = this.tasksDAO.getById(id)
-        result?.also {
-            Log.d("TasksRepository", it.id.toString())
-            Log.d("TasksRepository", it.title)
-            this.tasksDAO.delete(it)
-        }
+        result?.also { this.tasksDAO.delete(it) }
     }
 
     suspend fun deleteMultiple(idList: List<UUID>) {

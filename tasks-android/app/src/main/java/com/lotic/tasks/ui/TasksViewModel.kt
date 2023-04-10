@@ -87,7 +87,6 @@ class TasksViewModel : ViewModel(), EventObserver {
     }
 
     fun toggleComplete(task: Task) {
-        Log.d("TasksViewModel", this.uiState.taskCheckboxes[task.id].toString())
         this.uiState.taskCheckboxes[task.id] = this.uiState.taskCheckboxes[task.id]?.not() ?: false
         viewModelScope.launch {
             delay(1000)
@@ -118,7 +117,6 @@ class TasksViewModel : ViewModel(), EventObserver {
             || event.isOfType(EventType.TASKS_UPDATED)
             || event.isOfType(EventType.TASKS_CREATED)
             || event.isOfType(EventType.TASKS_COMPLETED)) {
-            Log.d("TasksViewModel", "Refreshing the UI")
             viewModelScope.launch {
                 delay(200)
                 refreshTaskList()

@@ -27,24 +27,17 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
         try {
             runBlocking {
                 val currentSession: AuthToken? = currentActiveAuthSessionProvider.get()
-                Log.d("SynchManager", currentSession.toString())
 
                 currentSession?.let { authToken ->
                     try {
                         val serverTasks: List<Task>? =
                             tasksClient?.listTasksForAccount(authToken.accountId)?.toDTO()
-                        Log.d("SynchManager", serverTasks.toString())
-                        Log.d("SynchManager", "Received server tasks")
                         serverTasks?.also { tasks ->
                             createTasksOperation.execute(tasks)
                         }
                         EventBus.post(Event(EventType.SYNC_SUCCESS))
                     } catch (e: HttpException) {
-                        Log.d("SynchManager", "Error happened")
-                        Log.d("SynchManager", e.stackTraceToString())
-                        Log.d("SynchManager", e.message())
                         // FIXME: We should refresh the token not delete them all
-                        Log.d("SynchManager", "After clearing all sessions")
                         EventBus.post(Event(EventType.SYNC_FAILURE))
                     }
                 }

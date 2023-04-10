@@ -62,11 +62,9 @@ fun MainScreen(
                 , modifier = modifier.padding(15.dp)
             ) {
                 if (viewModel.uiState.isLoggedIn) {
-                    Log.d("MainScreen", "Is logged in")
                     Text(text = stringResource(R.string.logout_btn))
                 }
                 else {
-                    Log.d("MainScreen", "Is not logged in")
                     Text(text = stringResource(R.string.login_btn))
                 }
             }
