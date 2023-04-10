@@ -3,17 +3,11 @@ package com.lotic.tasks.ui
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,21 +16,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lotic.tasks.R
-import kotlinx.coroutines.delay
 
 fun doLoginOrLogout(
     viewModel: TasksViewModel
@@ -109,24 +100,16 @@ fun MainScreen(
                         , modifier = modifier
                             .padding(2.dp)
                     ) {
-
-                        var title by remember { mutableStateOf(task.title) }
-                        var checkState by remember { mutableStateOf(false) }
-                        if (title == "") {
-                            Log.d("MainScreen", task.title)
-                            title = task.title
-                            Log.d("MainScreen", title)
-                            checkState = false
-                        }
+                        val focusManager = LocalFocusManager.current
 
                         TextField(
-                            value = title
+                            value = viewModel.uiState.taskTitles[task.id].orEmpty()
                             , onValueChange = {
-                                title = it
                                 viewModel.updateTaskTitle(task, it)
                             }
                             , singleLine = true
-                            , keyboardOptions = KeyboardOptions(autoCorrect = true)
+                            , keyboardOptions = KeyboardOptions(autoCorrect = true, imeAction = ImeAction.Done)
+                            , keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
                             , colors = TextFieldDefaults.textFieldColors(
                                 backgroundColor = MaterialTheme.colors.background
                                 , textColor = MaterialTheme.colors.onBackground
@@ -135,28 +118,20 @@ fun MainScreen(
                                 .weight(5f)
                                 .wrapContentWidth(align = Alignment.Start, unbounded = false)
                                 .focusRequester(focusRequester))
-                        if (title == "") {
+
+                        Checkbox(
+                            checked = viewModel.uiState.taskCheckboxes[task.id] ?: false
+                            , colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colors.primary)
+                            , onCheckedChange = { viewModel.toggleComplete(task) }
+                            , modifier = modifier
+                                .weight(1f)
+                                .wrapContentWidth(Alignment.End))
+
+                        if (viewModel.uiState.taskTitles[task.id] == "") {
                             LaunchedEffect(Unit) {
                                 focusRequester.requestFocus()
                             }
                         }
-
-                        Checkbox(
-                            checked = checkState
-                            , colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colors.primary)
-                            , onCheckedChange = {
-                                checkState = it
-                                Log.d("MainScreen", title)
-                                title = ""
-                                Log.d("MainScreen", "After reset")
-                                Log.d("MainScreen", title)
-                                if (it) {
-                                    viewModel.markComplete(task)
-                                }
-                            },
-                            modifier = modifier
-                                .weight(1f)
-                                .wrapContentWidth(Alignment.End))
                     }
                 }
             }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lotic.tasks.domain.events.Event
@@ -20,7 +21,11 @@ import java.time.ZonedDateTime
 import java.util.*
 
 // TODO: Remove the list
-data class TasksUIState(val taskList: List<Task> = listOf(), val isLoggedIn: Boolean) {
+data class TasksUIState(
+    val taskList: List<Task> = listOf()
+    , val taskTitles: MutableMap<UUID, String> = mutableMapOf()
+    , val taskCheckboxes: MutableMap<UUID, Boolean> = mutableMapOf()
+    , val isLoggedIn: Boolean) {
     // Do nothing for now
 }
 
@@ -74,16 +79,24 @@ class TasksViewModel : ViewModel(), EventObserver {
     }
 
     fun updateTaskTitle(task: Task, newTaskTitle: String) {
+        this.uiState.taskTitles[task.id] = newTaskTitle
         viewModelScope.launch {
             val updateTaskOperation = TasksOperationsProvider.updateTask()
             updateTaskOperation.execute(task.copy(title = newTaskTitle))
         }
     }
 
-    fun markComplete(task: Task) {
+    fun toggleComplete(task: Task) {
+        Log.d("TasksViewModel", this.uiState.taskCheckboxes[task.id].toString())
+        this.uiState.taskCheckboxes[task.id] = this.uiState.taskCheckboxes[task.id]?.not() ?: false
         viewModelScope.launch {
-            val completeTaskOperation = TasksOperationsProvider.completeTasks()
-            completeTaskOperation.execute(task.id)
+            delay(1000)
+            // I was force to do this idiocracy == true :facepalm:
+            if (uiState.taskCheckboxes[task.id] == true) {
+                val completeTaskOperation = TasksOperationsProvider.completeTasks()
+                completeTaskOperation.execute(task.id)
+                uiState.taskCheckboxes[task.id] = false
+            }
         }
     }
 
@@ -94,7 +107,10 @@ class TasksViewModel : ViewModel(), EventObserver {
 
     private suspend fun refreshTaskList() {
         val taskList = TasksOperationsProvider.listTasks().get()
-        uiState = uiState.copy(taskList = taskList)
+        uiState = uiState.copy(
+            taskList = taskList
+            , taskTitles = taskList.map { it.id to it.title }.toMutableStateMap()
+            , taskCheckboxes = taskList.map { it.id to false }.toMutableStateMap())
     }
 
     override fun notify(event: Event) {

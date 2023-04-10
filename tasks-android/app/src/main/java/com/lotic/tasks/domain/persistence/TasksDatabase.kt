@@ -18,7 +18,7 @@ import com.lotic.tasks.domain.modules.tasks.data.EntityTasksSync
         , EntityAccount::class
         , EntityTask::class
         , EntityTasksSync::class]
-    , version = 5
+    , version = 6
     , exportSchema = false
 )
 abstract class TasksDatabase : RoomDatabase() {
