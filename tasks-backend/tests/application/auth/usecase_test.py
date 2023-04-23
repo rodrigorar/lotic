@@ -252,8 +252,8 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         when(mocked_auth_storage) \
             .find_by_refresh_token(...) \
             .thenReturn(current_auth_session)
-        when(mocked_auth_storage) \
-            .remove_all_for_account_id(...)
+        #when(mocked_auth_storage) \
+        #    .remove_all_for_account_id(...)
         when(mocked_auth_storage) \
             .store(...)
 
@@ -267,7 +267,7 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         assert result.expires_at > datetime.now()
 
         verify(mocked_auth_storage).find_by_refresh_token(...)
-        verify(mocked_auth_storage).remove_all_for_account_id(...)
+        #verify(mocked_auth_storage).remove_all_for_account_id(...)
         verify(mocked_auth_storage).store(...)
 
         verifyNoMoreInteractions(mocked_auth_storage)
@@ -285,8 +285,8 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         when(mocked_auth_storage) \
             .find_by_refresh_token(...) \
             .thenReturn(current_auth_session)
-        when(mocked_auth_storage) \
-            .remove_all_for_account_id(...)
+        #when(mocked_auth_storage) \
+        #    .remove_all_for_account_id(...)
         when(mocked_auth_storage) \
             .store(...)
 
@@ -300,7 +300,7 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         assert result.expires_at > datetime.now()
 
         verify(mocked_auth_storage).find_by_refresh_token(...)
-        verify(mocked_auth_storage).remove_all_for_account_id(...)
+        #verify(mocked_auth_storage).remove_all_for_account_id(...)
         verify(mocked_auth_storage).store(...)
 
         verifyNoMoreInteractions(mocked_auth_storage)

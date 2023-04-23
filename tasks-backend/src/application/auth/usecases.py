@@ -77,9 +77,9 @@ class UseCaseRefresh(UseCase):
             if current_auth_session is None:
                 raise NotFoundError("No auth session found for refresh token: " + str(refresh_token))
 
-            self.auth_token_storage.remove_all_for_account_id(
-                unit_of_work
-                , current_auth_session.get_account_id())
+            #self.auth_token_storage.remove_all_for_account_id(
+            #    unit_of_work
+            #    , current_auth_session.get_account_id())
 
             current_time = datetime.now()
             new_auth_session = AuthSession(
