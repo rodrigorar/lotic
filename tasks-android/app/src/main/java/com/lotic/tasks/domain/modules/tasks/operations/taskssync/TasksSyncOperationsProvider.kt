@@ -28,7 +28,10 @@ object TasksSyncOperationsProvider : OperationsProvider {
 
         // XXX: This probably should not be done here, but i have no better idea
         EventBus.subscribe(
-            listOf(EventType.TASKS_CREATED, EventType.SYNC_SUCCESS)
+            listOf(
+                EventType.TASKS_CREATED
+                , EventType.TASKS_CREATED_SYNCED
+                , EventType.SYNC_SUCCESS)
             , CreateTasksSync(this.tasksSyncRepository)
         )
         EventBus.subscribe(EventType.TASKS_UPDATED, UpdateTasksSync(this.tasksSyncRepository))

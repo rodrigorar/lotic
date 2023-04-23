@@ -16,9 +16,10 @@ import com.lotic.tasks.domain.modules.tasks.client.TasksClient
 import com.lotic.tasks.domain.modules.tasks.client.payloads.CreateTasksRequest
 import com.lotic.tasks.domain.modules.tasks.client.payloads.UpdateTasksRequest
 import com.lotic.tasks.domain.modules.tasks.dtos.Task
-import com.lotic.tasks.domain.modules.tasks.operations.tasks.CreateTasks
+import com.lotic.tasks.domain.modules.tasks.operations.tasks.CreateTasksSynced
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.GetTasksById
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.TasksOperationsProvider
+import com.lotic.tasks.domain.modules.tasks.operations.tasks.UpdateTask
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.DeleteTaskSyncByTaskId
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetCompleteTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetDirtyTasksSync
@@ -41,7 +42,8 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
     private val markTasksSynced: MarkTasksSynced = TasksSyncOperationsProvider.markTasksSynced()
     private val deleteTaskSyncByTaskId: DeleteTaskSyncByTaskId = TasksSyncOperationsProvider.deleteTaskSyncByTaskId()
 
-    private val createTasksOperation: CreateTasks = TasksOperationsProvider.createTasks()
+    private val createTasksSynced: CreateTasksSynced = TasksOperationsProvider.createTasksSynced()
+    private val updateTask: UpdateTask = TasksOperationsProvider.updateTask()
     private val getTasksById: GetTasksById = TasksOperationsProvider.getTasksById()
 
     override fun doWork(): Result {
@@ -49,7 +51,7 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
             runBlocking {
                 val currentSession: AuthToken? = currentActiveAuthSessionProvider.get()
 
-                currentSession?.let { _ ->
+                currentSession?.let { authSession ->
                     try {
                         // Step 1: Persist local tasks remotely
 
@@ -97,11 +99,26 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                             }
                         }
 
-                        // Step 4: Get new remote tasks and create them locally
+                        tasksClient?.run {
+                            val remoteTasks: List<Task> =
+                                this.listTasksForAccount(authSession.accountId).tasks
+                                    .map { it.toDTO() }
 
-                        // Step 5: Get updated remote tasks and update them locally
+                            val accountTaskIds: List<UUID> = getTasksById
+                                .execute(remoteTasks.map { it.id })
+                                .map { it.id }
 
-                        // Step 6: Delete tasks locally that do not exist remotely
+                            // Step 4: Get new remote tasks and create them locally
+                            val tasksToCreateLocally: List<Task> = remoteTasks
+                                .filter { ! accountTaskIds.contains(it.id) }
+                            createTasksSynced.execute(tasksToCreateLocally)
+
+                            // Step 5: Get updated remote tasks and update them locally
+                            // TODO: Not implemented
+
+                            // Step 6: Delete tasks locally that do not exist remotely
+                            // TODO: Not implemented
+                        }
 
                         EventBus.post(
                             Event(

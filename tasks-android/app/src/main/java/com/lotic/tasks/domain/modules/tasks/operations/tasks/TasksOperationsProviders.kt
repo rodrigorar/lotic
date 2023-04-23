@@ -51,6 +51,10 @@ object TasksOperationsProvider : OperationsProvider {
         return CreateTasks(tasksRepository)
     }
 
+    fun createTasksSynced(): CreateTasksSynced {
+        return CreateTasksSynced(tasksRepository)
+    }
+
     fun updateTask(): UpdateTask {
         return UpdateTask(tasksRepository)
     }

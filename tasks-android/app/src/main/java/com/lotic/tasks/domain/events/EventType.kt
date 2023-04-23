@@ -9,5 +9,6 @@ enum class EventType {
     , SYNC_FAILURE
     , TASKS_UPDATED
     , TASKS_CREATED
+    , TASKS_CREATED_SYNCED
     , TASKS_COMPLETED
 }
