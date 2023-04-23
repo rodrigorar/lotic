@@ -9,6 +9,7 @@ import com.lotic.tasks.domain.modules.accounts.data.EntityAccount
 import com.lotic.tasks.domain.modules.auth.data.DAOAuthToken
 import com.lotic.tasks.domain.modules.auth.data.EntityAuthToken
 import com.lotic.tasks.domain.modules.tasks.data.DAOTasks
+import com.lotic.tasks.domain.modules.tasks.data.DAOTasksSync
 import com.lotic.tasks.domain.modules.tasks.data.EntityTask
 import com.lotic.tasks.domain.modules.tasks.data.EntityTasksSync
 
@@ -25,8 +26,8 @@ abstract class TasksDatabase : RoomDatabase() {
 
     abstract fun daoAuthToken(): DAOAuthToken
     abstract fun daoAccounts(): DAOAccounts
-
     abstract fun daoTasks(): DAOTasks
+    abstract fun daoTasksSync(): DAOTasksSync
 
     companion object {
         @Volatile

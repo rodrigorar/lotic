@@ -1,13 +1,7 @@
-package com.lotic.tasks.domain.modules.tasks
+package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
 import android.content.Context
 import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
-import com.lotic.tasks.domain.modules.tasks.operations.ClearTasksForAccount
-import com.lotic.tasks.domain.modules.tasks.operations.CompleteTask
-import com.lotic.tasks.domain.modules.tasks.operations.CreateTask
-import com.lotic.tasks.domain.modules.tasks.operations.CreateTasks
-import com.lotic.tasks.domain.modules.tasks.operations.ListTasks
-import com.lotic.tasks.domain.modules.tasks.operations.UpdateTask
 import com.lotic.tasks.domain.modules.tasks.repositories.TasksRepository
 import com.lotic.tasks.domain.persistence.TasksDatabase
 import com.lotic.tasks.domain.shared.OperationsProvider
@@ -20,12 +14,12 @@ object TasksOperationsProvider : OperationsProvider {
     private lateinit var authOperationsProvider: AuthOperationsProvider
 
     override fun setContextProvider(contextProvider: Provider<Context>): TasksOperationsProvider {
-        this.contextProvider = contextProvider
+        TasksOperationsProvider.contextProvider = contextProvider
         return this;
     }
 
     fun setAuthOperationsProvider(authOperationsProvider: AuthOperationsProvider): TasksOperationsProvider {
-        this.authOperationsProvider = authOperationsProvider
+        TasksOperationsProvider.authOperationsProvider = authOperationsProvider
         return this
     }
 
@@ -38,27 +32,34 @@ object TasksOperationsProvider : OperationsProvider {
 
     fun listTasks(): ListTasks {
         return ListTasks(
-            this.authOperationsProvider.currentActiveAuthSessionProvider()
-            , this.tasksRepository)
+            authOperationsProvider.currentActiveAuthSessionProvider()
+            , tasksRepository
+        )
+    }
+
+    fun getTasksById(): GetTasksById {
+        return GetTasksById(
+            this.tasksRepository
+            , this.authOperationsProvider.currentActiveAuthSessionProvider())
     }
 
     fun createTask(): CreateTask {
-        return CreateTask(this.tasksRepository)
+        return CreateTask(tasksRepository)
     }
 
     fun createTasks(): CreateTasks {
-        return CreateTasks(this.tasksRepository)
+        return CreateTasks(tasksRepository)
     }
 
     fun updateTask(): UpdateTask {
-        return UpdateTask(this.tasksRepository)
+        return UpdateTask(tasksRepository)
     }
 
     fun completeTasks(): CompleteTask {
-        return CompleteTask(this.tasksRepository)
+        return CompleteTask(tasksRepository)
     }
 
     fun clearTasksForAccount(): ClearTasksForAccount {
-        return ClearTasksForAccount(this.tasksRepository)
+        return ClearTasksForAccount(tasksRepository)
     }
 }

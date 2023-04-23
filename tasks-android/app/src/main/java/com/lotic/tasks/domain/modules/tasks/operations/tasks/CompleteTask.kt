@@ -1,4 +1,4 @@
-package com.lotic.tasks.domain.modules.tasks.operations
+package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
 import com.lotic.tasks.domain.events.Event
 import com.lotic.tasks.domain.events.EventBus

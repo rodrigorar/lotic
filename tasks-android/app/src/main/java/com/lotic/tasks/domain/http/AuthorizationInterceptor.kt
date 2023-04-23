@@ -1,5 +1,7 @@
 package com.lotic.tasks.domain.http
 
+import android.util.Log
+import com.google.gson.Gson
 import com.lotic.tasks.domain.modules.auth.dto.AuthToken
 import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionProvider
@@ -24,11 +26,15 @@ class AuthorizationInterceptor(private val authTokenProvider: CurrentActiveAuthS
 
     override fun intercept(chain: Interceptor.Chain): Response {
         var updatedRequest = chain.request()
+        Log.d("AuthorizationInterceptor", Gson().toJson(chain.request()))
         if (isAuthorizationNecessary(chain)) {
             runBlocking { authTokenProvider.get() }
                 ?.also { authToken ->
                     updatedRequest = buildAuthorizedRequest(chain, authToken)
                     var response = chain.proceed(updatedRequest)
+
+                    Log.d("AuthorizationInterceptor", response.message())
+                    Log.d("AuthorizationInterceptor", response.code().toString())
 
                     if (response.code() == 401) {
                         val refreshOperation = AuthOperationsProvider.refresh()

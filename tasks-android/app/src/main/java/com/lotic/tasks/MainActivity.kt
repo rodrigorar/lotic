@@ -6,18 +6,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.lotic.tasks.domain.modules.accounts.operations.AccountsOperationProvider
 import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.SyncManager
-import com.lotic.tasks.domain.modules.tasks.TasksOperationsProvider
+import com.lotic.tasks.domain.modules.tasks.operations.tasks.TasksOperationsProvider
+import com.lotic.tasks.domain.modules.tasks.operations.taskssync.TasksSyncOperationsProvider
 import com.lotic.tasks.domain.shared.Provider
 import com.lotic.tasks.ui.theme.TasksTheme
-import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
@@ -36,13 +34,16 @@ class MainActivity : ComponentActivity() {
             .setContextProvider(contextProvider)
             .setAuthOperationsProvider(authOperationsProvider = authOperationsProvider)
             .init()
+        TasksSyncOperationsProvider
+            .setContextProvider(contextProvider)
+            .init()
 
         WorkManager
             .getInstance(this)
             .enqueueUniquePeriodicWork(
                 "synch-manager"
                 , ExistingPeriodicWorkPolicy.REPLACE
-                , PeriodicWorkRequestBuilder<SyncManager>(1L, TimeUnit.SECONDS)
+                , PeriodicWorkRequestBuilder<SyncManager>(15L, TimeUnit.SECONDS)
                     .addTag("tasks-synch-manager-tag")
                     /*.setConstraints(
                         Constraints.Builder()

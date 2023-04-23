@@ -1,6 +1,5 @@
 package com.lotic.tasks.ui
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,7 +12,7 @@ import com.lotic.tasks.domain.events.EventObserver
 import com.lotic.tasks.domain.events.EventType
 import com.lotic.tasks.domain.modules.auth.dto.AuthToken
 import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
-import com.lotic.tasks.domain.modules.tasks.TasksOperationsProvider
+import com.lotic.tasks.domain.modules.tasks.operations.tasks.TasksOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.dtos.Task
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

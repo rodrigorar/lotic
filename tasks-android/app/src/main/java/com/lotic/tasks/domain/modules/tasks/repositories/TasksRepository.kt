@@ -40,6 +40,12 @@ class TasksRepository(private val tasksDAO: DAOTasks) : Repository<UUID, Task> {
         }
     }
 
+    suspend fun getTasksById(accountId: UUID, taskIds: List<UUID>): List<Task> {
+        // FIXME: Eventually all these operations should have a context (logged user, etc)
+        return this.tasksDAO.getByIds(taskIds)
+            .map { Task.fromEntity(it) }
+    }
+
     override suspend fun delete(id: UUID) {
         val result: EntityTask? = this.tasksDAO.getById(id)
         result?.also { this.tasksDAO.delete(it) }

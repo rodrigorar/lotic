@@ -1,4 +1,4 @@
-package com.lotic.tasks.domain.modules.tasks.operations
+package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
 import android.util.Log
 import com.lotic.tasks.domain.modules.tasks.dtos.Task
