@@ -1,6 +1,5 @@
 package com.lotic.tasks.domain.modules.tasks.operations.taskssync
 
-import android.util.Log
 import com.lotic.tasks.domain.modules.tasks.dtos.SyncStatus
 import com.lotic.tasks.domain.modules.tasks.dtos.TasksSync
 import com.lotic.tasks.domain.modules.tasks.repositories.TasksSyncRepository
@@ -12,8 +11,6 @@ class MarkTasksSynced(
     private val tasksSyncRepository: TasksSyncRepository) : Command<List<UUID>> {
 
     override suspend fun execute(input: List<UUID>) {
-        Log.d("MarkTasksSynced", "Marking tasks as synced")
-
         val updatedTasksSync: List<TasksSync> = this.tasksSyncRepository
             .getByTaskIds(input)
             .map { it.copy(syncStatus = SyncStatus.SYNCHED, updatedAt = ZonedDateTime.now()) }

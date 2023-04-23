@@ -59,6 +59,10 @@ object TasksOperationsProvider : OperationsProvider {
         return UpdateTask(tasksRepository)
     }
 
+    fun updateTaskSynced(): UpdateTasksSynced {
+        return UpdateTasksSynced(this.tasksRepository)
+    }
+
     fun completeTasks(): CompleteTask {
         return CompleteTask(tasksRepository)
     }

@@ -20,6 +20,7 @@ import com.lotic.tasks.domain.modules.tasks.operations.tasks.CreateTasksSynced
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.GetTasksById
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.TasksOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.UpdateTask
+import com.lotic.tasks.domain.modules.tasks.operations.tasks.UpdateTasksSynced
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.DeleteTaskSyncByTaskId
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetCompleteTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetDirtyTasksSync
@@ -43,7 +44,7 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
     private val deleteTaskSyncByTaskId: DeleteTaskSyncByTaskId = TasksSyncOperationsProvider.deleteTaskSyncByTaskId()
 
     private val createTasksSynced: CreateTasksSynced = TasksOperationsProvider.createTasksSynced()
-    private val updateTask: UpdateTask = TasksOperationsProvider.updateTask()
+    private val updateTaskSynced: UpdateTasksSynced = TasksOperationsProvider.updateTaskSynced()
     private val getTasksById: GetTasksById = TasksOperationsProvider.getTasksById()
 
     override fun doWork(): Result {
@@ -114,7 +115,12 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                             createTasksSynced.execute(tasksToCreateLocally)
 
                             // Step 5: Get updated remote tasks and update them locally
-                            // TODO: Not implemented
+                            val tasksToUpdateLocally: List<Task> = remoteTasks
+                                .filter { accountTaskIds.contains(it.id) }
+                            // FIXME: This should be a batch and not a loop
+                            tasksToUpdateLocally.forEach {
+                                updateTaskSynced.execute(it)
+                            }
 
                             // Step 6: Delete tasks locally that do not exist remotely
                             // TODO: Not implemented
