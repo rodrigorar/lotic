@@ -1,4 +1,4 @@
-package com.lotic.tasks.domain.modules.tasks.operations.taskssync
+package com.lotic.tasks.domain.modules.tasks.operations.taskssync.observers
 
 import android.util.Log
 import com.lotic.tasks.domain.events.Event
@@ -21,9 +21,15 @@ class UpdateTasksSync(
                 val currentTasksSyncEntry: TasksSync? = tasksSyncRepository.getByTaskId(eventInfo.taskId)
                 currentTasksSyncEntry?.run {
                     Log.d("UpdateTasksSync", "Updating tasks sync info")
-                    tasksSyncRepository.update(
-                        this.id
-                        , this.copy(syncStatus = SyncStatus.DIRTY, updatedAt = ZonedDateTime.now()))
+                    if (this.syncStatus != SyncStatus.LOCAL) {
+                        tasksSyncRepository.update(
+                            this.id,
+                            this.copy(
+                                syncStatus = SyncStatus.DIRTY,
+                                updatedAt = ZonedDateTime.now()
+                            )
+                        )
+                    }
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.lotic.tasks.domain.modules.tasks.operations.taskssync
+package com.lotic.tasks.domain.modules.tasks.operations.taskssync.observers
 
 import android.util.Log
 import com.lotic.tasks.domain.events.Event

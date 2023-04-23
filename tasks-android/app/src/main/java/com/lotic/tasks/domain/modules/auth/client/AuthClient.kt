@@ -1,6 +1,5 @@
 package com.lotic.tasks.domain.modules.auth.client
 
-import com.google.gson.JsonObject
 import com.lotic.tasks.domain.modules.auth.dto.AuthToken
 import com.lotic.tasks.domain.modules.auth.dto.Credentials
 import retrofit2.Response

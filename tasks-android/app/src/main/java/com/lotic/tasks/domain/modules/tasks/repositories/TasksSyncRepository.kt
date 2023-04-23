@@ -49,6 +49,6 @@ class TasksSyncRepository(private val tasksSyncDAO: DAOTasksSync) : Repository<U
 
     override suspend fun delete(id: UUID) {
         val taskSync: EntityTasksSync? = this.tasksSyncDAO.getById(id)
-        taskSync?.also { this.tasksSyncDAO.delete(it) }
+        taskSync?.run { tasksSyncDAO.delete(this) }
     }
 }

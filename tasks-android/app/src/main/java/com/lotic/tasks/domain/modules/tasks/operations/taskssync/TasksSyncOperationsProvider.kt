@@ -3,6 +3,9 @@ package com.lotic.tasks.domain.modules.tasks.operations.taskssync
 import android.content.Context
 import com.lotic.tasks.domain.events.EventBus
 import com.lotic.tasks.domain.events.EventType
+import com.lotic.tasks.domain.modules.tasks.operations.taskssync.observers.CompleteTasksSync
+import com.lotic.tasks.domain.modules.tasks.operations.taskssync.observers.CreateTasksSync
+import com.lotic.tasks.domain.modules.tasks.operations.taskssync.observers.UpdateTasksSync
 import com.lotic.tasks.domain.modules.tasks.repositories.TasksSyncRepository
 import com.lotic.tasks.domain.persistence.TasksDatabase
 import com.lotic.tasks.domain.shared.OperationsProvider
@@ -26,10 +29,10 @@ object TasksSyncOperationsProvider : OperationsProvider {
         // XXX: This probably should not be done here, but i have no better idea
         EventBus.subscribe(
             listOf(EventType.TASKS_CREATED, EventType.SYNC_SUCCESS)
-            , CreateTasksSync(this.tasksSyncRepository))
-        EventBus.subscribe(
-            listOf(EventType.TASKS_UPDATED, EventType.SYNC_SUCCESS)
-            , UpdateTasksSync(this.tasksSyncRepository))
+            , CreateTasksSync(this.tasksSyncRepository)
+        )
+        EventBus.subscribe(EventType.TASKS_UPDATED, UpdateTasksSync(this.tasksSyncRepository))
+        EventBus.subscribe(EventType.TASKS_COMPLETED, CompleteTasksSync(this.tasksSyncRepository))
 
         return this
     }
@@ -42,7 +45,15 @@ object TasksSyncOperationsProvider : OperationsProvider {
         return GetDirtyTasksSync(this.tasksSyncRepository)
     }
 
+    fun getCompleteTasksSync(): GetCompleteTasksSync {
+        return GetCompleteTasksSync(this.tasksSyncRepository)
+    }
+
     fun markTasksSynced(): MarkTasksSynced {
         return MarkTasksSynced(this.tasksSyncRepository)
+    }
+
+    fun deleteTaskSyncByTaskId(): DeleteTaskSyncByTaskId {
+        return DeleteTaskSyncByTaskId(this.tasksSyncRepository)
     }
 }

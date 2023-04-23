@@ -19,6 +19,8 @@ import com.lotic.tasks.domain.modules.tasks.dtos.Task
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.CreateTasks
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.GetTasksById
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.TasksOperationsProvider
+import com.lotic.tasks.domain.modules.tasks.operations.taskssync.DeleteTaskSyncByTaskId
+import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetCompleteTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetDirtyTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetLocalTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.MarkTasksSynced
@@ -35,7 +37,9 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
 
     private val getLocalTasksSync: GetLocalTasksSync = TasksSyncOperationsProvider.getLocalTasksSync()
     private val getDirtyTasksSync: GetDirtyTasksSync = TasksSyncOperationsProvider.getDirtyTasksSync()
+    private val getCompleteTasksSync: GetCompleteTasksSync = TasksSyncOperationsProvider.getCompleteTasksSync()
     private val markTasksSynced: MarkTasksSynced = TasksSyncOperationsProvider.markTasksSynced()
+    private val deleteTaskSyncByTaskId: DeleteTaskSyncByTaskId = TasksSyncOperationsProvider.deleteTaskSyncByTaskId()
 
     private val createTasksOperation: CreateTasks = TasksOperationsProvider.createTasks()
     private val getTasksById: GetTasksById = TasksOperationsProvider.getTasksById()
@@ -79,6 +83,19 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                         }
 
                         // Step 3: Delete complete tasks remotely
+
+                        Log.d("SyncManager", "Remove local tasks remotely")
+
+                        val completedTaskIds: List<UUID> = getCompleteTasksSync.get().map { it.taskId }
+                        if (completedTaskIds.isNotEmpty()) {
+                            // FIXME: This should be a single call, and not a loop
+                            completedTaskIds.forEach {
+                                tasksClient?.run {
+                                    this.deleteTask(it.toString())
+                                    deleteTaskSyncByTaskId.execute(it)
+                                }
+                            }
+                        }
 
                         // Step 4: Get new remote tasks and create them locally
 

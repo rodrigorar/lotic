@@ -33,9 +33,6 @@ class AuthorizationInterceptor(private val authTokenProvider: CurrentActiveAuthS
                     updatedRequest = buildAuthorizedRequest(chain, authToken)
                     var response = chain.proceed(updatedRequest)
 
-                    Log.d("AuthorizationInterceptor", response.message())
-                    Log.d("AuthorizationInterceptor", response.code().toString())
-
                     if (response.code() == 401) {
                         val refreshOperation = AuthOperationsProvider.refresh()
                         runBlocking { refreshOperation.execute(authToken) }
