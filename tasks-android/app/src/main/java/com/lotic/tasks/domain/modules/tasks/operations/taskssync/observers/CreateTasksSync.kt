@@ -38,8 +38,6 @@ class CreateTasksSync(private val tasksSyncRepository: TasksSyncRepository) : Ev
             val eventInfo: TasksCreatedSyncedEventInfo = event.eventInfo as TasksCreatedSyncedEventInfo
 
             runBlocking {
-                Log.d("CreateTasksSync", "Create a task sync from the server")
-
                 eventInfo.taskIds.forEach {
                     tasksSyncRepository.insert(
                         TasksSync(

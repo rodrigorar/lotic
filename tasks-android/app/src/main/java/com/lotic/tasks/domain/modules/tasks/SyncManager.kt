@@ -16,8 +16,10 @@ import com.lotic.tasks.domain.modules.tasks.client.TasksClient
 import com.lotic.tasks.domain.modules.tasks.client.payloads.CreateTasksRequest
 import com.lotic.tasks.domain.modules.tasks.client.payloads.UpdateTasksRequest
 import com.lotic.tasks.domain.modules.tasks.dtos.Task
+import com.lotic.tasks.domain.modules.tasks.operations.tasks.CompleteTask
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.CreateTasksSynced
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.GetTasksById
+import com.lotic.tasks.domain.modules.tasks.operations.tasks.ListTasks
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.TasksOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.UpdateTask
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.UpdateTasksSynced
@@ -45,6 +47,8 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
 
     private val createTasksSynced: CreateTasksSynced = TasksOperationsProvider.createTasksSynced()
     private val updateTaskSynced: UpdateTasksSynced = TasksOperationsProvider.updateTaskSynced()
+    private val completeTask: CompleteTask = TasksOperationsProvider.completeTasks()
+    private val listTasks: ListTasks = TasksOperationsProvider.listTasks()
     private val getTasksById: GetTasksById = TasksOperationsProvider.getTasksById()
 
     override fun doWork(): Result {
@@ -55,8 +59,6 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                 currentSession?.let { authSession ->
                     try {
                         // Step 1: Persist local tasks remotely
-
-                        Log.d("SyncManager", "Creating local tasks remotely")
 
                         val localTaskIds: List<UUID> = getLocalTasksSync.get().map { it.taskId }
                         if (localTaskIds.isNotEmpty()) {
@@ -71,8 +73,6 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
 
                         // Step 2: Update local tasks remotely
 
-                        Log.d("SyncManager", "Update local tasks remotely")
-
                         val dirtyTaskIds: List<UUID> = getDirtyTasksSync.get().map { it.taskId }
                         if (dirtyTaskIds.isNotEmpty()) {
                             val tasksToUpdateRemotely: List<Task> =
@@ -86,8 +86,6 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                         }
 
                         // Step 3: Delete complete tasks remotely
-
-                        Log.d("SyncManager", "Remove local tasks remotely")
 
                         val completedTaskIds: List<UUID> = getCompleteTasksSync.get().map { it.taskId }
                         if (completedTaskIds.isNotEmpty()) {
@@ -105,8 +103,8 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                                 this.listTasksForAccount(authSession.accountId).tasks
                                     .map { it.toDTO() }
 
-                            val accountTaskIds: List<UUID> = getTasksById
-                                .execute(remoteTasks.map { it.id })
+                            val accountTaskIds: List<UUID> = listTasks
+                                .get()
                                 .map { it.id }
 
                             // Step 4: Get new remote tasks and create them locally
@@ -123,7 +121,13 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                             }
 
                             // Step 6: Delete tasks locally that do not exist remotely
-                            // TODO: Not implemented
+                            val remoteTaskIds: List<UUID>  = remoteTasks.map { it.id }
+                            val taskToDeleteLocally: List<UUID> = accountTaskIds
+                                .filter { ! remoteTaskIds.contains(it) }
+                            taskToDeleteLocally.forEach {
+                                completeTask.execute(it)
+                                deleteTaskSyncByTaskId.execute(it)
+                            }
                         }
 
                         EventBus.post(
@@ -145,7 +149,6 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
 
             return Result.retry()
         } catch (e: Exception) {
-            Log.d("SyncManager", "Retrying another time")
             Log.d("SyncManager", e.toString())
             return Result.retry()
         }
