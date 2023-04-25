@@ -16,7 +16,12 @@ class Principal:
 
 class AuthToken:
 
-    def __init__(self, token: str, refresh_token: str, account_id: uuid, expires_at: datetime):
+    def __init__(
+            self
+            , token: str
+            , refresh_token: str
+            , account_id: uuid
+            , expires_at: datetime):
         self.token = token
         self.refresh_token = refresh_token
         self.account_id = account_id
@@ -31,6 +36,7 @@ class AuthSession(db.Model):
     account_id = db.Column(db.String, db.ForeignKey(Account.id))
     created_at = db.Column(db.DateTime, nullable=False)
     expires_at = db.Column(db.DateTime, nullable=False)
+    refresh_expires_at = db.Column(db.DateTime, nullable=False)
 
     def __init__(
             self
@@ -38,13 +44,15 @@ class AuthSession(db.Model):
             , refresh_token: str
             , account_id: uuid
             , created_at: datetime
-            , expires_at: datetime):
+            , expires_at: datetime
+            , refresh_expires_at: datetime):
 
         self.id = str(session_id)
         self.refresh_token = refresh_token
         self.account_id = str(account_id)
         self.created_at = created_at
         self.expires_at = expires_at
+        self.refresh_expires_at = refresh_expires_at
 
     def get_id(self):
         return uuid.UUID(self.id)
@@ -54,3 +62,6 @@ class AuthSession(db.Model):
 
     def is_valid(self):
         return self.expires_at > datetime.now()
+
+    def is_refresh_expired(self):
+        return self.refresh_expires_at < datetime.now()

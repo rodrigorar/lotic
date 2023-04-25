@@ -33,6 +33,9 @@ class UnitOfWork:
     def commit(self):
         raise NotImplemented("UnitOfWork#commit is not implemented!")
 
+    def flush(self):
+        raise NotImplemented("UnitOfWork#flush is not implemented")
+
     def rollback(self):
         raise NotImplemented("UnitOfWork#rollback is not implemented!")
 
@@ -52,6 +55,7 @@ class UnitOfWork:
                 self.__is_closed = True
             elif exc_type is not None:
                 self.logger.error("Unit of work failed, rolling back")
+                self.logger.error(exc_type)
                 self.rollback()
         except IntegrityError:
             raise ConflictError("Database integrity compromised")

@@ -50,6 +50,9 @@ class UnitOfWorkImpl(UnitOfWork):
     def commit(self):
         self._db_session.commit()
 
+    def flush(self):
+        self._db_session.flush()
+
     def rollback(self):
         self._db_session.rollback()
 

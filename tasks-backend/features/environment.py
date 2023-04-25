@@ -79,7 +79,8 @@ def before_scenario(context, scenario):
                 , str(JOHN_DOE_REFRESH_TOKEN)
                 , JOHN_DOE_ID
                 , datetime.now()
-                , datetime.now() + timedelta(hours=1)))
+                , datetime.now() + timedelta(hours=1)
+                , datetime.now() + timedelta(days=5)))
 
         context.db.session.add(
             Task(
@@ -126,7 +127,8 @@ def before_scenario(context, scenario):
                 , str(JANE_DOE_REFRESH_TOKEN)
                 , JANE_DOE_ID
                 , datetime.now()
-                , datetime.now() + timedelta(hours=1)))
+                , datetime.now() + timedelta(hours=1)
+                , datetime.now() + timedelta(days=5)))
 
         context.db.session.add(
             Task(

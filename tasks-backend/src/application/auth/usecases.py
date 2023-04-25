@@ -8,7 +8,7 @@ from src.application.auth.providers import AuthTokenStorage
 from src.application.auth.shared import AuthorizationContext, EncryptionEngine
 from src.domain import NotFoundError
 from src.domain.accounts import AccountBusinessRulesProvider
-from src.application.errors import AuthorizationError, LoginFailedError
+from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
 
 
 class UseCaseLogin(UseCase):
@@ -41,15 +41,14 @@ class UseCaseLogin(UseCase):
 
             auth_session = self.auth_token_storage.find_by_account_id(unit_of_work, account.get_id())
             if auth_session is None:
-                self.auth_token_storage.remove_all_for_account_id(unit_of_work, account.get_id())
-
                 current_time = datetime.now()
                 auth_session = AuthSession(
                     uuid4()
                     , str(uuid4())
                     , account.get_id()
                     , current_time
-                    , current_time + timedelta(hours=1))
+                    , current_time + timedelta(hours=1)
+                    , current_time + timedelta(days=5))
                 self.auth_token_storage.store(unit_of_work, auth_session)
 
             return AuthToken(
@@ -72,29 +71,39 @@ class UseCaseRefresh(UseCase):
     def execute(self, refresh_token: uuid) -> AuthToken:
         assert refresh_token is not None, "No refresh token provided"
 
-        with self.unit_of_work_provider.get() as unit_of_work:
-            current_auth_session = self.auth_token_storage.find_by_refresh_token(unit_of_work, str(refresh_token))
-            if current_auth_session is None:
-                raise NotFoundError("No auth session found for refresh token: " + str(refresh_token))
+        try:
+            with self.unit_of_work_provider.get() as unit_of_work:
+                current_auth_session = self.auth_token_storage.find_by_refresh_token(unit_of_work, str(refresh_token))
+                if current_auth_session is None:
+                    raise InvalidAuthorizationError("No auth session found for refresh token: " + str(refresh_token))
+                elif current_auth_session.is_refresh_expired():
+                    raise InvalidAuthorizationError()
 
-            #self.auth_token_storage.remove_all_for_account_id(
-            #    unit_of_work
-            #    , current_auth_session.get_account_id())
+                current_time = datetime.now()
+                new_auth_session = AuthSession(
+                    uuid4()
+                    , str(uuid4())
+                    , current_auth_session.get_account_id()
+                    , current_time
+                    , current_time + timedelta(hours=1)
+                    , current_time + timedelta(days=5))
+                self.auth_token_storage.store(unit_of_work, new_auth_session)
+                self.auth_token_storage.remove(unit_of_work, current_auth_session.get_account_id())
+        except InvalidAuthorizationError:
+            with self.unit_of_work_provider.get() as unit_of_work:
+                # FIXME: We need to migrate the error handling to return types to deal with this issue properly
+                #   or we might have to use multiple unit of work instead of just one, might be the better option
+                # FIXME: We need this here because raising an exception rollsback the entire operation
+                current_auth_session = self.auth_token_storage.find_by_refresh_token(unit_of_work, str(refresh_token))
+                if current_auth_session is not None:
+                    self.auth_token_storage.remove(unit_of_work, current_auth_session.get_id())
+            raise InvalidAuthorizationError("Refresh token is expired, full login required")
 
-            current_time = datetime.now()
-            new_auth_session = AuthSession(
-                uuid4()
-                , str(uuid4())
-                , current_auth_session.get_account_id()
-                , current_time
-                , current_time + timedelta(hours=1))
-            self.auth_token_storage.store(unit_of_work, new_auth_session)
-
-            return AuthToken(
-                new_auth_session.id
-                , new_auth_session.refresh_token
-                , new_auth_session.get_account_id()
-                , new_auth_session.expires_at)
+        return AuthToken(
+            new_auth_session.id
+            , new_auth_session.refresh_token
+            , new_auth_session.get_account_id()
+            , new_auth_session.expires_at)
 
 
 class UseCaseLogout(UseCase):

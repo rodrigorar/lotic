@@ -6,7 +6,7 @@ import bcrypt
 from sqlalchemy import and_
 
 from src.application import UnitOfWork
-from src.domain import NotFoundError
+from src.domain import LogProvider, NotFoundError
 from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseLogin, UseCaseLogout, \
     UseCaseRefresh, AuthSession
 from src.infrastructure import UnitOfWorkProviderImpl
@@ -44,7 +44,8 @@ class AuthTokenStorageImpl(AuthTokenStorage):
             , result.refresh_token
             , result.account_id
             , result.created_at
-            , result.expires_at) if result is not None else None
+            , result.expires_at
+            , result.refresh_expires_at) if result is not None else None
 
     def find_by_id(self, unit_of_work: UnitOfWork, auth_session_id: uuid) -> Optional[AuthSession]:
         assert unit_of_work is not None, "Unit of Work cannot be null"
@@ -52,29 +53,32 @@ class AuthTokenStorageImpl(AuthTokenStorage):
 
         query_manager = unit_of_work.query()
         result = query_manager.query(AuthSession) \
-            .filter(and_(
-                AuthSession.id == str(auth_session_id)
-                , AuthSession.expires_at > datetime.now())) \
+            .filter_by(id=str(auth_session_id)) \
             .first()
         return AuthSession(
             result.id
             , result.refresh_token
             , result.account_id
             , result.created_at
-            , result.expires_at) if result is not None else None
+            , result.expires_at
+            , result.refresh_expires_at) if result is not None else None
 
     def find_by_refresh_token(self, unit_of_work: UnitOfWork, refresh_token: str) -> Optional[AuthSession]:
         assert unit_of_work is not None, "Unit of Work cannot be null"
         assert refresh_token is not None, "Refresh token cannot be null"
 
         query_manager = unit_of_work.query()
-        result = query_manager.query(AuthSession).filter_by(refresh_token=refresh_token).first()
+        refresh_token = refresh_token
+        result = query_manager.query(AuthSession) \
+            .filter_by(refresh_token=refresh_token) \
+            .first()
         return AuthSession(
             result.id
             , result.refresh_token
             , result.account_id
             , result.created_at
-            , result.expires_at) if result is not None else None
+            , result.expires_at
+            , result.refresh_expires_at) if result is not None else None
 
     def store(self, unit_of_work: UnitOfWork, auth_session: AuthSession) -> uuid:
         assert unit_of_work is not None, "Unit of Work cannot be null"
@@ -89,17 +93,18 @@ class AuthTokenStorageImpl(AuthTokenStorage):
         assert auth_session_id is not None, "Auth Session id cannot be null"
 
         query_manager = unit_of_work.query()
-        auth_session = query_manager.query(AuthSession).filter_by(id=str(auth_session_id)).first()
-        if auth_session is None:
-            raise NotFoundError("No Auth Session found for id " + str(auth_session_id))
-        query_manager.remove(auth_session)
+        query_manager.query(AuthSession) \
+            .filter_by(id=str(auth_session_id)) \
+            .delete()
 
     def remove_all_for_account_id(self, unit_of_work: UnitOfWork, account_id: uuid) -> None:
         assert unit_of_work is not None, "Unit of Work cannot be null"
         assert account_id is not None, "Account id cannot be null"
 
         query_manager = unit_of_work.query()
-        query_manager.query(AuthSession).filter_by(account_id=str(account_id)).delete()
+        query_manager.query(AuthSession) \
+            .filter_by(account_id=str(account_id)) \
+            .delete()
 
 
 unit_of_work_provider = UnitOfWorkProviderImpl()

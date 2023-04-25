@@ -1,3 +1,6 @@
+from datetime import datetime
+import uuid
+
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, g, request
 from werkzeug.exceptions import HTTPException
@@ -64,13 +67,17 @@ def authorization_constructor():
     if authorization_token is not None:
         unit_of_work_provider = UnitOfWorkProviderImpl()
         with unit_of_work_provider.get() as unit_of_work:
-            auth_session = AuthTokenStorageImpl().find_by_id(unit_of_work, authorization_token)
+            auth_session = AuthTokenStorageImpl().find_by_id(unit_of_work, uuid.UUID(authorization_token))
+
             if auth_session is None:
-                raise InvalidAuthorizationError("Unknown authorization")
-            AuthorizationContext.create_context(
-                authorization_token
-                , auth_session.refresh_token
-                , auth_session.get_account_id())
+                raise InvalidAuthorizationError("Unknown session token")
+            elif auth_session.expires_at < datetime.now() and 'auth' not in request.path:
+                raise AuthorizationError("Session token is expired")
+            else:
+                AuthorizationContext.create_context(
+                    authorization_token
+                    , auth_session.refresh_token
+                    , auth_session.get_account_id())
 
 # Healthcheck
 

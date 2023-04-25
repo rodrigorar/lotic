@@ -6,7 +6,7 @@ from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
 from src.domain import DatabaseProvider, NotFoundError
-from src.application.errors import AuthorizationError, LoginFailedError
+from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
 from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider
 from tests.shared import MockDatabase
 
@@ -48,8 +48,6 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
             .find_by_account_id(...) \
             .thenReturn(None)
         when(mocked_auth_token_storage) \
-            .remove_all_for_account_id(...)
-        when(mocked_auth_token_storage) \
             .store(...)
 
         mocked_encryption_engine = mock(EncryptionEngine)
@@ -72,7 +70,6 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
         verify(mocked_get_account_by_email).execute(ACCOUNT_EMAIL)
         verify(mocked_account_br_provider).get_account_by_email(...)
         verify(mocked_auth_token_storage).find_by_account_id(...)
-        verify(mocked_auth_token_storage).remove_all_for_account_id(...)
         verify(mocked_auth_token_storage).store(...)
         verify(mocked_encryption_engine).check(...)
 
@@ -97,7 +94,8 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
             , str(uuid4())
             , ACCOUNT_ID
             , datetime.now()
-            , datetime.now() + timedelta(hours=1))
+            , datetime.now() + timedelta(hours=1)
+            , datetime.now() + timedelta(days=5))
 
         mocked_get_account_by_email = mock(GetAccountByEmail)
         when(mocked_get_account_by_email) \
@@ -247,15 +245,16 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
             , str(VALID_REFRESH_TOKEN)
             , ACCOUNT_ID
             , datetime.now() - timedelta(hours=5)
-            , datetime.now() - timedelta(hours=4))
+            , datetime.now() - timedelta(hours=4)
+            , datetime.now() + timedelta(days=4))
         mocked_auth_storage = mock(AuthTokenStorage)
         when(mocked_auth_storage) \
             .find_by_refresh_token(...) \
             .thenReturn(current_auth_session)
-        #when(mocked_auth_storage) \
-        #    .remove_all_for_account_id(...)
         when(mocked_auth_storage) \
             .store(...)
+        when(mocked_auth_storage) \
+            .remove(...)
 
         under_test = UseCaseRefresh(MockedUnitOfWorkProvider(), mocked_auth_storage)
         result = under_test.execute(VALID_REFRESH_TOKEN)
@@ -267,41 +266,24 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         assert result.expires_at > datetime.now()
 
         verify(mocked_auth_storage).find_by_refresh_token(...)
-        #verify(mocked_auth_storage).remove_all_for_account_id(...)
         verify(mocked_auth_storage).store(...)
+        verify(mocked_auth_storage).remove(...)
 
         verifyNoMoreInteractions(mocked_auth_storage)
 
     def test_should_fail_no_auth_session_found(self):
         from src.application.auth import AuthTokenStorage, AuthSession, UseCaseRefresh
 
-        current_auth_session = AuthSession(
-            uuid4()
-            , str(VALID_REFRESH_TOKEN)
-            , ACCOUNT_ID
-            , datetime.now() - timedelta(hours=5)
-            , datetime.now() - timedelta(hours=4))
         mocked_auth_storage = mock(AuthTokenStorage)
         when(mocked_auth_storage) \
             .find_by_refresh_token(...) \
-            .thenReturn(current_auth_session)
-        #when(mocked_auth_storage) \
-        #    .remove_all_for_account_id(...)
-        when(mocked_auth_storage) \
-            .store(...)
+            .thenReturn(None)
 
         under_test = UseCaseRefresh(MockedUnitOfWorkProvider(), mocked_auth_storage)
-        result = under_test.execute(VALID_REFRESH_TOKEN)
+        with pytest.raises(InvalidAuthorizationError):
+            under_test.execute(VALID_REFRESH_TOKEN)
 
-        assert result is not None
-        assert result.token is not None
-        assert result.refresh_token is not None
-        assert result.account_id == ACCOUNT_ID
-        assert result.expires_at > datetime.now()
-
-        verify(mocked_auth_storage).find_by_refresh_token(...)
-        #verify(mocked_auth_storage).remove_all_for_account_id(...)
-        verify(mocked_auth_storage).store(...)
+        verify(mocked_auth_storage, times=2).find_by_refresh_token(...)
 
         verifyNoMoreInteractions(mocked_auth_storage)
 
@@ -313,22 +295,6 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         under_test = UseCaseRefresh(MockedUnitOfWorkProvider(), mocked_auth_storage)
         with pytest.raises(AssertionError):
             under_test.execute(None)
-
-        verifyNoMoreInteractions(mocked_auth_storage)
-
-    def test_should_fail_no_auth_session(self):
-        from src.application.auth import AuthTokenStorage, UseCaseRefresh
-
-        mocked_auth_storage = mock(AuthTokenStorage)
-        when(mocked_auth_storage) \
-            .find_by_refresh_token(...) \
-            .thenReturn(None)
-
-        under_test = UseCaseRefresh(MockedUnitOfWorkProvider(), mocked_auth_storage)
-        with pytest.raises(NotFoundError):
-            under_test.execute(VALID_REFRESH_TOKEN)
-
-        verify(mocked_auth_storage).find_by_refresh_token(...)
 
         verifyNoMoreInteractions(mocked_auth_storage)
 
