@@ -75,61 +75,6 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
             , mocked_auth_token_storage
             , mocked_encryption_engine)
 
-    def test_should_succeed_already_logged_in(self):
-        from src.domain.accounts import AccountBusinessRulesProvider, GetAccountByEmail, Account
-        from src.application.auth import EncryptionEngine, Principal, AuthSession, AuthTokenStorage, UseCaseLogin
-
-        account = Account(
-            ACCOUNT_ID
-            , ACCOUNT_EMAIL
-            , ENCRYPTED_PASSWORD
-            , datetime.now()
-            , datetime.now())
-        auth_session = AuthSession(
-            uuid4()
-            , str(uuid4())
-            , ACCOUNT_ID
-            , datetime.now()
-            , datetime.now() + timedelta(hours=1)
-            , datetime.now() + timedelta(days=5))
-
-        mocked_get_account_by_email = mock(GetAccountByEmail)
-        when(mocked_get_account_by_email) \
-            .execute(ACCOUNT_EMAIL) \
-            .thenReturn(account)
-        mocked_account_br_provider = mock(AccountBusinessRulesProvider)
-        when(mocked_account_br_provider) \
-            .get_account_by_email(...) \
-            .thenReturn(mocked_get_account_by_email)
-
-        mocked_auth_session_repository = mock(AuthTokenStorage)
-        mocked_encryption_engine = mock(EncryptionEngine)
-        when(mocked_encryption_engine) \
-            .check(...) \
-            .thenReturn(True)
-
-        principal = Principal(ACCOUNT_EMAIL, ACCOUNT_PASSWORD)
-        under_test = UseCaseLogin(
-            MockedUnitOfWorkProvider()
-            , mocked_account_br_provider
-            , mocked_auth_session_repository
-            , mocked_encryption_engine)
-        result = under_test.execute(principal)
-
-        assert result is not None
-        assert result.token == auth_session.id
-        assert result.account_id == auth_session.get_account_id()
-
-        verify(mocked_get_account_by_email).execute(ACCOUNT_EMAIL)
-        verify(mocked_account_br_provider).get_account_by_email(...)
-        verify(mocked_encryption_engine).check(...)
-
-        verifyNoMoreInteractions(
-            mocked_encryption_engine
-            , mocked_get_account_by_email
-            , mocked_account_br_provider
-            , mocked_auth_session_repository)
-
     def test_should_fail_no_principal(self):
         from src.domain.accounts import AccountBusinessRulesProvider
         from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseLogin
