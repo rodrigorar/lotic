@@ -6,7 +6,7 @@ from src.application import UnitOfWorkProvider, UseCase
 from src.application.auth.models import AuthSession, AuthToken, Principal
 from src.application.auth.providers import AuthTokenStorage
 from src.application.auth.shared import AuthorizationContext, EncryptionEngine
-from src.domain import NotFoundError
+from src.domain import LogProvider, NotFoundError
 from src.domain.accounts import AccountBusinessRulesProvider
 from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
 
@@ -39,17 +39,15 @@ class UseCaseLogin(UseCase):
             if not self.encryption_engine.check(account.password, principal.secret):
                 raise LoginFailedError("Wrong secret")
 
-            auth_session = self.auth_token_storage.find_by_account_id(unit_of_work, account.get_id())
-            if auth_session is None:
-                current_time = datetime.now()
-                auth_session = AuthSession(
-                    uuid4()
-                    , str(uuid4())
-                    , account.get_id()
-                    , current_time
-                    , current_time + timedelta(hours=1)
-                    , current_time + timedelta(days=5))
-                self.auth_token_storage.store(unit_of_work, auth_session)
+            current_time = datetime.now()
+            auth_session = AuthSession(
+                uuid4()
+                , str(uuid4())
+                , account.get_id()
+                , current_time
+                , current_time + timedelta(hours=1)
+                , current_time + timedelta(days=5))
+            self.auth_token_storage.store(unit_of_work, auth_session)
 
             return AuthToken(
                 auth_session.id
@@ -88,7 +86,7 @@ class UseCaseRefresh(UseCase):
                     , current_time + timedelta(hours=1)
                     , current_time + timedelta(days=5))
                 self.auth_token_storage.store(unit_of_work, new_auth_session)
-                self.auth_token_storage.remove(unit_of_work, current_auth_session.get_account_id())
+                self.auth_token_storage.remove(unit_of_work, current_auth_session.get_id())
         except InvalidAuthorizationError:
             with self.unit_of_work_provider.get() as unit_of_work:
                 # FIXME: We need to migrate the error handling to return types to deal with this issue properly
@@ -96,6 +94,7 @@ class UseCaseRefresh(UseCase):
                 # FIXME: We need this here because raising an exception rollsback the entire operation
                 current_auth_session = self.auth_token_storage.find_by_refresh_token(unit_of_work, str(refresh_token))
                 if current_auth_session is not None:
+                    LogProvider().get().info("Erasing existing token")
                     self.auth_token_storage.remove(unit_of_work, current_auth_session.get_id())
             raise InvalidAuthorizationError("Refresh token is expired, full login required")
 

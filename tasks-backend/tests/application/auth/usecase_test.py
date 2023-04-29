@@ -45,9 +45,6 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
             .thenReturn(mocked_get_account_by_email)
         mocked_auth_token_storage = mock(AuthTokenStorage)
         when(mocked_auth_token_storage) \
-            .find_by_account_id(...) \
-            .thenReturn(None)
-        when(mocked_auth_token_storage) \
             .store(...)
 
         mocked_encryption_engine = mock(EncryptionEngine)
@@ -69,7 +66,6 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
 
         verify(mocked_get_account_by_email).execute(ACCOUNT_EMAIL)
         verify(mocked_account_br_provider).get_account_by_email(...)
-        verify(mocked_auth_token_storage).find_by_account_id(...)
         verify(mocked_auth_token_storage).store(...)
         verify(mocked_encryption_engine).check(...)
 
@@ -107,9 +103,6 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
             .thenReturn(mocked_get_account_by_email)
 
         mocked_auth_session_repository = mock(AuthTokenStorage)
-        when(mocked_auth_session_repository) \
-            .find_by_account_id(...) \
-            .thenReturn(auth_session)
         mocked_encryption_engine = mock(EncryptionEngine)
         when(mocked_encryption_engine) \
             .check(...) \
@@ -128,7 +121,6 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
         assert result.account_id == auth_session.get_account_id()
 
         verify(mocked_get_account_by_email).execute(ACCOUNT_EMAIL)
-        verify(mocked_auth_session_repository).find_by_account_id(...)
         verify(mocked_account_br_provider).get_account_by_email(...)
         verify(mocked_encryption_engine).check(...)
 

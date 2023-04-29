@@ -29,23 +29,23 @@ class EncryptionEngineBCrypt(EncryptionEngine):
 
 class AuthTokenStorageImpl(AuthTokenStorage):
 
-    def find_by_account_id(self, unit_of_work: UnitOfWork, account_id: uuid) -> Optional[AuthSession]:
+    # FIXME: Paginate or add offset / limit to this code to avoid loading to many sessions to memory
+    def find_by_account_id(self, unit_of_work: UnitOfWork, account_id: uuid) -> list[AuthSession]:
         assert unit_of_work is not None, "Unit of Work cannot be null"
         assert account_id is not None, "Account id cannot be null"
 
         query_manager = unit_of_work.query()
         result = query_manager.query(AuthSession) \
-            .filter(and_(
-                AuthSession.account_id == str(account_id)
-                , AuthSession.expires_at > datetime.now())) \
-            .first()
-        return AuthSession(
-            result.id
-            , result.refresh_token
-            , result.account_id
-            , result.created_at
-            , result.expires_at
-            , result.refresh_expires_at) if result is not None else None
+            .filter_by(account_id=str(account_id)) \
+            .fetchall()
+
+        return [AuthSession(
+            session.id
+            , session.refresh_token
+            , session.account_id
+            , session.created_at
+            , session.expires_at
+            , session.refresh_expires_at) for session in result]
 
     def find_by_id(self, unit_of_work: UnitOfWork, auth_session_id: uuid) -> Optional[AuthSession]:
         assert unit_of_work is not None, "Unit of Work cannot be null"
