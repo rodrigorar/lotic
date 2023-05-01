@@ -27,6 +27,10 @@ class UseCaseCreateTasks(UseCase):
 
     def execute(self, tasks: list[TaskDTO]) -> list[uuid]:
         assert tasks is not None, "No tasks were provided"
+        # FIXME: This should be converted into the normal functioning of the use case and not
+        #   be implemented as a safeguard
+        if len(tasks) == 0:
+            return list()
 
         owner_ids = [task.get_owner_id() for task in tasks] \
             if len(tasks) == 1 \
