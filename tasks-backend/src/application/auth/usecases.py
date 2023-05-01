@@ -114,6 +114,7 @@ class UseCaseLogout(UseCase):
         self.unit_of_work_provider = unit_of_work_provider
         self.auth_token_storage = auth_token_storage
 
+    # FIXME: Logout should be based on the token instead of the account
     def execute(self, account_id: uuid) -> None:
         assert account_id is not None, "Account id cannot be null"
 

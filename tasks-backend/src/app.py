@@ -132,6 +132,8 @@ def handle_login_failed_error(e: LoginFailedError):
     }), 401, {'Content-Type': 'application/problem+json'}
 
 
+# FIXME: We should add a WWW-Authenticate header with the endpoint
+#   where the app should authenticate.
 @app.errorhandler(InvalidAuthorizationError)
 def handle_login_failed_error(e: InvalidAuthorizationError):
     return to_json({
@@ -142,14 +144,16 @@ def handle_login_failed_error(e: InvalidAuthorizationError):
     }), 401, {'Content-Type': 'application/problem+json'}
 
 
+# FIXME: We should add a WWW-Authenticate header with the endpoint
+#   where the app should authenticate.
 @app.errorhandler(AuthorizationError)
 def handle_authorization_error(e: AuthorizationError):
     return to_json({
         "type": "http://localhost:5000/authorization_error"
         , "title": e.title
-        , "status": "403"
+        , "status": "401"
         , "details": e.details
-    }), 403, {'Content-Type': 'application/problem+json'}
+    }), 401, {'Content-Type': 'application/problem+json'}
 
 
 @app.errorhandler(InvalidArgumentError)
