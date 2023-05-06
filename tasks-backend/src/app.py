@@ -37,7 +37,7 @@ def setup_blueprints(app_context: OpenAPI):
     from src.infrastructure.tasks import tasks_bp
     from src.infrastructure.auth import auth_bp
 
-    app_context.register_blueprint(accounts_bp)
+    app_context.register_api(accounts_bp)
     app_context.register_blueprint(tasks_bp)
     app_context.register_api(auth_bp)
 

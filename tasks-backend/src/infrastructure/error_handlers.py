@@ -1,7 +1,7 @@
 from http.client import HTTPException
 
 from flask_openapi3 import OpenAPI, Info
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
 from src.domain import ConflictError, InvalidArgumentError, NotFoundError
@@ -30,47 +30,47 @@ class GenericErrorResponse(ErrorResponse):
             "http://localhost:5000/generic_error"
             , "Internal Service Error"
             , "500"
-            , detail.__str__)
+            , detail.__str__())
 
 
 class ConflictResponse(ErrorResponse):
 
-    def __init__(self, detail: ConflictError):
+    def __init__(self, detail: str):
         super().__init__(
             "http://localhost:5000/conflict_error"
             , "Conflict"
             , "409"
-            , detail.details)
+            , detail)
 
 
 class NotFoundResponse(ErrorResponse):
 
-    def __init__(self, detail: NotFoundError):
+    def __init__(self, detail: str):
         super().__init__(
             "http://localhost:5000/not_found_error"
             , "Not Found"
             , "404"
-            , detail.details)
+            , detail)
 
 
 class BadRequestResponse(ErrorResponse):
 
-    def __init__(self, detail: InvalidArgumentError):
+    def __init__(self, detail: str):
         super().__init__(
             "http://localhost:5000/bad_request"
             , "Bad Request"
             , "400"
-            , detail.details)
+            , detail)
 
 
 class UnauthorizedResponse(ErrorResponse):
 
-    def __init__(self, detail: LoginFailedError):
+    def __init__(self, detail: str):
         super().__init__(
             "http://localhost:5000/authorization_error"
             , "Unauthorized"
             , "401"
-            , detail.details)
+            , detail)
 
 
 def configure_error_handlers(app: OpenAPI):
@@ -83,19 +83,19 @@ def configure_error_handlers(app: OpenAPI):
 
     @app.errorhandler(ConflictError)
     def handle_not_found_error(e: ConflictError):
-        return to_json(ConflictResponse(e)) \
+        return to_json(ConflictResponse(e.details)) \
             , 409 \
             , {'Content-Type': 'application/problem+json'}
 
     @app.errorhandler(NotFoundError)
     def handle_not_found_error(e: NotFoundError):
-        return to_json(NotFoundResponse(e)) \
+        return to_json(NotFoundResponse(e.details)) \
             , 404 \
             , {'Content-Type': 'application/problem+json'}
 
     @app.errorhandler(LoginFailedError)
     def handle_login_failed_error(e: LoginFailedError):
-        return to_json(UnauthorizedResponse(e)) \
+        return to_json(UnauthorizedResponse(e.details)) \
             , 401 \
             , {'Content-Type': 'application/problem+json'}
 
@@ -103,7 +103,7 @@ def configure_error_handlers(app: OpenAPI):
     #   where the app should authenticate.
     @app.errorhandler(InvalidAuthorizationError)
     def handle_login_failed_error(e: InvalidAuthorizationError):
-        return to_json(UnauthorizedResponse(e)) \
+        return to_json(UnauthorizedResponse(e.details)) \
             , 401 \
             , {'Content-Type': 'application/problem+json'}
 
@@ -111,13 +111,19 @@ def configure_error_handlers(app: OpenAPI):
     #   where the app should authenticate.
     @app.errorhandler(AuthorizationError)
     def handle_authorization_error(e: AuthorizationError):
-        return to_json(UnauthorizedResponse(e)) \
+        return to_json(UnauthorizedResponse(e.details)) \
             , 401 \
             , {'Content-Type': 'application/problem+json'}
 
     @app.errorhandler(InvalidArgumentError)
     def handle_invalid_argument_error(e: InvalidArgumentError):
-        return to_json(BadRequestResponse(e)) \
+        return to_json(BadRequestResponse(e.details)) \
+            , 400 \
+            , {'Content-Type': 'application/problem+json'}
+
+    @app.errorhandler(ValidationError)
+    def handle_validation_error(e: ValidationError):
+        return to_json(BadRequestResponse(e.__str__())) \
             , 400 \
             , {'Content-Type': 'application/problem+json'}
 
