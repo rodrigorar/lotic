@@ -3,13 +3,16 @@ import uuid
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask import Flask, g, request
+from flask_openapi3 import OpenAPI, Info
+from flask import __version__, Flask, g, request
 from werkzeug.exceptions import HTTPException
 
 from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
 from src.domain import ConflictError, InvalidArgumentError, LogProvider, NotFoundError
 from src.infrastructure import AppProvider, DatabaseSessionProvider, AppConfigurations, to_json
 from logging.config import fileConfig
+
+from src.infrastructure.error_handlers import configure_error_handlers
 
 
 def config_app(flask):
@@ -29,14 +32,14 @@ def setup_providers(flask, db):
     DatabaseSessionProvider().set_session_provider(db)
 
 
-def setup_blueprints(app_context: Flask):
+def setup_blueprints(app_context: OpenAPI):
     from src.infrastructure.accounts import accounts_bp
     from src.infrastructure.tasks import tasks_bp
     from src.infrastructure.auth import auth_bp
 
     app_context.register_blueprint(accounts_bp)
     app_context.register_blueprint(tasks_bp)
-    app_context.register_blueprint(auth_bp)
+    app_context.register_api(auth_bp)
 
 
 def start(flask: Flask):
@@ -49,13 +52,18 @@ def start(flask: Flask):
         db.create_all()
 
 
-app = Flask(__name__, instance_relative_config=True)
+app = OpenAPI(
+    __name__
+    , info=Info(title="Tasks Backend", version=__version__)
+    , instance_relative_config=True)
+
 app.config.from_envvar('APP_CONFIG_FILE')
 AppProvider().set_app(app)
 
 config_app(app)
 setup_providers(app, SQLAlchemy(app))
 setup_blueprints(app)
+configure_error_handlers(app)
 start(app)
 
 
@@ -89,95 +97,3 @@ def authorization_constructor():
 @app.get("/health")
 def health():
     return {"status": "alive"}, 200, {"Content-Type": "application/json"}
-
-
-# Generic Error Handlers
-
-# TODO: Refactor these error handler to be easier to implement
-# and less prone to errors
-
-@app.errorhandler(Exception)
-def handle_generic_error(e):
-    return to_json({
-        "type": "http://localhost:5000/generic_error"
-        , "title": "Internal Service Error"
-        , "status": "500"
-        , "detail": e.__str__
-    }), 500, {'Content-Type': 'application/problem+json'}
-
-
-@app.errorhandler(ConflictError)
-def handle_not_found_error(e: ConflictError):
-    return to_json({
-        "type": "http://localhost:5000/conflict_error"
-        , "title": e.title
-        , "status": "409"
-        , "details": e.details
-    }), 409, {'Content-Type': 'application/problem+json'}
-
-
-@app.errorhandler(NotFoundError)
-def handle_not_found_error(e: NotFoundError):
-    return to_json({
-        "type": "http://localhost:5000/not_found_error"
-        , "title": e.title
-        , "status": "404"
-        , "details": e.details
-    }), 404, {'Content-Type': 'application/problem+json'}
-
-
-@app.errorhandler(LoginFailedError)
-def handle_login_failed_error(e: LoginFailedError):
-    return to_json({
-        "type": "http://localhost:5000/login_failed_error"
-        , "title": e.title
-        , "status": "401"
-        , "details": e.details
-    }), 401, {'Content-Type': 'application/problem+json'}
-
-
-# FIXME: We should add a WWW-Authenticate header with the endpoint
-#   where the app should authenticate.
-@app.errorhandler(InvalidAuthorizationError)
-def handle_login_failed_error(e: InvalidAuthorizationError):
-    return to_json({
-        "type": "http://localhost:5000/invalid_authorization_error"
-        , "title": e.title
-        , "status": "401"
-        , "details": e.details
-    }), 401, {'Content-Type': 'application/problem+json'}
-
-
-# FIXME: We should add a WWW-Authenticate header with the endpoint
-#   where the app should authenticate.
-@app.errorhandler(AuthorizationError)
-def handle_authorization_error(e: AuthorizationError):
-    return to_json({
-        "type": "http://localhost:5000/authorization_error"
-        , "title": e.title
-        , "status": "401"
-        , "details": e.details
-    }), 401, {'Content-Type': 'application/problem+json'}
-
-
-@app.errorhandler(InvalidArgumentError)
-def handle_invalid_argument_error(e: InvalidArgumentError):
-    return to_json({
-        "type": "http://localhost:5000/" + e.title
-        , "title": e.title
-        , "status": 400
-        , "details": e.details
-    }), 400, {'Content-Type': 'application/problem+json'}
-
-
-@app.errorhandler(HTTPException)
-def handle_http_error(e):
-    response = e.get_response()
-    response.data = to_json({
-        "type": "http://localhost:5000/http_error"
-        , "title": e.name
-        , "status": e.code
-        , "details": e.description
-    })
-    response.content_type = "application/json"
-    return response
