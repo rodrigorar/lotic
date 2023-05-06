@@ -1,5 +1,8 @@
 import uuid
 from datetime import datetime
+
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+
 from src.domain import DatabaseProvider
 from src.domain.accounts import Account
 
@@ -9,12 +12,12 @@ db = DatabaseProvider().get()
 class Task(db.Model):
     __tablename__ = "tasks"
 
-    id = db.Column(db.String, primary_key=True)
-    title = db.Column(db.String)
-    description = db.Column(db.String)
-    created_at = db.Column(db.String, nullable=False)
-    updated_at = db.Column(db.String, nullable=False)
-    owner_id = db.Column(db.String, nullable=False)
+    id = Column(String, primary_key=True)
+    title = Column(String)
+    description = Column(String)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
+    owner_id = Column(String, nullable=False)
 
     def __init__(
             self,
@@ -56,9 +59,9 @@ class Task(db.Model):
 class AccountTasks(db.Model):
     __tablename__ = "account_tasks"
 
-    id = db.Column(db.Integer, primary_key=True)
-    account_id = db.Column(db.String, db.ForeignKey(Account.id))
-    task_id = db.Column(db.String, db.ForeignKey(Task.id))
+    id = Column(Integer, primary_key=True)
+    account_id = Column(String, ForeignKey(Account.id))
+    task_id = Column(String, ForeignKey(Task.id))
 
     def __init__(self, account_id: uuid, task_id: uuid):
         self.account_id = str(account_id)

@@ -1,8 +1,10 @@
 from datetime import datetime
 import uuid
 
-from src.domain import DatabaseProvider
+from sqlalchemy import Column, DateTime, ForeignKey, String
+
 from src.domain.accounts import Account
+from src.domain.shared import DatabaseProvider
 
 db = DatabaseProvider().get()
 
@@ -31,12 +33,12 @@ class AuthToken:
 class AuthSession(db.Model):
     __tablename__ = "auth_sessions"
 
-    id = db.Column(db.String, primary_key=True)
-    refresh_token = db.Column(db.String, nullable=False)
-    account_id = db.Column(db.String, db.ForeignKey(Account.id))
-    created_at = db.Column(db.DateTime, nullable=False)
-    expires_at = db.Column(db.DateTime, nullable=False)
-    refresh_expires_at = db.Column(db.DateTime, nullable=False)
+    id = Column(String, primary_key=True)
+    refresh_token = Column(String, nullable=False)
+    account_id = Column(String, ForeignKey(Account.id))
+    created_at = Column(DateTime, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    refresh_expires_at = Column(DateTime, nullable=False)
 
     def __init__(
             self

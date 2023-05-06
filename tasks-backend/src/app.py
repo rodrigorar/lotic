@@ -2,6 +2,7 @@ from datetime import datetime
 import uuid
 
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from flask import Flask, g, request
 from werkzeug.exceptions import HTTPException
 
@@ -41,6 +42,9 @@ def setup_blueprints(app_context: Flask):
 def start(flask: Flask):
     from src.domain import DatabaseProvider
     db = DatabaseProvider().get()
+
+    Migrate(app, db)
+
     with flask.app_context():
         db.create_all()
 

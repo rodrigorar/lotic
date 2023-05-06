@@ -1,6 +1,8 @@
 import uuid
 from datetime import datetime
 
+from sqlalchemy import Column, String
+
 from src.domain import DatabaseProvider
 
 db = DatabaseProvider().get()
@@ -9,11 +11,11 @@ db = DatabaseProvider().get()
 class Account(db.Model):
     __tablename__ = "accounts"
 
-    id = db.Column(db.String, primary_key=True)
-    email = db.Column(db.String, nullable=False, unique=True)
-    password = db.Column(db.String, nullable=False)
-    created_at = db.Column(db.String, nullable=False)
-    updated_at = db.Column(db.String, nullable=False)
+    id = Column(String, primary_key=True)
+    email = Column(String, nullable=False, unique=True)
+    password = Column(String, nullable=False)
+    created_at = Column(String, nullable=False)
+    updated_at = Column(String, nullable=False)
 
     def __init__(
             self

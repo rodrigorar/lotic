@@ -1,6 +1,10 @@
 from logging import Logger
 from typing import Optional
-from src.domain.errors import ConflictError
+
+from sqlalchemy.ext.declarative import declarative_base
+
+# Base Entity
+BaseEntity = declarative_base()
 
 
 class BaseRepository:
