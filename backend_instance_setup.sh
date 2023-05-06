@@ -49,7 +49,7 @@ deploy() {
 run_schema_migrations() {
 	cd ./"$DEPLOYMENT_DIR"
 	source ./menv/bin/activate
-	flask --app $HOME/current/src/app db upgrade
+	APP_CONFIG_FILE="$HOME/config/production.py" flask --app "$HOME/current/src/app" db upgrade
 }
 
 start_server() {
