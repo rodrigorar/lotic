@@ -1,7 +1,7 @@
 from logging import Logger
 from typing import Optional
 
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 # Base Entity
 BaseEntity = declarative_base()
