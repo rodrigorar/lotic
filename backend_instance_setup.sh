@@ -46,6 +46,12 @@ deploy() {
 	rm -r "$TAR_DIR"*
 }
 
+run_schema_migrations() {
+	cd ./"$DEPLOYMENT_DIR"
+	source ./menv/bin/activate
+	flask --app $HOME/current/src/app db upgrade
+}
+
 start_server() {
 	echo "Starting the server..."
 	sleep 1
@@ -55,6 +61,7 @@ start_server() {
 stop_server
 clear_current_deployment
 deploy
+run_schema_migrations
 start_server
 FILE
 )
@@ -83,6 +90,7 @@ setup_python_env() {
 		gunicorn \
 		sqlalchemy \
 		flask-sqlalchemy \
+		flask-migrate \
 		python-dateutil \
         bcrypt
 }
