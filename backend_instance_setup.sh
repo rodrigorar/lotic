@@ -13,6 +13,26 @@ ENTRYPOINT="wsgi.py"
 
 TAR_DIR="tasks_server"
 
+create_logrotate_file {
+	local contents=$(cat <<LOGFILE
+/home/rodrigorar/logs/app.log {
+	# Sets the logs to rotate every week
+	daily
+	# Tells the system to remove old logs and only keep the three most recent rotated logs
+	rotate 3
+	# compress and delaycompress: These two options are used together and indicate that 
+	# rotated logs should be compressed (gzip) except for the most recent one.
+	compress
+	# creating a new log file to replace the rotated one
+	create
+	# do not rotate the log if it is empty
+	notifempty
+}
+LOGFILE
+)
+	sudo echo "$contents" > /etc/logrotate.d/tasks-backend
+}
+
 create_deploy_file() {
 local contents=$(cat <<FILE
 #!/bin/bash

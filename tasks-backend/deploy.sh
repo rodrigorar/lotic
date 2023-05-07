@@ -3,7 +3,7 @@
 set -euo pipefail
 
 run_unit_tests() {
-  hatch run unit-testgis
+  hatch run unit-tests
 }
 
 run_integration_tests() {
