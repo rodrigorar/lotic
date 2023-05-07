@@ -55,7 +55,7 @@ class UnitOfWork:
                 self.__is_closed = True
             elif exc_type is not None:
                 self.logger.error("Unit of work failed, rolling back")
-                self.logger.error(exc_type)
+                self.logger.error(exc_value)
                 self.rollback()
         except IntegrityError:
             raise ConflictError("Database integrity compromised")

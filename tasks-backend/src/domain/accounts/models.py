@@ -28,8 +28,8 @@ class Account(db.Model):
         self.id = str(account_id)
         self.email = email
         self.password = password
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created_at = created_at.astimezone().isoformat()
+        self.updated_at = updated_at.astimezone().isoformat()
 
     def get_id(self):
         return uuid.UUID(self.id)

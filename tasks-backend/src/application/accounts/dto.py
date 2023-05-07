@@ -1,6 +1,8 @@
 import uuid
 from datetime import datetime
 
+from dateutil import parser
+
 from src.application import DTOTranslator
 from src.domain.accounts import Account
 
@@ -35,4 +37,9 @@ class AccountDTO(DTOTranslator):
         assert entity.created_at is not None, "Created at cannot be empty"
         assert entity.updated_at is not None, "Updated at cannot be empty"
 
-        return cls(entity.id, entity.email, entity.password, entity.created_at, entity.updated_at)
+        return cls(
+            entity.get_id()
+            , entity.email
+            , entity.password
+            , parser.parse(entity.created_at)
+            , parser.parse(entity.updated_at))

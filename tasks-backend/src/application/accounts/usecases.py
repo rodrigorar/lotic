@@ -52,7 +52,7 @@ class UseCaseGetAccount(UseCase):
         self.account_business_rules_provider = account_business_rules_provider
         self.logger = logger
 
-    def execute(self, account_id: uuid):
+    def execute(self, account_id: uuid) -> AccountDTO:
         assert account_id is not None, "Account id cannot be empty"
 
         if not AuthorizationContext.is_matching_account(account_id):

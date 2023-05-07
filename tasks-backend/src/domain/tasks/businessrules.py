@@ -1,7 +1,8 @@
 from functools import reduce
 import uuid
 
-from src.domain import ConflictError, InternalError, BaseBusinessRule, reducer_duplicated
+from src.domain import ConflictError, InternalError, BaseBusinessRule, \
+    reducer_duplicated
 from src.domain.tasks import AccountTasks, Task, TasksRepository, AccountTasksRepository
 
 

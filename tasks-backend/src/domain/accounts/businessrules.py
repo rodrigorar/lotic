@@ -37,7 +37,7 @@ class GetAccount(BaseBusinessRule):
         super().__init__(unit_of_work)
         self.account_repository = account_repository
 
-    def execute(self, account_id: uuid):
+    def execute(self, account_id: uuid) -> Account:
         assert account_id is not None, "Account id cannot be empty"
         return self.account_repository.get_by_id(self.unit_of_work, account_id)
 

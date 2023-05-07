@@ -4,7 +4,7 @@ from flask_openapi3 import OpenAPI, Info
 from pydantic import BaseModel, Field, ValidationError
 
 from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
-from src.domain import ConflictError, InvalidArgumentError, NotFoundError
+from src.domain import ConflictError, InvalidArgumentError, LogProvider, NotFoundError
 from src.infrastructure import to_json
 
 
@@ -123,6 +123,12 @@ def configure_error_handlers(app: OpenAPI):
 
     @app.errorhandler(ValidationError)
     def handle_validation_error(e: ValidationError):
+        return to_json(BadRequestResponse(e.__str__())) \
+            , 400 \
+            , {'Content-Type': 'application/problem+json'}
+
+    @app.errorhandler(TypeError)
+    def handle_validation_error(e: TypeError):
         return to_json(BadRequestResponse(e.__str__())) \
             , 400 \
             , {'Content-Type': 'application/problem+json'}
