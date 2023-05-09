@@ -8,8 +8,8 @@ from src.application.accounts import AccountDTO
 
 
 class CreateAccountRequest(BaseModel):
-    email: str = Field(None, description="Email of the users account")
-    password: str = Field(None, description="The password to be used in this account")
+    email: str = Field(None, description="Account email")
+    password: str = Field(None, description="Account password")
 
     def __init__(self, email: str, password: str):
         super().__init__()

@@ -9,6 +9,9 @@ from src.domain.accounts import \
     , CreateAccount, AccountRepository, GetAccountByEmail, ValidateAccountEmail
 
 
+logger = LogProvider().get()
+
+
 class AccountRepositoryImpl(AccountRepository):
 
     def get_by_id(self, unit_of_work: UnitOfWork, account_id: uuid) -> Optional[Account]:
@@ -49,44 +52,55 @@ class AccountRepositoryImpl(AccountRepository):
         query_manager.add(entry)
 
 
+# We do this here, to try and save a bit on memory usage
+account_repository = AccountRepositoryImpl()
+
+
 class AccountBusinessRulesProviderImpl(AccountBusinessRulesProvider):
 
     @staticmethod
     def create_account(unit_of_work) -> CreateAccount:
-        return CreateAccount(unit_of_work, AccountRepositoryImpl())
+        return CreateAccount(logger, unit_of_work, account_repository)
 
     @staticmethod
     def validate_account_email(unit_of_work) -> ValidateAccountEmail:
-        return ValidateAccountEmail(unit_of_work)
+        return ValidateAccountEmail(logger, unit_of_work)
 
     @staticmethod
     def get_account(unit_of_work) -> GetAccount:
-        return GetAccount(unit_of_work, AccountRepositoryImpl())
+        return GetAccount(unit_of_work, account_repository)
 
     @staticmethod
     def get_account_by_email(unit_of_work) -> GetAccountByEmail:
-        return GetAccountByEmail(unit_of_work, AccountRepositoryImpl(), ValidateAccountEmail(unit_of_work))
+        return GetAccountByEmail(unit_of_work, account_repository, ValidateAccountEmail(unit_of_work))
+
+
+# This needs to be here because of order of inputs
+from src.infrastructure.auth import EncryptionEngineBCrypt
+from src.infrastructure import UnitOfWorkProviderImpl
+
+# We do this here, to try and save a bit on memory usage
+unit_of_work_provider = UnitOfWorkProviderImpl()
+account_br_provider = AccountBusinessRulesProviderImpl()
+encryption_engine = EncryptionEngineBCrypt()
 
 
 class AccountUseCaseProvider:
 
     @staticmethod
     def create_account():
-        from src.infrastructure.auth import EncryptionEngineBCrypt
-        from src.infrastructure import UnitOfWorkProviderImpl
-
         return UseCaseCreateAccount(
-            UnitOfWorkProviderImpl()
-            , AccountBusinessRulesProviderImpl()
-            , EncryptionEngineBCrypt()
-            , LogProvider().get())
+            logger
+            , unit_of_work_provider
+            , account_br_provider
+            , encryption_engine)
 
     @staticmethod
     def get_account():
         from src.infrastructure import UnitOfWorkProviderImpl
 
         return UseCaseGetAccount(
-            UnitOfWorkProviderImpl()
-            , AccountBusinessRulesProviderImpl()
-            , LogProvider().get())
+            unit_of_work_provider
+            , account_br_provider
+            , logger)
     

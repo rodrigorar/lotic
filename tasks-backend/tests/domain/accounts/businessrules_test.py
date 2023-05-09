@@ -6,7 +6,7 @@ import pytest
 
 from src.domain.errors import InternalError
 from tests.domain.shared import DomainUnitTestsBase
-from tests.shared import UnitOfWorkMockProvider
+from tests.shared import DummyLogger, UnitOfWorkMockProvider
 
 ACCOUNT_ID = uuid.uuid4()
 ACCOUNT_EMAIL = "john.doe@mail.not"
@@ -30,7 +30,8 @@ class TestCreateAccount(DomainUnitTestsBase):
             .thenReturn(ACCOUNT_ID)
 
         under_test = CreateAccount(
-            mocked_unit_of_work
+            DummyLogger()
+            , mocked_unit_of_work
             , mocked_account_repository)
         result = under_test.execute(test_input)
 
@@ -43,14 +44,15 @@ class TestCreateAccount(DomainUnitTestsBase):
             mocked_unit_of_work
             , mocked_account_repository)
 
-    def test_should_fail_no_port_provided(self):
+    def test_should_fail_no_account_provided(self):
         from src.domain.accounts import CreateAccount, AccountRepository
 
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
         mocked_account_repository = mock(AccountRepository)
 
         under_test = CreateAccount(
-            mocked_unit_of_work
+            DummyLogger()
+            , mocked_unit_of_work
             , mocked_account_repository)
         with pytest.raises(AssertionError):
             under_test.execute(None)
@@ -70,7 +72,8 @@ class TestCreateAccount(DomainUnitTestsBase):
         test_input = Account.from_values(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 
         under_test = CreateAccount(
-            mocked_unit_of_work
+            DummyLogger()
+            , mocked_unit_of_work
             , mocked_account_repository)
         with pytest.raises(InternalError):
             under_test.execute(test_input)
@@ -276,3 +279,39 @@ class TestGetAccountByEmail(DomainUnitTestsBase):
             mocked_unit_of_work
             , mocked_validate_email_br
             , mocked_account_repository)
+
+
+class TestValidateAccountEmail(DomainUnitTestsBase):
+    VALID_EMAIL = "test.mail@some.net"
+    INVALID_EMAIL = "test-mail@some.net"
+    NOT_AN_EMAIL = "test.user27718"
+
+    def test_should_succeed_valid_email(self):
+        from src.domain.accounts import ValidateAccountEmail
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+
+        under_test = ValidateAccountEmail(DummyLogger(), mocked_unit_of_work)
+        under_test.execute(self.VALID_EMAIL)
+
+        verifyNoMoreInteractions(mocked_unit_of_work)
+
+    def test_should_fail_invalid_email(self):
+        from src.domain.accounts import ValidateAccountEmail
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+
+        under_test = ValidateAccountEmail(DummyLogger(), mocked_unit_of_work)
+        under_test.execute(self.INVALID_EMAIL)
+
+        verifyNoMoreInteractions(mocked_unit_of_work)
+
+    def test_should_fail_not_an_email(self):
+        from src.domain.accounts import ValidateAccountEmail
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+
+        under_test = ValidateAccountEmail(DummyLogger(), mocked_unit_of_work)
+        under_test.execute(self.NOT_AN_EMAIL)
+
+        verifyNoMoreInteractions(mocked_unit_of_work)

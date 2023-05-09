@@ -1,3 +1,4 @@
+from logging import Logger
 import re
 from typing import Optional
 import uuid
@@ -10,23 +11,32 @@ class CreateAccount(BaseBusinessRule):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work
             , account_repository: AccountRepository):
 
         super().__init__(unit_of_work)
+
+        self.logger = logger
         self.account_repository = account_repository
 
     def execute(self, account: Account):
+        self.logger.info("Executing ---> DomainService[CreateAccount]")
+
         assert account is not None, "Account cannot be empty"
         return self.account_repository.insert(self.unit_of_work, account)
 
 
 class ValidateAccountEmail(BaseBusinessRule):
 
-    def __init__(self, unit_of_work):
+    def __init__(self, logger: Logger, unit_of_work):
         super().__init__(unit_of_work)
 
+        self.logger = logger
+
     def execute(self, email: str):
+        self.logger.info("Executing ---> DomainService[ValidateAccountEmail]")
+
         email_pattern = re.compile(r"[a-zA-Z0-9][a-zA-Z0-9\-\.\_\+]{0,61}[a-zA-Z0-9]@[a-zA-Z0.9\-\.]*\.[a-z]*")
         return re.fullmatch(email_pattern, email)
 

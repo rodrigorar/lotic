@@ -33,7 +33,7 @@ accounts_bp = APIBlueprint(
     }
 )
 def create_account(body: CreateAccountRequest):
-    logger.info("Endpoint: Create account")
+    logger.info("[API - Accounts]")
 
     use_case = AccountUseCaseProvider.create_account()
     result = use_case.execute(body.to_dto())

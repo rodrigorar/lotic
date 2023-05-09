@@ -1,6 +1,41 @@
+from logging import Logger
+
 from mockito import mock
 
 from src.application import UnitOfWork
+
+
+class DummyLogger(Logger):
+
+    def __init__(self):
+        super().__init__("test-logger", 0)
+
+    def debug(self, msg, *args, **kwargs):
+        ...
+
+    def info(self, msg, *args, **kwargs):
+        ...
+
+    def warning(self, msg, *args, **kwargs):
+        ...
+
+    def warn(self, msg, *args, **kwargs):
+        ...
+
+    def error(self, msg, *args, **kwargs):
+        ...
+
+    def exception(self, msg, *args, exc_info=True, **kwargs):
+        ...
+
+    def critical(self, msg, *args, **kwargs):
+        ...
+
+    def fatal(self, msg, *args, **kwargs):
+        ...
+
+    def log(self, level, msg, *args, **kwargs):
+        ...
 
 
 class MockDatabase:

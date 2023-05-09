@@ -72,10 +72,10 @@ class TestUseCaseCreateAccount:
             .thenReturn(ACCOUNT_ENCRYPTED_PASSWORD)
 
         under_test = UseCaseCreateAccount(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , mocked_encryption_engine
-            , MockedLogger())
+            , mocked_encryption_engine)
         result = under_test.execute(input_value)
 
         assert result is not None, "Result cannot be None"
@@ -90,10 +90,10 @@ class TestUseCaseCreateAccount:
             , create_account_br
             , mocked_encryption_engine)
 
-    def test_should_fail_none_input(self):
+    def test_should_fail_no_input(self):
         from src.application.accounts import UseCaseCreateAccount
 
-        under_test = UseCaseCreateAccount(None, None, None, MockedLogger())
+        under_test = UseCaseCreateAccount(MockedLogger(), None, None, None)
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
@@ -113,10 +113,10 @@ class TestUseCaseCreateAccount:
             .thenReturn(ACCOUNT_ENCRYPTED_PASSWORD)
 
         under_test = UseCaseCreateAccount(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , mocked_encryption_engine
-            , MockedLogger())
+            , mocked_encryption_engine)
         with pytest.raises(InternalError):
             under_test.execute(input_value)
 
@@ -140,10 +140,10 @@ class TestUseCaseCreateAccount:
         mocked_encryption_engine = mock(EncryptionEngine)
 
         under_test = UseCaseCreateAccount(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , mocked_encryption_engine
-            , MockedLogger())
+            , mocked_encryption_engine)
         with pytest.raises(InvalidArgumentError):
             under_test.execute(input_value)
 
@@ -168,10 +168,10 @@ class TestUseCaseCreateAccount:
             .thenReturn(ACCOUNT_ENCRYPTED_PASSWORD)
 
         under_test = UseCaseCreateAccount(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , MockedAccountBusinessRulesProvider()
-            , mocked_encryption_engine
-            , MockedLogger())
+            , mocked_encryption_engine)
         with pytest.raises(AssertionError):
             under_test.execute(input_value)
 
