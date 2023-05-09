@@ -11,6 +11,18 @@ class UseCase:
         raise NotImplemented("UseCase#execute is not implemented!")
 
 
+class UseCaseCommand(UseCase):
+
+    def execute(self, port) -> None:
+        raise NotImplemented("UseCaseCommand#execute is not implemented")
+
+
+class UseCaseQuery(UseCase):
+
+    def execute(self, port) -> object:
+        raise NotImplemented("UseCaseQuery#execute is not implemented")
+
+
 class DTOTranslator:
 
     def to_entity(self):
