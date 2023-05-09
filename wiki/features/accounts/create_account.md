@@ -12,7 +12,7 @@ their accounts to be identified and setting them as owners of their accounts.
 
 ## Sequence Diagram
 
-![Create Account Sequence Diagram](../assets/create_account_sequence_diagram.png)
+![Create Account Sequence Diagram](../../assets/create_account_sequence_diagram.png)
 
 ## Sequence Diagram Code
 
