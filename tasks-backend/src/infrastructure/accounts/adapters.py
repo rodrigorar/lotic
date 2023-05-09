@@ -72,7 +72,7 @@ class AccountBusinessRulesProviderImpl(AccountBusinessRulesProvider):
 
     @staticmethod
     def get_account_by_email(unit_of_work) -> GetAccountByEmail:
-        return GetAccountByEmail(unit_of_work, account_repository, ValidateAccountEmail(unit_of_work))
+        return GetAccountByEmail(unit_of_work, account_repository, ValidateAccountEmail(logger, unit_of_work))
 
 
 # This needs to be here because of order of inputs
