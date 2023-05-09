@@ -11,10 +11,10 @@ multiplatform.
 
 ### Features
 
-- [Create Account]() ⛔ No Implemented
+- [Create Account](https://github.com/rodrigorar/lotic/blob/main/wiki/features/accounts/create_account.md)
 - [Login]() ⛔ No Implemented
 - [Logout]() ⛔ No Implemented
-- [Refresh Auth Token](https://github.com/rodrigorar/lotic/blob/main/wiki/features/refresh_auth_session.md)
+- [Refresh Auth Token](https://github.com/rodrigorar/lotic/blob/main/wiki/features/auth/refresh_auth_session.md)
 - [Create Task]() ⛔ No Implemented
 - [Edit Task]() ⛔ No Implemented
 - [Complete Task]() ⛔ No Implemented
