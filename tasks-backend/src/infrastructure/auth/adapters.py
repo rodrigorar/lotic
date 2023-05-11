@@ -1,15 +1,19 @@
-from datetime import datetime
 from typing import Optional
 import uuid
 
 import bcrypt
-from sqlalchemy import and_
 
 from src.application import UnitOfWork
-from src.domain import LogProvider, NotFoundError
-from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseLogin, UseCaseLogout, \
-    UseCaseRefresh, AuthSession
+from src.application.auth.shared import EncryptionEngine
+from src.application.auth.models import AuthSession
+from src.application.auth.providers import AuthTokenStorage
+from src.application.auth.usecases import UseCaseLogin, UseCaseLogout, UseCaseRefresh
+from src.application.auth.configurations import AuthTokenTTLConfigs
+from src.domain import LogProvider
 from src.infrastructure import UnitOfWorkProviderImpl
+
+
+logger = LogProvider().get()
 
 
 class EncryptionEngineBCrypt(EncryptionEngine):
@@ -117,10 +121,12 @@ class AuthUseCaseProvider:
         from src.infrastructure.accounts import AccountBusinessRulesProviderImpl
 
         return UseCaseLogin(
-            unit_of_work_provider
+            logger
+            , unit_of_work_provider
             , AccountBusinessRulesProviderImpl()
             , AuthTokenStorageImpl()
-            , EncryptionEngineBCrypt())
+            , EncryptionEngineBCrypt()
+            , AuthTokenTTLConfigs())
 
     @staticmethod
     def refresh():

@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
+from logging import Logger
 import uuid
 from uuid import uuid4
 
 from src.application import UnitOfWorkProvider, UseCase
+from src.application.auth.configurations import AuthTokenTTLConfigs
 from src.application.auth.models import AuthSession, AuthToken, Principal
 from src.application.auth.providers import AuthTokenStorage
 from src.application.auth.shared import AuthorizationContext, EncryptionEngine
@@ -15,22 +17,26 @@ class UseCaseLogin(UseCase):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work_provider: UnitOfWorkProvider
             , account_br_provider: AccountBusinessRulesProvider
             , auth_token_storage: AuthTokenStorage
-            , encryption_engine: EncryptionEngine):
+            , encryption_engine: EncryptionEngine
+            , auth_tokens_ttls: AuthTokenTTLConfigs):
 
+        self.logger = logger
         self.unit_of_work_provider = unit_of_work_provider
         self.account_br_provider = account_br_provider
         self.auth_token_storage = auth_token_storage
         self.encryption_engine = encryption_engine
+        self.auth_token_ttls = auth_tokens_ttls
 
     def execute(self, principal: Principal) -> AuthToken:
+        self.logger.info("Executing ---> UseCase[Login]")
+
         assert principal is not None, "Principal cannot be null"
 
         with self.unit_of_work_provider.get() as unit_of_work:
-            assert principal is not None, "Principal cannot be null"
-
             account_by_email_br = self.account_br_provider.get_account_by_email(unit_of_work)
             account = account_by_email_br.execute(principal.subject)
             if account is None:
@@ -45,8 +51,8 @@ class UseCaseLogin(UseCase):
                 , str(uuid4())
                 , account.get_id()
                 , current_time
-                , current_time + timedelta(hours=1)
-                , current_time + timedelta(days=5))
+                , current_time + timedelta(hours=self.auth_token_ttls.access_token_ttl_hours)
+                , current_time + timedelta(days=self.auth_token_ttls.refresh_token_ttl_days))
             self.auth_token_storage.store(unit_of_work, auth_session)
 
             return AuthToken(

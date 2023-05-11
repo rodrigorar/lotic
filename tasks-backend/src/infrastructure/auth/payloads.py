@@ -1,7 +1,7 @@
 import uuid
 from pydantic import BaseModel, Field
 
-from src.application.auth import AuthToken, Principal
+from src.application.auth.models import AuthToken, Principal
 
 
 class LoginRequest(BaseModel):

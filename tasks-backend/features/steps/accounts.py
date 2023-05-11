@@ -19,7 +19,7 @@ def step_impl(context):
 @given('an existing account')
 def step_impl(context):
     from src.domain.accounts import Account
-    from src.application.auth import AuthSession
+    from src.application.auth.models import AuthSession
 
     with context.app.app_context():
         account = context.db.session.query(Account).filter_by(email='john.doe@mail.not').first()

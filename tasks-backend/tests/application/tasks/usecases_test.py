@@ -18,7 +18,7 @@ from src.domain.tasks import CreateTasks, DeleteTasks, ListTasksForAccount, \
     Task, TasksBusinessRulesProvider, UpdateTasks, ListTasks
 from src.application.tasks import TaskDTO, UseCaseCreateTasks, UseCaseUpdateTasks, \
     UseCaseDeleteTasks, UseCaseListTasksForAccount
-from src.application.auth import AuthorizationContext
+from src.application.auth.shared import AuthorizationContext
 
 global create_tasks_br
 global update_tasks_br

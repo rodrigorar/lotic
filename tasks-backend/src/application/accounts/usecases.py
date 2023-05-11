@@ -7,7 +7,7 @@ from src.application.accounts import AccountDTO
 from src.application.errors import AuthorizationError
 from src.domain.accounts import AccountBusinessRulesProvider
 from src.domain import InvalidArgumentError
-from src.application.auth import AuthorizationContext, EncryptionEngine
+from src.application.auth.shared import AuthorizationContext, EncryptionEngine
 
 
 class UseCaseCreateAccount(UseCase):

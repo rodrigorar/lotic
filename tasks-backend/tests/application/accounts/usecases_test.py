@@ -12,7 +12,7 @@ DatabaseProvider().set_database(MockDatabase())
 
 from src.domain.accounts import Account, CreateAccount, ValidateAccountEmail, GetAccount, AccountBusinessRulesProvider
 from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider, MockedLogger
-from src.application.auth import AuthorizationContext
+from src.application.auth.shared import AuthorizationContext
 
 global create_account_br
 global validate_account_email_br
@@ -59,7 +59,7 @@ class TestUseCaseCreateAccount:
 
     def test_should_succeed(self):
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
-        from src.application.auth import EncryptionEngine
+        from src.application.auth.shared import EncryptionEngine
 
         input_value = AccountDTO(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 
@@ -100,7 +100,7 @@ class TestUseCaseCreateAccount:
     # br = business_rule
     def test_should_fail_create_account_br_error(self):
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
-        from src.application.auth import EncryptionEngine
+        from src.application.auth.shared import EncryptionEngine
 
         input_value = AccountDTO(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 
@@ -131,7 +131,7 @@ class TestUseCaseCreateAccount:
 
     def test_should_fail_validate_account_email_br_error(self):
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
-        from src.application.auth import EncryptionEngine
+        from src.application.auth.shared import EncryptionEngine
 
         input_value = AccountDTO(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 
@@ -155,7 +155,7 @@ class TestUseCaseCreateAccount:
 
     def test_should_fail_dto_to_entity_error(self, setup_mocks_aspect):
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
-        from src.application.auth import EncryptionEngine
+        from src.application.auth.shared import EncryptionEngine
 
         input_value = AccountDTO(None, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
 

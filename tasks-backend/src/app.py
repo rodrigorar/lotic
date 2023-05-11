@@ -4,12 +4,10 @@ import uuid
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_openapi3 import OpenAPI, Info
-from flask import __version__, Flask, g, request
-from werkzeug.exceptions import HTTPException
+from flask import __version__, Flask, request
 
-from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
-from src.domain import ConflictError, InvalidArgumentError, LogProvider, NotFoundError
-from src.infrastructure import AppProvider, DatabaseSessionProvider, AppConfigurations, to_json
+from src.application.errors import AuthorizationError, InvalidAuthorizationError
+from src.infrastructure import AppProvider, DatabaseSessionProvider, AppConfigurations
 from logging.config import fileConfig
 
 from src.infrastructure.error_handlers import configure_error_handlers
@@ -72,7 +70,7 @@ start(app)
 @app.before_request
 def authorization_constructor():
     from src.infrastructure import UnitOfWorkProviderImpl
-    from src.application.auth import AuthorizationContext
+    from src.application.auth.shared import AuthorizationContext
     from src.infrastructure.auth import AuthTokenStorageImpl
 
     authorization_token = request.headers.get('X-Authorization')

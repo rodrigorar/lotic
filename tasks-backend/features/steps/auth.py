@@ -5,7 +5,6 @@ from uuid import uuid4
 from behave import *
 from dateutil import parser
 
-from features.environment import JOHN_DOE_ID
 from src.infrastructure import from_json
 from src.utils import URL_PREFIX_V1
 
@@ -34,7 +33,7 @@ def step_impl(context):
 def step_impl(context):
     from features.environment import JOHN_DOE_EMAIL, JOHN_DOE_PASSWORD, JOHN_DOE_REFRESH_TOKEN, \
         JOHN_DOE_AUTH_TOKEN, JOHN_DOE_ID
-    from src.application.auth import AuthSession
+    from src.application.auth.models import AuthSession
 
     context.account_id = JOHN_DOE_ID
     context.subject = JOHN_DOE_EMAIL
@@ -111,7 +110,7 @@ def step_impl(context):
 @then("it should receive a valid authorization token")
 def step_impl(context):
     from src.infrastructure.auth.payloads import AuthTokenResponse
-    from src.application.auth import AuthSession
+    from src.application.auth.models import AuthSession
     from features.environment import JOHN_DOE_ID
 
     assert context.response is not None
@@ -146,7 +145,7 @@ def step_impl(context):
 
 @then("it should receive a new valid authorization token")
 def step_impl(context):
-    from src.application.auth import AuthSession
+    from src.application.auth.models import AuthSession
     from src.infrastructure.auth.payloads import AuthTokenResponse
 
     assert context.response is not None
@@ -170,7 +169,7 @@ def step_impl(context):
 
 @then("it should successfully be logged out")
 def step_impl(context):
-    from src.application.auth import AuthSession
+    from src.application.auth.models import AuthSession
 
     assert context.response is not None
     assert context.response.status_code == 204

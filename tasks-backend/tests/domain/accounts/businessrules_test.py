@@ -5,6 +5,7 @@ from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
 from src.domain.errors import InternalError
+from tests.application.shared import MockedLogger
 from tests.domain.shared import DomainUnitTestsBase
 from tests.shared import DummyLogger, UnitOfWorkMockProvider
 
@@ -96,7 +97,7 @@ class TestGetAccount(DomainUnitTestsBase):
         mocked_account_repository = mock(AccountRepository)
         when(mocked_account_repository).get_by_id(mocked_unit_of_work, ACCOUNT_ID).thenReturn(account_result)
 
-        under_test = GetAccount(mocked_unit_of_work, mocked_account_repository)
+        under_test = GetAccount(MockedLogger(), mocked_unit_of_work, mocked_account_repository)
         result = under_test.execute(ACCOUNT_ID)
 
         assert result is not None, "Result cannot be empty."
@@ -109,7 +110,7 @@ class TestGetAccount(DomainUnitTestsBase):
         mocked_account_repository = mock(AccountRepository)
         when(mocked_account_repository).get_by_id(mocked_unit_of_work, ACCOUNT_ID).thenReturn(None)
 
-        under_test = GetAccount(mocked_unit_of_work, mocked_account_repository)
+        under_test = GetAccount(MockedLogger(), mocked_unit_of_work, mocked_account_repository)
         result = under_test.execute(ACCOUNT_ID)
 
         assert result is None, "Result should be empty"
@@ -120,7 +121,7 @@ class TestGetAccount(DomainUnitTestsBase):
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
         mocked_account_repository = mock(AccountRepository)
 
-        under_test = GetAccount(mocked_unit_of_work, mocked_account_repository)
+        under_test = GetAccount(MockedLogger(), mocked_unit_of_work, mocked_account_repository)
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
@@ -129,11 +130,11 @@ class TestGetAccount(DomainUnitTestsBase):
 
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
         mocked_account_repository = mock(AccountRepository)
-        when(mocked_account_repository)\
-            .get_by_id(mocked_unit_of_work, ACCOUNT_ID)\
+        when(mocked_account_repository) \
+            .get_by_id(mocked_unit_of_work, ACCOUNT_ID) \
             .thenRaise(InternalError("Something failed"))
 
-        under_test = GetAccount(mocked_unit_of_work, mocked_account_repository)
+        under_test = GetAccount(MockedLogger(), mocked_unit_of_work, mocked_account_repository)
         with pytest.raises(InternalError):
             under_test.execute(ACCOUNT_ID)
 
@@ -157,7 +158,8 @@ class TestGetAccountByEmail(DomainUnitTestsBase):
             .thenReturn(repo_return)
 
         under_test = GetAccountByEmail(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_account_repository
             , mocked_validate_email_br)
         result = under_test.execute(ACCOUNT_EMAIL)
@@ -189,7 +191,8 @@ class TestGetAccountByEmail(DomainUnitTestsBase):
             .thenReturn(None)
 
         under_test = GetAccountByEmail(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_account_repository
             , mocked_validate_email_br)
         result = under_test.execute(ACCOUNT_EMAIL_UNKNOWN)
@@ -213,7 +216,8 @@ class TestGetAccountByEmail(DomainUnitTestsBase):
         mocked_account_repository = mock(AccountRepository)
 
         under_test = GetAccountByEmail(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_account_repository
             , mocked_validate_email_br)
 
@@ -237,7 +241,8 @@ class TestGetAccountByEmail(DomainUnitTestsBase):
         mocked_account_repository = mock(AccountRepository)
 
         under_test = GetAccountByEmail(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_account_repository
             , mocked_validate_email_br)
 
@@ -266,7 +271,8 @@ class TestGetAccountByEmail(DomainUnitTestsBase):
             .thenRaise(InternalError)
 
         under_test = GetAccountByEmail(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_account_repository
             , mocked_validate_email_br)
         with pytest.raises(InternalError):

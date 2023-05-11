@@ -54,7 +54,7 @@ def before_tag(context, tag):
 def before_scenario(context, scenario):
     from src.domain.accounts import Account
     from src.domain.tasks import Task, AccountTasks
-    from src.application.auth import AuthSession
+    from src.application.auth.models import AuthSession
     from src.infrastructure.auth import EncryptionEngineBCrypt
 
     with context.app.app_context():
@@ -156,7 +156,7 @@ def before_scenario(context, scenario):
 def clear_database(context):
     from src.domain.accounts import Account
     from src.domain.tasks import AccountTasks, Task
-    from src.application.auth import AuthSession
+    from src.application.auth.models import AuthSession
 
     context.db.session.query(AccountTasks).delete()
     context.db.session.query(Account).delete()

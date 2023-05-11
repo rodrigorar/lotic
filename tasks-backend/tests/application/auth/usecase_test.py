@@ -5,14 +5,16 @@ from uuid import uuid4
 from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
+from src.application.auth.configurations import AuthTokenTTLConfigs
 from src.domain import DatabaseProvider, NotFoundError
 from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
-from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider
+from tests.application.shared import ApplicationUnitTestsBase, MockedLogger, \
+    MockedUnitOfWorkProvider
 from tests.shared import MockDatabase
 
 DatabaseProvider().set_database(MockDatabase())
 
-from src.application.auth import AuthorizationContext
+from src.application.auth.shared import AuthorizationContext
 
 ACCOUNT_ID = uuid4()
 ACCOUNT_EMAIL = "test.account@mail.not"
@@ -29,7 +31,9 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
 
     def test_should_succeed_login(self):
         from src.domain.accounts import AccountBusinessRulesProvider, GetAccountByEmail, Account
-        from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseLogin
+        from src.application.auth.shared import EncryptionEngine
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.usecases import UseCaseLogin
         from src.application.auth.models import Principal
 
         account = Account(ACCOUNT_ID, ACCOUNT_EMAIL, ENCRYPTED_PASSWORD, datetime.now(), datetime.now())
@@ -54,10 +58,12 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
 
         principal = Principal(ACCOUNT_EMAIL, ACCOUNT_PASSWORD)
         under_test = UseCaseLogin(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , mocked_account_br_provider
             , mocked_auth_token_storage
-            , mocked_encryption_engine)
+            , mocked_encryption_engine
+            , AuthTokenTTLConfigs())
         result = under_test.execute(principal)
 
         assert result is not None
@@ -77,17 +83,21 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
 
     def test_should_fail_no_principal(self):
         from src.domain.accounts import AccountBusinessRulesProvider
-        from src.application.auth import EncryptionEngine, AuthTokenStorage, UseCaseLogin
+        from src.application.auth.shared import EncryptionEngine
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.usecases import UseCaseLogin
 
         mocked_account_br_provider = mock(AccountBusinessRulesProvider)
         mocked_auth_session_repository = mock(AuthTokenStorage)
         mocked_encryption_engine = mock(EncryptionEngine)
 
         under_test = UseCaseLogin(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , mocked_account_br_provider
             , mocked_auth_session_repository
-            , mocked_encryption_engine)
+            , mocked_encryption_engine
+            , AuthTokenTTLConfigs())
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
@@ -98,7 +108,10 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
 
     def test_should_fail_unknown_account(self):
         from src.domain.accounts import AccountBusinessRulesProvider, GetAccountByEmail
-        from src.application.auth import EncryptionEngine, Principal, AuthTokenStorage, UseCaseLogin
+        from src.application.auth.shared import EncryptionEngine
+        from src.application.auth.models import Principal
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.usecases import UseCaseLogin
 
         mocked_get_account_by_email = mock(GetAccountByEmail)
         when(mocked_get_account_by_email) \
@@ -114,10 +127,12 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
 
         principal = Principal(ACCOUNT_EMAIL, ACCOUNT_PASSWORD)
         under_test = UseCaseLogin(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , mocked_account_br_provider
             , mocked_auth_session_repository
-            , mocked_encryption_engine)
+            , mocked_encryption_engine
+            , AuthTokenTTLConfigs())
         with pytest.raises(NotFoundError):
             under_test.execute(principal)
 
@@ -132,7 +147,10 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
 
     def test_should_fail_wrong_password(self):
         from src.domain.accounts import AccountBusinessRulesProvider, GetAccountByEmail, Account
-        from src.application.auth import EncryptionEngine, Principal, AuthTokenStorage, UseCaseLogin
+        from src.application.auth.shared import EncryptionEngine
+        from src.application.auth.models import Principal
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.usecases import UseCaseLogin
 
         account = Account(ACCOUNT_ID, ACCOUNT_EMAIL, ENCRYPTED_PASSWORD, datetime.now(), datetime.now())
 
@@ -153,10 +171,12 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
 
         principal = Principal(ACCOUNT_EMAIL, ACCOUNT_PASSWORD)
         under_test = UseCaseLogin(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , mocked_account_br_provider
             , mocked_auth_session_repository
-            , mocked_encryption_engine)
+            , mocked_encryption_engine
+            , AuthTokenTTLConfigs())
 
         with pytest.raises(LoginFailedError):
             under_test.execute(principal)
@@ -175,7 +195,8 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
 class TestUseCaseRefresh(ApplicationUnitTestsBase):
 
     def test_should_succeed_refresh(self):
-        from src.application.auth import AuthTokenStorage, AuthSession, UseCaseRefresh
+        from src.application.auth.providers import AuthTokenStorage, AuthSession
+        from src.application.auth.usecases import UseCaseRefresh
 
         current_auth_session = AuthSession(
             uuid4()
@@ -209,7 +230,8 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         verifyNoMoreInteractions(mocked_auth_storage)
 
     def test_should_fail_no_auth_session_found(self):
-        from src.application.auth import AuthTokenStorage, AuthSession, UseCaseRefresh
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.usecases import UseCaseRefresh
 
         mocked_auth_storage = mock(AuthTokenStorage)
         when(mocked_auth_storage) \
@@ -225,7 +247,8 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         verifyNoMoreInteractions(mocked_auth_storage)
 
     def test_should_fail_no_refresh_token(self):
-        from src.application.auth import AuthTokenStorage, UseCaseRefresh
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.usecases import UseCaseRefresh
 
         mocked_auth_storage = mock(AuthTokenStorage)
 
@@ -240,7 +263,8 @@ class TestUseCaseLogout(ApplicationUnitTestsBase):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_logout(self):
-        from src.application.auth import AuthTokenStorage, UseCaseLogout
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.usecases import UseCaseLogout
 
         mocked_auth_token_storage = mock(AuthTokenStorage)
         when(mocked_auth_token_storage) \
@@ -255,7 +279,8 @@ class TestUseCaseLogout(ApplicationUnitTestsBase):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=False))
     def test_should_fail_no_authorization(self):
-        from src.application.auth import AuthTokenStorage, UseCaseLogout
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.usecases import  UseCaseLogout
 
         mocked_auth_token_storage = mock(AuthTokenStorage)
 
@@ -267,7 +292,8 @@ class TestUseCaseLogout(ApplicationUnitTestsBase):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_no_account_id(self):
-        from src.application.auth import AuthTokenStorage, UseCaseLogout
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.usecases import UseCaseLogout
 
         mocked_auth_token_storage = mock(AuthTokenStorage)
 

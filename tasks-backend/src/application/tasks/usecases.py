@@ -3,7 +3,7 @@ from logging import Logger
 import uuid
 
 from src.application import UnitOfWorkProvider, UseCase
-from src.application.auth import AuthorizationContext
+from src.application.auth.shared import AuthorizationContext
 from src.application.errors import AuthorizationError
 from src.application.tasks.dto import TaskDTO
 from src.domain import reducer_duplicated, ConflictError, NotFoundError
