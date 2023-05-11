@@ -184,7 +184,6 @@ class TestUseCaseCreateAccount:
             , mocked_encryption_engine)
 
 
-# TODO: Should test authorization code as well, not only the happy path
 class TestUseCaseGetAccount(ApplicationUnitTestsBase):
 
     @pytest.fixture(autouse=True)
@@ -207,9 +206,9 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         when(get_account_br).execute(ACCOUNT_ID).thenReturn(result_value)
 
         under_test = UseCaseGetAccount(
-            MockedUnitOfWorkProvider()
-            , MockedAccountBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider())
         result = under_test.execute(ACCOUNT_ID)
 
         assert result is not None, "Result cannot be None"
@@ -223,9 +222,9 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         when(get_account_br).execute(UNKNOWN_ACCOUNT_ID).thenReturn(None)
 
         under_test = UseCaseGetAccount(
-            MockedUnitOfWorkProvider()
-            , MockedAccountBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider())
         result = under_test.execute(UNKNOWN_ACCOUNT_ID)
 
         assert result is None, "Result cannot be None"
@@ -237,9 +236,9 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         when(get_account_br).execute(ACCOUNT_ID).thenRaise(InternalError("Something went wrong"))
 
         under_test = UseCaseGetAccount(
-            MockedUnitOfWorkProvider()
-            , MockedAccountBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider())
         with pytest.raises(InternalError):
             under_test.execute(ACCOUNT_ID)
 
@@ -250,9 +249,9 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         when(get_account_br).execute(ACCOUNT_ID).thenReturn(None)
 
         under_test = UseCaseGetAccount(
-            MockedUnitOfWorkProvider()
-            , MockedAccountBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider())
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
@@ -265,8 +264,8 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
         when(get_account_br).execute(ACCOUNT_ID).thenReturn(result_value)
 
         under_test = UseCaseGetAccount(
-            MockedUnitOfWorkProvider()
-            , MockedAccountBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider())
         with pytest.raises(AssertionError):
             under_test.execute(ACCOUNT_ID)

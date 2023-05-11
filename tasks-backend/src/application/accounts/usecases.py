@@ -44,21 +44,21 @@ class UseCaseGetAccount(UseCase):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work_provider: UnitOfWorkProvider
-            , account_business_rules_provider: AccountBusinessRulesProvider
-            , logger: Logger):
+            , account_business_rules_provider: AccountBusinessRulesProvider):
 
+        self.logger = logger
         self.unit_of_work_provider = unit_of_work_provider
         self.account_business_rules_provider = account_business_rules_provider
-        self.logger = logger
 
     def execute(self, account_id: uuid) -> AccountDTO:
+        self.logger.info("Executing ---> UseCase[GetAccount]")
+
         assert account_id is not None, "Account id cannot be empty"
 
         if not AuthorizationContext.is_matching_account(account_id):
             raise AuthorizationError('Invalid authorization token provided')
-
-        self.logger.info("UseCase[GetAccount](" + str(account_id) + ")")
 
         with self.unit_of_work_provider.get() as unit_of_work:
             business_rule = self.account_business_rules_provider.get_account(unit_of_work)

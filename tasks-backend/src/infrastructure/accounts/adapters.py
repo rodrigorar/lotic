@@ -100,7 +100,7 @@ class AccountUseCaseProvider:
         from src.infrastructure import UnitOfWorkProviderImpl
 
         return UseCaseGetAccount(
-            unit_of_work_provider
-            , account_br_provider
-            , logger)
+            logger
+            , unit_of_work_provider
+            , account_br_provider)
     

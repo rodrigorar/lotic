@@ -38,7 +38,7 @@ class AccountDTO(DTOTranslator):
         assert entity.updated_at is not None, "Updated at cannot be empty"
 
         return cls(
-            entity.get_id()
+            uuid.UUID(entity.id)
             , entity.email
             , entity.password
             , parser.parse(entity.created_at)
