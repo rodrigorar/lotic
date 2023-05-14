@@ -214,7 +214,7 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         when(mocked_auth_storage) \
             .remove(...)
 
-        under_test = UseCaseRefresh(MockedUnitOfWorkProvider(), mocked_auth_storage)
+        under_test = UseCaseRefresh(MockedLogger(), MockedUnitOfWorkProvider(), mocked_auth_storage)
         result = under_test.execute(VALID_REFRESH_TOKEN)
 
         assert result is not None
@@ -238,11 +238,11 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
             .find_by_refresh_token(...) \
             .thenReturn(None)
 
-        under_test = UseCaseRefresh(MockedUnitOfWorkProvider(), mocked_auth_storage)
+        under_test = UseCaseRefresh(MockedLogger(), MockedUnitOfWorkProvider(), mocked_auth_storage)
         with pytest.raises(InvalidAuthorizationError):
             under_test.execute(VALID_REFRESH_TOKEN)
 
-        verify(mocked_auth_storage, times=2).find_by_refresh_token(...)
+        verify(mocked_auth_storage).find_by_refresh_token(...)
 
         verifyNoMoreInteractions(mocked_auth_storage)
 
@@ -252,7 +252,7 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
 
         mocked_auth_storage = mock(AuthTokenStorage)
 
-        under_test = UseCaseRefresh(MockedUnitOfWorkProvider(), mocked_auth_storage)
+        under_test = UseCaseRefresh(MockedLogger(), MockedUnitOfWorkProvider(), mocked_auth_storage)
         with pytest.raises(AssertionError):
             under_test.execute(None)
 

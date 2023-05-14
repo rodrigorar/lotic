@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from enum import Enum
 from logging import Logger
 import uuid
 from uuid import uuid4
@@ -8,9 +9,29 @@ from src.application.auth.configurations import AuthTokenTTLConfigs
 from src.application.auth.models import AuthSession, AuthToken, Principal
 from src.application.auth.providers import AuthTokenStorage
 from src.application.auth.shared import AuthorizationContext, EncryptionEngine
-from src.domain import LogProvider, NotFoundError
+from src.domain import InternalError, LogProvider, NotFoundError
 from src.domain.accounts import AccountBusinessRulesProvider
 from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
+
+
+class AuthError:
+    class Cause(Enum):
+        GENERIC_ERROR = 1
+        INVALID_AUTHORIZATION = 2
+
+    def __init__(self, cause: Cause, message: str):
+        self.cause = cause
+        self.message = message
+
+    def raise_exception(self):
+
+        match self.cause:
+            case AuthError.Cause.INVALID_AUTHORIZATION:
+                raise InvalidAuthorizationError(self.message)
+            case AuthError.Cause.GENERIC_ERROR:
+                raise InternalError(self.message)
+            case _:
+                raise InternalError()
 
 
 class UseCaseLogin(UseCase):
@@ -66,23 +87,29 @@ class UseCaseRefresh(UseCase):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work_provider: UnitOfWorkProvider
             , auth_token_storage: AuthTokenStorage):
 
+        self.logger = logger
         self.unit_of_work_provider = unit_of_work_provider
         self.auth_token_storage = auth_token_storage
 
+    @staticmethod
+    def can_refresh(auth_session) -> bool:
+        return not (auth_session is None or auth_session.is_refresh_expired())
+
     def execute(self, refresh_token: uuid) -> AuthToken:
+        self.logger.info("Executing ---> UseCase[Refresh]")
+
         assert refresh_token is not None, "No refresh token provided"
 
-        try:
-            with self.unit_of_work_provider.get() as unit_of_work:
-                current_auth_session = self.auth_token_storage.find_by_refresh_token(unit_of_work, str(refresh_token))
-                if current_auth_session is None:
-                    raise InvalidAuthorizationError("No auth session found for refresh token: " + str(refresh_token))
-                elif current_auth_session.is_refresh_expired():
-                    raise InvalidAuthorizationError()
+        error = None
 
+        with self.unit_of_work_provider.get() as unit_of_work:
+            current_auth_session = self.auth_token_storage.find_by_refresh_token(unit_of_work, str(refresh_token))
+
+            if self.can_refresh(current_auth_session):
                 current_time = datetime.now()
                 new_auth_session = AuthSession(
                     uuid4()
@@ -93,16 +120,13 @@ class UseCaseRefresh(UseCase):
                     , current_time + timedelta(days=5))
                 self.auth_token_storage.store(unit_of_work, new_auth_session)
                 self.auth_token_storage.remove(unit_of_work, current_auth_session.get_id())
-        except InvalidAuthorizationError:
-            with self.unit_of_work_provider.get() as unit_of_work:
-                # FIXME: We need to migrate the error handling to return types to deal with this issue properly
-                #   or we might have to use multiple unit of work instead of just one, might be the better option
-                # FIXME: We need this here because raising an exception rollsback the entire operation
-                current_auth_session = self.auth_token_storage.find_by_refresh_token(unit_of_work, str(refresh_token))
+            else:
                 if current_auth_session is not None:
-                    LogProvider().get().info("Erasing existing token")
                     self.auth_token_storage.remove(unit_of_work, current_auth_session.get_id())
-            raise InvalidAuthorizationError("Refresh token is expired, full login required")
+                error = AuthError(AuthError.Cause.INVALID_AUTHORIZATION, "Refresh token not valid")
+
+        if error is not None:
+            error.raise_exception()
 
         return AuthToken(
             new_auth_session.id
