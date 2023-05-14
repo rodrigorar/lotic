@@ -89,11 +89,13 @@ class UseCaseRefresh(UseCase):
             self
             , logger: Logger
             , unit_of_work_provider: UnitOfWorkProvider
-            , auth_token_storage: AuthTokenStorage):
+            , auth_token_storage: AuthTokenStorage
+            , auth_tokens_ttl_configs: AuthTokenTTLConfigs):
 
         self.logger = logger
         self.unit_of_work_provider = unit_of_work_provider
         self.auth_token_storage = auth_token_storage
+        self.auth_tokens_ttl_configs = auth_tokens_ttl_configs
 
     @staticmethod
     def can_refresh(auth_session) -> bool:
@@ -116,8 +118,8 @@ class UseCaseRefresh(UseCase):
                     , str(uuid4())
                     , current_auth_session.get_account_id()
                     , current_time
-                    , current_time + timedelta(hours=1)
-                    , current_time + timedelta(days=5))
+                    , current_time + timedelta(hours=self.auth_tokens_ttl_configs.get_access_token_ttl())
+                    , current_time + timedelta(days=self.auth_tokens_ttl_configs.get_refresh_token_ttl()))
                 self.auth_token_storage.store(unit_of_work, new_auth_session)
                 self.auth_token_storage.remove(unit_of_work, current_auth_session.get_id())
             else:

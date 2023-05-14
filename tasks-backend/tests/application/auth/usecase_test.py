@@ -214,7 +214,11 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         when(mocked_auth_storage) \
             .remove(...)
 
-        under_test = UseCaseRefresh(MockedLogger(), MockedUnitOfWorkProvider(), mocked_auth_storage)
+        under_test = UseCaseRefresh(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , mocked_auth_storage
+            , AuthTokenTTLConfigs())
         result = under_test.execute(VALID_REFRESH_TOKEN)
 
         assert result is not None
@@ -238,7 +242,11 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
             .find_by_refresh_token(...) \
             .thenReturn(None)
 
-        under_test = UseCaseRefresh(MockedLogger(), MockedUnitOfWorkProvider(), mocked_auth_storage)
+        under_test = UseCaseRefresh(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , mocked_auth_storage
+            , AuthTokenTTLConfigs())
         with pytest.raises(InvalidAuthorizationError):
             under_test.execute(VALID_REFRESH_TOKEN)
 
@@ -252,9 +260,44 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
 
         mocked_auth_storage = mock(AuthTokenStorage)
 
-        under_test = UseCaseRefresh(MockedLogger(), MockedUnitOfWorkProvider(), mocked_auth_storage)
+        under_test = UseCaseRefresh(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , mocked_auth_storage
+            , AuthTokenTTLConfigs())
         with pytest.raises(AssertionError):
             under_test.execute(None)
+
+        verifyNoMoreInteractions(mocked_auth_storage)
+
+    def test_should_fail_refresh_token_expired(self):
+        from src.application.auth.providers import AuthTokenStorage, AuthSession
+        from src.application.auth.usecases import UseCaseRefresh
+
+        current_auth_session = AuthSession(
+            uuid4()
+            , str(INVALID_REFRESH_TOKEN)
+            , ACCOUNT_ID
+            , datetime.now() - timedelta(hours=5)
+            , datetime.now() - timedelta(hours=4)
+            , datetime.now() - timedelta(days=2))
+        mocked_auth_storage = mock(AuthTokenStorage)
+        when(mocked_auth_storage) \
+            .find_by_refresh_token(...) \
+            .thenReturn(current_auth_session)
+        when(mocked_auth_storage) \
+            .remove(...)
+
+        under_test = UseCaseRefresh(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , mocked_auth_storage
+            , AuthTokenTTLConfigs())
+        with pytest.raises(InvalidAuthorizationError):
+            under_test.execute(INVALID_REFRESH_TOKEN)
+
+        verify(mocked_auth_storage).find_by_refresh_token(...)
+        verify(mocked_auth_storage).remove(...)
 
         verifyNoMoreInteractions(mocked_auth_storage)
 

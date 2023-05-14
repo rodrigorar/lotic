@@ -21,15 +21,18 @@ Feature: Auth operations
   # Refresh
 
   Scenario: Refresh successfully
-    # TODO: Not implemented
     Given a valid account
     When it tries to refresh its token
     Then it should receive a new valid authorization token
 
   Scenario: Refresh with unknown token
-    # TODO: Not implemented
     Given an invalid account
     When it tries to refresh its token
+    Then it should receive a forbidden error
+
+  Scenario: Expired Refresh Token
+    Given a valid account
+    When it tries to refresh its old token
     Then it should receive a forbidden error
 
   # Logout

@@ -9,7 +9,9 @@ JOHN_DOE_ID = uuid.UUID("59dc6d88-d894-4d26-a2d5-dad9c57cde05")
 JOHN_DOE_EMAIL = "john.doe@mail.not"
 JOHN_DOE_PASSWORD = "passwd01"
 JOHN_DOE_AUTH_TOKEN = uuid.UUID("2c924286-753c-46b8-9711-fc716606ee0c")
+JOHN_DOE_OLD_AUTH_TOKEN = uuid.UUID("9cd043e4-6f0b-4581-bc4d-818982a4cdcf")
 JOHN_DOE_REFRESH_TOKEN = uuid.UUID("dd62564a-f36a-486d-915a-3c46517847f0")
+JOHN_DOE_OLD_REFRESH_TOKEN = uuid.UUID("0f194472-5a58-47e3-ae4e-f0df407407c2")
 JOHN_DOE_TASK_1 = uuid.UUID("7dd8eda4-dd7e-404c-a578-84eafdad1086")
 JOHN_DOE_TASK_2 = uuid.UUID("db62fd6b-b958-4cef-8efa-07dce85133b9")
 JOHN_DOE_TASK_3 = uuid.UUID("30fa464f-4692-45aa-a4d2-752dc19fa0cc")
@@ -81,6 +83,15 @@ def before_scenario(context, scenario):
                 , datetime.now()
                 , datetime.now() + timedelta(hours=1)
                 , datetime.now() + timedelta(days=5)))
+
+        context.db.session.add(
+            AuthSession(
+                JOHN_DOE_OLD_AUTH_TOKEN
+                , str(JOHN_DOE_OLD_REFRESH_TOKEN)
+                , JOHN_DOE_ID
+                , datetime.now()
+                , datetime.now() - timedelta(hours=1)
+                , datetime.now() - timedelta(days=5)))
 
         context.db.session.add(
             Task(

@@ -130,7 +130,11 @@ class AuthUseCaseProvider:
 
     @staticmethod
     def refresh():
-        return UseCaseRefresh(logger, unit_of_work_provider, AuthTokenStorageImpl())
+        return UseCaseRefresh(
+            logger
+            , unit_of_work_provider
+            , AuthTokenStorageImpl()
+            , AuthTokenTTLConfigs())
 
     @staticmethod
     def logout():

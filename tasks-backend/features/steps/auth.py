@@ -12,13 +12,15 @@ from src.utils import URL_PREFIX_V1
 @given("a valid account")
 def step_impl(context):
     from features.environment import JOHN_DOE_EMAIL, JOHN_DOE_PASSWORD, JOHN_DOE_REFRESH_TOKEN, \
-        JOHN_DOE_AUTH_TOKEN, JOHN_DOE_ID
+        JOHN_DOE_AUTH_TOKEN, JOHN_DOE_ID, JOHN_DOE_OLD_AUTH_TOKEN, JOHN_DOE_OLD_REFRESH_TOKEN
 
     context.account_id = JOHN_DOE_ID
     context.subject = JOHN_DOE_EMAIL
     context.secret = JOHN_DOE_PASSWORD
-    context.refresh_token = JOHN_DOE_REFRESH_TOKEN
     context.auth_token = JOHN_DOE_AUTH_TOKEN
+    context.refresh_token = JOHN_DOE_REFRESH_TOKEN
+    context.old_auth_token = JOHN_DOE_OLD_AUTH_TOKEN
+    context.old_refresh_token = JOHN_DOE_OLD_REFRESH_TOKEN
 
 
 @given("a valid account with a wrong secret")
@@ -80,6 +82,15 @@ def step_impl(context):
         URL_PREFIX_V1 + "/auth/refresh/" + str(context.refresh_token)
         , headers={
             'X-Authorization': context.auth_token
+        })
+
+
+@when('it tries to refresh its old token')
+def step_impl(context):
+    context.response = context.client.post(
+        URL_PREFIX_V1 + "/auth/refresh/" + str(context.old_refresh_token)
+        , headers={
+            'X-Authorization': context.old_auth_token
         })
 
 
@@ -149,6 +160,8 @@ def step_impl(context):
     from src.infrastructure.auth.payloads import AuthTokenResponse
 
     assert context.response is not None
+    print(context.response.status_code)
+    print(context.response.get_data())
     assert context.response.status_code == 200
 
     auth_response = from_json(AuthTokenResponse, context.response.get_data())
