@@ -7,16 +7,16 @@ class AppConfigurations:
             cls._instance = object.__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def set_app_config(self, app_config):
+    def set_app_config(self, app):
         from src.application.auth.configurations import AuthTokenTTLConfigs
 
         if self._app_config is None:
-            self._app_config = app_config
+            self._app_config = app.config
 
-            # Configure Auth Tokens TTL Config
-            value = AuthTokenTTLConfigs()
-            value.with_access_token_ttl_hours(self.access_token_ttl_hours())
-            value.with_refresh_token_ttl_days(self.refresh_token_ttl_days())
+        # Configure Auth Tokens TTL Config
+        value = AuthTokenTTLConfigs()
+        value.with_access_token_ttl_hours(lambda: self.access_token_ttl_hours())
+        value.with_refresh_token_ttl_days(lambda: self.refresh_token_ttl_days())
 
     def database_uri(self):
         return self._app_config.get("SQLALCHEMY_DATABASE_URI")

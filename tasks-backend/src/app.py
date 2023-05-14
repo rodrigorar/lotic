@@ -15,7 +15,7 @@ from src.infrastructure.error_handlers import configure_error_handlers
 
 def config_app(flask):
     app_config = AppConfigurations()
-    app_config.set_app_config(flask.config)
+    app_config.set_app_config(flask)
     fileConfig(app_config.config_file())
     flask.secret_key = app_config.secret_key()
 

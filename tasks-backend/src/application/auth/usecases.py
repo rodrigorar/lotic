@@ -51,8 +51,8 @@ class UseCaseLogin(UseCase):
                 , str(uuid4())
                 , account.get_id()
                 , current_time
-                , current_time + timedelta(hours=self.auth_token_ttls.access_token_ttl_hours)
-                , current_time + timedelta(days=self.auth_token_ttls.refresh_token_ttl_days))
+                , current_time + timedelta(hours=self.auth_token_ttls.get_access_token_ttl())
+                , current_time + timedelta(days=self.auth_token_ttls.get_refresh_token_ttl()))
             self.auth_token_storage.store(unit_of_work, auth_session)
 
             return AuthToken(
