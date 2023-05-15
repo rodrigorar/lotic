@@ -35,6 +35,23 @@ Feature: Auth operations
     When it tries to refresh its old token
     Then it should receive a forbidden error
 
+  # Logout Session
+
+  Scenario: Logout Session Successfully
+    Given a valid account
+    When it tries to logout the session
+    Then the session should be successfully logged out
+
+  Scenario: Logout session with invalid authorization token
+    Given a valid account
+    When it tries to logout the session with an invalid auth token
+    Then it should continue with the session logged in
+
+  Scenario: Logout session with no auth sessions
+    Given a valid account with no sessions
+    When it tries to logout the session
+    Then it should receive a forbidden error from the session
+
   # Logout
 
   Scenario: Logout successfully

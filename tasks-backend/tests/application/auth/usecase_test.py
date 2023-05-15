@@ -302,6 +302,24 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
         verifyNoMoreInteractions(mocked_auth_storage)
 
 
+class TestUseCaseLogoutSession(ApplicationUnitTestsBase):
+
+    def test_should_succeed_logout(self):
+        raise NotImplementedError("TestUseCaseLogoutSession#test_should_succeed_logout is not implemented")
+
+    def test_should_fail_forbidden_error(self):
+        raise NotImplementedError("TestUseCaseLogoutSession#test_should_fail_forbidden_error is not implemented")
+
+    def test_should_fail_not_found_error(self):
+        raise NotImplementedError("TestUseCaseLogoutSession#test_should_fail_not_found_error is not implemented")
+
+    def test_should_fail_storage_error(self):
+        raise NotImplementedError("TestUseCaseLogoutSession#test_should_fail_storage_error is not implemented")
+
+    def test_should_fail_no_access_token_provided(self):
+        raise NotImplementedError("TestUseCaseLogoutSession#test_should_fail_no_access_token_provided is not implemented")
+
+
 class TestUseCaseLogout(ApplicationUnitTestsBase):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
@@ -313,7 +331,10 @@ class TestUseCaseLogout(ApplicationUnitTestsBase):
         when(mocked_auth_token_storage) \
             .remove_all_for_account_id(...)
 
-        under_test = UseCaseLogout(MockedUnitOfWorkProvider(), mocked_auth_token_storage)
+        under_test = UseCaseLogout(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , mocked_auth_token_storage)
         under_test.execute(ACCOUNT_ID)
 
         verify(mocked_auth_token_storage).remove_all_for_account_id(...)
@@ -327,7 +348,10 @@ class TestUseCaseLogout(ApplicationUnitTestsBase):
 
         mocked_auth_token_storage = mock(AuthTokenStorage)
 
-        under_test = UseCaseLogout(MockedUnitOfWorkProvider(), mocked_auth_token_storage)
+        under_test = UseCaseLogout(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , mocked_auth_token_storage)
         with pytest.raises(AuthorizationError):
             under_test.execute(ACCOUNT_ID)
 
@@ -340,7 +364,10 @@ class TestUseCaseLogout(ApplicationUnitTestsBase):
 
         mocked_auth_token_storage = mock(AuthTokenStorage)
 
-        under_test = UseCaseLogout(MockedUnitOfWorkProvider(), mocked_auth_token_storage)
+        under_test = UseCaseLogout(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , mocked_auth_token_storage)
         with pytest.raises(AssertionError):
             under_test.execute(None)
 

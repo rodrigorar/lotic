@@ -12,7 +12,6 @@ from src.infrastructure.error_handlers import BadRequestResponse, ConflictRespon
     GenericErrorResponse, NotFoundResponse, UnauthorizedResponse
 from src.utils import URL_PREFIX_V1
 
-logger = LogProvider().get()
 auth_bp = APIBlueprint(
     "/auth"
     , __name__
@@ -30,7 +29,6 @@ auth_bp = APIBlueprint(
     }
 )
 def login(body: LoginRequest):
-    logger.info("Endpoint: login")
     use_case = AuthUseCaseProvider.login()
     result = use_case.execute(body.to_dto())
     return to_json(AuthTokenResponse.from_dto(result))
@@ -49,11 +47,26 @@ class RefreshTokenPath(BaseModel):
     }
 )
 def refresh(path: RefreshTokenPath):
-    logger.info("Endpoint: refresh")
-
     use_case = AuthUseCaseProvider.refresh()
     result = use_case.execute(uuid.UUID(path.refresh_token))
-    return to_json(AuthTokenResponse.from_dto(result)), 200, {'Content-Type': 'application/json'}
+    return to_json(AuthTokenResponse.from_dto(result)), 200, {"Content-Type": "application/json"}
+
+
+class LogoutSessionTokenPath(BaseModel):
+    access_token: str = Field(None, description="Access Token")
+
+
+@auth_bp.post(
+    "/<access_token>/logout"
+    , responses={
+        "204": None
+        , "401": UnauthorizedResponse
+        , "500": GenericErrorResponse
+    })
+def logout_session(path: LogoutSessionTokenPath):
+    use_case = AuthUseCaseProvider.logout_session()
+    result = use_case.execute(uuid.UUID(path.access_token))
+    return to_json(AuthTokenResponse.from_dto(result)), 200, {"Content-Type": "application/json"}
 
 
 @auth_bp.post(
@@ -66,8 +79,6 @@ def refresh(path: RefreshTokenPath):
     }
 )
 def logout():
-    logger.info("Endpoint: logout")
-
     try:
         request_data = from_json(LogoutRequest, request.get_data())
     except TypeError:

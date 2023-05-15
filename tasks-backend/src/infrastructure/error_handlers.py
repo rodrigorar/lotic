@@ -3,7 +3,8 @@ from http.client import HTTPException
 from flask_openapi3 import OpenAPI, Info
 from pydantic import BaseModel, Field, ValidationError
 
-from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
+from src.application.errors import AuthorizationError, ForbiddenError, InvalidAuthorizationError, \
+    LoginFailedError
 from src.domain import ConflictError, InvalidArgumentError, LogProvider, NotFoundError
 from src.infrastructure import to_json
 
@@ -53,6 +54,14 @@ class NotFoundResponse(ErrorResponse):
             , detail)
 
 
+class ForbiddenResponse(ErrorResponse):
+    def __init__(self, detail: str):
+        super().__init__(
+            "http://localhost:5000/forbidden_error"
+            , "Forbidden"
+            , "403"
+            , detail)
+
 class BadRequestResponse(ErrorResponse):
 
     def __init__(self, detail: str):
@@ -92,6 +101,12 @@ def configure_error_handlers(app: OpenAPI):
         return to_json(NotFoundResponse(e.details)) \
             , 404 \
             , {'Content-Type': 'application/problem+json'}
+
+    @app.errorhandler(ForbiddenError)
+    def handle_forbidden_error(e: ForbiddenError):
+        return to_json(ForbiddenError(e.details)) \
+            , 403 \
+            , {"Content-Type": "application/problem+json"}
 
     @app.errorhandler(LoginFailedError)
     def handle_login_failed_error(e: LoginFailedError):

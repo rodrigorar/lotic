@@ -7,7 +7,8 @@ from src.application import UnitOfWork
 from src.application.auth.shared import EncryptionEngine
 from src.application.auth.models import AuthSession
 from src.application.auth.providers import AuthTokenStorage
-from src.application.auth.usecases import UseCaseLogin, UseCaseLogout, UseCaseRefresh
+from src.application.auth.usecases import UseCaseLogin, UseCaseLogout, UseCaseLogoutSession, \
+    UseCaseRefresh
 from src.application.auth.configurations import AuthTokenTTLConfigs
 from src.domain import LogProvider
 from src.infrastructure import UnitOfWorkProviderImpl
@@ -112,6 +113,8 @@ class AuthTokenStorageImpl(AuthTokenStorage):
 
 
 unit_of_work_provider = UnitOfWorkProviderImpl()
+auth_token_storage = AuthTokenStorageImpl()
+auth_token_ttl_configs = AuthTokenTTLConfigs()
 
 
 class AuthUseCaseProvider:
@@ -124,18 +127,27 @@ class AuthUseCaseProvider:
             logger
             , unit_of_work_provider
             , AccountBusinessRulesProviderImpl()
-            , AuthTokenStorageImpl()
+            , auth_token_storage
             , EncryptionEngineBCrypt()
-            , AuthTokenTTLConfigs())
+            , auth_token_ttl_configs)
 
     @staticmethod
     def refresh():
         return UseCaseRefresh(
             logger
             , unit_of_work_provider
-            , AuthTokenStorageImpl()
-            , AuthTokenTTLConfigs())
+            , auth_token_storage
+            , auth_token_ttl_configs)
+
+    @staticmethod
+    def logout_session():
+        return UseCaseLogoutSession(
+            logger
+            , unit_of_work_provider)
 
     @staticmethod
     def logout():
-        return UseCaseLogout(unit_of_work_provider, AuthTokenStorageImpl())
+        return UseCaseLogout(
+            logger
+            , unit_of_work_provider
+            , auth_token_storage)

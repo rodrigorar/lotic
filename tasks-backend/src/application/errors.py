@@ -13,6 +13,12 @@ class InvalidAuthorizationError(BaseError):
         super().__init__("invalid_authorization_error", details)
 
 
+class ForbiddenError(BaseError):
+
+    def __init__(self, details=""):
+        super().__init__("forbidden_error", details)
+
+
 class AuthorizationError(BaseError):
 
     def __init__(self, details=""):

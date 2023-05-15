@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
 from enum import Enum
+import inspect
 from logging import Logger
 import uuid
 from uuid import uuid4
+import warnings
 
 from src.application import UnitOfWorkProvider, UseCase
 from src.application.auth.configurations import AuthTokenTTLConfigs
@@ -137,17 +139,46 @@ class UseCaseRefresh(UseCase):
             , new_auth_session.expires_at)
 
 
+class UseCaseLogoutSession(UseCase):
+
+    def __init__(
+            self
+            , logger: Logger
+            , unit_of_work_provider: UnitOfWorkProvider
+            , auth_token_storage: AuthTokenStorage):
+
+        self.logger = logger
+        self.unit_of_work_provider = unit_of_work_provider
+        self.auth_token_storage = auth_token_storage
+
+    def execute(self, access_token: uuid):
+        self.logger.info("Executing ---> UseCase[LogoutSession]")
+
+        assert access_token is not None, "Access Token cannot be null"
+
+        with self.unit_of_work_provider.get() as unit_of_work:
+            auth_session = self.auth_token_storage.find_by_id(unit_of_work, access_token)
+            if auth_session is None:
+                raise NotFoundError("No auth session for " + access_token)
+            elif not AuthorizationContext.is_matching_account(auth_session.account_id):
+                raise AuthorizationError("Non authorized operation for ")
+            self.auth_token_storage.remove(unit_of_work, access_token)
+
+
 class UseCaseLogout(UseCase):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work_provider: UnitOfWorkProvider
             , auth_token_storage: AuthTokenStorage):
+        self.logger = logger
         self.unit_of_work_provider = unit_of_work_provider
         self.auth_token_storage = auth_token_storage
 
-    # FIXME: Logout should be based on the token instead of the account
     def execute(self, account_id: uuid) -> None:
+        self.logger.info("Executing ---> UseCase[Logout]")
+
         assert account_id is not None, "Account id cannot be null"
 
         if not AuthorizationContext.is_matching_account(account_id):
