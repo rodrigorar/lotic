@@ -106,6 +106,27 @@ def step_impl(context):
         })
 
 
+@when("it tries to logout the session")
+def step_impl(context):
+    context.response = context.client.delete(
+        URL_PREFIX_V1 + "/auth/" + str(context.auth_token)
+        , headers={
+            "X-Authorization": str(context.auth_token)
+        }
+    )
+
+
+@when("it tries to logout the session with an invalid auth token")
+def step_impl(context):
+    invalid_auth_token = uuid4()
+    context.response = context.client.delete(
+        URL_PREFIX_V1 + "/auth/" + str(invalid_auth_token)
+        , headers={
+            "X-Authorization": str(invalid_auth_token)
+        }
+    )
+
+
 @when("it tries to logout with an invalid auth token")
 def step_impl(context):
     context.response = context.client.post(
@@ -192,7 +213,34 @@ def step_impl(context):
         assert len(db_entries) == 0
 
 
+@then("the session should be successfully logged out")
+def step_impl(context):
+    from src.application.auth.models import AuthSession
+
+    print(context.response.status_code)
+    print(context.response.get_data())
+
+    assert context.response is not None
+    assert context.response.status_code == 204
+
+    with context.app.app_context():
+        db_entries = context.db.session.query(AuthSession).filter_by(id=context.auth_token).first()
+        assert db_entries is None
+
+
 @then("it should continue logged in")
+def step_impl(context):
+    assert context.response is not None
+    assert context.response.status_code == 401
+
+
+@then("it should continue with the session logged in")
+def step_impl(context):
+    assert context.response is not None
+    assert context.response.status_code == 401
+
+
+@then("it should receive a forbidden error from the session")
 def step_impl(context):
     assert context.response is not None
     assert context.response.status_code == 401

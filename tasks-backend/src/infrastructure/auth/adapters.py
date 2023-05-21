@@ -143,7 +143,8 @@ class AuthUseCaseProvider:
     def logout_session():
         return UseCaseLogoutSession(
             logger
-            , unit_of_work_provider)
+            , unit_of_work_provider
+            , auth_token_storage)
 
     @staticmethod
     def logout():

@@ -56,8 +56,8 @@ class LogoutSessionTokenPath(BaseModel):
     access_token: str = Field(None, description="Access Token")
 
 
-@auth_bp.post(
-    "/<access_token>/logout"
+@auth_bp.delete(
+    "/<access_token>"
     , responses={
         "204": None
         , "401": UnauthorizedResponse
@@ -65,8 +65,8 @@ class LogoutSessionTokenPath(BaseModel):
     })
 def logout_session(path: LogoutSessionTokenPath):
     use_case = AuthUseCaseProvider.logout_session()
-    result = use_case.execute(uuid.UUID(path.access_token))
-    return to_json(AuthTokenResponse.from_dto(result)), 200, {"Content-Type": "application/json"}
+    use_case.execute(uuid.UUID(path.access_token))
+    return "", 204
 
 
 @auth_bp.post(

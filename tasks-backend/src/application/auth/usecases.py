@@ -158,10 +158,11 @@ class UseCaseLogoutSession(UseCase):
 
         with self.unit_of_work_provider.get() as unit_of_work:
             auth_session = self.auth_token_storage.find_by_id(unit_of_work, access_token)
+
             if auth_session is None:
                 raise NotFoundError("No auth session for " + str(access_token))
-            elif not AuthorizationContext.is_matching_account(auth_session.account_id):
-                raise AuthorizationError("Non authorized operation for ")
+            elif not AuthorizationContext.is_matching_account(auth_session.get_account_id()):
+                raise AuthorizationError("Not authorized for operation")
             self.auth_token_storage.remove(unit_of_work, access_token)
 
 
