@@ -43,14 +43,14 @@ class AuthSession(db.Model):
     def __init__(
             self
             , session_id: uuid
-            , refresh_token: str
+            , refresh_token: uuid
             , account_id: uuid
             , created_at: datetime
             , expires_at: datetime
             , refresh_expires_at: datetime):
 
         self.id = str(session_id)
-        self.refresh_token = refresh_token
+        self.refresh_token = str(refresh_token)
         self.account_id = str(account_id)
         self.created_at = created_at
         self.expires_at = expires_at

@@ -71,7 +71,7 @@ class UseCaseLogin(UseCase):
             current_time = datetime.now()
             auth_session = AuthSession(
                 uuid4()
-                , str(uuid4())
+                , uuid4()
                 , account.get_id()
                 , current_time
                 , current_time + timedelta(hours=self.auth_token_ttls.get_access_token_ttl())
@@ -117,7 +117,7 @@ class UseCaseRefresh(UseCase):
                 current_time = datetime.now()
                 new_auth_session = AuthSession(
                     uuid4()
-                    , str(uuid4())
+                    , uuid4()
                     , current_auth_session.get_account_id()
                     , current_time
                     , current_time + timedelta(hours=self.auth_tokens_ttl_configs.get_access_token_ttl())
@@ -159,7 +159,7 @@ class UseCaseLogoutSession(UseCase):
         with self.unit_of_work_provider.get() as unit_of_work:
             auth_session = self.auth_token_storage.find_by_id(unit_of_work, access_token)
             if auth_session is None:
-                raise NotFoundError("No auth session for " + access_token)
+                raise NotFoundError("No auth session for " + str(access_token))
             elif not AuthorizationContext.is_matching_account(auth_session.account_id):
                 raise AuthorizationError("Non authorized operation for ")
             self.auth_token_storage.remove(unit_of_work, access_token)

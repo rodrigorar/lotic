@@ -78,8 +78,8 @@ class AuthTokenStorageImpl(AuthTokenStorage):
             .filter_by(refresh_token=refresh_token) \
             .first()
         return AuthSession(
-            result.id
-            , result.refresh_token
+            uuid.UUID(result.id)
+            , uuid.UUID(result.refresh_token)
             , result.account_id
             , result.created_at
             , result.expires_at

@@ -78,7 +78,7 @@ def before_scenario(context, scenario):
         context.db.session.add(
             AuthSession(
                 JOHN_DOE_AUTH_TOKEN
-                , str(JOHN_DOE_REFRESH_TOKEN)
+                , JOHN_DOE_REFRESH_TOKEN
                 , JOHN_DOE_ID
                 , datetime.now()
                 , datetime.now() + timedelta(hours=1)
@@ -87,7 +87,7 @@ def before_scenario(context, scenario):
         context.db.session.add(
             AuthSession(
                 JOHN_DOE_OLD_AUTH_TOKEN
-                , str(JOHN_DOE_OLD_REFRESH_TOKEN)
+                , JOHN_DOE_OLD_REFRESH_TOKEN
                 , JOHN_DOE_ID
                 , datetime.now()
                 , datetime.now() - timedelta(hours=1)
@@ -135,7 +135,7 @@ def before_scenario(context, scenario):
         context.db.session.add(
             AuthSession(
                 JANE_DOE_AUTH_TOKEN
-                , str(JANE_DOE_REFRESH_TOKEN)
+                , JANE_DOE_REFRESH_TOKEN
                 , JANE_DOE_ID
                 , datetime.now()
                 , datetime.now() + timedelta(hours=1)

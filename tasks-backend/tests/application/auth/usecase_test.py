@@ -6,7 +6,7 @@ from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
 from src.application.auth.configurations import AuthTokenTTLConfigs
-from src.domain import DatabaseProvider, NotFoundError
+from src.domain import DatabaseProvider, InternalError, NotFoundError
 from src.application.errors import AuthorizationError, InvalidAuthorizationError, LoginFailedError
 from tests.application.shared import ApplicationUnitTestsBase, MockedLogger, \
     MockedUnitOfWorkProvider
@@ -200,7 +200,7 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
 
         current_auth_session = AuthSession(
             uuid4()
-            , str(VALID_REFRESH_TOKEN)
+            , VALID_REFRESH_TOKEN
             , ACCOUNT_ID
             , datetime.now() - timedelta(hours=5)
             , datetime.now() - timedelta(hours=4)
@@ -276,7 +276,7 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
 
         current_auth_session = AuthSession(
             uuid4()
-            , str(INVALID_REFRESH_TOKEN)
+            , INVALID_REFRESH_TOKEN
             , ACCOUNT_ID
             , datetime.now() - timedelta(hours=5)
             , datetime.now() - timedelta(hours=4)
@@ -304,20 +304,127 @@ class TestUseCaseRefresh(ApplicationUnitTestsBase):
 
 class TestUseCaseLogoutSession(ApplicationUnitTestsBase):
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_logout(self):
-        raise NotImplementedError("TestUseCaseLogoutSession#test_should_succeed_logout is not implemented")
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.models import AuthSession
+        from src.application.auth.usecases import UseCaseLogoutSession
 
+        access_token = uuid4()
+        dummy_auth_session = AuthSession(
+            access_token
+            , uuid4()
+            , ACCOUNT_ID
+            , datetime.now() - timedelta(hours=5)
+            , datetime.now() - timedelta(hours=4)
+            , datetime.now() - timedelta(days=2))
+
+        mocked_auth_token_storage = mock(AuthTokenStorage)
+        when(mocked_auth_token_storage) \
+            .find_by_id(...) \
+            .thenReturn(dummy_auth_session)
+        when(mocked_auth_token_storage) \
+            .remove(...)
+
+        under_test = UseCaseLogoutSession(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , mocked_auth_token_storage)
+        under_test.execute(access_token)
+
+        verify(mocked_auth_token_storage).find_by_id(...)
+        verify(mocked_auth_token_storage).remove(...)
+
+        verifyNoMoreInteractions(mocked_auth_token_storage)
+
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=False))
     def test_should_fail_forbidden_error(self):
-        raise NotImplementedError("TestUseCaseLogoutSession#test_should_fail_forbidden_error is not implemented")
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.models import AuthSession
+        from src.application.auth.usecases import UseCaseLogoutSession
 
+        access_token = uuid4()
+        dummy_auth_session = AuthSession(
+            access_token
+            , uuid4()
+            , ACCOUNT_ID
+            , datetime.now() - timedelta(hours=5)
+            , datetime.now() - timedelta(hours=4)
+            , datetime.now() - timedelta(days=2))
+
+        mocked_auth_token_storage = mock(AuthTokenStorage)
+        when(mocked_auth_token_storage) \
+            .find_by_id(...) \
+            .thenReturn(dummy_auth_session)
+
+        under_test = UseCaseLogoutSession(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , mocked_auth_token_storage)
+        with pytest.raises(AuthorizationError):
+            under_test.execute(access_token)
+
+        verify(mocked_auth_token_storage).find_by_id(...)
+
+        verifyNoMoreInteractions(mocked_auth_token_storage)
+
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_not_found_error(self):
-        raise NotImplementedError("TestUseCaseLogoutSession#test_should_fail_not_found_error is not implemented")
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.usecases import UseCaseLogoutSession
 
+        mocked_auth_token_storage = mock(AuthTokenStorage)
+        when(mocked_auth_token_storage) \
+            .find_by_id(...) \
+            .thenReturn(None)
+
+        under_test = UseCaseLogoutSession(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , mocked_auth_token_storage)
+        with pytest.raises(NotFoundError):
+            under_test.execute(uuid4())
+
+        verify(mocked_auth_token_storage).find_by_id(...)
+
+        verifyNoMoreInteractions(mocked_auth_token_storage)
+
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_storage_error(self):
-        raise NotImplementedError("TestUseCaseLogoutSession#test_should_fail_storage_error is not implemented")
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.usecases import UseCaseLogoutSession
 
+        mocked_auth_token_storage = mock(AuthTokenStorage)
+        when(mocked_auth_token_storage) \
+            .find_by_id(...) \
+            .thenRaise(InternalError("Something went very wrong"))
+
+        under_test = UseCaseLogoutSession(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , mocked_auth_token_storage)
+        with pytest.raises(InternalError):
+            under_test.execute(uuid4())
+
+        verify(mocked_auth_token_storage).find_by_id(...)
+
+        verifyNoMoreInteractions(mocked_auth_token_storage)
+
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_no_access_token_provided(self):
-        raise NotImplementedError("TestUseCaseLogoutSession#test_should_fail_no_access_token_provided is not implemented")
+        from src.application.auth.providers import AuthTokenStorage
+        from src.application.auth.usecases import UseCaseLogoutSession
+
+        mocked_auth_token_storage = mock(AuthTokenStorage)
+
+        under_test = UseCaseLogoutSession(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , mocked_auth_token_storage)
+        with pytest.raises(AssertionError):
+            under_test.execute(None)
+
+        verifyNoMoreInteractions(mocked_auth_token_storage)
 
 
 class TestUseCaseLogout(ApplicationUnitTestsBase):
