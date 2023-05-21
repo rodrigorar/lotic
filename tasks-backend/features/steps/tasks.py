@@ -105,6 +105,19 @@ def step_impl(context):
                 })
 
 
+@when("it tries to create tasks with empty array")
+def step_impl(context):
+    context.result = []
+    context.response = context.client.post(
+        URL_PREFIX_V1 + '/tasks'
+        , json={
+            "tasks": []
+        }
+        , headers={
+            'X-Authorization': context.auth_tokens[0]
+        })
+
+
 @when('it tries to update a single task')
 def step_impl(context):
     from src.domain.tasks import Task, AccountTasks
@@ -314,15 +327,16 @@ def step_impl(context):
 
     assert context.response is not None
     assert context.response.status_code == 200
-    with context.app.app_context():
-        db_result = context.db.session \
-            .query(Task) \
-            .filter(Task.id.in_([str(entry) for entry in context.result])) \
-            .all()
+    if len(context.result) > 0:
+        with context.app.app_context():
+            db_result = context.db.session \
+                .query(Task) \
+                .filter(Task.id.in_([str(entry) for entry in context.result])) \
+                .all()
 
-        assert len(db_result) == 3
-        for task in db_result:
-            assert task.get_id() in context.result
+            assert len(db_result) == 3
+            for task in db_result:
+                assert task.get_id() in context.result
 
 
 @then('that task should be successfully updated')

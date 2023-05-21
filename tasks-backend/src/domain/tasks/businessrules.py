@@ -1,8 +1,8 @@
 from functools import reduce
+from logging import Logger
 import uuid
 
-from src.domain import ConflictError, InternalError, BaseBusinessRule, \
-    reducer_duplicated
+from src.domain import InternalError, BaseBusinessRule
 from src.domain.tasks import AccountTasks, Task, TasksRepository, AccountTasksRepository
 
 
@@ -10,29 +10,27 @@ class CreateTasks(BaseBusinessRule):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work
             , tasks_repository: TasksRepository
             , user_tasks_repository: AccountTasksRepository):
 
         super().__init__(unit_of_work)
+
+        self.logger = logger
         self.tasks_repository = tasks_repository
         self.account_tasks_repository = user_tasks_repository
 
     def execute(self, tasks: list[Task]) -> list[uuid]:
+        self.logger.info("Executing ---> BusinessRule[CreateTasks]")
+
         assert tasks is not None, "Task list cannot be null"
-        owner_ids = [task.get_owner_id() for task in tasks] \
-            if len(tasks) == 1 \
-            else reduce(reducer_duplicated, [task.get_owner_id() for task in tasks])
 
-        # FIXME: Use assert instead of if
-        if len(owner_ids) > 1:
-            raise ConflictError('Cannot create tasks for more than one owner at a time')
-
-        task_ids = self.tasks_repository.insert_multiple(self.unit_of_work, tasks)
-        account_tasks = [AccountTasks(owner_ids[0], task_id) for task_id in task_ids]
+        account_tasks = [AccountTasks(task.get_owner_id(), task.get_id()) for task in tasks]
+        self.tasks_repository.insert_multiple(self.unit_of_work, tasks)
         self.account_tasks_repository.insert_multiple(self.unit_of_work, account_tasks)
 
-        return task_ids
+        return [task.get_id() for task in tasks]
 
 
 class UpdateTasks(BaseBusinessRule):

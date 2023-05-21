@@ -5,53 +5,54 @@ import uuid
 from src.application import UnitOfWorkProvider, UseCase
 from src.application.auth.shared import AuthorizationContext
 from src.application.errors import AuthorizationError
+from src.application.shared import UseCaseCommand
 from src.application.tasks.dto import TaskDTO
 from src.domain import reducer_duplicated, ConflictError, NotFoundError
 from src.domain.accounts import AccountBusinessRulesProvider
 from src.domain.tasks import TasksBusinessRulesProvider
 
 
+# FIXME: This should be a UseCaseCommand to be coherent with the CQS Pattern we wish to use
+#   this has not been changed be cause we will need to change the API (Controller) and being so
+#   we probably will need to use a BranchByAbstraction pattern.
 class UseCaseCreateTasks(UseCase):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work_provider: UnitOfWorkProvider
             , tasks_br_provider: TasksBusinessRulesProvider
-            , account_br_provider: AccountBusinessRulesProvider
-            , logger: Logger):
+            , account_br_provider: AccountBusinessRulesProvider):
 
+        self.logger = logger
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
         self.account_br_provider = account_br_provider
-        self.logger = logger
 
     def execute(self, tasks: list[TaskDTO]) -> list[uuid]:
+        self.logger.info("Executing ---> UseCase[CreateTasks]")
+
         assert tasks is not None, "No tasks were provided"
-        # FIXME: This should be converted into the normal functioning of the use case and not
-        #   be implemented as a safeguard
-        if len(tasks) == 0:
-            return list()
 
-        owner_ids = [task.get_owner_id() for task in tasks] \
-            if len(tasks) == 1 \
-            else reduce(reducer_duplicated, [task.get_owner_id() for task in tasks])
+        result = list()
+        if len(tasks) != 0:
+            owner_ids = [task.get_owner_id() for task in tasks] \
+                if len(tasks) == 1 \
+                else reduce(reducer_duplicated, [task.get_owner_id() for task in tasks])
+            if len(owner_ids) > 1:
+                raise ConflictError("Cannot create tasks for more than one owner at a time")
 
-        if not AuthorizationContext.is_matching_account(owner_ids[0]):
-            raise AuthorizationError('Unauthorized operation')
+            if not AuthorizationContext.is_matching_account(owner_ids[0]):
+                raise AuthorizationError('Unauthorized operation')
 
-        self.logger.info("UseCase[CreateTasks](" + str(owner_ids[0]) + ")")
+            with self.unit_of_work_provider.get() as unit_of_work:
+                get_account_br = self.account_br_provider.get_account(unit_of_work)
+                account = get_account_br.execute(owner_ids[0])
+                if account is None:
+                    raise NotFoundError("Non existent account")
 
-        if len(owner_ids) > 1:
-            raise ConflictError("Cannot create tasks for more than one owner at a time")
-
-        with self.unit_of_work_provider.get() as unit_of_work:
-            get_account_br = self.account_br_provider.get_account(unit_of_work)
-            account = get_account_br.execute(owner_ids[0])
-            if account is None:
-                raise NotFoundError("Non existent account")
-
-            create_tasks_br = self.tasks_br_provider.create_tasks(unit_of_work)
-            result = create_tasks_br.execute([task.to_entity() for task in tasks])
+                create_tasks_br = self.tasks_br_provider.create_tasks(unit_of_work)
+                result = create_tasks_br.execute([task.to_entity() for task in tasks])
 
         return result
 

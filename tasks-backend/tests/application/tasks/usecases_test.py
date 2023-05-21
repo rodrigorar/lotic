@@ -115,7 +115,6 @@ class TasksUseCaseBaseTest:
         get_account_br = None
 
 
-# TODO: Should test authorization code as well, not only the happy path
 class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
@@ -137,10 +136,10 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
         ]
 
         under_test = UseCaseCreateTasks(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , MockedAccountBusinessRulesProvider()
-            , MockedLogger())
+            , MockedAccountBusinessRulesProvider())
         result = under_test.execute(input_data)
 
         assert result is not None
@@ -168,10 +167,10 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
         input_data = [TaskDTO(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID)]
 
         under_test = UseCaseCreateTasks(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , MockedAccountBusinessRulesProvider()
-            , MockedLogger())
+            , MockedAccountBusinessRulesProvider())
         result = under_test.execute(input_data)
 
         assert result is not None
@@ -183,12 +182,27 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
 
         verifyNoMoreInteractions(get_account_br, create_tasks_br)
 
+    @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
+    @patch.object(AuthorizationContext, 'is_known_account', MagicMock(return_value=True))
+    def test_should_succeed_empty_task_list(self):
+        under_test = UseCaseCreateTasks(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider()
+            , MockedAccountBusinessRulesProvider())
+        result = under_test.execute([])
+
+        assert result is not None
+        assert len(result) == 0
+
+        verifyNoMoreInteractions(get_account_br, create_tasks_br)
+
     def test_should_fail_no_port(self):
         under_test = UseCaseCreateTasks(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , MockedAccountBusinessRulesProvider()
-            , MockedLogger())
+            , MockedAccountBusinessRulesProvider())
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
@@ -212,10 +226,10 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
         ]
 
         under_test = UseCaseCreateTasks(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , MockedAccountBusinessRulesProvider()
-            , MockedLogger())
+            , MockedAccountBusinessRulesProvider())
         with pytest.raises(InternalError):
             under_test.execute(input_data)
 
@@ -238,10 +252,10 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
         ]
 
         under_test = UseCaseCreateTasks(
-            MockedUnitOfWorkProvider()
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
             , MockedTasksBusinessRulesProvider()
-            , MockedAccountBusinessRulesProvider()
-            , MockedLogger())
+            , MockedAccountBusinessRulesProvider())
 
         with pytest.raises(NotFoundError):
             under_test.execute(input_data)

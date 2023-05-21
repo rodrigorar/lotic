@@ -13,6 +13,11 @@ Feature: Tasks Operations
     When it tries to create multiple tasks
     Then those tasks should be successfully created
 
+  Scenario: A Valid user tries to create empty tasks successfully
+    Given a valid user
+    When it tries to create tasks with empty array
+    Then those tasks should be successfully created
+
   Scenario: Multiple user task creation
     Given several users
     When it tries to create multiple tasks

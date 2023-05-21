@@ -55,7 +55,6 @@ class GetAccount(BaseBusinessRule):
         self.logger.info("Executing ---> DomainService[GetAccount]")
 
         assert account_id is not None, "Account id cannot be empty"
-
         return self.account_repository.get_by_id(self.unit_of_work, account_id)
 
 

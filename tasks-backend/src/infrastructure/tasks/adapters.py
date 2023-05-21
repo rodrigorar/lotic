@@ -10,17 +10,18 @@ from src.infrastructure import UnitOfWorkProviderImpl
 from src.infrastructure.accounts import AccountBusinessRulesProviderImpl
 
 
+logger = LogProvider().get()
+
+
 class TasksRepositoryImpl(TasksRepository):
 
-    def insert_multiple(self, unit_of_work: UnitOfWork, tasks: list[Task]) -> list[uuid]:
+    def insert_multiple(self, unit_of_work: UnitOfWork, tasks: list[Task]) -> None:
         assert unit_of_work is not None, "Unit of work cannot be empty"
         assert tasks is not None, "Tasks list cannot be empty"
 
         query = unit_of_work.query()
         for task in tasks:
             query.add(task)
-
-        return [task.get_id() for task in tasks]
 
     def update_multiple(self, unit_of_work: UnitOfWork, tasks: list[Task]) -> tuple[list[uuid], list[uuid]]:
         assert unit_of_work is not None, "Unit of work cannot be empty"
@@ -74,15 +75,13 @@ class TasksRepositoryImpl(TasksRepository):
 
 class AccountTasksRepositoryImpl(AccountTasksRepository):
 
-    def insert_multiple(self, unit_of_work: UnitOfWork, account_tasks: list[AccountTasks]) -> list[(uuid, uuid)]:
+    def insert_multiple(self, unit_of_work: UnitOfWork, account_tasks: list[AccountTasks]) -> None:
         assert unit_of_work is not None, "Unit of work cannot be empty"
         assert account_tasks is not None, "User Tasks cannot be empty"
 
         query = unit_of_work.query()
         for user_task in account_tasks:
             query.add(user_task)
-
-        return [(user_task.get_account_id(), user_task.get_task_id()) for user_task in account_tasks]
 
     def list_account_tasks(self, unit_of_work: UnitOfWork, account_id: uuid) -> list[AccountTasks]:
         assert unit_of_work is not None, "Unit of work cannot be empty"
@@ -107,11 +106,19 @@ class AccountTasksRepositoryImpl(AccountTasksRepository):
         query.delete(account_task)
 
 
+tasks_repository = TasksRepositoryImpl()
+account_tasks_repository = AccountTasksRepositoryImpl()
+
+
 class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):
 
     @staticmethod
     def create_tasks(unit_of_work) -> CreateTasks:
-        return CreateTasks(unit_of_work, TasksRepositoryImpl(), AccountTasksRepositoryImpl())
+        return CreateTasks(
+            logger
+            , unit_of_work
+            , tasks_repository
+            , account_tasks_repository)
 
     @staticmethod
     def update_tasks(unit_of_work) -> UpdateTasks:
@@ -140,10 +147,10 @@ class TasksUseCaseProvider:
     @staticmethod
     def create_task():
         return UseCaseCreateTasks(
-            unit_of_work_provider
+            LogProvider().get()
+            , unit_of_work_provider
             , tasks_business_rules_provider
-            , account_business_rules_provider
-            , LogProvider().get())
+            , account_business_rules_provider)
 
     @staticmethod
     def update_tasks():

@@ -5,6 +5,7 @@ from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
 from src.domain import ConflictError, InternalError
+from tests.application.shared import MockedLogger
 from tests.domain.shared import DomainUnitTestsBase
 from tests.shared import UnitOfWorkMockProvider
 
@@ -63,7 +64,8 @@ class TestCreateTasks(DomainUnitTestsBase):
             .thenReturn([(task.get_owner_id(), task.get_id()) for task in task_list])
 
         under_test = CreateTasks(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_task_repository
             , mocked_account_tasks_repository)
         result = under_test.execute(task_list)
@@ -90,7 +92,8 @@ class TestCreateTasks(DomainUnitTestsBase):
         mocked_account_tasks_repository = mock(AccountTasksRepository)
 
         under_test = CreateTasks(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_task_repository
             , mocked_account_tasks_repository)
 
@@ -139,7 +142,8 @@ class TestCreateTasks(DomainUnitTestsBase):
         mocked_account_tasks_repository = mock(AccountTasksRepository)
 
         under_test = CreateTasks(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_task_repository
             , mocked_account_tasks_repository)
 
@@ -186,7 +190,8 @@ class TestCreateTasks(DomainUnitTestsBase):
             .thenRaise(ConflictError("Failed to insert the new AccountTask"))
 
         under_test = CreateTasks(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_task_repository
             , mocked_account_tasks_repository)
 
@@ -195,50 +200,6 @@ class TestCreateTasks(DomainUnitTestsBase):
 
         verify(mocked_task_repository).insert_multiple(...)
         verify(mocked_account_tasks_repository).insert_multiple(...)
-        verifyNoMoreInteractions(
-            mocked_unit_of_work
-            , mocked_task_repository
-            , mocked_account_tasks_repository)
-
-    def test_should_fail_multiple_owners(self):
-        from src.domain.tasks import Task, TasksRepository, AccountTasksRepository, CreateTasks
-
-        task_list = [
-            Task(
-                TASK_1_ID
-                , TASK_1_TITLE
-                , TASK_1_DESCRIPTION
-                , datetime.now()
-                , datetime.now()
-                , ACCOUNT_1_ID)
-            , Task(
-                TASK_2_ID
-                , TASK_2_TITLE
-                , TASK_2_DESCRIPTION
-                , datetime.now()
-                , datetime.now()
-                , ACCOUNT_2_ID)
-            , Task(
-                TASK_3_ID
-                , TASK_1_TITLE
-                , TASK_1_DESCRIPTION
-                , datetime.now()
-                , datetime.now()
-                , ACCOUNT_1_ID)
-        ]
-
-        mocked_unit_of_work = UnitOfWorkMockProvider.get()
-        mocked_task_repository = mock(TasksRepository)
-        mocked_account_tasks_repository = mock(AccountTasksRepository)
-
-        under_test = CreateTasks(
-            mocked_unit_of_work
-            , mocked_task_repository
-            , mocked_account_tasks_repository)
-
-        with pytest.raises(ConflictError):
-            under_test.execute(task_list)
-
         verifyNoMoreInteractions(
             mocked_unit_of_work
             , mocked_task_repository
