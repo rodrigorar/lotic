@@ -125,7 +125,7 @@ class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):
 
     @staticmethod
     def update_tasks(unit_of_work) -> UpdateTasks:
-        return UpdateTasks(logger, unit_of_work, TasksRepositoryImpl())
+        return UpdateTasks(logger, unit_of_work, tasks_repository)
 
     @staticmethod
     def delete_tasks(unit_of_work) -> DeleteTasks:
@@ -133,7 +133,11 @@ class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):
 
     @staticmethod
     def list_tasks_for_user(unit_of_work) -> ListTasksForAccount:
-        return ListTasksForAccount(unit_of_work, TasksRepositoryImpl(), AccountTasksRepositoryImpl())
+        return ListTasksForAccount(
+            logger
+            , unit_of_work
+            , tasks_repository
+            , account_tasks_repository)
 
     @staticmethod
     def list_tasks(unit_of_work) -> ListTasks:
@@ -172,6 +176,6 @@ class TasksUseCaseProvider:
     @staticmethod
     def list_tasks_for_user():
         return UseCaseListTasksForAccount(
-            unit_of_work_provider
-            , tasks_business_rules_provider
-            , LogProvider().get())
+            LogProvider().get()
+            , unit_of_work_provider
+            , tasks_business_rules_provider)

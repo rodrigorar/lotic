@@ -561,9 +561,9 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
             .thenReturn(br_result)
 
         under_test = UseCaseListTasksForAccount(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
         result = under_test.execute(ACCOUNT_ID)
 
         assert result is not None
@@ -585,9 +585,9 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
             .thenReturn(br_result)
 
         under_test = UseCaseListTasksForAccount(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
         result = under_test.execute(ACCOUNT_ID)
 
         assert result is not None
@@ -607,9 +607,9 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
             .thenReturn(br_result)
 
         under_test = UseCaseListTasksForAccount(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
         result = under_test.execute(ACCOUNT_ID)
 
         assert result is not None
@@ -622,9 +622,9 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_no_port(self):
         under_test = UseCaseListTasksForAccount(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
 
         with pytest.raises(AssertionError):
             under_test.execute(None)
@@ -638,9 +638,9 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
             .thenRaise(InternalError("Something as gone very very wrong"))
 
         under_test = UseCaseListTasksForAccount(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
 
         with pytest.raises(InternalError):
             under_test.execute(ACCOUNT_ID)

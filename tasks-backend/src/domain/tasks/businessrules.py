@@ -99,28 +99,27 @@ class ListTasksForAccount(BaseBusinessRule):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work
             , tasks_repository: TasksRepository
             , account_tasks_repository: AccountTasksRepository):
 
         super().__init__(unit_of_work)
+
+        self.logger = logger
         self.tasks_repository = tasks_repository
         self.account_tasks_repository = account_tasks_repository
 
     def execute(self, account_id: uuid):
+        self.logger.info("Executing ---> BusinessRule[ListTasksForAccount]")
+
         assert account_id is not None, "Account id cannot be null"
 
-        result = []
-
-        account_tasks = self.account_tasks_repository.list_account_tasks(self.unit_of_work, account_id)
-        # TODO: Optimize this code so that we don't have this loop
-        for account_task in account_tasks:
-            task = self.tasks_repository.get_by_id(self.unit_of_work, account_task.get_task_id())
-            if task is None:
-                raise InternalError("Invalid data state, cannot recover")
-            result.append(task)
-
-        return result
+        account_tasks = self.account_tasks_repository \
+            .list_account_tasks(self.unit_of_work, account_id)
+        result = self.tasks_repository \
+            .list_tasks(self.unit_of_work, [account_task.get_task_id() for account_task in account_tasks])
+        return result if result is not None else []
 
 
 class TasksBusinessRulesProvider:

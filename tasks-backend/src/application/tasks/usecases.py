@@ -139,21 +139,21 @@ class UseCaseListTasksForAccount(UseCase):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work_provider: UnitOfWorkProvider
-            , tasks_br_provider: TasksBusinessRulesProvider
-            , logger: Logger):
+            , tasks_br_provider: TasksBusinessRulesProvider):
 
+        self.logger = logger
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
-        self.logger = logger
 
     def execute(self, account_id: uuid) -> list[TaskDTO]:
+        self.logger.info("Executing ---> UseCase[ListTasksForAccount]")
+
         assert account_id is not None, "Account id cannot be null"
 
         if not AuthorizationContext.is_matching_account(account_id):
             raise AuthorizationError('Unauthorized operation')
-
-        self.logger.info("UseCase[ListTasksForAccount](" + str(account_id) + ")")
 
         with self.unit_of_work_provider.get() as unit_of_work:
             list_account_tasks = self.tasks_br_provider.list_tasks_for_user(unit_of_work)

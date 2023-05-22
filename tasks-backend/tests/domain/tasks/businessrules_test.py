@@ -622,14 +622,8 @@ class TestListTasksForAccount(DomainUnitTestsBase):
         task_3 = Task(task_3_id, "Task #3 Title", "Task #3 Description", now, now, account_id)
         mocked_tasks_repository = mock(TasksRepository)
         when(mocked_tasks_repository) \
-            .get_by_id(mocked_unit_of_work, task_1_id) \
-            .thenReturn(task_1)
-        when(mocked_tasks_repository) \
-            .get_by_id(mocked_unit_of_work, task_2_id) \
-            .thenReturn(task_2)
-        when(mocked_tasks_repository) \
-            .get_by_id(mocked_unit_of_work, task_3_id) \
-            .thenReturn(task_3)
+            .list_tasks(mocked_unit_of_work, [task_1_id, task_2_id, task_3_id]) \
+            .thenReturn([task_1, task_2, task_3])
 
         account_tasks = [
             AccountTasks(account_id, task_1_id),
@@ -642,7 +636,8 @@ class TestListTasksForAccount(DomainUnitTestsBase):
             .thenReturn(account_tasks)
 
         under_test = ListTasksForAccount(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_tasks_repository
             , mocked_account_tasks_repository)
         result = under_test.execute(account_id)
@@ -653,9 +648,7 @@ class TestListTasksForAccount(DomainUnitTestsBase):
         for entry in result:
             assert entry.get_id() in task_ids
 
-        verify(mocked_tasks_repository, times=1).get_by_id(mocked_unit_of_work, task_1_id)
-        verify(mocked_tasks_repository, times=1).get_by_id(mocked_unit_of_work, task_2_id)
-        verify(mocked_tasks_repository, times=1).get_by_id(mocked_unit_of_work, task_3_id)
+        verify(mocked_tasks_repository).list_tasks(mocked_unit_of_work, [task_1_id, task_2_id, task_3_id])
         verify(mocked_account_tasks_repository, times=1).list_account_tasks(...)
 
         verifyNoMoreInteractions(
@@ -663,7 +656,7 @@ class TestListTasksForAccount(DomainUnitTestsBase):
             , mocked_tasks_repository
             , mocked_account_tasks_repository)
 
-    def test_should_fail_no_port(self):
+    def test_should_fail_no_input(self):
         from src.domain.tasks import TasksRepository, AccountTasksRepository, \
             ListTasksForAccount, Task, AccountTasks
 
@@ -672,7 +665,8 @@ class TestListTasksForAccount(DomainUnitTestsBase):
         mocked_account_tasks_repository = mock(AccountTasksRepository)
 
         under_test = ListTasksForAccount(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_tasks_repository
             , mocked_account_tasks_repository)
 
@@ -696,7 +690,7 @@ class TestListTasksForAccount(DomainUnitTestsBase):
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
         mocked_tasks_repository = mock(TasksRepository)
         when(mocked_tasks_repository) \
-            .get_by_id(mocked_unit_of_work, task_1_id) \
+            .list_tasks(mocked_unit_of_work, [task_1_id, task_2_id, task_3_id]) \
             .thenRaise(InternalError("Something very wrong has happened here"))
 
         account_tasks = [
@@ -710,14 +704,15 @@ class TestListTasksForAccount(DomainUnitTestsBase):
             .thenReturn(account_tasks)
 
         under_test = ListTasksForAccount(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_tasks_repository
             , mocked_account_tasks_repository)
 
         with pytest.raises(InternalError):
             under_test.execute(account_id)
 
-        verify(mocked_tasks_repository, times=1).get_by_id(mocked_unit_of_work, task_1_id)
+        verify(mocked_tasks_repository).list_tasks(mocked_unit_of_work, [task_1_id, task_2_id, task_3_id])
         verify(mocked_account_tasks_repository, times=1).list_account_tasks(...)
 
         verifyNoMoreInteractions(
@@ -740,7 +735,8 @@ class TestListTasksForAccount(DomainUnitTestsBase):
             .thenRaise(InternalError("Something very wrong has happened here"))
 
         under_test = ListTasksForAccount(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_tasks_repository
             , mocked_account_tasks_repository)
 
