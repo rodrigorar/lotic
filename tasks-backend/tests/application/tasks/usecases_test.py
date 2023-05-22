@@ -443,7 +443,6 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
         verifyNoMoreInteractions(list_tasks_br, update_tasks_br)
 
 
-# TODO: Should test authorization code as well, not only the happy path
 class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
@@ -466,9 +465,9 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
 
         test_input = [TASK_1_ID, TASK_2_ID, TASK_3_ID]
         under_test = UseCaseDeleteTasks(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
         under_test.execute(test_input)
 
         verify(list_tasks_br).execute(...)
@@ -492,9 +491,9 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
 
         test_input = [TASK_1_ID]
         under_test = UseCaseDeleteTasks(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
         under_test.execute(test_input)
 
         verify(list_tasks_br).execute(...)
@@ -502,11 +501,11 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
 
         verifyNoMoreInteractions(list_tasks_br, delete_tasks_br)
 
-    def test_should_fail_no_port(self):
+    def test_should_fail_no_input(self):
         under_test = UseCaseDeleteTasks(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
 
         with pytest.raises(AssertionError):
             under_test.execute(None)
@@ -514,7 +513,7 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
         verifyNoMoreInteractions(delete_tasks_br)
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
-    def test_should_fail_create_tasks_br_error(self):
+    def test_should_fail_delete_tasks_br_error(self):
         list_task_br_result = [
             Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
                  ACCOUNT_ID)
@@ -533,9 +532,9 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
 
         test_input = [TASK_1_ID, TASK_2_ID, TASK_3_ID]
         under_test = UseCaseDeleteTasks(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
 
         with pytest.raises(InternalError):
             under_test.execute(test_input)
@@ -546,7 +545,6 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
         verifyNoMoreInteractions(list_tasks_br, delete_tasks_br)
 
 
-# TODO: Should test authorization code as well, not only the happy path
 class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))

@@ -1,8 +1,7 @@
-from functools import reduce
 from logging import Logger
 import uuid
 
-from src.domain import InternalError, BaseBusinessRule
+from src.domain import BaseBusinessRule
 from src.domain.tasks import AccountTasks, Task, TasksRepository, AccountTasksRepository
 
 
@@ -50,7 +49,6 @@ class UpdateTasks(BaseBusinessRule):
         self.logger.info("Executing ---> BusinessRule[UpdateTasks]")
 
         assert tasks is not None, "Tasks cannot be null"
-
         self.tasks_repository.update_multiple(self.unit_of_work, tasks)
 
 
@@ -58,20 +56,24 @@ class DeleteTasks(BaseBusinessRule):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work
             , tasks_repository: TasksRepository
             , account_tasks_repository: AccountTasksRepository):
 
         super().__init__(unit_of_work)
+
+        self.logger = logger
         self.tasks_repository = tasks_repository
         self.account_tasks_repository = account_tasks_repository
 
     def execute(self, task_ids: list[uuid]):
+        self.logger.info("Executing ---> BusinessRule[DeleteTasks]")
+
         assert task_ids is not None, "Task Ids cannot be null"
 
         self.tasks_repository.delete_multiple(self.unit_of_work, task_ids)
-        for task_id in task_ids:
-            self.account_tasks_repository.delete_by_task_id(self.unit_of_work, task_id)
+        self.account_tasks_repository.delete_multiple_by_task_id(self.unit_of_work, task_ids)
 
 
 class ListTasks(BaseBusinessRule):

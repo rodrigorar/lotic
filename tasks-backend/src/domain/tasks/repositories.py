@@ -22,10 +22,13 @@ class TasksRepository(BaseRepository):
 class AccountTasksRepository(BaseRepository):
 
     def insert_multiple(self, unit_of_work, account_tasks: list[AccountTasks]) -> list[(uuid, uuid)]:
-        raise NotImplemented("AccountTasksRepository#insert_multiple not implemented.")
+        raise NotImplementedError("AccountTasksRepository#insert_multiple not implemented.")
 
     def list_account_tasks(self, unit_of_work, account_id: uuid) -> list[AccountTasks]:
-        raise NotImplemented("AccountTasksRepository#list is not implemented")
+        raise NotImplementedError("AccountTasksRepository#list is not implemented")
 
     def delete_by_task_id(self, unit_of_work, task_id: uuid):
-        raise NotImplemented("AccountTasksRepository#delete_by_task_id is not implemented.")
+        raise NotImplementedError("AccountTasksRepository#delete_by_task_id is not implemented.")
+
+    def delete_multiple_by_task_id(self, unit_of_work, task_ids: list[uuid]):
+        raise NotImplementedError("AccountTasksRepository#delete_multiple_by_task_id is not implemented")

@@ -507,25 +507,26 @@ class TestDeleteTasks(DomainUnitTestsBase):
 
         mocked_account_tasks_repository = mock(AccountTasksRepository)
         when(mocked_account_tasks_repository) \
-            .delete_by_task_id(...) \
+            .delete_multiple_by_task_id(...) \
             .thenReturn(None)
 
         test_input = [uuid4(), uuid4(), uuid4()]
         under_test = DeleteTasks(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_tasks_repository
             , mocked_account_tasks_repository)
         under_test.execute(test_input)
 
-        verify(mocked_tasks_repository, times=1).delete_multiple(...)
-        verify(mocked_account_tasks_repository, times=3).delete_by_task_id(...)
+        verify(mocked_tasks_repository).delete_multiple(...)
+        verify(mocked_account_tasks_repository).delete_multiple_by_task_id(...)
 
         verifyNoMoreInteractions(
             mocked_unit_of_work
             , mocked_tasks_repository
             , mocked_account_tasks_repository)
 
-    def test_should_fail_no_port(self):
+    def test_should_fail_no_input(self):
         from src.domain.tasks import TasksRepository, AccountTasksRepository, DeleteTasks
 
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
@@ -533,7 +534,8 @@ class TestDeleteTasks(DomainUnitTestsBase):
         mocked_account_tasks_repository = mock(AccountTasksRepository)
 
         under_test = DeleteTasks(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_tasks_repository
             , mocked_account_tasks_repository)
 
@@ -559,14 +561,15 @@ class TestDeleteTasks(DomainUnitTestsBase):
 
         test_input = [uuid4(), uuid4(), uuid4()]
         under_test = DeleteTasks(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_tasks_repository
             , mocked_account_tasks_repository)
 
         with pytest.raises(InternalError):
             under_test.execute(test_input)
 
-        verify(mocked_tasks_repository, times=1).delete_multiple(...)
+        verify(mocked_tasks_repository).delete_multiple(...)
 
         verifyNoMoreInteractions(
             mocked_unit_of_work
@@ -583,20 +586,21 @@ class TestDeleteTasks(DomainUnitTestsBase):
 
         mocked_account_tasks_repository = mock(AccountTasksRepository)
         when(mocked_account_tasks_repository) \
-            .delete_by_task_id(...) \
+            .delete_multiple_by_task_id(...) \
             .thenRaise(InternalError("Something went very wrong here"))
 
         test_input = [uuid4(), uuid4(), uuid4()]
         under_test = DeleteTasks(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_tasks_repository
             , mocked_account_tasks_repository)
 
         with pytest.raises(InternalError):
             under_test.execute(test_input)
 
-        verify(mocked_tasks_repository, times=1).delete_multiple(...)
-        verify(mocked_account_tasks_repository, times=1).delete_by_task_id(...)
+        verify(mocked_tasks_repository).delete_multiple(...)
+        verify(mocked_account_tasks_repository).delete_multiple_by_task_id(...)
 
         verifyNoMoreInteractions(
             mocked_unit_of_work

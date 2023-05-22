@@ -108,6 +108,15 @@ class AccountTasksRepositoryImpl(AccountTasksRepository):
             raise NotFoundError("No account task found for deletion")
         query.delete(account_task)
 
+    def delete_multiple_by_task_id(self, unit_of_work: UnitOfWork, task_ids: list[uuid]) -> None:
+        assert unit_of_work is not None, "Unit of work cannot be empty"
+        assert task_ids is not None, "Task ids list cannot be null"
+
+        query_manager = unit_of_work.query()
+        query_manager.query(AccountTasks) \
+            .filter(AccountTasks.task_id.in_([str(task_id) for task_id in task_ids])) \
+            .delete()
+
 
 tasks_repository = TasksRepositoryImpl()
 account_tasks_repository = AccountTasksRepositoryImpl()
@@ -129,7 +138,11 @@ class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):
 
     @staticmethod
     def delete_tasks(unit_of_work) -> DeleteTasks:
-        return DeleteTasks(unit_of_work, TasksRepositoryImpl(), AccountTasksRepositoryImpl())
+        return DeleteTasks(
+            logger
+            , unit_of_work
+            , tasks_repository
+            , account_tasks_repository)
 
     @staticmethod
     def list_tasks_for_user(unit_of_work) -> ListTasksForAccount:
@@ -169,9 +182,9 @@ class TasksUseCaseProvider:
     @staticmethod
     def delete_tasks():
         return UseCaseDeleteTasks(
-            unit_of_work_provider
-            , tasks_business_rules_provider
-            , LogProvider().get())
+            LogProvider().get()
+            , unit_of_work_provider
+            , tasks_business_rules_provider)
 
     @staticmethod
     def list_tasks_for_user():

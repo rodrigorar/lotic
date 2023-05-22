@@ -105,18 +105,26 @@ class UseCaseDeleteTasks(UseCase):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work_provider: UnitOfWorkProvider
-            , tasks_br_provider: TasksBusinessRulesProvider
-            , logger: Logger):
+            , tasks_br_provider: TasksBusinessRulesProvider):
 
+        self.logger = logger
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
-        self.logger = logger
+
+    @staticmethod
+    def validate_tasks_owners(tasks: list[Task]) -> uuid:
+        owner_ids = [task.get_owner_id() for task in tasks] \
+            if len(tasks) == 1 \
+            else reduce(reducer_duplicated, [task.owner_id for task in tasks])
+        if len(owner_ids) > 1 or not AuthorizationContext.is_matching_account(owner_ids[0]):
+            raise AuthorizationError('Unauthorized operation')
 
     def execute(self, task_ids: list[uuid]):
-        assert task_ids is not None, "Task id list cannot be null"
+        self.logger.info("Executing ---> UseCase[DeleteTasks]")
 
-        self.logger.info("UseCase[DeleteTasks]")
+        assert task_ids is not None, "Task id list cannot be null"
 
         with self.unit_of_work_provider.get() as unit_of_work:
             list_tasks_br = self.tasks_br_provider.list_tasks(unit_of_work)
@@ -125,11 +133,7 @@ class UseCaseDeleteTasks(UseCase):
             if len(task_entities) == 0:
                 raise NotFoundError('No tasks found')
 
-            owner_ids = [task.get_owner_id() for task in task_entities] \
-                if len(task_entities) == 1 \
-                else reduce(reducer_duplicated, [task.owner_id for task in task_entities])
-            if len(owner_ids) > 1 or not AuthorizationContext.is_matching_account(owner_ids[0]):
-                raise AuthorizationError('Unauthorized operation')
+            self.validate_tasks_owners(task_entities)
 
             delete_task = self.tasks_br_provider.delete_tasks(unit_of_work)
             delete_task.execute(task_ids)
