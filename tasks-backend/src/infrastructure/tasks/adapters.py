@@ -51,7 +51,10 @@ class TasksRepositoryImpl(TasksRepository):
         assert task_ids is not None, "Task ids cannot be null"
 
         query_manager = unit_of_work.query()
-        query_result = query_manager.query(Task).filter(Task.id.in_([str(task_id) for task_id in task_ids])).all()
+        query_result = query_manager.query(Task)\
+            .filter(Task.id.in_([str(task_id) for task_id in task_ids]))\
+            .all()
+
         return [
             Task(
                 entry.get_id()
@@ -122,7 +125,7 @@ class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):
 
     @staticmethod
     def update_tasks(unit_of_work) -> UpdateTasks:
-        return UpdateTasks(unit_of_work, TasksRepositoryImpl())
+        return UpdateTasks(logger, unit_of_work, TasksRepositoryImpl())
 
     @staticmethod
     def delete_tasks(unit_of_work) -> DeleteTasks:
@@ -134,7 +137,7 @@ class TasksBusinessRulesProviderImpl(TasksBusinessRulesProvider):
 
     @staticmethod
     def list_tasks(unit_of_work) -> ListTasks:
-        return ListTasks(unit_of_work, TasksRepositoryImpl())
+        return ListTasks(logger, unit_of_work, TasksRepositoryImpl())
 
 
 unit_of_work_provider = UnitOfWorkProviderImpl()
@@ -155,9 +158,9 @@ class TasksUseCaseProvider:
     @staticmethod
     def update_tasks():
         return UseCaseUpdateTasks(
-            unit_of_work_provider
-            , tasks_business_rules_provider
-            , LogProvider().get())
+            LogProvider().get()
+            , unit_of_work_provider
+            , tasks_business_rules_provider)
 
     @staticmethod
     def delete_tasks():

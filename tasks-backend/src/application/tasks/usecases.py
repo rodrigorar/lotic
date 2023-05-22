@@ -5,11 +5,10 @@ import uuid
 from src.application import UnitOfWorkProvider, UseCase
 from src.application.auth.shared import AuthorizationContext
 from src.application.errors import AuthorizationError
-from src.application.shared import UseCaseCommand
 from src.application.tasks.dto import TaskDTO
 from src.domain import reducer_duplicated, ConflictError, NotFoundError
 from src.domain.accounts import AccountBusinessRulesProvider
-from src.domain.tasks import TasksBusinessRulesProvider
+from src.domain.tasks import Task, TasksBusinessRulesProvider
 
 
 # FIXME: This should be a UseCaseCommand to be coherent with the CQS Pattern we wish to use
@@ -57,38 +56,47 @@ class UseCaseCreateTasks(UseCase):
         return result
 
 
+# FIXME: This should be a UseCaseCommand to be coherent with the CQS Pattern we wish to use
+#   this has not been changed be cause we will need to change the API (Controller) and being so
+#   we probably will need to use a BranchByAbstraction pattern.
 class UseCaseUpdateTasks(UseCase):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work_provider: UnitOfWorkProvider
-            , tasks_br_provider: TasksBusinessRulesProvider
-            , logger: Logger):
+            , tasks_br_provider: TasksBusinessRulesProvider):
 
+        self.logger = logger
         self.unit_of_work_provider = unit_of_work_provider
         self.tasks_br_provider = tasks_br_provider
-        self.logger = logger
+
+    @staticmethod
+    def validate_tasks_owners(tasks: list[Task]) -> uuid:
+        owner_ids = [task.get_owner_id() for task in tasks] \
+            if len(tasks) == 1 \
+            else reduce(reducer_duplicated, [task.get_owner_id() for task in tasks])
+        if len(owner_ids) > 1 or not AuthorizationContext.is_matching_account(owner_ids[0]):
+            raise AuthorizationError('Unauthorized operation')
+        return owner_ids[0]
 
     def execute(self, tasks: list[TaskDTO]):
+        self.logger.info("Executing ---> UseCase[UpdateTasks]")
+
         assert tasks is not None, "Tasks cannot be null"
 
-        with self.unit_of_work_provider.get() as unit_of_work:
-            list_tasks_br = self.tasks_br_provider.list_tasks(unit_of_work)
-            task_entities = list_tasks_br.execute([entry.get_id() for entry in tasks])
+        result = list()
+        if len(tasks) != 0:
+            with self.unit_of_work_provider.get() as unit_of_work:
+                list_tasks_br = self.tasks_br_provider.list_tasks(unit_of_work)
+                task_entities = list_tasks_br.execute([entry.get_id() for entry in tasks])
 
-            if len(task_entities) == 0:
-                raise NotFoundError('No tasks found')
+                if len(task_entities) == 0:
+                    raise NotFoundError('No tasks found')
+                self.validate_tasks_owners(task_entities)
 
-            owner_ids = [task.get_owner_id() for task in task_entities] \
-                if len(task_entities) == 1 \
-                else reduce(reducer_duplicated, [task.get_owner_id() for task in task_entities])
-            if len(owner_ids) > 1 or not AuthorizationContext.is_matching_account(owner_ids[0]):
-                raise AuthorizationError('Unauthorized operation')
-
-            self.logger.info("UseCase[UpdateTasks]")
-
-            update_tasks_br = self.tasks_br_provider.update_tasks(unit_of_work)
-            result = update_tasks_br.execute([task.to_entity() for task in tasks])
+                update_tasks_br = self.tasks_br_provider.update_tasks(unit_of_work)
+                result = update_tasks_br.execute([task.to_entity() for task in tasks])
 
         return result
 

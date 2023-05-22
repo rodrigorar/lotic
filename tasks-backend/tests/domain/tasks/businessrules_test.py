@@ -5,6 +5,7 @@ from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
 from src.domain import ConflictError, InternalError
+from src.domain.tasks import TasksRepository
 from tests.application.shared import MockedLogger
 from tests.domain.shared import DomainUnitTestsBase
 from tests.shared import UnitOfWorkMockProvider
@@ -243,7 +244,30 @@ class TestUpdateTasks(DomainUnitTestsBase):
             .thenReturn([task.get_id() for task in task_list])
 
         under_test = UpdateTasks(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
+            , mocked_task_repository)
+        under_test.execute(task_list)
+
+        verify(mocked_task_repository).update_multiple(...)
+
+        verifyNoMoreInteractions(mocked_unit_of_work, mocked_task_repository)
+
+    def test_should_succeed_empty_input(self):
+        from src.domain.tasks import Task, TasksRepository, UpdateTasks
+
+        task_list = []
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+
+        mocked_task_repository = mock(TasksRepository)
+        when(mocked_task_repository) \
+            .update_multiple(...) \
+            .thenReturn([task.get_id() for task in task_list])
+
+        under_test = UpdateTasks(
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_task_repository)
         under_test.execute(task_list)
 
@@ -286,7 +310,8 @@ class TestUpdateTasks(DomainUnitTestsBase):
             .thenReturn(([TASK_3_ID], [TASK_1_ID, TASK_2_ID]))
 
         under_test = UpdateTasks(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_task_repository)
         under_test.execute(task_list)
 
@@ -301,7 +326,8 @@ class TestUpdateTasks(DomainUnitTestsBase):
         mocked_task_repository = mock(TasksRepository)
 
         under_test = UpdateTasks(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_task_repository)
 
         with pytest.raises(AssertionError):
@@ -344,7 +370,8 @@ class TestUpdateTasks(DomainUnitTestsBase):
             .thenRaise(ConflictError("Failed to update task"))
 
         under_test = UpdateTasks(
-            mocked_unit_of_work
+            MockedLogger()
+            , mocked_unit_of_work
             , mocked_task_repository)
 
         with pytest.raises(ConflictError):
@@ -353,6 +380,117 @@ class TestUpdateTasks(DomainUnitTestsBase):
         verify(mocked_task_repository).update_multiple(...)
         
         verifyNoMoreInteractions(mocked_unit_of_work, mocked_task_repository)
+
+
+class TestListTasks(DomainUnitTestsBase):
+
+    def test_should_succeed(self):
+        from src.domain.tasks.models import Task
+        from src.domain.tasks.businessrules import ListTasks
+
+        result_values = [
+            Task(
+                TASK_1_ID
+                , TASK_1_TITLE
+                , TASK_1_DESCRIPTION
+                , datetime.now()
+                , datetime.now()
+                , ACCOUNT_1_ID)
+            , Task(
+                TASK_2_ID
+                , TASK_2_TITLE
+                , TASK_2_DESCRIPTION
+                , datetime.now()
+                , datetime.now()
+                , ACCOUNT_1_ID)
+            , Task(
+                TASK_3_ID
+                , TASK_1_TITLE
+                , TASK_1_DESCRIPTION
+                , datetime.now()
+                , datetime.now()
+                , ACCOUNT_1_ID)
+        ]
+
+        mocked_tasks_repository = mock(TasksRepository)
+        when(mocked_tasks_repository) \
+            .list_tasks(...) \
+            .thenReturn(result_values)
+
+        under_test = ListTasks(
+            MockedLogger()
+            , UnitOfWorkMockProvider.get()
+            , mocked_tasks_repository)
+        result = under_test.execute([TASK_1_ID, TASK_2_ID, TASK_3_ID])
+
+        assert result is not None
+        assert len(result) == 3
+        for entry in result:
+            assert entry.get_id() in [TASK_1_ID, TASK_2_ID, TASK_3_ID]
+
+        verify(mocked_tasks_repository).list_tasks(...)
+
+        verifyNoMoreInteractions(mocked_tasks_repository)
+
+    def test_empty_input_should_succeed(self):
+        from src.domain.tasks.businessrules import ListTasks
+
+        result_values = []
+
+        mocked_tasks_repository = mock(TasksRepository)
+        when(mocked_tasks_repository) \
+            .list_tasks(...) \
+            .thenReturn(result_values)
+
+        under_test = ListTasks(
+            MockedLogger()
+            , UnitOfWorkMockProvider.get()
+            , mocked_tasks_repository)
+        result = under_test.execute([])
+
+        assert result is not None
+        assert len(result) == 0
+
+        verify(mocked_tasks_repository).list_tasks(...)
+
+        verifyNoMoreInteractions(mocked_tasks_repository)
+
+    def test_no_result_should_succeed(self):
+        from src.domain.tasks.businessrules import ListTasks
+
+        result_values = []
+
+        mocked_tasks_repository = mock(TasksRepository)
+        when(mocked_tasks_repository) \
+            .list_tasks(...) \
+            .thenReturn(result_values)
+
+        under_test = ListTasks(
+            MockedLogger()
+            , UnitOfWorkMockProvider.get()
+            , mocked_tasks_repository)
+        result = under_test.execute([TASK_1_ID, TASK_2_ID, TASK_3_ID])
+
+        assert result is not None
+        assert len(result) == 0
+
+        verify(mocked_tasks_repository).list_tasks(...)
+
+        verifyNoMoreInteractions(mocked_tasks_repository)
+
+    def test_should_fail_null_input(self):
+        from src.domain.tasks.businessrules import ListTasks
+
+        mocked_tasks_repository = mock(TasksRepository)
+
+        under_test = ListTasks(
+            MockedLogger()
+            , UnitOfWorkMockProvider.get()
+            , mocked_tasks_repository)
+        with pytest.raises(AssertionError):
+            under_test.execute(None)
+
+        verifyNoMoreInteractions(mocked_tasks_repository)
 
 
 class TestDeleteTasks(DomainUnitTestsBase):

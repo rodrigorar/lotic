@@ -40,6 +40,21 @@ Feature: Tasks Operations
     When it tries to update several tasks
     Then those tasks should be successfully updated
 
+  Scenario: Valid user tries to update not owned tasks
+    Given a valid user
+    When it tries to update tasks it does not own
+    Then it should receive an authorization error
+
+  Scenario: Valid user tries to update not partially owned tasks
+    Given a valid user
+    When it tries to update tasks it owns and it does not own
+    Then it should receive an authorization error
+
+  Scenario: Valid user tries to update no tasks
+    Given a valid user
+    When it tries to update an empty task list
+    Then those tasks should be successfully updated
+
   # Delete Tasks
 
   Scenario: Delete an existing task successfully

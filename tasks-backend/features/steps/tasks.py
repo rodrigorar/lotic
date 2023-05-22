@@ -223,6 +223,166 @@ def step_impl(context):
                 })
 
 
+@when("it tries to update tasks it does not own")
+def step_impl(context):
+    from src.domain.tasks import Task, AccountTasks
+
+    random_user = uuid4()
+
+    with context.app.app_context():
+        data = [
+            Task(
+                uuid4()
+                , "Yet another task #1"
+                , "Yet another task description #1"
+                , datetime.now()
+                , datetime.now()
+                , random_user
+            ),
+            Task(
+                uuid4()
+                , "Yet another task #2"
+                , "Yet another task description #2"
+                , datetime.now()
+                , datetime.now()
+                , random_user
+            ),
+            Task(
+                uuid4()
+                , "Yet another task #3"
+                , "Yet another task description #3"
+                , datetime.now()
+                , datetime.now()
+                , random_user
+            )
+        ]
+        account_task_data = [
+            AccountTasks(data[0].get_id(), context.account_ids[0]),
+            AccountTasks(data[1].get_id(), context.account_ids[0]),
+            AccountTasks(data[2].get_id(), context.account_ids[0])
+        ]
+
+        for entry in data:
+            context.db.session.add(entry)
+        for entry in account_task_data:
+            context.db.session.add(entry)
+        context.db.session.commit()
+
+        context.response = context.client.put(
+                URL_PREFIX_V1 + '/tasks'
+                , json={
+                    "tasks": [
+                        {
+                            "task_id": data[0].id
+                            , "title": "Yet another task #1"
+                            , "description": "Yet another task description #1"
+                            , "updated_at": "2023-02-01T09:00:00.000Z"
+                        },
+                        {
+                            "task_id": data[1].id
+                            , "title": "Yet another task #2"
+                            , "description": "Yet another task description #2"
+                            , "updated_at": "2022-01-12T14:53:34.000Z"
+                        },
+                        {
+                            "task_id": data[2].id
+                            , "title": "Yet another task #3"
+                            , "description": "Yet another task description #3"
+                            , "updated_at": "2022-01-24T23:51:00.000Z"
+                        }
+                    ]
+                }
+                , headers={
+                    'X-Authorization': context.auth_tokens[0]
+                })
+
+
+@when("it tries to update an empty task list")
+def step_impl(context):
+    with context.app.app_context():
+        data = []
+        context.response = context.client.put(
+                URL_PREFIX_V1 + '/tasks'
+                , json={
+                    "tasks": []
+                }
+                , headers={
+                    'X-Authorization': context.auth_tokens[0]
+                })
+
+
+@when("it tries to update tasks it owns and it does not own")
+def step_impl(context):
+    from src.domain.tasks import Task, AccountTasks
+
+    with context.app.app_context():
+        data = [
+            Task(
+                uuid4()
+                , "Yet another task #1"
+                , "Yet another task description #1"
+                , datetime.now()
+                , datetime.now()
+                , context.account_ids[0]
+            ),
+            Task(
+                uuid4()
+                , "Yet another task #2"
+                , "Yet another task description #2"
+                , datetime.now()
+                , datetime.now()
+                , uuid4()
+            ),
+            Task(
+                uuid4()
+                , "Yet another task #3"
+                , "Yet another task description #3"
+                , datetime.now()
+                , datetime.now()
+                , context.account_ids[0]
+            )
+        ]
+        account_task_data = [
+            AccountTasks(data[0].get_id(), context.account_ids[0]),
+            AccountTasks(data[1].get_id(), context.account_ids[0]),
+            AccountTasks(data[2].get_id(), context.account_ids[0])
+        ]
+
+        for entry in data:
+            context.db.session.add(entry)
+        for entry in account_task_data:
+            context.db.session.add(entry)
+        context.db.session.commit()
+
+        context.response = context.client.put(
+                URL_PREFIX_V1 + '/tasks'
+                , json={
+                    "tasks": [
+                        {
+                            "task_id": data[0].id
+                            , "title": "Yet another task #1"
+                            , "description": "Yet another task description #1"
+                            , "updated_at": "2023-02-01T09:00:00.000Z"
+                        },
+                        {
+                            "task_id": data[1].id
+                            , "title": "Yet another task #2"
+                            , "description": "Yet another task description #2"
+                            , "updated_at": "2022-01-12T14:53:34.000Z"
+                        },
+                        {
+                            "task_id": data[2].id
+                            , "title": "Yet another task #3"
+                            , "description": "Yet another task description #3"
+                            , "updated_at": "2022-01-24T23:51:00.000Z"
+                        }
+                    ]
+                }
+                , headers={
+                    'X-Authorization': context.auth_tokens[0]
+                })
+
+
 @when('it tries to delete a task')
 def step_impl(context):
     from src.domain.tasks import Task, AccountTasks
@@ -431,6 +591,12 @@ def step_impl(context):
 def step_impl(context):
     assert context.response is not None
     assert context.response.status_code == 409
+
+
+@then("it should receive an authorization error")
+def step_impl(context):
+    assert context.response is not None
+    assert context.response.status_code == 401
 
 
 @then('an error should happen for user not found')

@@ -265,7 +265,6 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
         verifyNoMoreInteractions(get_account_br, create_tasks_br)
 
 
-# TODO: Should test authorization code as well, not only the happy path
 class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
@@ -290,9 +289,9 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
             TaskDTO(TASK_3_ID, TASK_3_NEW_TITLE, TASK_3_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
         ]
         under_test = UseCaseUpdateTasks(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
         result = under_test.execute(test_input)
 
         assert result is not None
@@ -322,9 +321,9 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
 
         test_input = [TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID)]
         under_test = UseCaseUpdateTasks(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
         result = under_test.execute(test_input)
 
         assert result is not None
@@ -362,9 +361,9 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
             TaskDTO(TASK_3_ID, TASK_3_NEW_TITLE, TASK_3_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
         ]
         under_test = UseCaseUpdateTasks(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
         result = under_test.execute(test_input)
 
         assert result is not None
@@ -378,11 +377,31 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
 
         verifyNoMoreInteractions(list_tasks_br, update_tasks_br)
 
+    @patch.object(AuthorizationContext, "is_matching_account", MagicMock(return_value=True))
+    def test_should_fail_empty_input(self):
+        list_task_br_result = []
+        when(list_tasks_br) \
+            .execute(...) \
+            .thenReturn(list_task_br_result)
+
+        test_input = [TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID)]
+        under_test = UseCaseUpdateTasks(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
+
+        with pytest.raises(NotFoundError):
+            under_test.execute(test_input)
+
+        verify(list_tasks_br).execute(...)
+
+        verifyNoMoreInteractions(list_tasks_br, update_tasks_br)
+
     def test_should_fail_no_port(self):
         under_test = UseCaseUpdateTasks(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
         with pytest.raises(AssertionError):
             under_test.execute(None)
 
@@ -412,9 +431,9 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
             TaskDTO(TASK_3_ID, TASK_3_NEW_TITLE, TASK_3_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
         ]
         under_test = UseCaseUpdateTasks(
-            MockedUnitOfWorkProvider()
-            , MockedTasksBusinessRulesProvider()
-            , MockedLogger())
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedTasksBusinessRulesProvider())
         with pytest.raises(InternalError):
             under_test.execute(test_input)
 

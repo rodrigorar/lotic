@@ -37,13 +37,18 @@ class UpdateTasks(BaseBusinessRule):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work
             , tasks_repository: TasksRepository):
 
         super().__init__(unit_of_work)
+
+        self.logger = logger
         self.tasks_repository = tasks_repository
 
     def execute(self, tasks: list[Task]):
+        self.logger.info("Executing ---> BusinessRule[UpdateTasks]")
+
         assert tasks is not None, "Tasks cannot be null"
 
         self.tasks_repository.update_multiple(self.unit_of_work, tasks)
@@ -73,13 +78,20 @@ class ListTasks(BaseBusinessRule):
 
     def __init__(
             self
+            , logger: Logger
             , unit_of_work
             , tasks_repository: TasksRepository):
 
         super().__init__(unit_of_work)
+
+        self.logger = logger
         self.tasks_repository = tasks_repository
 
     def execute(self, tasks_ids: list[uuid]):
+        self.logger.info("Executing ---> BusinessRule[ListTasks]")
+
+        assert tasks_ids is not None
+
         return self.tasks_repository.list_tasks(self.unit_of_work, tasks_ids)
 
 
