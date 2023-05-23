@@ -105,4 +105,9 @@ jobs:
         run: |
           cd tasks-backend
           hatch build
-      # TODO: Make the artifactas available for download
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          path: tasks-backend/dist/tasks_server-*.tar.gz
+          if-no-files-found: error
+          retention-days: 7
