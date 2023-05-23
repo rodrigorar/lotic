@@ -35,8 +35,31 @@ jobs:
           cd tasks-backend
           hatch run unit-tests
       # TODO: Add a coverage functionality
+      
+  integration-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          cd tasks-backend
+          python -m pip install --upgrade pip
+          pip install hatch
+          pip install hatchling
+          python -m pip install -e .
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  
+      - name: Run Unit tests
+        run: |
+          cd tasks-backend
+          hatch run integration-tests
+      # TODO: Add a coverage functionality
         
-  build:
+  linting:
 
     runs-on: ubuntu-latest
 
@@ -49,7 +72,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        python -m pip install -e
+        pip install flake8
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
@@ -57,6 +81,26 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        pytest
+  
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          cd tasks-backend
+          python -m pip install --upgrade pip
+          pip install hatch
+          pip install hatchling
+          python -m pip install -e .
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  
+      - name: Run Unit tests
+        run: |
+          cd tasks-backend
+          hatch build
+      # TODO: Make the artifactas available for download
