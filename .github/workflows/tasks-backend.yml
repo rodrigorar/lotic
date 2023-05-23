@@ -107,7 +107,7 @@ jobs:
           hatch build
       - name: Get Artifact Name
         run: |
-          echo "ARTIFACT_NAME=$(ls tasks-backend/dist/ | grep -e tasks_server.*.tar.gz)" >> GITHUB_ENV
+          echo "ARTIFACT_NAME=$(ls tasks-backend/dist/ | grep -e tasks_server.*.tar.gz)" >> $GITHUB_ENV
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.2
         with:
