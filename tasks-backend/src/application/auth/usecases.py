@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
 from enum import Enum
-import inspect
 from logging import Logger
 import uuid
 from uuid import uuid4
-import warnings
 
 from src.application import UnitOfWorkProvider, UseCase
 from src.application.auth.configurations import AuthTokenTTLConfigs
@@ -27,13 +25,12 @@ class AuthError:
 
     def raise_exception(self):
 
-        match self.cause:
-            case AuthError.Cause.INVALID_AUTHORIZATION:
-                raise InvalidAuthorizationError(self.message)
-            case AuthError.Cause.GENERIC_ERROR:
-                raise InternalError(self.message)
-            case _:
-                raise InternalError()
+        if self.cause == AuthError.Cause.INVALID_AUTHORIZATION:
+            raise InvalidAuthorizationError(self.message)
+        elif self.cause == AuthError.Cause.GENERIC_ERROR:
+            raise InternalError(self.message)
+        else:
+            raise InternalError()
 
 
 class UseCaseLogin(UseCase):
