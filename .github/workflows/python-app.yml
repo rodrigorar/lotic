@@ -29,26 +29,26 @@ jobs:
           python-version: "3.10"
       - name: Setup Pip
         run: |
-          python3 -m pip install --upgrade pip
+          python -m pip install --upgrade pip
       - name: Configure Hatch
         run: |
-          pip3 install hatch
+          pip install hatch
       - name: Install dependencies
         run: |
-          pip3 install pytest pytest-cov
-          pip3 install pytest-mock
-          pip3 install flask
-          pip3 install flask-sqlalchemy
-          pip3 install flask-migrate
-          pip3 install flask-openapi3
-          pip3 install behave
-          pip3 install mockito
-          pip3 install python-dateutil
-          pip3 install bcrypt
+          pip install pytest pytest-cov
+          pip install pytest-mock
+          pip install flask
+          pip install flask-sqlalchemy
+          pip install flask-migrate
+          pip install flask-openapi3
+          pip install behave
+          pip install mockito
+          pip install python-dateutil
+          pip install bcrypt
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  
       - name: Run Unit tests
         run: |
-          hatch run unit-tests
+          python -m hatch run unit-tests
       # TODO: Add a coverage functionality
         
   build:
