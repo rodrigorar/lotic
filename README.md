@@ -1,3 +1,7 @@
+# CI Status
+
+[![Tasks Backend](https://github.com/rodrigorar/lotic/actions/workflows/python-app.yml/badge.svg)](https://github.com/rodrigorar/lotic/actions/workflows/python-app.yml)
+
 # Projects
 
 ## Tasks
