@@ -20,9 +20,11 @@ jobs:
       - uses: actions/checkout@v3
       - name: Move to Backend Folder
         run: |
+          ls -la
           cd tasks-backend
           pwd .
           ls -la
+          cat pyproject.toml
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
@@ -35,21 +37,22 @@ jobs:
           pip install hatch
       - name: Install dependencies
         run: |
-          pip install pytest pytest-cov
-          pip install pytest-mock
-          pip install flask
-          pip install flask-sqlalchemy
-          pip install flask-migrate
-          pip install flask-openapi3
-          pip install behave
-          pip install mockito
-          pip install python-dateutil
-          pip install bcrypt
+          python install -e .
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  
       - name: Run Unit tests
         run: |
-          python -m hatch run unit-tests
+          hatch run unit-tests
       # TODO: Add a coverage functionality
+      # pip install pytest pytest-cov
+      # pip install pytest-mock
+      # pip install flask
+      # pip install flask-sqlalchemy
+      # pip install flask-migrate
+      # pip install flask-openapi3
+      # pip install behave
+      # pip install mockito
+      # pip install python-dateutil
+      # pip install bcrypt
         
   build:
 
