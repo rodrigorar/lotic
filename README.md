@@ -19,7 +19,7 @@ multiplatform.
 - [Login](https://github.com/rodrigorar/lotic/blob/main/wiki/features/login.md)
 - [Logout](https://github.com/rodrigorar/lotic/blob/main/wiki/features/logout.md)
 - [Refresh Auth Token](https://github.com/rodrigorar/lotic/blob/main/wiki/features/refresh_auth_session.md)
-- [Create Task]() ⛔ No Implemented
+- [Create Task](https://github.com/rodrigorar/lotic/blob/main/wiki/features/create_task.md)
 - [Edit Task]() ⛔ No Implemented
 - [Complete Task]() ⛔ No Implemented
 - [Synchronize Tasks]() ⛔ No Implemented
