@@ -2,11 +2,13 @@
 
 ## Description
 
-A brief description of what the feature does, and how it is implemented on a high level degree. 
+Allows the user to update the Task Information.
 
 ## Problem Being Solved
 
-What problem are trying to solve by implementing this feature and it will bring value to the users of this feature. 
+A user might want to change the task information because it no longer makes sense,
+because it made a mistake or because there is something in the task itself that has changed, 
+the use cases are several and varied. 
 
 ## Sequence Diagram
 
