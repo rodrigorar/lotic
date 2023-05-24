@@ -21,7 +21,7 @@ multiplatform.
 - [Refresh Auth Token](https://github.com/rodrigorar/lotic/blob/main/wiki/features/refresh_auth_session.md)
 - [Create Task](https://github.com/rodrigorar/lotic/blob/main/wiki/features/create_task.md)
 - [Edit Task](https://github.com/rodrigorar/lotic/blob/main/wiki/features/update_task.md)
-- [Complete Task]() ⛔ No Implemented
+- [Complete Task](https://github.com/rodrigorar/lotic/blob/main/wiki/features/complete_task.md)
 - [Synchronize Tasks]() ⛔ No Implemented
 
 ## Thoughts
