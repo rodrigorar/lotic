@@ -14,7 +14,7 @@ one user.
 
 ## Sequence Diagram
 
-![Logout Sequence Diagram](../../assets/logout_sequence_diagram.png)
+![Logout Sequence Diagram](../assets/logout_sequence_diagram.png)
 
 
 ```
