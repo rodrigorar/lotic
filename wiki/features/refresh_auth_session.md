@@ -10,7 +10,7 @@ Making easier the usage of the app with significant intervals between usages by 
 
 ## Sequence Diagram
 
-![Refresh Token Sequence Diagram](../../assets/refresh_token_sequence_diagram.png)
+![Refresh Token Sequence Diagram](../assets/refresh_token_sequence_diagram.png)
 
 ### Sequence Diagram Code
 
