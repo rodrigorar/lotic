@@ -28,12 +28,23 @@ multiplatform.
 
 ### Description
 
-<Simple description of what the project tries to achieve and what problem 
-is trying to solve>
+A **Simple** and **Easy** to use application that allows the users to write notes
+/ simple documents and share them across all of their devices. The main ideia is 
+to have an app that allows users to write their thoughts on their Phone and continue
+working on them on their computer. 
 
 ### Features
 
-## License
+- [Create Account]() ⛔ No Implemented
+- [Login]() ⛔ No Implemented
+- [Logout]() ⛔ No Implemented
+- [Refresh Auth Token]() ⛔ No Implemented
+- [Create Note]() ⛔ No Implemented
+- [Edit Note]() ⛔ No Implemented
+- [Delete Note]() ⛔ No Implemented
+- [Synchornize Notes]() ⛔ No Implemented
+
+# License
 
 To Be Determined
 
