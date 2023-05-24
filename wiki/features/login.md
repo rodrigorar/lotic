@@ -12,7 +12,7 @@ to a given client, also the login allows the system to see what tasks the users 
 
 ## Sequence Diagram
 
-![Login Sequence Diagram](../../assets/login_sequence_diagram.png)
+![Login Sequence Diagram](../assets/login_sequence_diagram.png)
 
 ```
 @startuml
