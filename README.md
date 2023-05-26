@@ -22,7 +22,7 @@ multiplatform.
 - [Create Task](https://github.com/rodrigorar/lotic/blob/main/wiki/features/create_task.md)
 - [Edit Task](https://github.com/rodrigorar/lotic/blob/main/wiki/features/update_task.md)
 - [Complete Task](https://github.com/rodrigorar/lotic/blob/main/wiki/features/complete_task.md)
-- [Synchronize Tasks]() ⛔ No Implemented
+- [Synchronize Tasks](https://github.com/rodrigorar/lotic/blob/main/wiki/features/synchronize_tasks.md)
 
 ## Thoughts
 
