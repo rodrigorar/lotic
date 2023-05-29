@@ -44,7 +44,7 @@ async function refresh(accountId) {
         throw new Errors.UnknownAccountError("No session found for account id: " + accountId);
     }
 
-    const refreshResult = await AuthRPC.refresh(oldAuthToken.refreshToken)
+    const refreshResult = await AuthRPC.refresh(oldAuthToken.token, oldAuthToken.refreshToken)
     if (refreshResult.hasOwnProperty('status') && refreshResult.status == '404') {
         // TODO: Eventually this needs to notify the user so that we don't log them 
         // out of nowhere.
@@ -62,9 +62,11 @@ async function refresh(accountId) {
     return authToken;
 }
 
-async function logout(accountId) {
-    Validators.isNotNull(accountId, "No accountId provided");
-    await AuthRepository.eraseAuthSessionsForAccount(accountId)
+async function logout(authSession) {
+    Validators.isNotNull(authSession, "No auth session provided");
+
+    await AuthRepository.eraseAuthSessionsForAccount(authSession.accountId)
+    await AuthRPC.logout(authSession.token);
 }
 
 function getActiveSession() {

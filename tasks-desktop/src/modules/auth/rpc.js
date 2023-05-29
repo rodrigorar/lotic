@@ -7,7 +7,8 @@ async function doCall(operation) {
     try {
         return await operation();
     } catch (error) {
-        Logger.error(error.response.data);
+        Logger.error(error.response);
+        console.log(error.response);
         return error.response;
     }
 }
@@ -31,7 +32,7 @@ async function login(principal) {
     return result.data;
 }
 
-async function refresh(refreshToken) {
+async function refresh(accessToken, refreshToken) {
     Logger.trace(`Calling URL: #POST ${BASE_PATH}/refresh/${refreshToken}`);
 
     const result = await doCall(async () => {
@@ -40,34 +41,27 @@ async function refresh(refreshToken) {
             , {}
             , {
                 headers: {
-                    [Headers.ContentType]: ContentTypes.ApplicationJson
-                    , [Headers.Accept]: ContentTypes.ApplicationJson 
+                    [Headers.Accept]: ContentTypes.ApplicationJson 
+                    , [Headers.XAuthorization]: accessToken
                 }
             });
     });
     return result.data;
 }
 
-async function logout(accountId) {
-    Logger.trace(`Calling URL: #POST ${BASE_PATH}/logout`);
+async function logout(accessToken) {
+    Logger.trace(`Calling URL: #DELETE ${BASE_PATH}/${accessToken}`);
 
-    const activeSession = await AuthServices.getActiveSession();
-
-    const result = await doCall(async () => {
-        return await Client.post(
-            BASE_PATH + "/logout"
-            , {
-                account_id: accountId
-            }
+    await doCall(async () => {
+        return await Client.delete(
+            BASE_PATH + "/" + accessToken
             , {
                 headers: {
-                    [Headers.ContentType]: ContentTypes.ApplicationJson
-                    , [Headers.Accept]: ContentTypes.ApplicationJson 
-                    , [Headers.XAuthorization]: activeSession.token 
+                    [Headers.Accept]: ContentTypes.ApplicationJson 
+                    , [Headers.XAuthorization]: accessToken
                 }
             });
     });
-    return result.data;
 }
 
 module.exports.AuthRPC = {

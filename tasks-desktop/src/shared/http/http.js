@@ -11,7 +11,7 @@ async function doCall(httpCall) {
             // TODO: Abstract Auth Services from here, this is deeply wrong
             await AuthServices.refresh(activeSession.accountId);
 
-            const newActiveSession = AuthServices.getActiveSession();
+            const newActiveSession = await AuthServices.getActiveSession();
             try {
                 return await httpCall(newActiveSession.token);
             } catch (error) {

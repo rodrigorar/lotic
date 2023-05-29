@@ -43,7 +43,7 @@ async function handleLogin(event, loginData) {
 
 async function handleLogout(event) {
     const activeSession = await AuthServices.getActiveSession();
-    await AuthServices.logout(activeSession.accountId);
+    await AuthServices.logout(activeSession);
 
     webContents.getFocusedWebContents().send('auth:logged_out');
 }
