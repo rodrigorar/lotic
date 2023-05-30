@@ -53,7 +53,7 @@ const createTaskTable =
     + "title TEXT,"
     + "created_at DATETIME NOT NULL,"
     + "updated_at DATETIME NOT NULL,"
-    + "owner_id TEXT"
+    + "owner_id TEXT NOT NULL"
     + ')';
 
 const createTaskSyncTable = 

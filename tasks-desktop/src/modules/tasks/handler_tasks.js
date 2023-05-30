@@ -9,8 +9,11 @@ async function handleCreateTask(event, newTask) {
         newTask.ownerId = activeSession.accountId;
     }
 
-    TaskServices.create(newTask);
-    TasksSynchServices.createSynchMonitor(newTask.id);
+    TaskServices
+        .create(newTask)
+        .then(() => {
+            TasksSynchServices.createSynchMonitor(newTask.id);
+        });
     
     SynchManager.execute();
 }

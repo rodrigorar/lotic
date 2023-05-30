@@ -1,7 +1,7 @@
 const { Validators } = require("../../shared/utils/utils");
 const { TasksRepository, Task } = require("./data");
 
-function create(taskData) {
+async function create(taskData) {
     Validators.isNotNull(taskData, 'No task data was provided!');
     
     const task = 
@@ -11,7 +11,7 @@ function create(taskData) {
             , taskData.createdAt
             , taskData.updatedAt
             , taskData.ownerId);
-    TasksRepository.createTask(task);
+    await TasksRepository.createTask(task);
 }
 
 async function createMultiple(tasksData) {
