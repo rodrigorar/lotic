@@ -64,12 +64,17 @@ app.on('ready', () => {
   app.on('before-quit', (e) => {
 
     if (closeSemaphor) {
+      closeSemaphor = false;
       e.preventDefault();
 
       SynchManager.execute()
         .then(() => {
           closeSemaphor = false;
-          app.quit();
+          setTimeout(() => {
+            if (process.platform !== "darwin") {
+              app.quit()
+            }
+          }, 5000);
         });
     }
   });
