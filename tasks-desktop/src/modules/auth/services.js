@@ -35,7 +35,13 @@ async function login(principal) {
         }
         await AuthRepository.persistAuthToken(authToken);
 
-        EventBus.publish(new Event(EventType.LOGIN_SUCCESS, {}));
+        EventBus.publish(
+            new Event(
+                EventType.LOGIN_SUCCESS
+                , {
+                    access_token: authToken.token
+                    , account_id: authToken.accountId
+                 }));
     }
 }
 

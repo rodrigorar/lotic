@@ -43,6 +43,8 @@ async function handleListTasks(event) {
     const activeSession = await AuthServices.getActiveSession();
     if (activeSession != undefined) {
         return await TaskServices.list(activeSession.accountId);
+    } else {
+        return await TaskServices.listTasksWithoutOwner();
     }
 }
 

@@ -21,16 +21,39 @@ function updateTask(taskId, data) {
         });
 }
 
+async function updateTaskOwner(task) {
+    UnitOfWork.begin()
+        .then(async (db) => {
+            await db.run(
+                "UPDATE tasks SET owner_id=?, updated_at=? WHERE task_id=?"
+                , [task.ownerId, new Date().toISOString(), task.id]);
+            db.close();
+        });
+}
+
 // TODO: Refactor this method to use a more function approach
 async function listTasks(accountId) {
-    let result = [];
+    return await UnitOfWork.begin()
+        .then(async (db) => {
+            const queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks t WHERE owner_id = ?', [accountId]);
+            const result = queryResult.map(entry => new Task(entry.task_id, entry.title, new Date(entry.created_at), new Date(entry.updated_at), entry.owner_id));
 
-    await UnitOfWork.begin();
-    const queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks t WHERE owner_id = ?', [accountId]);
-    result = queryResult.map(entry => new Task(entry.task_id, entry.title, new Date(entry.created_at), new Date(entry.updated_at), entry.owner_id));
-    UnitOfWork.end();
+            db.close();
 
-    return result;
+            return result;
+        });
+}
+
+async function listTasksWithoutOwner() {
+    return await UnitOfWork.begin()
+        .then(async (db) => {
+            const queryResult = await db.all("SELECT * FROM tasks WHERE owner_id is null", []);
+            const result = queryResult.map(entry => new Task(entry.task_id, entry.title, new Date(entry.created_at), new Date(entry.updated_at), entry.owner_id));
+
+            db.close();
+
+            return result;
+        });
 }
 
 async function listById(tasksIds = []) {
@@ -61,7 +84,9 @@ async function deleteAllForAccount(accountId) {
 module.exports.TasksRepository = {
     createTask
     , updateTask
+    , updateTaskOwner
     , listTasks
+    , listTasksWithoutOwner
     , listById
     , deleteTask
     , deleteAllForAccount

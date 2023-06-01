@@ -1,5 +1,7 @@
+const { EventBus, EventType, EventSubscriber } = require("../../shared/event-bus");
 const { Validators } = require("../../shared/utils/utils");
 const { TasksRepository, Task } = require("./data");
+const { v4 } = require("uuid");
 
 async function create(taskData) {
     Validators.isNotNull(taskData, 'No task data was provided!');
@@ -17,7 +19,6 @@ async function create(taskData) {
 async function createMultiple(tasksData) {
     Validators.isNotNull(tasksData, 'No tasks where provided');
 
-    // TODO: Optimize this so it doesn't call the database so many times
     tasksData
         .map(taskData => 
                 new Task(
@@ -38,7 +39,12 @@ function update(taskId, taskData) {
 
 async function list(accountId) {
     Validators.isNotNull(accountId, 'No accountId provided');
+
     return await TasksRepository.listTasks(accountId);
+}
+
+async function listTasksWithoutOwner() {
+    return await TasksRepository.listTasksWithoutOwner();
 }
 
 async function listById(taskIdList = []) {
@@ -54,7 +60,6 @@ function deleteTask(taskId) {
 async function deleteMultiple(taskIds) {
     Validators.isNotNull(taskIds, 'No task ids provided');
 
-    // TODO: Optimize this so it doesn't call the database so many times
     await taskIds
         .forEach(async taskId => await TasksRepository.deleteTask(taskId));
 }
@@ -69,8 +74,21 @@ module.exports.TaskServices = {
     , createMultiple
     , update
     , list
+    , listTasksWithoutOwner
     , listById
     , deleteTask
     , deleteMultiple
     , deleteAllForAccount
 }
+
+// Event Bus Subscribers
+
+EventBus.register(
+    EventType.LOGIN_SUCCESS
+    , new EventSubscriber(v4(), async (event) => {
+        const tasksWithoutOwner = await listTasksWithoutOwner();
+        tasksWithoutOwner.forEach(async (task) => { 
+            task.ownerId = event.body.account_id;
+            await TasksRepository.updateTaskOwner(task)
+        });
+    }));
