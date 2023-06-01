@@ -35,43 +35,35 @@ module.exports.runSchemaMigrations = async () => {
     Logger.trace('Running schema migrations')
     
     await begin(); 
-    
-    await db.run(createTaskTable, []);
-    await db.run(createTaskSyncTable, []);
-    await db.run(createAccountsTable, []);
-    await db.run(createAuthSessionsTable, []);
-
+    migrations.forEach(async (migration) => await db.run(migration, []));
     db.close();
 }
 
 
 // Schema migrations
 
-const createTaskTable = 
+const migrations = [
     "CREATE TABLE IF NOT EXISTS tasks (" 
     + "task_id TEXT UNIQUE PRIMARY KEY," 
     + "title TEXT,"
     + "created_at DATETIME NOT NULL,"
     + "updated_at DATETIME NOT NULL,"
     + "owner_id TEXT"
-    + ')';
-
-const createTaskSyncTable = 
+    + ')'
+    , 
     "CREATE TABLE IF NOT EXISTS tasks_synch (" 
     + "task_synch_id TEXT UNIQUE PRIMARY KEY," 
     + "task_id TEXT UNIQUE NOT NULL,"
     + "synch_status TEXT NOT NULL,"
     + "created_at DATETIME NOT NULL," 
     + "updated_at DATETIME  NOT NULL" 
-    + ')';
-
-const createAccountsTable = 
+    + ')'
+    ,
     "CREATE TABLE IF NOT EXISTS accounts ("
     + "id TEXT UNIQUE PRIMARY KEY,"
     + "email TEXT UNIQUE NOT NULL"
-    + ')';
-
-const createAuthSessionsTable =
+    + ')'
+    ,
     "CREATE TABLE IF NOT EXISTS auth_tokens ("
     + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
     + "token TEXT UNIQUE NOT NULL,"
@@ -79,3 +71,4 @@ const createAuthSessionsTable =
     + "account_id TEXT NOT NULL,"
     + "expires_at DATETIME NOT NULL"
     + ')'
+];
