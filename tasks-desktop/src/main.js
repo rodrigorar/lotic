@@ -12,6 +12,10 @@ const { Logger } = require('./shared/logging/logger');
 const { AuthHandlers } = require('./modules/auth/handler_auth');
 const { AuthServices } = require('./modules/auth/services');
 const { TasksSynchServices } = require('./modules/tasks_synch/services');
+const { EventType } = require('./shared/event-bus');
+const { EventBus } = require('./shared/event-bus');
+const { EventSubscriber } = require('./shared/event-bus');
+const { v4 } = require("uuid");
 
 app.setName('Tasks');
 
@@ -23,8 +27,11 @@ let schemaMigrationSemaphor = false;
 runSchemaMigrations()
   .then(_ => schemaMigrationSemaphor = true);
 
+let closeSemaphor = true;
+let mainWindow = null;
+
 const createWindow = () => {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 400,
     height: 500,
     webPreferences: {
@@ -38,10 +45,8 @@ const createWindow = () => {
   return mainWindow;
 };
 
-let closeSemaphor = true;
-
 app.on('ready', () => {
-  const mainWindow = createWindow()
+  createWindow()
 
   Menu.setApplicationMenu(null);
 
@@ -88,15 +93,18 @@ ipcMain.on('log:warn', LoggerHandler.handleWarnLog);
 ipcMain.on('log:error', LoggerHandler.handleErrorLog);
 
 // Utils Event Listeners
+
 ipcMain.handle('utils:id:generate', UtilsHandler.handleGenerateId);
 
 // Tasks Event Listeners
+
 ipcMain.on('tasks:create', TasksHandler.handleCreateTask);
 ipcMain.on('tasks:update', TasksHandler.handleUpdateTasks);
 ipcMain.on('tasks:complete', TasksHandler.handleCompletion);
 ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
 
 // Auth Event Listeners
+
 ipcMain.on('auth:open:login', AuthHandlers.handleOpenLogin);
 ipcMain.on('auth:login', AuthHandlers.handleLogin);
 ipcMain.on('auth:logout', async (event) => {
@@ -105,3 +113,10 @@ ipcMain.on('auth:logout', async (event) => {
   await AuthHandlers.handleLogout(event); // This one has to be last, we need to know which account is logging out
 });
 ipcMain.handle('auth:is_logged_in', AuthHandlers.handleIsLoggedIn);
+
+
+// EventBus Listeners
+
+EventBus.register(
+  EventType.REFRESH_FAILED
+  , new EventSubscriber(v4(), (event) => mainWindow.webContents.send("auth:logged_out")));

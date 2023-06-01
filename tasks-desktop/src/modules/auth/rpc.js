@@ -8,7 +8,6 @@ async function doCall(operation) {
         return await operation();
     } catch (error) {
         Logger.error(error.response);
-        console.log(error.response);
         return error.response;
     }
 }

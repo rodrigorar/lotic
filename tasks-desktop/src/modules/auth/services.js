@@ -3,6 +3,7 @@ const { AuthRepository, AuthToken } = require("./data");
 const { AccountServices } = require("../accounts/services");
 const { AuthRPC } = require("./rpc");
 const { Errors } = require("../../shared/errors/errors");
+const { EventBus, Event, EventType } = require("../../shared/event-bus");
  
 async function login(principal) {
     Validators.isNotNull(principal.email, "No email provided");
@@ -33,6 +34,8 @@ async function login(principal) {
             });
         }
         await AuthRepository.persistAuthToken(authToken);
+
+        EventBus.publish(new Event(EventType.LOGIN_SUCCESS, {}));
     }
 }
 
@@ -45,10 +48,16 @@ async function refresh(accountId) {
     }
 
     const refreshResult = await AuthRPC.refresh(oldAuthToken.token, oldAuthToken.refreshToken)
-    if (refreshResult.hasOwnProperty('status') && refreshResult.status == '404') {
-        // TODO: Eventually this needs to notify the user so that we don't log them 
-        // out of nowhere.
-        await AuthRepository.eraseAuthSessionsForAccount(accountId);
+    if (refreshResult.hasOwnProperty("status") && 
+        (refreshResult.status == "404") || refreshResult.status == "401") {
+            await AuthRepository.eraseAuthSessionsForAccount(accountId);
+            EventBus.publish(new Event(
+                EventType.REFRESH_FAILED
+                , { 
+                    account_id: oldAuthToken.accountId
+                    , refresh_token: oldAuthToken.refreshToken 
+                }));
+            return;
     }
 
     const authToken = new AuthToken(
@@ -59,6 +68,8 @@ async function refresh(accountId) {
 
     await AuthRepository.persistAuthToken(authToken);
 
+    EventBus.publish(new Event(EventType.REFRESH_SUCCESS, {}));
+
     return authToken;
 }
 
@@ -67,6 +78,8 @@ async function logout(authSession) {
 
     await AuthRepository.eraseAuthSessionsForAccount(authSession.accountId)
     await AuthRPC.logout(authSession.token);
+
+    EventBus.publish(new Event(EventType.LOGOUT_SUCCESS, {}));
 }
 
 function getActiveSession() {
