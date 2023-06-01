@@ -143,7 +143,7 @@ addTaskButton.addEventListener('click', async () => {
 });
 
 window.addEventListener('keypress', (key) => {
-    if (key.code === 'Enter') {
+    if (key.code === "Enter") {
         if (emptyTask == undefined) {
             createTask();
         }

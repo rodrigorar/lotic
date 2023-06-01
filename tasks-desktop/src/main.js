@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const { runSchemaMigrations } = require('./shared/persistence/database');
-const { app, BrowserWindow, Menu, ipcMain, webContents } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, globalShortcut } = require('electron');
 const path = require('path');
 const { LoggerHandler } = require('./shared/logging/handler_logging');
 const { UtilsHandler } = require('./shared/utils/handler_utils');
@@ -82,6 +82,10 @@ app.on('ready', () => {
           }, 5000);
         });
     }
+  });
+
+  globalShortcut.register("F5", () => {
+    SynchManager.execute(mainWindow.webContents);
   });
 });
 
