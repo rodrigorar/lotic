@@ -4,10 +4,10 @@ async function persistAuthToken(authToken) {
     await UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
-                'DELETE FROM auth_tokens WHERE account_id = ?'
+                'DELETE FROM auth_sessions WHERE account_id = ?'
                 , [authToken.accountId]);
             await db.run(
-                'INSERT INTO auth_tokens(token, refresh_token, account_id, expires_at) VALUES (?, ?, ?, ?)'
+                'INSERT INTO auth_sessions(token, refresh_token, account_id, expires_at) VALUES (?, ?, ?, ?)'
                 , [authToken.token, authToken.refreshToken, authToken.accountId, authToken.expiresAt])
             db.close();
         });
@@ -18,7 +18,7 @@ async function getAuthToken(accountId) {
         .then(async (db) => {
             const queryResult =
                 await db.get(
-                    'SELECT * FROM auth_tokens WHERE account_id = ?'
+                    'SELECT * FROM auth_sessions WHERE account_id = ?'
                     , [accountId]);
 
             if (queryResult == undefined) {
@@ -40,7 +40,7 @@ async function getActiveSession() {
         .then(async (db) => {
             const queryResult =
                 await db.get(
-                    'SELECT * FROM auth_tokens LIMIT 1'
+                    'SELECT * FROM auth_sessions LIMIT 1'
                     , []);
             
             if (queryResult == undefined) {
@@ -61,7 +61,7 @@ async function eraseAuthSessionsForAccount(accountId) {
     await UnitOfWork.begin()
         .then(async (db) => {
             await db.run(
-                'DELETE FROM auth_tokens WHERE account_id = ?'
+                'DELETE FROM auth_sessions WHERE account_id = ?'
                 , [accountId]);
             db.close();
         });
