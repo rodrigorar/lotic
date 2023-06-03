@@ -6,10 +6,13 @@ const { RunUnitOfWork } = require("../../shared/persistence/unitofwork");
 
 let loginWindow;
 
-
 async function handleOpenLogin(event) {
     if (loginWindow == undefined) {
-        const activeSession = await AuthServices.getActiveSession();
+        
+        const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
+            return await AuthServices.getActiveSession(unitOfWork);
+        });
+
         loginWindow = new BrowserWindow({
             width: 400,
             height: 200,
@@ -37,7 +40,7 @@ async function handleLogin(event, loginData) {
     loginWindow = undefined;
 
     await RunUnitOfWork.run(async (unitOfWork) => {
-        await AuthServices.AuthServices.login(unitOfWork, loginData);
+        await AuthServices.login(unitOfWork, loginData);
     });
 
     await SynchManager.execute();
@@ -46,15 +49,18 @@ async function handleLogin(event, loginData) {
 }
 
 async function handleLogout(event) {
-    const activeSession = await AuthServices.getActiveSession();
-    await AuthServices.logout(activeSession);
-
+    await RunUnitOfWork.run(async (unitOfWork) => {
+        const activeSession = await AuthServices.getActiveSession(unitOfWork);
+        await AuthServices.logout(unitOfWork, activeSession);
+    });
+    
     webContents.getFocusedWebContents().send('auth:logged_out');
 }
 
 async function handleIsLoggedIn(event) {
-    const activeSession = await AuthServices.getActiveSession();
-    return activeSession != undefined;
+    return await RunUnitOfWork.run(async (unitOfWork) => {
+        return await AuthServices.getActiveSession(unitOfWork);
+    }) != undefined;
 }
 
 module.exports.AuthHandlers = {

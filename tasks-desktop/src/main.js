@@ -16,6 +16,7 @@ const { EventType } = require('./shared/event-bus');
 const { EventBus } = require('./shared/event-bus');
 const { EventSubscriber } = require('./shared/event-bus');
 const { v4 } = require("uuid");
+const { RunUnitOfWork } = require('./shared/persistence/unitofwork');
 
 app.setName('Tasks');
 
@@ -112,7 +113,9 @@ ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
 ipcMain.on('auth:open:login', AuthHandlers.handleOpenLogin);
 ipcMain.on('auth:login', AuthHandlers.handleLogin);
 ipcMain.on('auth:logout', async (event) => {
-  const activeSession = await AuthServices.getActiveSession();
+  const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
+    return await AuthServices.getActiveSession(unitOfWork);
+  }); 
   await TasksHandler.handleLogout(event, activeSession.accountId);
   await AuthHandlers.handleLogout(event); // This one has to be last, we need to know which account is logging out
 });

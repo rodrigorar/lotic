@@ -2,9 +2,13 @@ const { SynchManager } = require('../synch-manager');
 const { TaskServices } = require('./services');
 const { TasksSynchServices } = require('../tasks_synch/services');
 const { AuthServices } = require('../auth/services');
+const { RunUnitOfWork } = require('../../shared/persistence/unitofwork');
 
 async function handleCreateTask(event, newTask) {
-    const activeSession = await AuthServices.getActiveSession();
+    const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
+        return await AuthServices.getActiveSession(unitOfWork);
+    });
+    
     if (activeSession != undefined) {
         newTask.ownerId = activeSession.accountId;
     }
@@ -40,7 +44,10 @@ function handleCompletion(event, taskId) {
 }
 
 async function handleListTasks(event) {
-    const activeSession = await AuthServices.getActiveSession();
+    const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
+        return await AuthServices.getActiveSession(unitOfWork);
+    });
+
     if (activeSession != undefined) {
         return await TaskServices.list(activeSession.accountId);
     } else {

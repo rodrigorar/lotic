@@ -7,6 +7,7 @@ const { TASK_SYNCH_STATUS, TaskSynchRepository } = require("./tasks_synch/data")
 const { Logger } = require("../shared/logging/logger");
 const { StatusCode } = require("../shared/http/http");
 const { webContents } = require("electron");
+const { RunUnitOfWork } = require("../shared/persistence/unitofwork");
 
 /***
  * HOW THE SYNCH SHOULD FUNCTION
@@ -22,7 +23,7 @@ const { webContents } = require("electron");
 // TODO: Improve the design of the synch manager, and if possible, make it less 
 // good functiony than this. rodrigorar - 27/02/2023
 
-async function callCreateTasks(authToken, account, taskIds) {
+async function callCreateTasks(unitOfWork, authToken, account, taskIds) {
     const tasks = await TaskServices.listById(taskIds);
 
     const tasksRequest = tasks
@@ -35,7 +36,7 @@ async function callCreateTasks(authToken, account, taskIds) {
             , owner_id: authToken.accountId
         }));
 
-    const result = await TasksRPC.createTasks(tasksRequest);
+    const result = await TasksRPC.createTasks(unitOfWork, tasksRequest);
     if (result != undefined && 'ids' in result && result.ids.length == tasksRequest.length) {
         await TasksSynchServices.markSynched(taskIds);
     } else if ('status' in result && result.status === '409') {
@@ -43,7 +44,7 @@ async function callCreateTasks(authToken, account, taskIds) {
     }
 } 
 
-async function callUpdateTasks(taskIds) {
+async function callUpdateTasks(unitOfWork, taskIds) {
     const tasks = await TaskServices.listById(taskIds);
 
     const tasksRequest = tasks
@@ -54,19 +55,19 @@ async function callUpdateTasks(taskIds) {
         , updated_at: task.updatedAt.toISOString()
     }));
 
-    const result = await TasksRPC.updateTasks(tasksRequest);
+    const result = await TasksRPC.updateTasks(unitOfWork, tasksRequest);
     if (result != undefined) {
         await TasksSynchServices.markSynched(taskIds);
     }
 }
 
-async function callDeleteTasks(taskIds) {
+async function callDeleteTasks(unitOfWork, taskIds) {
     const result = [];    
 
     for (const taskId of taskIds) {
         if (taskId != undefined) {
             try {
-                await TasksRPC.deleteTasks(taskId);
+                await TasksRPC.deleteTasks(unitOfWork, taskId);
                 result.push(taskId);
             } catch (e) {
                 if (e.response.status == StatusCode.NotFound) {
@@ -81,8 +82,8 @@ async function callDeleteTasks(taskIds) {
     return result;
 }
 
-async function callListServerTasks(account) {
-    result = await TasksRPC.listTasks(account.id);
+async function callListServerTasks(unitOfWork, account) {
+    result = await TasksRPC.listTasks(unitOfWork, account.id);
     return result.data.tasks.map(entry => ({
         task_id: entry.task_id
         , title: entry.title
@@ -97,123 +98,125 @@ async function doExecute(providedWebContents = undefined) {
             ? providedWebContents 
             : webContents.getFocusedWebContents();
     
-    const authToken = await AuthServices.getActiveSession();
-    if (authToken == undefined) {
-        Logger.info("Unable to run Synch Manager, no account logged in");
-        return;
-    }
-    const account = await AccountServices.getAccountById(authToken.accountId);
-
-    // Created tasks in server
-
-    const createdTasksSynch = await TasksSynchServices.getNonSynched();
-
-    const tasksToCreate = 
-        createdTasksSynch
-            .filter(task => task.synchStatus == TASK_SYNCH_STATUS.LOCAL)
-            .map(taskSynch => taskSynch.taskId)
-    if (tasksToCreate.length > 0) {
-        await callCreateTasks(authToken, account, tasksToCreate);
-    }
-
-    // Update tasks in server
-
-    const tasksToUpdate =
-        createdTasksSynch
-            .filter(task => task.synchStatus == TASK_SYNCH_STATUS.DIRTY)
-            .map(tasksSynch => tasksSynch.taskId);
-    if (tasksToUpdate.length > 0) {
-        await callUpdateTasks(tasksToUpdate);
-    }
-
-    // Delete completed tasks from the server
-
-    const completeTasksSynch = await TasksSynchServices.getComplete();
-    if (completeTasksSynch.length > 0) {
-        const tasksToDelete = completeTasksSynch.map(task => task.taskId);
-        const tasksSynchToDelete = await callDeleteTasks(tasksToDelete);
-        if (tasksSynchToDelete.length > 0) {
-            await TasksSynchServices.deleteMultipleByTaskId(tasksSynchToDelete);
+    await RunUnitOfWork.run(async (unitOfWork) => {
+        const authToken = await AuthServices.getActiveSession(unitOfWork);
+        if (authToken == undefined) {
+            Logger.info("Unable to run Synch Manager, no account logged in");
+            return;
         }
-    }
+        const account = await AccountServices.getAccountById(unitOfWork, authToken.accountId);
 
-    // Get Tasks from server
+        // Created tasks in server
 
-    const result = await callListServerTasks(account);
-    let tasksToInsert = undefined;
-    if (result.length > 0) {
-        const existingTasks = await TaskServices.list(account.id);
-        tasksToInsert = result
-                .filter(result => existingTasks.filter(entry => entry.id == result.task_id).length == 0)
-                .map(taskData => ({
-                    id: taskData.task_id
-                    , title: taskData.title
+        const createdTasksSynch = await TasksSynchServices.getNonSynched();
+
+        const tasksToCreate = 
+            createdTasksSynch
+                .filter(task => task.synchStatus == TASK_SYNCH_STATUS.LOCAL)
+                .map(taskSynch => taskSynch.taskId)
+        if (tasksToCreate.length > 0) {
+            await callCreateTasks(unitOfWork, authToken, account, tasksToCreate);
+        }
+
+        // Update tasks in server
+
+        const tasksToUpdate =
+            createdTasksSynch
+                .filter(task => task.synchStatus == TASK_SYNCH_STATUS.DIRTY)
+                .map(tasksSynch => tasksSynch.taskId);
+        if (tasksToUpdate.length > 0) {
+            await callUpdateTasks(unitOfWork, tasksToUpdate);
+        }
+
+        // Delete completed tasks from the server
+
+        const completeTasksSynch = await TasksSynchServices.getComplete();
+        if (completeTasksSynch.length > 0) {
+            const tasksToDelete = completeTasksSynch.map(task => task.taskId);
+            const tasksSynchToDelete = await callDeleteTasks(tasksToDelete);
+            if (tasksSynchToDelete.length > 0) {
+                await TasksSynchServices.deleteMultipleByTaskId(unitOfWork, tasksSynchToDelete);
+            }
+        }
+
+        // Get Tasks from server
+
+        const result = await callListServerTasks(unitOfWork, account);
+        let tasksToInsert = undefined;
+        if (result.length > 0) {
+            const existingTasks = await TaskServices.list(account.id);
+            tasksToInsert = result
+                    .filter(result => existingTasks.filter(entry => entry.id == result.task_id).length == 0)
+                    .map(taskData => ({
+                        id: taskData.task_id
+                        , title: taskData.title
+                        , createdAt: new Date() // FIXME: This should come from the server
+                        , updatedAt: new Date() // FIXME: This should come from the server
+                        , ownerId: authToken.accountId
+                    }));
+            await TaskServices.createMultiple(tasksToInsert);
+            tasksToInsert.forEach(entry => {
+                TasksSynchServices.createSynchMonitor(entry.id, TASK_SYNCH_STATUS['SYNCHED'])
+            })
+
+            // FIXME: Update only tasks that need updating
+            result.map(entry => TaskServices.update(
+                entry.task_id
+                , {
+                    id: entry.task_id
+                    , title: entry.title
                     , createdAt: new Date() // FIXME: This should come from the server
                     , updatedAt: new Date() // FIXME: This should come from the server
-                    , ownerId: authToken.accountId
-                }));
-        await TaskServices.createMultiple(tasksToInsert);
-        tasksToInsert.forEach(entry => {
-            TasksSynchServices.createSynchMonitor(entry.id, TASK_SYNCH_STATUS['SYNCHED'])
-        })
+                    , ownerId: entry.owner_id
+                }))
+            
+            setTimeout(async () => {
+                const refreshedTasks = await TaskServices.list(account.id);
+                eventHandler.send('tasks:refresh', refreshedTasks);
+            }, 500);
+        }
 
-        // FIXME: Update only tasks that need updating
-        result.map(entry => TaskServices.update(
-            entry.task_id
-            , {
-                id: entry.task_id
-                , title: entry.title
-                , createdAt: new Date() // FIXME: This should come from the server
-                , updatedAt: new Date() // FIXME: This should come from the server
-                , ownerId: entry.owner_id
-            }))
-        
-        setTimeout(async () => {
-            const refreshedTasks = await TaskServices.list(account.id);
-            eventHandler.send('tasks:refresh', refreshedTasks);
-        }, 500);
-    }
-
-    const existingTasks = await TaskServices.list(account.id);
-    if (existingTasks.length != 0) { 
-        let tasksWithSynchStatus = [];
-        if (result.length > 0) {
-            tasksWithSynchStatus = existingTasks
-                .map(async entry => {
+        const existingTasks = await TaskServices.list(account.id);
+        if (existingTasks.length != 0) { 
+            let tasksWithSynchStatus = [];
+            if (result.length > 0) {
+                tasksWithSynchStatus = existingTasks
+                    .map(async entry => {
+                        const synchStatus = await TasksSynchServices.getSynchStatus(entry.id);
+                        return {
+                            id: entry.id
+                            , taskSynchStatus: synchStatus.synchStatus
+                        };
+                    });
+            } else {
+                tasksWithSynchStatus = existingTasks.map(async entry => {
                     const synchStatus = await TasksSynchServices.getSynchStatus(entry.id);
                     return {
                         id: entry.id
-                        , taskSynchStatus: synchStatus.synchStatus
-                    };
+                        , tasksSynchStatus: synchStatus
+                    }
                 });
-        } else {
-            tasksWithSynchStatus = existingTasks.map(async entry => {
-                const synchStatus = await TasksSynchServices.getSynchStatus(entry.id);
-                return {
-                    id: entry.id
-                    , tasksSynchStatus: synchStatus
+            }
+
+            Promise.all(tasksWithSynchStatus).then(async values => {
+                const tasksToDelete = values
+                    .filter(entry => {
+                        return result.filter(value => value.task_id == entry.id) == 0
+                            && entry.taskSynchStatus != TASK_SYNCH_STATUS['LOCAL'];
+                    })
+                    .map(entry => entry.id);
+                if (tasksToDelete.length > 0) {
+                    await TaskServices.deleteMultiple(tasksToDelete);
+                    await TasksSynchServices.deleteMultipleByTaskId(tasksToDelete);
+                    
+                    setTimeout(async () => {
+                        const refreshedTasks = await TaskServices.list(account.id);
+                        eventHandler.send('tasks:refresh', refreshedTasks); 
+                    }, 500);
                 }
             });
         }
-
-        Promise.all(tasksWithSynchStatus).then(async values => {
-            const tasksToDelete = values
-                .filter(entry => {
-                    return result.filter(value => value.task_id == entry.id) == 0
-                        && entry.taskSynchStatus != TASK_SYNCH_STATUS['LOCAL'];
-                })
-                .map(entry => entry.id);
-            if (tasksToDelete.length > 0) {
-                await TaskServices.deleteMultiple(tasksToDelete);
-                await TasksSynchServices.deleteMultipleByTaskId(tasksToDelete);
-                
-                setTimeout(async () => {
-                    const refreshedTasks = await TaskServices.list(account.id);
-                    eventHandler.send('tasks:refresh', refreshedTasks); 
-                }, 500);
-            }
-        });
-    }
+    });
 
     Logger.trace('Finished Task Synchornization, Refreshing');
 }

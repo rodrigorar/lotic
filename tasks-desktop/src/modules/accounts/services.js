@@ -28,30 +28,6 @@ class AccountServices {
 
         return await this.accountRepository.getAccountById(unitOfWork, accountId);
     }
-
-    // DEPRECATED Functions ---> 03/06/2023
-
-    // DEPRECATED: 03/06/2023
-    async create(accountData) {
-        Validators.isNotNull(accountData, "No account data provided");
-
-        await this.accountRepository
-            .createAccount(new Account(accountData.id, accountData.email));
-    }
-
-    // DEPRECATED: 03/06/2023
-    async getAccount(email) {
-        Validators.isNotNull(email, "No email provided");
-
-        return await this.accountRepository.getAccount(email);
-    }
-
-    // DEPRECATED: 03/06/2023
-    async getAccountById(accountId) {
-        Validators.isNotNull(accountId, "No accountId provided");
-
-        return await this.accountRepository.getAccountById(accountId);
-    }
 }
 
 module.exports.AccountServices = new AccountServices(AccountRepository);

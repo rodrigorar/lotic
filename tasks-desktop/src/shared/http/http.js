@@ -2,8 +2,8 @@ const { Logger } = require('../logging/logger');
 const { AuthServices } = require('../../modules/auth/services');
 const { Client, BASE_URL, Headers, ContentTypes } = require('./client');
 
-async function doCall(httpCall) {
-    const activeSession = await AuthServices.getActiveSession();
+async function doCall(unitOfWork, httpCall) {
+    const activeSession = await AuthServices.getActiveSession(unitOfWork);
     try {
         return await httpCall(activeSession.token);
     } catch (error) {
@@ -11,7 +11,7 @@ async function doCall(httpCall) {
             // TODO: Abstract Auth Services from here, this is deeply wrong
             await AuthServices.refresh(activeSession.accountId);
 
-            const newActiveSession = await AuthServices.getActiveSession();
+            const newActiveSession = await AuthServices.getActiveSession(unitOfWork);
             try {
                 return await httpCall(newActiveSession.token);
             } catch (error) {
@@ -22,9 +22,9 @@ async function doCall(httpCall) {
     }
 }
 
-const get = async (path) => {
+const get = async (unitOfWork, path) => {
     Logger.trace(`Calling URL: #GET ${BASE_URL + path}`);
-    return await doCall((authToken) =>
+    return await doCall(unitOfWork, (authToken) =>
         Client.get(BASE_URL + path, {
             headers: {
                 [Headers.Accept]: [ContentTypes.ApplicationJson]
@@ -35,10 +35,10 @@ const get = async (path) => {
 
 // TODO: Improve the autorization code, so we don't hve to add it to every request
 
-const post = async (path, data) => {
+const post = async (unitOfWork, path, data) => {
     Logger.trace(`Calling URL: #POST ${BASE_URL + path} with Data: ${JSON.stringify(data)}`);
 
-    const result = await doCall((authToken) =>
+    const result = await doCall(unitOfWork, (authToken) =>
         Client.post(BASE_URL + path, data, {
             headers: {
                 [Headers.ContentType]: [ContentTypes.ApplicationJson]
@@ -49,10 +49,10 @@ const post = async (path, data) => {
     return result;
 };
 
-const put = async (path, data) => {
+const put = async (unitOfWork, path, data) => {
     Logger.trace(`Calling URL: #PUT ${BASE_URL + path} with Data: ${JSON.stringify(data)}`);
 
-    return await doCall((authToken) =>
+    return await doCall(unitOfWork, (authToken) =>
         Client.put(BASE_URL + path, data, {
             headers: {
                 [Headers.ContentType]: [ContentTypes.ApplicationJson]
@@ -62,10 +62,10 @@ const put = async (path, data) => {
         }));
 };
 
-const del = async (path) => {
+const del = async (unitOfWork, path) => {
     Logger.trace(`Calling URL: #DELETE ${BASE_URL + path}`);
 
-    return await doCall((authToken) =>
+    return await doCall(unitOfWork, (authToken) =>
         Client.delete(BASE_URL + path, {
             headers: {
                 [Headers.Accept]: [ContentTypes.ApplicationJson]
