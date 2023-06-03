@@ -1,5 +1,7 @@
 const { UnitOfWork } = require("../../shared/persistence/database")
 
+// DEPRECATED ////////////////////////////////////////////////////////////
+
 async function persistAuthToken(authToken) {
     await UnitOfWork.begin()
         .then(async (db) => {
@@ -27,7 +29,7 @@ async function getAuthToken(accountId) {
 
             const result = new AuthToken(
                 queryResult.token
-                , queryResult.refresh_token
+                , queryResult.re// DEPRECATED ////////////////////////////////////////////////////////////fresh_token
                 , queryResult.account_id
                 , queryResult.expires_at);
             db.close();
@@ -67,6 +69,22 @@ async function eraseAuthSessionsForAccount(accountId) {
         });
 }
 
+// DEPRECATED ////////////////////////////////////////////////////////////
+
+
+class AuthRepository {
+
+    async persistAuthToken(unitOfWork, authToken) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            'DELETE FROM auth_sessions WHERE account_id = ?'
+            , [authToken.accountId]);
+        await queryManager.run(
+            'INSERT INTO auth_sessions(token, refresh_token, account_id, expires_at) VALUES (?, ?, ?, ?)'
+            , [authToken.token, authToken.refreshToken, authToken.accountId, authToken.expiresAt])
+    }
+}
+
 
 class AuthToken {
     constructor(token, refreshToken, accountId, expiresAt) {
@@ -78,9 +96,9 @@ class AuthToken {
 }
 
 module.exports.AuthToken = AuthToken;
-
 module.exports.AuthRepository = {
-    persistAuthToken
+    AuthRepository: new AuthRepository()
+    , persistAuthToken
     , getAuthToken
     , getActiveSession
     , eraseAuthSessionsForAccount

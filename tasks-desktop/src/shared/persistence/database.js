@@ -4,6 +4,9 @@ const { Logger } = require('../logging/logger');
 const { open } = require('sqlite');
 const sqlite3 = require('sqlite3').verbose();
 const { v4 } = require("uuid");
+const { Tables } = require('./tables');
+
+// DEPRECATED //////////////////////////////////////////////////////////
 
 let db;
 begin = async () => {
@@ -23,12 +26,15 @@ end = () => {
     // TODO: The db.close() should called here, not on the methods
 }
 
-
 module.exports.UnitOfWork = {
     begin,
     getDB,
     end
 };
+
+// DEPRECATED //////////////////////////////////////////////////////////
+
+// Create base data structures
 
 async function run_schema_migration(schemaMigration) {    
     Logger.trace(`Schema Migration Version: ${schemaMigration.version}`);
@@ -42,8 +48,6 @@ async function run_schema_migration(schemaMigration) {
         , [v4(), schemaMigration.version, schemaMigration.description, new Date().toISOString()]);
 }
 
-
-// Create base data structures
 module.exports.runSchemaMigrations = async () => {
     Logger.trace('Running schema migrations')
     
@@ -100,7 +104,7 @@ const migrations = [
     },
     {
         version: 3
-        , description: "Create accounts table"
+        , description: `Create ${Tables.ACCOUNTS} table`
         , migration: "CREATE TABLE IF NOT EXISTS accounts ("
             + "id TEXT UNIQUE PRIMARY KEY,"
             + "email TEXT UNIQUE NOT NULL"

@@ -2,6 +2,7 @@ const { BrowserWindow, webContents } = require('electron');
 const path = require('path');
 const { AuthServices } = require('./services');
 const { SynchManager } = require('../synch-manager');
+const { RunUnitOfWork } = require("../../shared/persistence/unitofwork");
 
 let loginWindow;
 
@@ -35,7 +36,10 @@ async function handleLogin(event, loginData) {
     loginWindow.destroy();
     loginWindow = undefined;
 
-    await AuthServices.login(loginData);
+    await RunUnitOfWork.run(async (unitOfWork) => {
+        await AuthServices.AuthServices.login(unitOfWork, loginData);
+    });
+
     await SynchManager.execute();
 
     webContents.getFocusedWebContents().send('auth:logged_in');
