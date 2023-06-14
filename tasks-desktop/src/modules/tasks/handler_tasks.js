@@ -30,9 +30,6 @@ let updateTaskCounter = 0;
 // TODO: We need a buffer for this input, in order to not lag on the UI
 async function handleUpdateTasks(event, taskId, data) {
 
-    console.log("Updating task information with:");
-    console.log(data);
-
     await RunUnitOfWork.run(async (unitOfWork) => {
         await TaskServices.update(unitOfWork, data);
         TasksSyncServices.markDirty(unitOfWork, taskId);

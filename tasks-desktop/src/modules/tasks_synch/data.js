@@ -51,7 +51,7 @@ class TasksSyncRepository {
     async markSynced(unitOfWork, taskIds) {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
-            `UPDATE tasks_sync SET ${Tables.TASKS_SYNC} = 'SYNCHED', updated_at = ? WHERE task_id in (` + taskIds.map(_ => '?').join(',') +")"
+            `UPDATE ${Tables.TASKS_SYNC} SET synch_status = 'SYNCHED', updated_at = ? WHERE task_id in (` + taskIds.map(_ => '?').join(',') +")"
             , [new Date().toISOString(), ...taskIds]);
     }
 

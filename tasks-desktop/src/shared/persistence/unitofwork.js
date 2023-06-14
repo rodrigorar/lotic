@@ -45,8 +45,6 @@ async function runUnitOfWork(work) {
     const unitOfWork = new UnitOfWork();
     await unitOfWork.init();
 
-    console.log("Running Unit of Work");
-
     try {
         await unitOfWork.begin();
         result = await work(unitOfWork);

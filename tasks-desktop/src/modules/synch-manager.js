@@ -92,7 +92,7 @@ async function callListServerTasks(unitOfWork, account) {
     }));
 }
 
-async function doExecute(providedWebContents = undefined) {
+async function doExecute(providedWebContents = undefined, isShutdown) {
     const eventHandler = 
         providedWebContents != undefined 
             ? providedWebContents 
@@ -169,10 +169,14 @@ async function doExecute(providedWebContents = undefined) {
                     , ownerId: entry.owner_id
                 }))
             
-            setTimeout(async () => {
-                const refreshedTasks = await TaskServices.list(unitOfWork, account.id);
-                eventHandler.send('tasks:refresh', refreshedTasks);
-            }, 500);
+            if (! isShutdown) {
+                // FIXME: This debounced function execution should be moved to an
+                //      event handler from the event bus
+                setTimeout(async () => {
+                    const refreshedTasks = await TaskServices.list(unitOfWork, account.id);
+                    eventHandler.send('tasks:refresh', refreshedTasks);
+                }, 500);
+            }
         }
 
         const existingTasks = await TaskServices.list(unitOfWork, account.id);
@@ -207,22 +211,26 @@ async function doExecute(providedWebContents = undefined) {
                 if (tasksToDelete.length > 0) {
                     await TaskServices.deleteMultiple(unitOfWork, tasksToDelete);
                     await TasksSyncServices.deleteMultipleByTaskId(unitOfWork, tasksToDelete);
-                    
-                    setTimeout(async () => {
-                        const refreshedTasks = await TaskServices.list(unitOfWork, account.id);
-                        eventHandler.send('tasks:refresh', refreshedTasks); 
-                    }, 500);
+
+                    if (! isShutdown) {
+                        // FIXME: This debounced function execution should be moved to an
+                        //      event handler from the event bus
+                        setTimeout(async () => {
+                            const refreshedTasks = await TaskServices.list(unitOfWork, account.id);
+                            eventHandler.send('tasks:refresh', refreshedTasks); 
+                        }, 500);
+                    }
                 }
             });
         }
     });
 
-    Logger.trace('Finished Task Synchornization, Refreshing');
+    Logger.trace('Finished Task Synchornization');
 }
 
-async function execute(providedWebContents = undefined) {
+async function execute(providedWebContents = undefined, isShutdown = false) {
     try {
-        await doExecute(providedWebContents);
+        await doExecute(providedWebContents, isShutdown);
     } catch (e) {
         Logger.error('Failed to properly synch with server');
         Logger.error(e);

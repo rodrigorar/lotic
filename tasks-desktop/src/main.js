@@ -73,7 +73,7 @@ app.on('ready', () => {
       closeSemaphor = false;
       e.preventDefault();
 
-      SynchManager.execute()
+      SynchManager.execute(undefined, true)
         .then(() => {
           closeSemaphor = false;
           setTimeout(() => {

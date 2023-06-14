@@ -172,11 +172,9 @@ function handleTextInput(event) {
     
     updatedText = event.target.value;
     if (debouncedUpdateOperation) {
-        logger.info("Clearing debounced update operation");
         clearTimeout(debouncedUpdateOperation);
     }
     debouncedUpdateOperation = setTimeout(() => {
-        logger.info("Running debounced project");
         tasks.updateTask(taskId, {
             id: taskId
             , title: updatedText
