@@ -2,8 +2,8 @@ const { AccountServices } = require("./accounts/services");
 const { AuthServices } = require("./auth/services");
 const { TasksRPC } = require("./tasks/rpc");
 const { TaskServices } = require("./tasks/services");
-const { TasksSynchServices } = require("./tasks_synch/services");
-const { TASK_SYNCH_STATUS, TaskSynchRepository } = require("./tasks_synch/data");
+const { TasksSyncServices } = require("./tasks_synch/services");
+const { TASK_SYNCH_STATUS } = require("./tasks_synch/data");
 const { Logger } = require("../shared/logging/logger");
 const { StatusCode } = require("../shared/http/http");
 const { webContents } = require("electron");
@@ -24,7 +24,7 @@ const { RunUnitOfWork } = require("../shared/persistence/unitofwork");
 // good functiony than this. rodrigorar - 27/02/2023
 
 async function callCreateTasks(unitOfWork, authToken, account, taskIds) {
-    const tasks = await TaskServices.listById(taskIds);
+    const tasks = await TaskServices.listById(unitOfWork, taskIds);
 
     const tasksRequest = tasks
         .map(task => ({
@@ -38,14 +38,14 @@ async function callCreateTasks(unitOfWork, authToken, account, taskIds) {
 
     const result = await TasksRPC.createTasks(unitOfWork, tasksRequest);
     if (result != undefined && 'ids' in result && result.ids.length == tasksRequest.length) {
-        await TasksSynchServices.markSynched(taskIds);
+        await TasksSyncServices.markSynched(unitOfWork, taskIds);
     } else if ('status' in result && result.status === '409') {
-        await TasksSynchServices.markSynched(taskIds);
+        await TasksSyncServices.markSynced(unitOfWork, taskIds);
     }
 } 
 
 async function callUpdateTasks(unitOfWork, taskIds) {
-    const tasks = await TaskServices.listById(taskIds);
+    const tasks = await TaskServices.listById(unitOfWork, taskIds);
 
     const tasksRequest = tasks
     .map(task => ({
@@ -57,7 +57,7 @@ async function callUpdateTasks(unitOfWork, taskIds) {
 
     const result = await TasksRPC.updateTasks(unitOfWork, tasksRequest);
     if (result != undefined) {
-        await TasksSynchServices.markSynched(taskIds);
+        await TasksSyncServices.markSynced(unitOfWork, taskIds);
     }
 }
 
@@ -108,8 +108,7 @@ async function doExecute(providedWebContents = undefined) {
 
         // Created tasks in server
 
-        const createdTasksSynch = await TasksSynchServices.getNonSynched();
-
+        const createdTasksSynch = await TasksSyncServices.getNonSynced(unitOfWork);
         const tasksToCreate = 
             createdTasksSynch
                 .filter(task => task.synchStatus == TASK_SYNCH_STATUS.LOCAL)
@@ -130,12 +129,12 @@ async function doExecute(providedWebContents = undefined) {
 
         // Delete completed tasks from the server
 
-        const completeTasksSynch = await TasksSynchServices.getComplete();
+        const completeTasksSynch = await TasksSyncServices.getComplete(unitOfWork);
         if (completeTasksSynch.length > 0) {
             const tasksToDelete = completeTasksSynch.map(task => task.taskId);
-            const tasksSynchToDelete = await callDeleteTasks(tasksToDelete);
+            const tasksSynchToDelete = await callDeleteTasks(unitOfWork, tasksToDelete);
             if (tasksSynchToDelete.length > 0) {
-                await TasksSynchServices.deleteMultipleByTaskId(unitOfWork, tasksSynchToDelete);
+                await TasksSyncServices.deleteMultipleByTaskId(unitOfWork, tasksSynchToDelete);
             }
         }
 
@@ -144,7 +143,7 @@ async function doExecute(providedWebContents = undefined) {
         const result = await callListServerTasks(unitOfWork, account);
         let tasksToInsert = undefined;
         if (result.length > 0) {
-            const existingTasks = await TaskServices.list(account.id);
+            const existingTasks = await TaskServices.list(unitOfWork, account.id);
             tasksToInsert = result
                     .filter(result => existingTasks.filter(entry => entry.id == result.task_id).length == 0)
                     .map(taskData => ({
@@ -154,14 +153,14 @@ async function doExecute(providedWebContents = undefined) {
                         , updatedAt: new Date() // FIXME: This should come from the server
                         , ownerId: authToken.accountId
                     }));
-            await TaskServices.createMultiple(tasksToInsert);
+            await TaskServices.createMultiple(unitOfWork, tasksToInsert);
             tasksToInsert.forEach(entry => {
-                TasksSynchServices.createSynchMonitor(entry.id, TASK_SYNCH_STATUS['SYNCHED'])
+                TasksSyncServices.createSyncMonitor(unitOfWork, entry.id, TASK_SYNCH_STATUS['SYNCHED'])
             })
 
             // FIXME: Update only tasks that need updating
             result.map(entry => TaskServices.update(
-                entry.task_id
+                unitOfWork
                 , {
                     id: entry.task_id
                     , title: entry.title
@@ -171,18 +170,18 @@ async function doExecute(providedWebContents = undefined) {
                 }))
             
             setTimeout(async () => {
-                const refreshedTasks = await TaskServices.list(account.id);
+                const refreshedTasks = await TaskServices.list(unitOfWork, account.id);
                 eventHandler.send('tasks:refresh', refreshedTasks);
             }, 500);
         }
 
-        const existingTasks = await TaskServices.list(account.id);
+        const existingTasks = await TaskServices.list(unitOfWork, account.id);
         if (existingTasks.length != 0) { 
             let tasksWithSynchStatus = [];
             if (result.length > 0) {
                 tasksWithSynchStatus = existingTasks
                     .map(async entry => {
-                        const synchStatus = await TasksSynchServices.getSynchStatus(entry.id);
+                        const synchStatus = await TasksSyncServices.getSyncStatus(unitOfWork, entry.id);
                         return {
                             id: entry.id
                             , taskSynchStatus: synchStatus.synchStatus
@@ -190,7 +189,7 @@ async function doExecute(providedWebContents = undefined) {
                     });
             } else {
                 tasksWithSynchStatus = existingTasks.map(async entry => {
-                    const synchStatus = await TasksSynchServices.getSynchStatus(entry.id);
+                    const synchStatus = await TasksSyncServices.getSyncStatus(unitOfWork, entry.id);
                     return {
                         id: entry.id
                         , tasksSynchStatus: synchStatus
@@ -206,11 +205,11 @@ async function doExecute(providedWebContents = undefined) {
                     })
                     .map(entry => entry.id);
                 if (tasksToDelete.length > 0) {
-                    await TaskServices.deleteMultiple(tasksToDelete);
-                    await TasksSynchServices.deleteMultipleByTaskId(tasksToDelete);
+                    await TaskServices.deleteMultiple(unitOfWork, tasksToDelete);
+                    await TasksSyncServices.deleteMultipleByTaskId(unitOfWork, tasksToDelete);
                     
                     setTimeout(async () => {
-                        const refreshedTasks = await TaskServices.list(account.id);
+                        const refreshedTasks = await TaskServices.list(unitOfWork, account.id);
                         eventHandler.send('tasks:refresh', refreshedTasks); 
                     }, 500);
                 }

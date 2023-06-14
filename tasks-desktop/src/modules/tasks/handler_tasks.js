@@ -1,32 +1,42 @@
 const { SynchManager } = require('../synch-manager');
 const { TaskServices } = require('./services');
-const { TasksSynchServices } = require('../tasks_synch/services');
+const { TasksSyncServices } = require('../tasks_synch/services');
 const { AuthServices } = require('../auth/services');
 const { RunUnitOfWork } = require('../../shared/persistence/unitofwork');
+const { TASK_SYNCH_STATUS } = require('../tasks_synch/data');
 
 async function handleCreateTask(event, newTask) {
-    const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
-        return await AuthServices.getActiveSession(unitOfWork);
-    });
+    await RunUnitOfWork.run(async (unitOfWork) => {
+        const activeSession = await AuthServices.getActiveSession(unitOfWork);
     
-    if (activeSession != undefined) {
-        newTask.ownerId = activeSession.accountId;
-    }
+        if (activeSession != undefined) {
+            newTask.ownerId = activeSession.accountId;
+        }
 
-    TaskServices
-        .create(newTask)
-        .then(() => {
-            TasksSynchServices.createSynchMonitor(newTask.id);
-        });
-    
+        TaskServices
+            .create(unitOfWork, newTask)
+            .then(() => {
+                TasksSyncServices.createSyncMonitor(
+                    unitOfWork
+                    , newTask.id
+                    , TASK_SYNCH_STATUS["LOCAL"]);
+            });
+    });
     SynchManager.execute();
 }
 
 let updateTaskCounter = 0;
 
-function handleUpdateTasks(event, taskId, data) {
-    TaskServices.update(taskId, data);
-    TasksSynchServices.markDirty(taskId);
+// TODO: We need a buffer for this input, in order to not lag on the UI
+async function handleUpdateTasks(event, taskId, data) {
+
+    console.log("Updating task information with:");
+    console.log(data);
+
+    await RunUnitOfWork.run(async (unitOfWork) => {
+        await TaskServices.update(unitOfWork, data);
+        TasksSyncServices.markDirty(unitOfWork, taskId);
+    });
 
     // TODO: Find a better way to optimize the synch with the server
     if (updateTaskCounter >= 40) {
@@ -37,28 +47,32 @@ function handleUpdateTasks(event, taskId, data) {
     }
 }
 
-function handleCompletion(event, taskId) {
-    TaskServices.deleteTask(taskId);
-    TasksSynchServices.markForRemoval(taskId);
+async function handleCompletion(event, taskId) {
+    await RunUnitOfWork.run(async (unitOfWork) => {
+        await TaskServices.deleteTask(unitOfWork, taskId);
+        TasksSyncServices.markForRemoval(unitOfWork, taskId);
+    }) ;
+    
     SynchManager.execute();
 }
 
 async function handleListTasks(event) {
-    const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
-        return await AuthServices.getActiveSession(unitOfWork);
-    });
+    return await RunUnitOfWork.run(async (unitOfWork) => {
+        const activeSession = await AuthServices.getActiveSession(unitOfWork);
 
-    if (activeSession != undefined) {
-        return await TaskServices.list(activeSession.accountId);
-    } else {
-        return await TaskServices.listTasksWithoutOwner();
-    }
+        if (activeSession != undefined) {
+            return await TaskServices.list(unitOfWork, activeSession.accountId);
+        } else {
+            return await TaskServices.listTasksWithoutOwner(unitOfWork);
+        }
+    });
 }
 
 async function handleLogout(event, accountId) {
-    // Order mathers, we need tasks to delete tasks synch
-    await TasksSynchServices.deleteAllForAccount(accountId);
-    await TaskServices.deleteAllForAccount(accountId);
+    await RunUnitOfWork.run(async (unitOfWork) => {
+        await TasksSyncServices.deleteAllForAccount(unitOfWork, accountId);
+        await TaskServices.deleteAllForAccount(unitOfWork, accountId);
+    });
 }
 
 module.exports.TasksHandler = {

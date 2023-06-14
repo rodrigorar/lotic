@@ -16,8 +16,6 @@ class AccountRepository {
         const queryResult = await queryManager.get(
             'SELECT * FROM accounts WHERE email = ?'
             , [email]);
-
-        console.log(queryResult);
         return queryResult != undefined 
                 ? new Account(queryResult.id, queryResult.email) 
                 : undefined;

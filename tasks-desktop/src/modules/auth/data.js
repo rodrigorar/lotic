@@ -1,4 +1,3 @@
-const { UnitOfWork } = require("../../shared/persistence/database")
 
 class AuthRepository {
 

@@ -152,6 +152,8 @@ window.addEventListener('keypress', (key) => {
 
 // UI Handlers
 
+let debouncedUpdateOperation;
+let updatedText = "";
 function handleTextInput(event) {
     const taskId = extractId(event.target.id);
 
@@ -168,10 +170,18 @@ function handleTextInput(event) {
         return;
     }
     
-    tasks.updateTask(taskId, {
-        id: taskId
-        , title: event.target.value
-        , updatedAt: new Date()
+    updatedText = event.target.value;
+    if (debouncedUpdateOperation) {
+        logger.info("Clearing debounced update operation");
+        clearTimeout(debouncedUpdateOperation);
+    }
+    debouncedUpdateOperation = setTimeout(() => {
+        logger.info("Running debounced project");
+        tasks.updateTask(taskId, {
+            id: taskId
+            , title: updatedText
+            , updatedAt: new Date()
+        }, 100);
     });
 }
 

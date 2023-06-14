@@ -1,79 +1,79 @@
 const { ServiceUtils } = require("../../shared/utils/service-utils");
 const { Validators } = require("../../shared/utils/utils");
-const { TaskSynchRepository } = require("./data");
+const { TaskSynchRepository, TasksSyncRepository } = require("./data");
 
-async function createSynchMonitor(taskId, state = undefined) {
-    await ServiceUtils.asyncErrorWrapper(async () => {
-        Validators.isNotNull(taskId, 'No task id was provided!');
-        await TaskSynchRepository.create(taskId, state);
-    })
+class TasksSyncServices {
+
+    constructor(tasksSyncRepository) {
+        this.tasksSyncRepository = tasksSyncRepository;
+    }
+
+    async createSyncMonitor(unitOfWork, taskId, state = undefined) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        Validators.isNotNull(taskId, "No task id provided");
+
+        await this.tasksSyncRepository.create(unitOfWork, taskId, state);
+    }
+
+    async deleteComplete(unitOfWork) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+
+        await this.tasksSyncRepository.deleteComplete(unitOfWork);
+    }
+
+    async deleteMultipleByTaskId(unitOfWork, taskIds) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        Validators.isNotNull(taskIds, "No task ids provided");
+
+        await this.tasksSyncRepository.deleteMultipleByTaskId(unitOfWork, taskIds);
+    }
+
+    async deleteAllForAccount(unitOfWork, accountId) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        Validators.isNotNull(accountId, "No account id provided");
+
+        await this.tasksSyncRepository.deleteAllForAccount(unitOfWork, accountId);
+    }
+
+    async markForRemoval(unitOfWork, taskId) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        Validators.isNotNull(taskId, "No task id provided");
+
+        await this.tasksSyncRepository.markForRemoval(unitOfWork, taskId);
+    }
+
+    async markDirty(unitOfWork, taskId) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        Validators.isNotNull(taskId, "No task id provided");
+
+        await this.tasksSyncRepository.markDirty(unitOfWork, taskId);
+    }
+
+    async markSynced(unitOfWork, taskIds) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        Validators.isNotNull(taskIds, "No task ids provided");
+
+        await this.tasksSyncRepository.markSynced(unitOfWork, taskIds);
+    }
+
+    async getNonSynced(unitOfWork) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+
+        return await this.tasksSyncRepository.getLocalAndDirty(unitOfWork);
+    }
+
+    async getComplete(unitOfWork) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+
+        return await this.tasksSyncRepository.getComplete(unitOfWork);
+    }
+
+    async getSyncStatus(unitOfWork, taskId) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        Validators.isNotNull(taskId, "No task id provided");
+
+        return await this.tasksSyncRepository.getSyncStatus(unitOfWork, taskId);
+    }
 }
 
-async function deleteComplete() {
-    return await ServiceUtils.asyncErrorWrapper(async () => {
-        return await TaskSynchRepository.deleteComplete();
-    });
-}
-
-async function deleteMultipleByTaskId(taskIds) {
-    return await ServiceUtils.asyncErrorWrapper(async () => {
-        return await TaskSynchRepository.deleteMultipleByTaskId(taskIds);
-    });
-}
-
-async function deleteAllForAccount(accountId) {
-    return await ServiceUtils.asyncErrorWrapper(async () => {
-        return await TaskSynchRepository.deleteAllForAccount(accountId);
-    });
-}
-
-async function markForRemoval(taskId) {
-    await ServiceUtils.asyncErrorWrapper(async () => {
-        await TaskSynchRepository.markForRemoval(taskId);
-    });
-}
-
-async function markDirty(taskId) {
-    await ServiceUtils.asyncErrorWrapper(async () => {
-        Validators.isNotNull(taskId, 'No task id was provided!');
-        await TaskSynchRepository.markDirty(taskId);
-    });
-}
-
-async function markSynched(taskIds) {
-    await ServiceUtils.asyncErrorWrapper(async () => {
-        Validators.isNotNull(taskIds, 'No task ids were provided');
-        await TaskSynchRepository.markSynched(taskIds);
-    });
-}
-
-async function getNonSynched() {
-    return await ServiceUtils.asyncErrorWrapper(async () => {
-        return await TaskSynchRepository.getLocalAndDirty();
-    });
-}
-
-async function getComplete() {
-    return await ServiceUtils.asyncErrorWrapper(async () => {
-        return await TaskSynchRepository.getComplete();
-    });
-}
-
-async function getSynchStatus(taskId) {
-    return await ServiceUtils.asyncErrorWrapper(async () => {
-        return await TaskSynchRepository.getSynchStatus(taskId);
-    });
-}
-
-module.exports.TasksSynchServices = {
-    createSynchMonitor
-    , deleteComplete
-    , deleteMultipleByTaskId
-    , deleteAllForAccount
-    , markForRemoval
-    , markDirty
-    , markSynched
-    , getNonSynched
-    , getComplete
-    , getSynchStatus
-}
+module.exports.TasksSyncServices = new TasksSyncServices(new TasksSyncRepository());

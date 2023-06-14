@@ -1,95 +1,74 @@
 const { UnitOfWork } = require('../../shared/persistence/database');
+const { Tables } = require('../../shared/persistence/tables');
 
-async function createTask(task) {
-    await UnitOfWork.begin()
-        .then(async (db) => {
-            await db.run(
-                `INSERT INTO tasks(task_id, title, created_at, updated_at, owner_id) VALUES(?, ?, ?, ?, ?)`,
-                [task.id, task.title, task.createdAt, task.updatedAt, task.ownerId]);
-            db.close();
-        });
-}
+class TasksRepository {
 
-function updateTask(taskId, data) {
-    // TODO: This code needs to be way more efficient, it currently calls this for every letter inputted. 
-    UnitOfWork.begin()
-        .then(async (db) => {
-            await db.run(
-                'UPDATE tasks SET title=?, updated_at=? WHERE task_id=?', 
-                [data.title, data.updatedAt.toISOString(), taskId]);
-            db.close();
-        });
-}
+    async createTask(unitOfWork, task) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `INSERT INTO ${Tables.TASKS}(task_id, title, created_at, updated_at, owner_id) VALUES(?, ?, ?, ?, ?)`,
+            [task.id, task.title, task.createdAt, task.updatedAt, task.ownerId]);
+    }
 
-async function updateTaskOwner(task) {
-    UnitOfWork.begin()
-        .then(async (db) => {
-            await db.run(
-                "UPDATE tasks SET owner_id=?, updated_at=? WHERE task_id=?"
-                , [task.ownerId, new Date().toISOString(), task.id]);
-            db.close();
-        });
-}
+    async updateTask(unitOfWork, task) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `UPDATE ${Tables.TASKS} SET title=?, updated_at=? WHERE task_id=?`, 
+            [task.title, task.updatedAt.toISOString(), task.id]);
+    }
 
-// TODO: Refactor this method to use a more function approach
-async function listTasks(accountId) {
-    return await UnitOfWork.begin()
-        .then(async (db) => {
-            const queryResult = await UnitOfWork.getDB().all('SELECT * FROM tasks t WHERE owner_id = ?', [accountId]);
-            const result = queryResult.map(entry => new Task(entry.task_id, entry.title, new Date(entry.created_at), new Date(entry.updated_at), entry.owner_id));
+    async updateTaskOwner(unitOfWork, task) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `UPDATE ${Tables.TASKS} SET owner_id=?, updated_at=? WHERE task_id=?`
+            , [task.ownerId, new Date().toISOString(), task.id]);
+    }
 
-            db.close();
+    async listTasks(unitOfWork, accountId) {
+        const queryManager = unitOfWork.getQueryManager();
+        const result = await queryManager
+            .all(`SELECT * FROM ${Tables.TASKS} t WHERE owner_id = ?`, [accountId])
+        return result.map(entry => new Task(
+                entry.task_id
+                , entry.title
+                , new Date(entry.created_at)
+                , new Date(entry.updated_at)
+                , entry.owner_id));
+    }
 
-            return result;
-        });
-}
+    async listTasksWithoutOwner(unitOfWork) {
+        const queryManager = unitOfWork.getQueryManager();
+        const result = await queryManager
+            .all(`SELECT * FROM ${Tables.TASKS} WHERE owner_id is null`, []);
+        return result.map(entry => new Task(
+                entry.task_id
+                , entry.title
+                , new Date(entry.created_at)
+                , new Date(entry.updated_at)
+                , entry.owner_id));
+    }
 
-async function listTasksWithoutOwner() {
-    return await UnitOfWork.begin()
-        .then(async (db) => {
-            const queryResult = await db.all("SELECT * FROM tasks WHERE owner_id is null", []);
-            const result = queryResult.map(entry => new Task(entry.task_id, entry.title, new Date(entry.created_at), new Date(entry.updated_at), entry.owner_id));
+    async listById(unitOfWork, tasksIds = []) {
+        const queryManager = unitOfWork.getQueryManager();
+        const result = await queryManager
+            .all(`SELECT * FROM ${Tables.TASKS} WHERE task_id in (` + tasksIds.map(task => '?').join(',') + ')', tasksIds);
+        return result.map(entry => new Task(
+                entry.task_id
+                , entry.title
+                , new Date(entry.created_at)
+                , new Date(entry.updated_at)
+                , entry.owner_id));
+    }
+    
+    async deleteTask(unitOfWork, id) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(`DELETE FROM ${Tables.TASKS} WHERE task_id = ?`, [id]);
+    }
 
-            db.close();
-
-            return result;
-        });
-}
-
-async function listById(tasksIds = []) {
-    return await UnitOfWork.begin()
-        .then(async (db) => {
-            const queryResult = await db.all('SELECT * FROM tasks WHERE task_id in (' + tasksIds.map(task => '?').join(',') + ')', tasksIds);
-            return queryResult.map(entry => new Task(entry.task_id, entry.title, new Date(entry.created_at), new Date(entry.updated_at), entry.owner_id));
-        });
-}
-
-async function deleteTask(id) {
-    await UnitOfWork.begin()
-        .then(async (db) => {
-            await db.run('DELETE FROM tasks WHERE task_id = ?', [id]);
-            // FIXME: This close should be done in the Unit of Work, not here
-            db.close();
-        })
-}
-
-async function deleteAllForAccount(accountId) {
-    await UnitOfWork.begin()
-        .then(async (db) => {
-            await db.run('DELETE FROM tasks WHERE owner_id = ?', [accountId]);
-            db.close();
-        });
-}
-
-module.exports.TasksRepository = {
-    createTask
-    , updateTask
-    , updateTaskOwner
-    , listTasks
-    , listTasksWithoutOwner
-    , listById
-    , deleteTask
-    , deleteAllForAccount
+    async deleteAllForAccount(unitOfWork, accountId) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(`DELETE FROM ${Tables.TASKS} WHERE owner_id = ?`, [accountId]);
+    }
 }
 
 class Task {
@@ -101,4 +80,6 @@ class Task {
         this.ownerId = ownerId;
     }
 }
+
+module.exports.TasksRepository = TasksRepository;
 module.exports.Task = Task;

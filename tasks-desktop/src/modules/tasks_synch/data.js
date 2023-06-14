@@ -1,120 +1,114 @@
 const { generateId } = require('../../shared/utils/utils');
 const { UnitOfWork } = require("../../shared/persistence/database");
+const { Tables } = require('../../shared/persistence/tables');
 
 
-async function getLocalAndDirty() {
-    let result = [];
+// FIXME: We should have a single query method, and and update method that 
+//  updates the status of the task syncs, after that we should remove all the
+//  functions that are to specific for updating to a specific status or value. 
+class TasksSyncRepository {
 
-    await UnitOfWork.begin();
-    const queryResult = await UnitOfWork.getDB().all(
-        "SELECT * FROM tasks_sync WHERE synch_status = 'LOCAL' OR synch_status = 'DIRTY'"
-        , []);
-    result = queryResult.map(row => new TaskSynch(row.task_synch_id, row.task_id, row.synch_status, new Date(row.created_at), new Date(row.updated_at)));
-    UnitOfWork.end();
+    async getLocalAndDirty(unitOfWork) {
+        const queryManager = unitOfWork.getQueryManager();
+        const queryResult = await queryManager.all(
+            `SELECT * FROM ${Tables.TASKS_SYNC} WHERE synch_status = 'LOCAL' OR synch_status = 'DIRTY'`
+            , []);
+        return queryResult.map(row => new TaskSynch(
+            row.task_synch_id
+            , row.task_id
+            , row.synch_status
+            , new Date(row.created_at)
+            , new Date(row.updated_at)));
+    }
 
-    return result;
-}
+    async getComplete(unitOfWork) {
+        const queryManager = unitOfWork.getQueryManager();
+        const queryResult = await queryManager.all(
+            `SELECT * FROM ${Tables.TASKS_SYNC} WHERE synch_status = 'COMPLETE'`
+            , []);
+        return queryResult.map(row => new TaskSynch(
+            row.task_synch_id
+            , row.task_id
+            , row.synch_status
+            , new Date(row.created_at)
+            , new Date(row.updated_at)));
+    }
 
-async function getComplete() {
-    let result = [];
+    async markForRemoval(unitOfWork, taskId) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `UPDATE ${Tables.TASKS_SYNC} SET synch_status = 'COMPLETE', updated_at = ? WHERE task_id = ?`
+            , [new Date().toISOString(), taskId]);
+    }
 
-    await UnitOfWork.begin();
-    const queryResult = await UnitOfWork.getDB().all(
-        "SELECT * FROM tasks_sync WHERE synch_status = 'COMPLETE'"
-        , []);
-    result = queryResult.map(row => new TaskSynch(row.task_synch_id, row.task_id, row.synch_status, new Date(row.created_at), new Date(row.updated_at)));
-    UnitOfWork.end();
+    async markDirty(unitOfWork, taskId) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `UPDATE ${Tables.TASKS_SYNC} SET synch_status = 'DIRTY', updated_at = ? WHERE task_id = ? AND synch_status != 'LOCAL'`
+            , [new Date().toISOString(), taskId]);
+    }
 
-    return result;
-}
+    async markSynced(unitOfWork, taskIds) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `UPDATE tasks_sync SET ${Tables.TASKS_SYNC} = 'SYNCHED', updated_at = ? WHERE task_id in (` + taskIds.map(_ => '?').join(',') +")"
+            , [new Date().toISOString(), ...taskIds]);
+    }
 
-async function markForRemoval(taskId) {
-    await UnitOfWork.begin()
-        .then(async (db) => {
-            await db.run(
-                "UPDATE tasks_sync SET synch_status = 'COMPLETE', updated_at = ? WHERE task_id = ?"
-                , [new Date().toISOString(), taskId]);
-            db.close();
-        });
-}
+    async deleteComplete(unitOfWork) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `DELETE FROM ${Tables.TASKS_SYNC} WHERE synch_status = 'COMPLETE'`
+            , []);
+    }
 
-async function markDirty(taskId) {
-    await UnitOfWork.begin()
-        .then(async (db) => {
-            await db.run(
-                "UPDATE tasks_sync SET synch_status = 'DIRTY', updated_at = ? WHERE task_id = ? AND synch_status != 'LOCAL'"
-                , [new Date().toISOString(), taskId]);
-            db.close();
-        });
-}
+    async deleteMultipleByTaskId(unitOfWork, taskIds) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `DELETE FROM ${Tables.TASKS_SYNC} WHERE synch_status = 'COMPLETE' AND task_id in (` + taskIds.map(_ => '?').join(',') + ")"
+            , taskIds);
+    }
 
-async function markSynched(taskIds) {
-    await UnitOfWork.begin()
-        .then(async (db) => {
-            await db.run(
-                "UPDATE tasks_sync SET synch_status = 'SYNCHED', updated_at = ? WHERE task_id in (" + taskIds.map(_ => '?').join(',') +")"
-                , [new Date().toISOString(), ...taskIds]
-            )
-            db.close();
-        });
-}
+    async deleteAllForAccount(unitOfWork, accountId) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `DELETE FROM ${Tables.TASKS_SYNC} WHERE task_id in (SELECT task_id FROM ${Tables.TASKS} WHERE owner_id = ?)`
+            , [accountId]);
+    }
 
-async function deleteComplete() {
-    await UnitOfWork.begin()
-        .then(async (db) => {
-            await db.run(
-                "DELETE FROM tasks_sync WHERE synch_status = 'COMPLETE'"
-                , []);
-            db.close();
-        });
-}
+    async create(unitOfWork, taskId, state = undefined) {
+        const queryManager = unitOfWork.getQueryManager();
+        const id = generateId();
+        const currentDate = new Date();
+    
+        await queryManager.run(
+            `INSERT INTO ${Tables.TASKS_SYNC}(task_synch_id, task_id, synch_status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`
+            , [id, taskId, state , currentDate.toISOString(), currentDate.toISOString()]);   
+    }
 
-async function deleteMultipleByTaskId(taskIds) {
-    await UnitOfWork.begin()
-        .then(async (db) => {
-            await db.run(
-                "DELETE FROM tasks_sync WHERE synch_status = 'COMPLETE' AND task_id in (" + taskIds.map(_ => '?').join(',') + ")"
-                , taskIds);
-            db.close();
-        });
-}
+    async getSyncStatus(unitOfWork, taskId) {
+        const queryManager = unitOfWork.getQueryManager();
+        const result = await queryManager.get(
+            `SELECT * FROM ${Tables.TASKS_SYNC} WHERE task_id = ?`
+            , [taskId]);
+        
+        if (result != undefined) {
+            return new TaskSynch(
+                result.task_synch_id
+                , result.task_id
+                , result.synch_status
+                , new Date(result.created_at)
+                , new Date(result.updated_at))
+        }  
 
-async function deleteAllForAccount(accountId) {
-    await UnitOfWork.begin()
-        .then(async (db) => {
-            await db.run(
-                'DELETE FROM tasks_sync WHERE task_id in (SELECT task_id FROM tasks WHERE owner_id = ?)'
-                , [accountId])
-        });
-}
+        return result ? new TaskSynch(
+            result.task_sync_id
+            , result.task_id
+            , result.synch_status
+            , new Date(result.created_at)
+            , new Date(result.updated_at)) : undefined;
+    }
 
-async function create(taskId, state = undefined) {
-    db_state = state == undefined ? TASK_SYNCH_STATUS['LOCAL'] : state;
-    await UnitOfWork.begin()
-        .then(async (db) => {
-            const id = generateId();
-            const currentDate = new Date();
-
-            await db.run(
-                "INSERT INTO tasks_sync(task_synch_id, task_id, synch_status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)"
-                , [id, taskId, db_state , currentDate.toISOString(), currentDate.toISOString()]);
-
-            db.close();
-        });
-}
-
-async function getSynchStatus(taskId) {
-    return await UnitOfWork.begin()
-        .then(async (db) => {
-            const row = await db.get(
-                "SELECT * FROM tasks_sync WHERE task_id = ?"
-                , [taskId]);
-            
-            if (row != undefined) {
-                return new TaskSynch(row.task_synch_id, row.task_id, row.synch_status, new Date(row.created_at), new Date(row.updated_at))
-            }  
-            return undefined;
-        });
 }
 
 const TASK_SYNCH_STATUS = {
@@ -136,15 +130,4 @@ class TaskSynch {
 
 module.exports.TASK_SYNCH_STATUS = TASK_SYNCH_STATUS;
 module.exports.TaskSynch = TaskSynch;
-module.exports.TaskSynchRepository = {
-    getLocalAndDirty
-    , getComplete
-    , markForRemoval
-    , markDirty
-    , markSynched
-    , create
-    , deleteComplete
-    , deleteMultipleByTaskId
-    , deleteAllForAccount
-    , getSynchStatus
-}
+module.exports.TasksSyncRepository = TasksSyncRepository;

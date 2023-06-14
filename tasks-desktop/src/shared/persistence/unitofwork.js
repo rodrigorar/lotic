@@ -25,7 +25,6 @@ class UnitOfWork {
 
     async begin() {
         await this.queryManager.run("BEGIN TRANSACTION", []);
-        console.log("Began transaction");
     }
 
     getQueryManager() {
@@ -34,12 +33,10 @@ class UnitOfWork {
 
     async commit() {
         await this.queryManager.run("COMMIT", []);
-        console.log("Committing transaction");
     }
 
     async rollback() {
         await this.queryManager.run("ROLLBACK", []);
-        console.log("Rolling back transaction");
     }
 }
 
@@ -48,7 +45,7 @@ async function runUnitOfWork(work) {
     const unitOfWork = new UnitOfWork();
     await unitOfWork.init();
 
-    Logger.trace("Running Unit Of Work");
+    console.log("Running Unit of Work");
 
     try {
         await unitOfWork.begin();
