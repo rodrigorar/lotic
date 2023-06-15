@@ -60,7 +60,7 @@ class AuthServices {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(accountId, "Account id cannot be empty");
     
-        const oldAuthToken = await this.authRepsitory.getAuthToken(unitOfWork, accountId);
+        const oldAuthToken = await this.authRepository.getAuthToken(unitOfWork, accountId);
         if (oldAuthToken == undefined) {
             throw new Errors.UnknownAccountError("No session found for account id: " + accountId);
         }

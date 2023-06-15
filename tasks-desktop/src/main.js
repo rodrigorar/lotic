@@ -17,6 +17,7 @@ const { EventBus } = require('./shared/event-bus');
 const { EventSubscriber } = require('./shared/event-bus');
 const { v4 } = require("uuid");
 const { RunUnitOfWork } = require('./shared/persistence/unitofwork');
+const { TaskServices } = require('./modules/tasks/services');
 
 app.setName('Tasks');
 
@@ -127,3 +128,16 @@ ipcMain.handle('auth:is_logged_in', AuthHandlers.handleIsLoggedIn);
 EventBus.register(
   EventType.REFRESH_FAILED
   , new EventSubscriber(v4(), (event) => mainWindow.webContents.send("auth:logged_out")));
+
+EventBus.register(
+  EventType.NEW_TASK_INFO
+  , new EventSubscriber(v4(), (event) => {
+      setTimeout(async () => {
+          const refreshedTasks = await RunUnitOfWork.run(async (unitOfWork) => {
+            return await TaskServices.list(unitOfWork, event.body.accountId);
+          });
+          mainWindow.webContents.send('tasks:refresh', refreshedTasks); 
+        }
+      , 500);
+  })
+)

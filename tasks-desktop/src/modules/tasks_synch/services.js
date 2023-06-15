@@ -15,6 +15,15 @@ class TasksSyncServices {
         await this.tasksSyncRepository.create(unitOfWork, taskId, state);
     }
 
+    async createMultipleSyncMonitor(unitOfWork, tasksSyncData) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        Validators.isNotNull(tasksSyncData, "No task sync data provided");
+
+        for (let taskSyncData of tasksSyncData) {
+            await this.tasksSyncRepository.create(unitOfWork, taskSyncData.taskId, taskSyncData.status);
+        }
+    }
+
     async deleteComplete(unitOfWork) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
 

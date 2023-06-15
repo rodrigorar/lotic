@@ -179,7 +179,7 @@ function handleTextInput(event) {
             id: taskId
             , title: updatedText
             , updatedAt: new Date()
-        }, 100);
+        }, 1000);
     });
 }
 

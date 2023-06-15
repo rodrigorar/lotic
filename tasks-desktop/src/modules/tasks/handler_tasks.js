@@ -22,7 +22,6 @@ async function handleCreateTask(event, newTask) {
                     , TASK_SYNCH_STATUS["LOCAL"]);
             });
     });
-    SynchManager.execute();
 }
 
 let updateTaskCounter = 0;
@@ -34,14 +33,6 @@ async function handleUpdateTasks(event, taskId, data) {
         await TaskServices.update(unitOfWork, data);
         TasksSyncServices.markDirty(unitOfWork, taskId);
     });
-
-    // TODO: Find a better way to optimize the synch with the server
-    if (updateTaskCounter >= 40) {
-        SynchManager.execute();
-        updateTaskCounter = 0;
-    } else {
-        updateTaskCounter += 1;
-    }
 }
 
 async function handleCompletion(event, taskId) {
@@ -49,8 +40,6 @@ async function handleCompletion(event, taskId) {
         await TaskServices.deleteTask(unitOfWork, taskId);
         TasksSyncServices.markForRemoval(unitOfWork, taskId);
     }) ;
-    
-    SynchManager.execute();
 }
 
 async function handleListTasks(event) {

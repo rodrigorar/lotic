@@ -9,7 +9,7 @@ async function doCall(unitOfWork, httpCall) {
     } catch (error) {
         if (error.response.status == StatusCode.Unauthorized) {
             // TODO: Abstract Auth Services from here, this is deeply wrong
-            await AuthServices.refresh(activeSession.accountId);
+            await AuthServices.refresh(unitOfWork, activeSession.accountId);
 
             const newActiveSession = await AuthServices.getActiveSession(unitOfWork);
             try {

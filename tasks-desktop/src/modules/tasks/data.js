@@ -7,7 +7,7 @@ class TasksRepository {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
             `INSERT INTO ${Tables.TASKS}(task_id, title, created_at, updated_at, owner_id) VALUES(?, ?, ?, ?, ?)`,
-            [task.id, task.title, task.createdAt, task.updatedAt, task.ownerId]);
+            [task.id, task.title, task.createdAt.toISOString(), task.updatedAt.toISOString(), task.ownerId]);
     }
 
     async updateTask(unitOfWork, task) {

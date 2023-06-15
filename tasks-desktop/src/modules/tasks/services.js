@@ -28,15 +28,17 @@ class TasksServices {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(tasksData, "No tasks where provided");
     
-        tasksData
+        const tasks = tasksData
             .map(taskData => 
                     new Task(
                         taskData.id
                         , taskData.title
                         , taskData.createdAt
                         , taskData.updatedAt
-                        , taskData.ownerId))
-            .forEach(async task => await this.tasksRepository.createTask(unitOfWork, task));
+                        , taskData.ownerId));
+        for (let task of tasks) {
+            await this.tasksRepository.createTask(unitOfWork, task);
+        }
     }
 
     async update(unitOfWork, taskData) {
@@ -44,6 +46,15 @@ class TasksServices {
         Validators.isNotNull(taskData, "No task data provided");
 
         await this.tasksRepository.updateTask(unitOfWork, taskData);
+    }
+
+    async updateMultiple(unitOfWork, tasksData) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        Validators.isNotNull(tasksData, "No task data list provided");
+
+        for (let taskData of tasksData) {
+            await this.tasksRepository.updateTask(unitOfWork, taskData)
+        }
     }
 
     async list(unitOfWork, accountId) {
