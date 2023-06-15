@@ -5,7 +5,7 @@ async function runStateMachine(initialState) {
 
     while(currentState) {
         await currentState.runEffect();
-        currentState = currentState.next();
+        currentState = await currentState.next();
     }
 }
 

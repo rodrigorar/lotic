@@ -1,4 +1,5 @@
 const { EventBus, EventType, Event } = require("../../shared/event-bus");
+const { Logger } = require("../../shared/logging/logger");
 const { RunUnitOfWork } = require("../../shared/persistence/unitofwork");
 const { AccountServices } = require("../accounts/services");
 const { AuthServices } = require("../auth/services");
@@ -16,7 +17,7 @@ class SyncDoneState extends State {
         super();
     }
 
-    next() {
+    async next() {
         return undefined;
     }
 }
@@ -74,7 +75,7 @@ class DeleteTasksLocalState extends State {
         super(effect);
     }
 
-    next() {
+    async next() {
         return new SyncDoneState();
     }
 }
@@ -115,7 +116,7 @@ class UpdateTasksLocalState extends State {
         super(effect);
     }
 
-    next() {
+    async next() {
         // FIXME: This State & StateAction should come from a provider
         return new DeleteTasksLocalState(
             new DeleteTasksLocalStateEffect(AuthServices, TaskServices, TasksSyncServices, TasksRPC));
@@ -171,7 +172,7 @@ class CreateTasksLocalState extends State {
         super(effect);
     }
 
-    next() {
+    async next() {
         // FIXME: This State & StateAction should come from a provider
         return new UpdateTasksLocalState(
             new UpdateTasksLocalStateEffect(
@@ -227,7 +228,7 @@ class DeleteTasksRemoteState extends State {
         super(effect);
     }
 
-    next() {
+    async next() {
         // FIXME: This State & StateAction should come from a provider
         return new CreateTasksLocalState(
             new CreateTasksLocalStateEffect(
@@ -282,7 +283,7 @@ class UpdateTasksRemoteState extends State {
         super(effect);
     }
 
-    next() {
+    async next() {
         // FIXME: This State & StateAction should come from a provider
         return new DeleteTasksRemoteState(
             new DeleteTasksRemoteStateEffect(TaskServices, TasksSyncServices, TasksRPC));
@@ -346,7 +347,7 @@ class CreateTasksRemoteState extends State {
         super(effect);
     }
 
-    next() {
+    async next() {
         // FIXME: This State & StateAction should come from a provider
         return new UpdateTasksRemoteState(
             new UpdateTasksRemoteStateEffect(TaskServices, TasksSyncServices, TasksRPC));
@@ -361,15 +362,27 @@ class StartSyncState extends State {
         super();
     }
 
-    next() {
-        // FIXME: This State & StateAction should come from a provider
-        return new CreateTasksRemoteState(
-            new CreateTasksRemoteStateEffect(
-                AuthServices
-                , AccountServices
-                , TaskServices
-                , TasksSyncServices
-                , TasksRPC));
+    async next() {
+        return await RunUnitOfWork.run(async (unitOfWork) => {
+            const authSession = await AuthServices.getActiveSession(unitOfWork);
+
+            let result = undefined;
+            if (authSession) {
+                // FIXME: This State & StateAction should come from a provider
+                result = new CreateTasksRemoteState(
+                    new CreateTasksRemoteStateEffect(
+                        AuthServices
+                        , AccountServices
+                        , TaskServices
+                        , TasksSyncServices
+                        , TasksRPC));
+            } else {
+                Logger.info("No account logged in, next state is SyncDoneState");
+                result = new SyncDoneState()
+            }
+
+            return result;
+        });
     }
 }
 

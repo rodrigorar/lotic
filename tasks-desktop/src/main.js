@@ -132,7 +132,6 @@ EventBus.register(
 EventBus.register(
   EventType.NEW_TASK_INFO
   , new EventSubscriber(v4(), (event) => {
-      console.log(event);
       setTimeout(async () => {
           const refreshedTasks = await RunUnitOfWork.run(async (unitOfWork) => {
             return await TaskServices.list(unitOfWork, event.body.accountId);

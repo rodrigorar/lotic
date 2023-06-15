@@ -26,7 +26,7 @@ class State {
         return this.effect ? await this.effect.execute() : undefined;
     }
 
-    next() {
+    async next() {
         throw new Error("next is an abstract function that needs to be implemented");
     }
 }
