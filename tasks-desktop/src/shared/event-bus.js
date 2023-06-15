@@ -6,6 +6,8 @@ const EventType = {
     , REFRESH_FAILED: "RefreshFailed"
     , LOGOUT_SUCCESS: "LogoutSuccess"
     , NEW_TASK_INFO: "NewTaskInfo"
+    , SYNC_STARTED: "SyncStarted"
+    , SYNC_ENDED: "SyncEnded"
 }
 
 class Event {
@@ -50,6 +52,8 @@ class EventBus {
             , [EventType.REFRESH_FAILED]: []
             , [EventType.LOGOUT_SUCCESS]: []
             , [EventType.NEW_TASK_INFO]: []
+            , [EventType.SYNC_STARTED]: []
+            , [EventType.SYNC_ENDED]: []
         }
     }
 

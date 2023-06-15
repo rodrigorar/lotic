@@ -243,6 +243,19 @@ auth.handleLoggedOut(event => {
     createTask();
 });
 
+ui.handleLoadingStart((event) => {
+    logger.trace("Loading started");
+
+    document.querySelector("#main-body").classList = ["loader"];
+});
+
+ui.handleLoadingEnd((event) => {
+    logger.trace("Loading ended");
+
+    document.querySelector("#main-body").classList = ["main-body"];
+
+});
+
 // Helper functions
 
 function extractId(value) {

@@ -2,6 +2,7 @@ const { Logger } = require("../shared/logging/logger");
 const { webContents } = require("electron");
 const { runStateMachine } = require("./sync/statemachine");
 const { StartSyncState } = require("./sync/states");
+const { EventBus, EventType, Event } = require("../shared/event-bus");
 
 async function doExecute(providedWebContents = undefined, isShutdown) {
     const eventHandler = 
@@ -9,7 +10,9 @@ async function doExecute(providedWebContents = undefined, isShutdown) {
             ? providedWebContents 
             : webContents.getFocusedWebContents();
 
+    EventBus.publish(new Event(EventType.SYNC_STARTED, {}));
     await runStateMachine(new StartSyncState());
+    EventBus.publish(new Event(EventType.SYNC_ENDED, {}));
 
     Logger.trace('Finished Task Synchornization');
 }

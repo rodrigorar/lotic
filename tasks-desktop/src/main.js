@@ -140,4 +140,18 @@ EventBus.register(
         }
       , 500);
   })
-)
+);
+
+EventBus.register(
+  EventType.SYNC_STARTED
+  , new EventSubscriber(v4(), (event) => {
+    mainWindow.webContents.send("ui:loading:start");
+  })
+);
+
+EventBus.register(
+  EventType.SYNC_ENDED
+  , new EventSubscriber(v4(), (event) => {
+    mainWindow.webContents.send("ui:loading:end")
+  })
+);

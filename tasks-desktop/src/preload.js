@@ -35,3 +35,10 @@ contextBridge.exposeInMainWorld('auth', {
     , handleLoggedIn: (callback) => ipcRenderer.on('auth:logged_in', callback)
     , handleLoggedOut: (callback) => ipcRenderer.on('auth:logged_out', callback)
 });
+
+// ui management
+
+contextBridge.exposeInMainWorld('ui', {
+    handleLoadingStart: (callback) => ipcRenderer.on("ui:loading:start", callback)
+    , handleLoadingEnd: (callback) => ipcRenderer.on("ui:loading:end", callback)
+})
