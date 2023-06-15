@@ -1,6 +1,6 @@
 const { ServiceUtils } = require("../../shared/utils/service-utils");
 const { Validators } = require("../../shared/utils/utils");
-const { TaskSynchRepository, TasksSyncRepository } = require("./data");
+const { TaskSynchRepository, TasksSyncRepository, TASK_SYNCH_STATUS } = require("./data");
 
 class TasksSyncServices {
 
@@ -48,7 +48,7 @@ class TasksSyncServices {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskId, "No task id provided");
 
-        await this.tasksSyncRepository.markForRemoval(unitOfWork, taskId);
+        await this.tasksSyncRepository.update(unitOfWork, { taskId: taskId, status: TASK_SYNCH_STATUS["COMPLETE"] });
     }
 
     async markDirty(unitOfWork, taskId) {
@@ -62,7 +62,11 @@ class TasksSyncServices {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskIds, "No task ids provided");
 
-        await this.tasksSyncRepository.markSynced(unitOfWork, taskIds);
+        const tasksSyncData = taskIds.map((id) => ({
+            taskId: id
+            , status: TASK_SYNCH_STATUS["SYNCHED"]
+        }));
+        await this.tasksSyncRepository.updateMultiple(unitOfWork, tasksSyncData);
     }
 
     async getNonSynced(unitOfWork) {

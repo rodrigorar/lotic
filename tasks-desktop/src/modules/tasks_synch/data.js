@@ -8,6 +8,23 @@ const { Tables } = require('../../shared/persistence/tables');
 //  functions that are to specific for updating to a specific status or value. 
 class TasksSyncRepository {
 
+    async create(unitOfWork, taskId, state = undefined) {
+        const queryManager = unitOfWork.getQueryManager();
+        const id = generateId();
+        const currentDate = new Date();
+    
+        await queryManager.run(
+            `INSERT INTO ${Tables.TASKS_SYNC}(task_synch_id, task_id, synch_status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`
+            , [id, taskId, state , currentDate.toISOString(), currentDate.toISOString()]);   
+    }
+
+    async markDirty(unitOfWork, taskId) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `UPDATE ${Tables.TASKS_SYNC} SET synch_status = 'DIRTY', updated_at = ? WHERE task_id = ? AND synch_status != 'LOCAL'`
+            , [new Date().toISOString(), taskId]);
+    }
+
     async getLocalAndDirty(unitOfWork) {
         const queryManager = unitOfWork.getQueryManager();
         const queryResult = await queryManager.all(
@@ -34,58 +51,6 @@ class TasksSyncRepository {
             , new Date(row.updated_at)));
     }
 
-    async markForRemoval(unitOfWork, taskId) {
-        const queryManager = unitOfWork.getQueryManager();
-        await queryManager.run(
-            `UPDATE ${Tables.TASKS_SYNC} SET synch_status = 'COMPLETE', updated_at = ? WHERE task_id = ?`
-            , [new Date().toISOString(), taskId]);
-    }
-
-    async markDirty(unitOfWork, taskId) {
-        const queryManager = unitOfWork.getQueryManager();
-        await queryManager.run(
-            `UPDATE ${Tables.TASKS_SYNC} SET synch_status = 'DIRTY', updated_at = ? WHERE task_id = ? AND synch_status != 'LOCAL'`
-            , [new Date().toISOString(), taskId]);
-    }
-
-    async markSynced(unitOfWork, taskIds) {
-        const queryManager = unitOfWork.getQueryManager();
-        await queryManager.run(
-            `UPDATE ${Tables.TASKS_SYNC} SET synch_status = 'SYNCHED', updated_at = ? WHERE task_id in (` + taskIds.map(_ => '?').join(',') +")"
-            , [new Date().toISOString(), ...taskIds]);
-    }
-
-    async deleteComplete(unitOfWork) {
-        const queryManager = unitOfWork.getQueryManager();
-        await queryManager.run(
-            `DELETE FROM ${Tables.TASKS_SYNC} WHERE synch_status = 'COMPLETE'`
-            , []);
-    }
-
-    async deleteMultipleByTaskId(unitOfWork, taskIds) {
-        const queryManager = unitOfWork.getQueryManager();
-        await queryManager.run(
-            `DELETE FROM ${Tables.TASKS_SYNC} WHERE synch_status = 'COMPLETE' AND task_id in (` + taskIds.map(_ => '?').join(',') + ")"
-            , taskIds);
-    }
-
-    async deleteAllForAccount(unitOfWork, accountId) {
-        const queryManager = unitOfWork.getQueryManager();
-        await queryManager.run(
-            `DELETE FROM ${Tables.TASKS_SYNC} WHERE task_id in (SELECT task_id FROM ${Tables.TASKS} WHERE owner_id = ?)`
-            , [accountId]);
-    }
-
-    async create(unitOfWork, taskId, state = undefined) {
-        const queryManager = unitOfWork.getQueryManager();
-        const id = generateId();
-        const currentDate = new Date();
-    
-        await queryManager.run(
-            `INSERT INTO ${Tables.TASKS_SYNC}(task_synch_id, task_id, synch_status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`
-            , [id, taskId, state , currentDate.toISOString(), currentDate.toISOString()]);   
-    }
-
     async getSyncStatus(unitOfWork, taskId) {
         const queryManager = unitOfWork.getQueryManager();
         const result = await queryManager.get(
@@ -107,6 +72,40 @@ class TasksSyncRepository {
             , result.synch_status
             , new Date(result.created_at)
             , new Date(result.updated_at)) : undefined;
+    }
+
+    async update(unitOfWork, taskSyncData) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `UPDATE ${Tables.TASKS_SYNC} SET synch_status = ?, updated_at = ? WHERE task_id = ?`
+            , [taskSyncData.status, new Date().toISOString(), taskSyncData.taskId])
+    }
+
+    async updateMultiple(unitOfWork, tasksSyncData) {
+        for (let taskSyncData of tasksSyncData) {
+            this.update(unitOfWork, taskSyncData);
+        }
+    }
+
+    async deleteComplete(unitOfWork) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `DELETE FROM ${Tables.TASKS_SYNC} WHERE synch_status = 'COMPLETE'`
+            , []);
+    }
+
+    async deleteMultipleByTaskId(unitOfWork, taskIds) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `DELETE FROM ${Tables.TASKS_SYNC} WHERE synch_status = 'COMPLETE' AND task_id in (` + taskIds.map(_ => '?').join(',') + ")"
+            , taskIds);
+    }
+
+    async deleteAllForAccount(unitOfWork, accountId) {
+        const queryManager = unitOfWork.getQueryManager();
+        await queryManager.run(
+            `DELETE FROM ${Tables.TASKS_SYNC} WHERE task_id in (SELECT task_id FROM ${Tables.TASKS} WHERE owner_id = ?)`
+            , [accountId]);
     }
 
 }
