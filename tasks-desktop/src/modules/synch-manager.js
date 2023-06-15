@@ -1,18 +1,7 @@
-const { TasksRPC } = require("./tasks/rpc");
 const { Logger } = require("../shared/logging/logger");
 const { webContents } = require("electron");
 const { runStateMachine } = require("./sync/statemachine");
 const { StartSyncState } = require("./sync/states");
-
-async function callListServerTasks(unitOfWork, account) {
-    result = await TasksRPC.listTasks(unitOfWork, account.id);
-    return result.data.tasks.map(entry => ({
-        task_id: entry.task_id
-        , title: entry.title
-        , description: entry.description
-        , owner_id: entry.owner_id
-    }));
-}
 
 async function doExecute(providedWebContents = undefined, isShutdown) {
     const eventHandler = 

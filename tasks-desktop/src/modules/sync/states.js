@@ -56,12 +56,9 @@ class DeleteTasksLocalStateEffect extends StateEffect {
                     })
 
             if (tasksToDelete.length > 0) {
-                console.log(tasksToDelete);
                 const tasksToDeleteIds = tasksToDelete.map((task) => task.id);
                 await this.taskServices.deleteMultiple(unitOfWork, tasksToDeleteIds);
                 await this.tasksSyncServices.deleteMultipleByTaskId(unitOfWork, tasksToDeleteIds);
-
-                console.log("Sending refresh event");
 
                 EventBus.publish(new Event(EventType.NEW_TASK_INFO, { accountId: authToken.accountId }));
             }
