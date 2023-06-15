@@ -1,7 +1,7 @@
 {
   "name": "Tasks",
   "productName": "Tasks",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Todos and Daily Planner",
   "main": "src/main.js",
   "scripts": {
