@@ -51,12 +51,16 @@ class DeleteTasksLocalStateEffect extends StateEffect {
 
             const tasksToDelete = notNewLocalTasks
                     .filter(entry => {
-                        return remoteTasksResponse.data.tasks.filter(value => value.id == entry.id) == 0
+                        return remoteTasksResponse.data.tasks.filter(value => value.task_id == entry.id) == 0
                     })
 
             if (tasksToDelete.length > 0) {
-                await TaskServices.deleteMultiple(unitOfWork, tasksToDelete);
-                await TasksSyncServices.deleteMultipleByTaskId(unitOfWork, tasksToDelete);
+                console.log(tasksToDelete);
+                const tasksToDeleteIds = tasksToDelete.map((task) => task.id);
+                await this.taskServices.deleteMultiple(unitOfWork, tasksToDeleteIds);
+                await this.tasksSyncServices.deleteMultipleByTaskId(unitOfWork, tasksToDeleteIds);
+
+                console.log("Sending refresh event");
 
                 EventBus.publish(new Event(EventType.NEW_TASK_INFO, { accountId: authToken.accountId }));
             }

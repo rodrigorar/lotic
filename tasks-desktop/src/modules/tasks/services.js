@@ -85,9 +85,10 @@ class TasksServices {
 
     async deleteMultiple(unitOfWork, taskIds = []) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        
-        taskIds
-            .forEach(async taskId => await this.tasksRepository.deleteTask(unitOfWork, taskId));
+
+        for (let taskId of taskIds) {
+            await this.tasksRepository.deleteTask(unitOfWork, taskId)
+        }
     }
 
     async deleteAllForAccount(unitOfWork, accountId) {
