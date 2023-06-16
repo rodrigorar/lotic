@@ -4,7 +4,7 @@
 
 [![Tasks Desktop](https://github.com/rodrigorar/lotic/actions/workflows/tasks-desktop.yml/badge.svg)](https://github.com/rodrigorar/lotic/actions/workflows/tasks-desktop.yml)
 
-[![Tasks Android]()]()
+[Tasks Android]()
 
 # Projects
 
