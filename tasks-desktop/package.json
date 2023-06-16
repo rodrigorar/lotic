@@ -9,6 +9,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "lint": "echo \"No linting configured\"",
+    "test": "jest",
     "unit-tests": "jest"
   },
   "keywords": [],

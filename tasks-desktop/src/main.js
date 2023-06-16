@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const { runSchemaMigrations } = require('./shared/persistence/database');
-const { app, BrowserWindow, Menu, ipcMain, globalShortcut } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, globalShortcut, Notification } = require('electron');
 const path = require('path');
 const { LoggerHandler } = require('./shared/logging/handler_logging');
 const { UtilsHandler } = require('./shared/utils/handler_utils');
