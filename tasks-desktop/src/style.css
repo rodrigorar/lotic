@@ -2,8 +2,9 @@
 /* Layout */
 
 .loader {
-  width: 100vw;
-  height: 2vh;
+  position: relative;
+  width: 75vw;
+  height: 1vh;
   border-radius: 5%;
   border-right: 25% solid #f3f3f3;
   border-left: 25% solid #f3f3f3;
@@ -92,6 +93,7 @@
   margin: 0%;
   padding-top: 8%;
   padding-left: 1%;
+  text-align: center;
   max-width: 94vw;
   max-height: 88vh;
   vertical-align: middle;
@@ -112,14 +114,19 @@
 .login-input {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     Arial, sans-serif;
-  font-size: x-large;
+  font-size: 1.5em;
   display: inherit;
   width: 100%;
   margin: 0 auto;
+  text-align: center;
   border-color: lightgray;
   border-style: solid;
   box-shadow: none;
   border-radius: 10px
+}
+
+.login-input:focus {
+  outline-color: lightblue;
 }
 
 .login-input:not(:last-child) {
@@ -137,6 +144,12 @@
 
 .app-font {
   font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
+}
+
+.main-title {
+  font-size: 3em;
+  font-weight: bolder;
+  color: #077296;
 }
 
 .title {

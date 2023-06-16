@@ -111,8 +111,27 @@ ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
 
 // Auth Event Listeners
 
-ipcMain.on('auth:open:login', AuthHandlers.handleOpenLogin);
-ipcMain.on('auth:login', AuthHandlers.handleLogin);
+ipcMain.on('auth:open:login', async (event) => {
+  const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
+    return await AuthServices.getActiveSession(unitOfWork);
+  });
+  const authFile = 
+            activeSession == undefined 
+                ? 'ui/login/login.html' 
+                : 'ui/login/logged_in.html';
+  mainWindow.loadFile(path.join(__dirname, authFile));
+});
+ipcMain.on('auth:login', async (event, loginData) => {
+    await RunUnitOfWork.run(async (unitOfWork) => {
+        await AuthServices.login(unitOfWork, loginData);
+    });
+
+    mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html'));
+    await SynchManager.execute();
+
+    webContents.getFocusedWebContents().send('auth:logged_in');
+});
+
 ipcMain.on('auth:logout', async (event) => {
   const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
     return await AuthServices.getActiveSession(unitOfWork);
