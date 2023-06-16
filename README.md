@@ -1,6 +1,7 @@
 # CI Status
 
 [![Tasks Backend](https://github.com/rodrigorar/lotic/actions/workflows/tasks-backend.yml/badge.svg?branch=main)](https://github.com/rodrigorar/lotic/actions/workflows/tasks-backend.yml)
+
 [![Tasks Desktop](https://github.com/rodrigorar/lotic/actions/workflows/tasks-desktop.yml/badge.svg)](https://github.com/rodrigorar/lotic/actions/workflows/tasks-desktop.yml)
 
 # Projects
