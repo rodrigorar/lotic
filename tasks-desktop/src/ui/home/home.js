@@ -244,16 +244,11 @@ auth.handleLoggedOut(event => {
 });
 
 ui.handleLoadingStart((event) => {
-    logger.trace("Loading started");
-
-    document.querySelector("#main-body").classList = ["loader"];
+    document.querySelector("#loader").classList = ["loader"];
 });
 
 ui.handleLoadingEnd((event) => {
-    logger.trace("Loading ended");
-
-    document.querySelector("#main-body").classList = ["main-body"];
-
+    document.querySelector("#loader").classList = [""];
 });
 
 // Helper functions
