@@ -83,6 +83,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           echo "ARTIFACT_NAME_UBUNTU=$(ls tasks-desktop/out/make/deb/x64 | grep -e tasks_*_amd64.deb)" >> $GITHUB_ENV
+          echo ${{ env.ARTIFACT_NAME_UBUNTU }}
       - name: Upload a Ubuntu Build Artifact
         uses: actions/upload-artifact@v3.1.2
         with:
