@@ -46,14 +46,9 @@ class EventSubscriber {
 class EventBus {
 
     constructor() {
-        this.queueSubscribers = {
-            [EventType.LOGIN_SUCCESS]: []
-            , [EventType.REFRESH_SUCCESS]: []
-            , [EventType.REFRESH_FAILED]: []
-            , [EventType.LOGOUT_SUCCESS]: []
-            , [EventType.NEW_TASK_INFO]: []
-            , [EventType.SYNC_STARTED]: []
-            , [EventType.SYNC_ENDED]: []
+        this.queueSubscribers = {};
+        for (let key of Object.keys(EventType)) {
+            this.queueSubscribers[EventType[key]] = [];
         }
     }
 
