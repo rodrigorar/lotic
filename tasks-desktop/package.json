@@ -6,11 +6,10 @@
   "main": "src/main.js",
   "scripts": {
     "start": "NODE_ENV=development electron-forge start",
-    "package": "electron-forge package",
     "make": "electron-forge make",
     "lint": "echo \"No linting configured\"",
-    "test": "jest",
-    "unit-tests": "jest"
+    "unit-tests": "jest",
+    "integration-tests": "echo \"No integration tests configured\""
   },
   "keywords": [],
   "author": {
