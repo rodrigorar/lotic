@@ -10,15 +10,64 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  linting:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+    steps:      
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Running Linting
+        working-directory: ./tasks-desktop
+        run: |
+          npm install
+          npm run lint
+  unit-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    steps:      
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Running Unit Tests
+        working-directory: ./tasks-desktop
+        run: |
+          npm install
+          npm run unit-tests
+  integration-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    steps:      
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Running Integration Tests
+        working-directory: ./tasks-desktop
+        run: |
+          npm install
+          npm run integration-tests
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:      
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -29,4 +78,15 @@ jobs:
         working-directory: ./tasks-desktop
         run: |
           npm install
-          npm test
+          npm run make
+      - name: Get Ubuntu Artifact Name
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          echo "ARTIFACT_NAME_UBUNTU=$(ls tasks-desktop/out/make/deb/x64 | grep -e tasks_.*_amd64.deb)" >> $GITHUB_ENV
+      - name: Upload a Ubuntu Build Artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: ${{ env.ARTIFACT_NAME_UBUNTU }}
+          path: tasks-desktop/out/make/deb/x64/tasks_-*_amd64.deb
+          if-no-files-found: error
+          retention-days: 7
