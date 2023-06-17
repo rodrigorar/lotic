@@ -1,12 +1,12 @@
-const { UnitOfWork } = require('../../shared/persistence/database');
-const { Tables } = require('../../shared/persistence/tables');
+const { Tables, Fields } = require('../../shared/persistence/tables');
 
 class AccountRepository {
 
     async createAccount(unitOfWork, account) {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
-            `INSERT INTO ${Tables.ACCOUNTS}(id, email) VALUES (?, ?)`
+            `INSERT INTO ${Tables.Accounts}(${Fields.Accounts.Id}, ${Fields.Accounts.Email})`
+            + `VALUES (?, ?)`
             , [account.id, account.email]);
     }
 
@@ -14,7 +14,9 @@ class AccountRepository {
         const queryManager = unitOfWork.getQueryManager();
         
         const queryResult = await queryManager.get(
-            'SELECT * FROM accounts WHERE email = ?'
+            `SELECT * `
+            + `FROM ${Tables.Accounts} `
+            + `WHERE ${Fields.Accounts.Email} = ?`
             , [email]);
         return queryResult != undefined 
                 ? new Account(queryResult.id, queryResult.email) 
@@ -25,7 +27,9 @@ class AccountRepository {
         const queryManager = unitOfWork.getQueryManager();
 
         const queryResult = await queryManager.get(
-            'SELECT * FROM accounts WHERE id = ?'
+            `SELECT * `
+            + `FROM ${Tables.Accounts} `
+            + `WHERE ${Fields.Accounts.Id} = ?`
             , [accountId]);
 
         return queryResult != undefined 

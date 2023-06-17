@@ -60,7 +60,7 @@ class DeleteTasksLocalStateEffect extends StateEffect {
                 await this.taskServices.deleteMultiple(unitOfWork, tasksToDeleteIds);
                 await this.tasksSyncServices.deleteMultipleByTaskId(unitOfWork, tasksToDeleteIds);
 
-                EventBus.publish(new Event(EventType.NEW_TASK_INFO, { accountId: authToken.accountId }));
+                EventBus.publish(new Event(EventType.DELETED_LOCAL_TASKS, { accountId: authToken.accountId }));
             }
         });
     }
@@ -158,7 +158,7 @@ class CreateTasksLocalStateEffect extends StateEffect {
                     })));
             }
 
-            EventBus.publish(new Event(EventType.NEW_TASK_INFO, { accountId: authToken.accountId }));
+            EventBus.publish(new Event(EventType.CREATED_LOCAL_TASKS, { accountId: authToken.accountId }));
         });
     }
 }

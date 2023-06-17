@@ -1,13 +1,18 @@
+const { Tables, Fields } = require('../../shared/persistence/tables');
 
 class AuthRepository {
 
     async persistAuthToken(unitOfWork, authToken) {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
-            'DELETE FROM auth_sessions WHERE account_id = ?'
+            `DELETE `
+            + `FROM ${Tables.AuthSessions} `
+            + `WHERE ${Fields.AuthSessions.AccountId} = ?`
             , [authToken.accountId]);
         await queryManager.run(
-            'INSERT INTO auth_sessions(token, refresh_token, account_id, expires_at) VALUES (?, ?, ?, ?)'
+            `INSERT INTO ${Tables.AuthSessions}` 
+                + `(${Fields.AuthSessions.AccessToken}, ${Fields.AuthSessions.RefreshToken}, ${Fields.AuthSessions.AccountId}, ${Fields.AuthSessions.ExpiresAt})`
+                + `VALUES (?, ?, ?, ?)`
             , [authToken.token, authToken.refreshToken, authToken.accountId, authToken.expiresAt])
     }    
 
@@ -16,7 +21,9 @@ class AuthRepository {
 
         const queryResult =
             await queryManager.get(
-                'SELECT * FROM auth_sessions WHERE account_id = ?'
+                `SELECT * `
+                + `FROM ${Tables.AuthSessions} `
+                + `WHERE ${Fields.AuthSessions.AccountId} = ?`
                 , [accountId]);
 
         if (queryResult == undefined) {
@@ -35,7 +42,9 @@ class AuthRepository {
 
         const queryResult =
             await queryManager.get(
-                'SELECT * FROM auth_sessions LIMIT 1'
+                `SELECT * `
+                + `FROM ${Tables.AuthSessions} `
+                + `LIMIT 1`
                 , []);
     
         if (queryResult == undefined) {
@@ -53,7 +62,7 @@ class AuthRepository {
         const queryManager = unitOfWork.getQueryManager();
         
         await queryManager.run(
-            'DELETE FROM auth_sessions WHERE account_id = ?'
+            `DELETE FROM ${Tables.AuthSessions} WHERE ${Fields.AuthSessions.AccountId} = ?`
             , [accountId]);
     }
 }

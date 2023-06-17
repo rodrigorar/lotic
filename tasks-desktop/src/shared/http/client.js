@@ -2,8 +2,9 @@ const { default: axios } = require("axios");
 
 
 const client = axios.create({
-    baseURL: 'http://lotic.eu:8080',
-    timeout: 5000
+    //baseURL: 'http://lotic.eu/tasks',
+    baseURL: "http://localhost:5000"
+    , timeout: 5000
 });
 
 // Logging filters

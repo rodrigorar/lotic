@@ -1,6 +1,5 @@
 const { generateId } = require('../../shared/utils/utils');
-const { UnitOfWork } = require("../../shared/persistence/database");
-const { Tables } = require('../../shared/persistence/tables');
+const { Tables, Fields } = require('../../shared/persistence/tables');
 
 
 // FIXME: We should have a single query method, and and update method that 
@@ -14,21 +13,27 @@ class TasksSyncRepository {
         const currentDate = new Date();
     
         await queryManager.run(
-            `INSERT INTO ${Tables.TASKS_SYNC}(task_synch_id, task_id, synch_status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`
+            `INSERT INTO ${Tables.TasksSync}`
+            + `(${Fields.TasksSync.Id}, task_id, synch_status, created_at, updated_at) `
+            + `VALUES (?, ?, ?, ?, ?)`
             , [id, taskId, state , currentDate.toISOString(), currentDate.toISOString()]);   
     }
 
     async markDirty(unitOfWork, taskId) {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
-            `UPDATE ${Tables.TASKS_SYNC} SET synch_status = 'DIRTY', updated_at = ? WHERE task_id = ? AND synch_status != 'LOCAL'`
+            `UPDATE ${Tables.TasksSync} `
+            + `SET ${Fields.TasksSync.Status} = 'DIRTY', ${Fields.TasksSync.UpdatedAt} = ? `
+            + `WHERE ${Fields.TasksSync.TaskId} = ? AND ${Fields.TasksSync.Status} != 'LOCAL'`
             , [new Date().toISOString(), taskId]);
     }
 
     async getLocalAndDirty(unitOfWork) {
         const queryManager = unitOfWork.getQueryManager();
         const queryResult = await queryManager.all(
-            `SELECT * FROM ${Tables.TASKS_SYNC} WHERE synch_status = 'LOCAL' OR synch_status = 'DIRTY'`
+            `SELECT * `
+            + `FROM ${Tables.TasksSync} `
+            + `WHERE ${Fields.TasksSync.Status} = 'LOCAL' OR ${Fields.TasksSync.Status} = 'DIRTY'`
             , []);
         return queryResult.map(row => new TaskSynch(
             row.task_synch_id
@@ -41,7 +46,9 @@ class TasksSyncRepository {
     async getComplete(unitOfWork) {
         const queryManager = unitOfWork.getQueryManager();
         const queryResult = await queryManager.all(
-            `SELECT * FROM ${Tables.TASKS_SYNC} WHERE synch_status = 'COMPLETE'`
+            `SELECT * `
+            + `FROM ${Tables.TasksSync} `
+            + `WHERE ${Fields.TasksSync.Status} = 'COMPLETE'`
             , []);
         return queryResult.map(row => new TaskSynch(
             row.task_synch_id
@@ -54,7 +61,9 @@ class TasksSyncRepository {
     async getSyncStatus(unitOfWork, taskId) {
         const queryManager = unitOfWork.getQueryManager();
         const result = await queryManager.get(
-            `SELECT * FROM ${Tables.TASKS_SYNC} WHERE task_id = ?`
+            `SELECT * `
+            + `FROM ${Tables.TasksSync} `
+            + `WHERE ${Fields.TasksSync.TaskId} = ?`
             , [taskId]);
         
         if (result != undefined) {
@@ -77,7 +86,9 @@ class TasksSyncRepository {
     async update(unitOfWork, taskSyncData) {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
-            `UPDATE ${Tables.TASKS_SYNC} SET synch_status = ?, updated_at = ? WHERE task_id = ?`
+            `UPDATE ${Tables.TasksSync} `
+            + `SET ${Fields.TasksSync.Status} = ?, ${Fields.TasksSync.UpdatedAt} = ? `
+            + `WHERE ${Fields.TasksSync.TaskId} = ?`
             , [taskSyncData.status, new Date().toISOString(), taskSyncData.taskId])
     }
 
@@ -90,21 +101,27 @@ class TasksSyncRepository {
     async deleteComplete(unitOfWork) {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
-            `DELETE FROM ${Tables.TASKS_SYNC} WHERE synch_status = 'COMPLETE'`
+            `DELETE FROM ${Tables.TasksSync} `
+            + `WHERE ${Fields.TasksSync.Status} = 'COMPLETE'`
             , []);
     }
 
     async deleteMultipleByTaskId(unitOfWork, taskIds) {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
-            `DELETE FROM ${Tables.TASKS_SYNC} WHERE synch_status = 'COMPLETE' AND task_id in (` + taskIds.map(_ => '?').join(',') + ")"
+            `DELETE FROM ${Tables.TasksSync} `
+            + `WHERE ${Fields.TasksSync.Status} = 'COMPLETE' AND ${Fields.TasksSync.TaskId} in (` + taskIds.map(_ => '?').join(',') + ")"
             , taskIds);
     }
 
     async deleteAllForAccount(unitOfWork, accountId) {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
-            `DELETE FROM ${Tables.TASKS_SYNC} WHERE task_id in (SELECT task_id FROM ${Tables.TASKS} WHERE owner_id = ?)`
+            `DELETE FROM ${Tables.TasksSync} `
+            + `WHERE ${Fields.Tasks.Id} in (`
+                + `SELECT ${Fields.Tasks.Id} `
+                + `FROM ${Tables.Tasks} `
+                + `WHERE ${Fields.Tasks.OwnerId} = ?)`
             , [accountId]);
     }
 

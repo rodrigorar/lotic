@@ -8,10 +8,8 @@ const { TasksHandler } = require('./modules/tasks/handler_tasks');
 const { OSMask } = require('./shared/os/os-mask');
 const { isDev } = require('./shared/utils/utils');
 const { SynchManager } = require('./modules/synch-manager');
-const { Logger } = require('./shared/logging/logger');
 const { AuthHandlers } = require('./modules/auth/handler_auth');
 const { AuthServices } = require('./modules/auth/services');
-const { TasksSynchServices } = require('./modules/tasks_synch/services');
 const { EventType } = require('./shared/event-bus');
 const { EventBus } = require('./shared/event-bus');
 const { EventSubscriber } = require('./shared/event-bus');
@@ -54,13 +52,13 @@ app.on('ready', () => {
 
   if (schemaMigrationSemaphor) {
     // Run Synch Manager at the start
-    SynchManager.execute(mainWindow.webContents);
+    SynchManager.execute();
   }
 
   // TODO: This cron should come from a config file.
   cron.schedule('*/30 * * * * *', () => {
     if (schemaMigrationSemaphor) {
-      SynchManager.execute(mainWindow.webContents);
+      SynchManager.execute();
     }
   }).start();
 
@@ -74,7 +72,7 @@ app.on('ready', () => {
       closeSemaphor = false;
       e.preventDefault();
 
-      SynchManager.execute(undefined, true)
+      SynchManager.execute()
         .then(() => {
           closeSemaphor = false;
           setTimeout(() => {
@@ -148,8 +146,8 @@ EventBus.register(
   EventType.REFRESH_FAILED
   , new EventSubscriber(v4(), (event) => mainWindow.webContents.send("auth:logged_out")));
 
-EventBus.register(
-  EventType.NEW_TASK_INFO
+EventBus.registerForSeveralEventTypes(
+  [EventType.CREATED_LOCAL_TASKS, EventType.DELETED_LOCAL_TASKS]
   , new EventSubscriber(v4(), (event) => {
       setTimeout(async () => {
           const refreshedTasks = await RunUnitOfWork.run(async (unitOfWork) => {
@@ -164,6 +162,7 @@ EventBus.register(
 EventBus.register(
   EventType.SYNC_STARTED
   , new EventSubscriber(v4(), (event) => {
+    // FIXME: Validate if the Main Window / Web Contents still exist before calling it
     mainWindow.webContents.send("ui:loading:start");
   })
 );
@@ -171,6 +170,7 @@ EventBus.register(
 EventBus.register(
   EventType.SYNC_ENDED
   , new EventSubscriber(v4(), (event) => {
+    // FIXME: Validate if the Main Window / Web Contents still exist before calling it  
     mainWindow.webContents.send("ui:loading:end")
   })
 );

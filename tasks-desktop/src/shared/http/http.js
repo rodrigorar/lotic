@@ -33,8 +33,6 @@ const get = async (unitOfWork, path) => {
         }));
 };
 
-// TODO: Improve the autorization code, so we don't hve to add it to every request
-
 const post = async (unitOfWork, path, data) => {
     Logger.trace(`Calling URL: #POST ${BASE_URL + path} with Data: ${JSON.stringify(data)}`);
 

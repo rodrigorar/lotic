@@ -6,6 +6,8 @@ const EventType = {
     , REFRESH_FAILED: "RefreshFailed"
     , LOGOUT_SUCCESS: "LogoutSuccess"
     , NEW_TASK_INFO: "NewTaskInfo"
+    , CREATED_LOCAL_TASKS: "CreatedLocalTasks"
+    , DELETED_LOCAL_TASKS: "DeletedLocalTasks"
     , SYNC_STARTED: "SyncStarted"
     , SYNC_ENDED: "SyncEnded"
 }
@@ -71,6 +73,13 @@ class EventBus {
         } else {
             this.queueSubscribers[eventType].push(subscriber);
         }
+    }
+
+    registerForSeveralEventTypes(eventTypes, subscriber) {
+        Validators.isNotNull(eventTypes);
+        Validators.isNotNull(subscriber);
+
+        eventTypes.forEach(eventType => this.register(eventType, subscriber));
     }
 
     unregister(eventType, subscriber) {

@@ -1,4 +1,3 @@
-const { SynchManager } = require('../synch-manager');
 const { TaskServices } = require('./services');
 const { TasksSyncServices } = require('../tasks_synch/services');
 const { AuthServices } = require('../auth/services');
@@ -24,9 +23,6 @@ async function handleCreateTask(event, newTask) {
     });
 }
 
-let updateTaskCounter = 0;
-
-// TODO: We need a buffer for this input, in order to not lag on the UI
 async function handleUpdateTasks(event, taskId, data) {
 
     await RunUnitOfWork.run(async (unitOfWork) => {
