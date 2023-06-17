@@ -74,6 +74,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          os: ${{ matrix.os }}
       - name: Run CI
         working-directory: ./tasks-desktop
         run: |
