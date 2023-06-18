@@ -81,7 +81,7 @@ jobs:
       - name: Get Artifact Name
         run: |
           echo "ARTIFACT_NAME=$(ls tasks-desktop/out/make/deb/x64 | grep -e tasks_*_.deb)" >> $GITHUB_ENV
-          echo ${{ env.ARTIFACT_NAME }}
+          echo ${{ env }}
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.2
         with:
