@@ -78,8 +78,10 @@ jobs:
         run: |
           npm install
           npm run make
-      - run: |
-          echo "ARTIFACT_NAME=$(ls tasks-desktop/out/make/deb/x64 | grep -e tasks_*_.deb)" >> $GITHUB_ENV
+      - name: Get Artifact Name
+        working-directory: ./tasks-desktop
+        run: |
+          echo "ARTIFACT_NAME=$(ls ./out/make/deb/x64 | grep -e tasks_*_.deb)" >> $GITHUB_ENV
           echo ${{ env }}
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.2
