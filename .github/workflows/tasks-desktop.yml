@@ -61,11 +61,10 @@ jobs:
         run: |
           npm install
           npm run integration-tests
-  build:
-    runs-on: ${{ matrix.os }}
+  build-ubuntu:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: ["ubuntu-latest"]
         node-version: [18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:      
@@ -74,18 +73,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          os: ${{ matrix.os }}
       - name: Run CI
         working-directory: ./tasks-desktop
         run: |
           npm install
           npm run make
-      - name: Get Ubuntu Artifact Name
-        if: matrix.os == 'ubuntu-latest'
+      - name: Get Artifact Name
         run: |
-          echo "ARTIFACT_NAME=$(ls tasks-desktop/out/make/deb/x64)" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME=$(ls tasks-desktop/out/make/deb/x64 | grep -e tasks_*_.deb)" >> $GITHUB_ENV
           echo ${{ env.ARTIFACT_NAME }}
-      - name: Upload a Ubuntu Build Artifact
+      - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.2
         with:
           name: ${{ env.ARTIFACT_NAME }}
