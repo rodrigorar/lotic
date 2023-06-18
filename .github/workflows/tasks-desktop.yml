@@ -78,8 +78,7 @@ jobs:
         run: |
           npm install
           npm run make
-      - name: Get Artifact Name
-        run: |
+      - run: |
           echo "ARTIFACT_NAME=$(ls tasks-desktop/out/make/deb/x64 | grep -e tasks_*_.deb)" >> $GITHUB_ENV
           echo ${{ env }}
       - name: Upload a Build Artifact
