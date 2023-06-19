@@ -80,13 +80,11 @@ jobs:
           npm run make
       - name: Get Artifact Name
         run: |
-          ls tasks-desktop/out/make/deb/x64
-          echo "ARTIFACT_NAME=$(ls tasks-desktop/out/make/deb/x64)" >> $GITHUB_ENV
-          echo ${{ env.ARTIFACT_NAME }}
+          echo "ARTIFACT_NAME_UBUNTU=$(ls tasks-desktop/out/make/deb/x64)" >> $GITHUB_ENV
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: ${{ env.ARTIFACT_NAME }}
+          name: ${{ env.ARTIFACT_NAME_UBUNTU }}
           path: tasks-desktop/out/make/deb/x64/
           if-no-files-found: error
           retention-days: 7
@@ -110,12 +108,12 @@ jobs:
         - name: Get Artifact Name
           run: |
             ls tasks-desktop/out/make/
-            echo "ARTIFACT_NAME=$(ls tasks-desktop/out/make/macos/x64)" >> $GITHUB_ENV
-            echo ${{ env.ARTIFACT_NAME }}
+            echo "ARTIFACT_NAME_MACOS=$(ls tasks-desktop/out/make)" >> $GITHUB_ENV
+            echo ${{ env.ARTIFACT_NAME_MACOS }}
         - name: Upload a Build Artifact
           uses: actions/upload-artifact@v3.1.2
           with:
-            name: ${{ env.ARTIFACT_NAME }}
-            path: tasks-desktop/out/make/macos/x64/
+            name: ${{ env.ARTIFACT_NAME_MACOS }}
+            path: tasks-desktop/out/make/
             if-no-files-found: error
             retention-days: 7
