@@ -90,3 +90,32 @@ jobs:
           path: tasks-desktop/out/make/deb/x64/
           if-no-files-found: error
           retention-days: 7
+  build-macos:
+      runs-on: macos-latest
+      strategy:
+        matrix:
+          node-version: [18.x]
+          # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+      steps:      
+        - uses: actions/checkout@v3
+        - name: Use Node.js ${{ matrix.node-version }}
+          uses: actions/setup-node@v3
+          with:
+            node-version: ${{ matrix.node-version }}
+        - name: Run CI
+          working-directory: ./tasks-desktop
+          run: |
+            npm install
+            npm run make
+        - name: Get Artifact Name
+          run: |
+            ls tasks-desktop/out/make/
+            echo "ARTIFACT_NAME=$(ls tasks-desktop/out/make/macos/x64)" >> $GITHUB_ENV
+            echo ${{ env.ARTIFACT_NAME }}
+        - name: Upload a Build Artifact
+          uses: actions/upload-artifact@v3.1.2
+          with:
+            name: ${{ env.ARTIFACT_NAME }}
+            path: tasks-desktop/out/make/macos/x64/
+            if-no-files-found: error
+            retention-days: 7
