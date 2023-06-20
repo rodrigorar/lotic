@@ -1,6 +1,6 @@
 const { Validators } = require("../../shared/utils/utils");
 const { AuthRepository, AuthToken } = require("./data");
-const { AccountServices } = require("../accounts/services");
+const { AccountServicesInstance } = require("../accounts/services");
 const { AuthRPC } = require("./rpc");
 const { Errors } = require("../../shared/errors/errors");
 const { EventBus, Event, EventType } = require("../../shared/event-bus");
@@ -107,4 +107,4 @@ class AuthServices {
     }
 }
 
-module.exports.AuthServices = new AuthServices(AccountServices, AuthRepository, AuthRPC);
+module.exports.AuthServices = new AuthServices(AccountServicesInstance, AuthRepository, AuthRPC);

@@ -30,4 +30,5 @@ class AccountServices {
     }
 }
 
-module.exports.AccountServices = new AccountServices(AccountRepository);
+module.exports.AccountServices = AccountServices;
+module.exports.AccountServicesInstance = new AccountServices(AccountRepository);
