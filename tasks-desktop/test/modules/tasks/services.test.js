@@ -89,15 +89,33 @@ describe("[Tasks]: Test Update Multiple Service", () => {
 });
 
 describe("[Tasks]: Test List Service", () => {
-    // TODO: Not implemented
+    
+    it("Should succeed listing tasks", async () => {
+        throw new Error("Should succeed listing tasks is not implemented");
+    });
+
+    it("Should fail, tasks repository error", async () => {
+        throw new Error("Should fail, tasks repository error is not implemented");
+    });
 
     it("Should fail, no unit of work provided", async () => {
         throw new Error("Should fail, no unit of work provided is not implemented");
     });
+
+    it("Should fail, no account id provided", async () => {
+        throw new Error("Should fail, no account id provided is not implemented");
+    });
 });
 
 describe("[Tasks]: Test List Without Owner Service", () => {
-    // TODO: Not implemented
+    
+    it("Should succeed listing tasks without owner", async () => {
+        throw new Error("Should succeed listing tasks without owner is not implemented");
+    });
+
+    it("Should fail, tasks repository error", async () => {
+        throw new Error("Should fail, tasks repository error is not implemented");
+    });
 
     it("Should fail, no unit of work provided", async () => {
         throw new Error("Should fail, no unit of work provided is not implemented");
@@ -105,33 +123,77 @@ describe("[Tasks]: Test List Without Owner Service", () => {
 });
 
 describe("[Tasks]: Test List by Id Service", () => {
-    // TODO: Not implemented
+    it("Should succeed listing tasks by id", async () => {
+        throw new Error("Should succeed listing tasks by id is not implemented");
+    });
+
+    it("Should fail, tasks repository error", async () => {
+        throw new Error("Should fail, tasks repository error is not implemented");
+    });
 
     it("Should fail, no unit of work provided", async () => {
         throw new Error("Should fail, no unit of work provided is not implemented");
+    });
+
+    it("Should fail, not task id list provided", async () => {
+        throw new Error("Should fail, not task id list provided is not implemented");
     });
 });
 
 describe("[Tasks]: Test Delete Service", () => {
-    // TODO: Not implemented
+    it("Should succeed deleting the task", async () => {
+        throw new Error("Should succeed deleting the task is not implemented");
+    });
+
+    it("Should fail, tasks repository error", async () => {
+        throw new Error("Should fail, tasks repository error is not implemented");
+    });
 
     it("Should fail, no unit of work provided", async () => {
         throw new Error("Should fail, no unit of work provided is not implemented");
+    });
+
+    it("Should fail, no task id is provided", async () => {
+        throw new Error("Should fail, no task id is provided is not implemented");
     });
 });
 
 describe("[Tasks]: Test Delete Multiple Service", () => {
-    // TODO: Not implemented
+    it("Should succeed deleting multiple tasks", async () => {
+        throw new Error("Should succeed deleting multiple tasks is not implemented");
+    });
+
+    it("Should succeed deleting a single task", async () => {
+        throw new Error("Should succeed deleting a single task is not implemented");
+    });
+
+    it("Should succeed deleting no tasks", async () => {
+        throw new Error("Should succeed deleting no tasks is not implemented");
+    });
 
     it("Should fail, no unit of work provided", async () => {
         throw new Error("Should fail, no unit of work provided is not implemented");
     });
+
+    it("Should fail, no task ids provided", async () => {
+        throw new Error("Should fail, no task ids provided is not implemented");
+    });
 });
 
 describe("[Tasks]: Test Delete All For Account Service", () => {
-    // TODO: Not implemented
+    it("Should succeed deleting all tasks for account", async () => {
+        throw new Error("Should succeed deleting all tasks for account is not implemented");
+    });
+
+    it("Should fail, tasks repository error", async () => {
+        throw new Error("Should fail, Should fail, tasks repository error is not implemented");
+    });
 
     it("Should fail, no unit of work provided", async () => {
         throw new Error("Should fail, no unit of work provided is not implemented");
+    });
+
+    it("Should fail, no account id provided", async () => {
+        throw new Error("Should fail, no account id provided is not implemented");
     });
 });
