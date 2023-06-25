@@ -15,10 +15,10 @@ class AuthServices {
 
     async login(unitOfWork, principal) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        Validators.isNotNull(principal.email, "No email provided");
+        Validators.isNotNull(principal, "No principal provided");
     
         const account = await this.accountServices.getAccount(unitOfWork, principal.email);
-    
+
         let authToken = undefined;
         if (account != undefined) {
             authToken = await this.authRepository.getAuthToken(unitOfWork, account.id);
@@ -29,7 +29,6 @@ class AuthServices {
             if (loginResult.hasOwnProperty('status')) {
                 throw new Errors.LoginFailedError('Failed to login account');
             }
-            
             authToken = new AuthToken(
                 loginResult.token
                 , loginResult.refresh_token
@@ -107,4 +106,5 @@ class AuthServices {
     }
 }
 
-module.exports.AuthServices = new AuthServices(AccountServicesInstance, AuthRepository, AuthRPC);
+module.exports.AuthServices = AuthServices;
+module.exports.AuthServicesInstance = new AuthServices(AccountServicesInstance, AuthRepository, AuthRPC);

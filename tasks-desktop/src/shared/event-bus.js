@@ -35,10 +35,6 @@ class EventSubscriber {
         this.notifyAction = notifyAction;
     }
 
-    subscriberId() {
-        return this.subscriberId;
-    }
-    
     notify(event) {
         this.notifyAction(event);
     }
@@ -66,7 +62,7 @@ class EventBus {
         Validators.isNotNull(subscriber);
 
         const matchingSubscribers = this.queueSubscribers[eventType]
-            .filter(entry => entry.subscriberId() == subscriber.subscriberId());
+            .filter(entry => entry.subscriberId == subscriber.subscriberId);
         
         if (matchingSubscribers.length > 0) {
             // TODO: Throw an error for duplicated subscriber
@@ -82,11 +78,13 @@ class EventBus {
         eventTypes.forEach(eventType => this.register(eventType, subscriber));
     }
 
-    unregister(eventType, subscriber) {
+    unregister(eventType, subscriberId) {
         Validators.isNotNull(eventType);
-        Validators.isNotNull(subscriber);
+        Validators.isNotNull(subscriberId);
 
-        // TODO: Not implemented
+        const matchingSubscriber = this.queueSubscribers[eventType]
+            .filter(entry => entry.subscriberId == subscriberId);
+        this.queueSubscribers[eventType].splice(this.queueSubscribers[eventType].indexOf(matchingSubscriber), 1);
     }
 
 }

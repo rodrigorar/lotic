@@ -1,6 +1,6 @@
 const { BrowserWindow, webContents } = require('electron');
 const path = require('path');
-const { AuthServices } = require('./services');
+const { AuthServicesInstance } = require('./services');
 const { SynchManager } = require('../synch-manager');
 const { RunUnitOfWork } = require("../../shared/persistence/unitofwork");
 
@@ -10,7 +10,7 @@ async function handleOpenLogin(event) {
     if (loginWindow == undefined) {
         
         const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
-            return await AuthServices.getActiveSession(unitOfWork);
+            return await AuthServicesInstance.getActiveSession(unitOfWork);
         });
 
         loginWindow = new BrowserWindow({
@@ -40,7 +40,7 @@ async function handleLogin(event, loginData) {
     loginWindow = undefined;
 
     await RunUnitOfWork.run(async (unitOfWork) => {
-        await AuthServices.login(unitOfWork, loginData);
+        await AuthServicesInstance.login(unitOfWork, loginData);
     });
 
     await SynchManager.execute();
@@ -50,8 +50,8 @@ async function handleLogin(event, loginData) {
 
 async function handleLogout(event) {
     await RunUnitOfWork.run(async (unitOfWork) => {
-        const activeSession = await AuthServices.getActiveSession(unitOfWork);
-        await AuthServices.logout(unitOfWork, activeSession);
+        const activeSession = await AuthServicesInstance.getActiveSession(unitOfWork);
+        await AuthServicesInstance.logout(unitOfWork, activeSession);
     });
     
     webContents.getFocusedWebContents().send('auth:logged_out');
@@ -59,7 +59,7 @@ async function handleLogout(event) {
 
 async function handleIsLoggedIn(event) {
     return await RunUnitOfWork.run(async (unitOfWork) => {
-        return await AuthServices.getActiveSession(unitOfWork);
+        return await AuthServicesInstance.getActiveSession(unitOfWork);
     }) != undefined;
 }
 

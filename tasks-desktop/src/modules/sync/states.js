@@ -2,7 +2,7 @@ const { EventBus, EventType, Event } = require("../../shared/event-bus");
 const { Logger } = require("../../shared/logging/logger");
 const { RunUnitOfWork } = require("../../shared/persistence/unitofwork");
 const { AccountServices } = require("../accounts/services");
-const { AuthServices } = require("../auth/services");
+const { AuthServicesInstance } = require("../auth/services");
 const { TasksRPC } = require("../tasks/rpc");
 const { TaskServices } = require("../tasks/services");
 const { TASK_SYNCH_STATUS } = require("../tasks_synch/data");
@@ -116,7 +116,7 @@ class UpdateTasksLocalState extends State {
     async next() {
         // FIXME: This State & StateAction should come from a provider
         return new DeleteTasksLocalState(
-            new DeleteTasksLocalStateEffect(AuthServices, TaskServices, TasksSyncServices, TasksRPC));
+            new DeleteTasksLocalStateEffect(AuthServicesInstance, TaskServices, TasksSyncServices, TasksRPC));
     }
 }
 
@@ -173,7 +173,7 @@ class CreateTasksLocalState extends State {
         // FIXME: This State & StateAction should come from a provider
         return new UpdateTasksLocalState(
             new UpdateTasksLocalStateEffect(
-                AuthServices
+                AuthServicesInstance
                 , TaskServices
                 , TasksSyncServices
                 , TasksRPC));
@@ -229,7 +229,7 @@ class DeleteTasksRemoteState extends State {
         // FIXME: This State & StateAction should come from a provider
         return new CreateTasksLocalState(
             new CreateTasksLocalStateEffect(
-                AuthServices
+                AuthServicesInstance
                 , TaskServices
                 , TasksSyncServices
                 , TasksRPC));
@@ -361,14 +361,14 @@ class StartSyncState extends State {
 
     async next() {
         return await RunUnitOfWork.run(async (unitOfWork) => {
-            const authSession = await AuthServices.getActiveSession(unitOfWork);
+            const authSession = await AuthServicesInstance.getActiveSession(unitOfWork);
 
             let result = undefined;
             if (authSession) {
                 // FIXME: This State & StateAction should come from a provider
                 result = new CreateTasksRemoteState(
                     new CreateTasksRemoteStateEffect(
-                        AuthServices
+                        AuthServicesInstance
                         , AccountServices
                         , TaskServices
                         , TasksSyncServices

@@ -9,7 +9,7 @@ const { OSMask } = require('./shared/os/os-mask');
 const { isDev } = require('./shared/utils/utils');
 const { SynchManager } = require('./modules/synch-manager');
 const { AuthHandlers } = require('./modules/auth/handler_auth');
-const { AuthServices } = require('./modules/auth/services');
+const { AuthServicesInstance } = require('./modules/auth/services');
 const { EventType } = require('./shared/event-bus');
 const { EventBus } = require('./shared/event-bus');
 const { EventSubscriber } = require('./shared/event-bus');
@@ -111,7 +111,7 @@ ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
 
 ipcMain.on('auth:open:login', async (event) => {
   const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
-    return await AuthServices.getActiveSession(unitOfWork);
+    return await AuthServicesInstance.getActiveSession(unitOfWork);
   });
   const authFile = 
             activeSession == undefined 
@@ -121,7 +121,7 @@ ipcMain.on('auth:open:login', async (event) => {
 });
 ipcMain.on('auth:login', async (event, loginData) => {
     await RunUnitOfWork.run(async (unitOfWork) => {
-        await AuthServices.login(unitOfWork, loginData);
+        await AuthServicesInstance.login(unitOfWork, loginData);
     });
 
     mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html'));
@@ -132,7 +132,7 @@ ipcMain.on('auth:login', async (event, loginData) => {
 
 ipcMain.on('auth:logout', async (event) => {
   const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
-    return await AuthServices.getActiveSession(unitOfWork);
+    return await AuthServicesInstance.getActiveSession(unitOfWork);
   }); 
   await TasksHandler.handleLogout(event, activeSession.accountId);
   await AuthHandlers.handleLogout(event); // This one has to be last, we need to know which account is logging out
