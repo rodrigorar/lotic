@@ -114,4 +114,4 @@ jobs:
             name: ${{ env.ARTIFACT_NAME_MACOS }}
             path: tasks-desktop/out/make/
             if-no-files-found: error
-            retention-days: 7
+            retention-days: 1
