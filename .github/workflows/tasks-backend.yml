@@ -112,4 +112,4 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}
           path: tasks-backend/dist/tasks_server-*.tar.gz
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 1
