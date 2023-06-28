@@ -2,6 +2,7 @@ const { v4 } = require("uuid");
 const { TaskServices } = require("../../../src/modules/tasks/services");
 const { Errors } = require("../../../src/shared/errors/errors");
 const { Task } = require("../../../src/modules/tasks/data");
+const { UnitOfWork } = require("../../../src/shared/persistence/unitofwork");
 
 describe("[Tasks]: Test Create Service", () => {
     
@@ -439,20 +440,50 @@ describe("[Tasks]: Test List Service", () => {
     });
 });
 
-// describe("[Tasks]: Test List Without Owner Service", () => {
+describe("[Tasks]: Test List Without Owner Service", () => {
     
-//     it("Should succeed listing tasks without owner", async () => {
-//         throw new Error("Should succeed listing tasks without owner is not implemented");
-//     });
+    it("Should succeed listing tasks without owner", async () => {
+        const unitOfWork = jest.fn();
+        const accountId = v4();
+        const dbResult = [
+            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+        ];
 
-//     it("Should fail, tasks repository error", async () => {
-//         throw new Error("Should fail, tasks repository error is not implemented");
-//     });
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.listTasksWithoutOwner = jest.fn((unitOfWork) => dbResult);
 
-//     it("Should fail, no unit of work provided", async () => {
-//         throw new Error("Should fail, no unit of work provided is not implemented");
-//     });
-// });
+        const underTest = new TaskServices(mockedTasksRepository);
+        const result = await underTest.listTasksWithoutOwner(unitOfWork);
+
+        expect(result).toBeDefined();
+        expect(result).toHaveLength(3);
+
+        expect(mockedTasksRepository.listTasksWithoutOwner.mock.calls).toHaveLength(1);
+    });
+
+    it("Should fail, tasks repository error", async () => {
+        const unitOfWork = jest.fn();
+
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.listTasksWithoutOwner = jest.fn((unitOfWork) => {
+            throw new Error();
+        });
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        expect(underTest.listTasksWithoutOwner(unitOfWork)).rejects.toThrow(Error);
+
+        expect(mockedTasksRepository.listTasksWithoutOwner.mock.calls).toHaveLength(1);
+    });
+
+    it("Should fail, no unit of work provided", async () => {
+        const mockedTasksRepository = jest.fn();
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        expect(underTest.listTasksWithoutOwner(undefined)).rejects.toThrow(Errors.NullArgumentError);
+    });
+});
 
 // describe("[Tasks]: Test List by Id Service", () => {
 //     it("Should succeed listing tasks by id", async () => {

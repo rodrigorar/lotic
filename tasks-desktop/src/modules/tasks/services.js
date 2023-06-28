@@ -73,7 +73,7 @@ class TaskServices {
     async listById(unitOfWork, taskIdList = []) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
 
-        return await this.tasksRepository.listById(unitOfWork, taskIdList);p
+        return await this.tasksRepository.listById(unitOfWork, taskIdList);
     }
 
     async deleteTask(unitOfWork, taskId) {
