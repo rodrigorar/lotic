@@ -76,6 +76,7 @@ class TaskServices {
         return await this.tasksRepository.listById(unitOfWork, taskIdList);
     }
 
+    // FIXME: Change the name to delete instead of deleteTask
     async deleteTask(unitOfWork, taskId) {
         Validators.isNotNull(unitOfWork, "No Unit of Work provided");
         Validators.isNotNull(taskId, "No task id provided");
@@ -95,6 +96,7 @@ class TaskServices {
         Validators.isNotNull(unitOfWork, "No Unit of Work provided");
         Validators.isNotNull(accountId, "No account id provided");
 
+        // TODO: This should use the standard Repository API and not a specific method
         this.tasksRepository.deleteAllForAccount(unitOfWork, accountId);
     }
 }

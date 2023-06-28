@@ -485,63 +485,171 @@ describe("[Tasks]: Test List Without Owner Service", () => {
     });
 });
 
-// describe("[Tasks]: Test List by Id Service", () => {
-//     it("Should succeed listing tasks by id", async () => {
-//         throw new Error("Should succeed listing tasks by id is not implemented");
-//     });
+describe("[Tasks]: Test List by Id Service", () => {
+    it("Should succeed listing tasks by id", async () => {
+        const unitOfWork = jest.fn();
+        const accountId = v4();
+        const dbResult = [
+            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+        ];
 
-//     it("Should fail, tasks repository error", async () => {
-//         throw new Error("Should fail, tasks repository error is not implemented");
-//     });
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.listById = jest.fn((unitOfWork, taskIds) => dbResult);
 
-//     it("Should fail, no unit of work provided", async () => {
-//         throw new Error("Should fail, no unit of work provided is not implemented");
-//     });
+        const underTest = new TaskServices(mockedTasksRepository);
+        const result = await underTest.listById(unitOfWork, dbResult.map(value => value.id));
 
-//     it("Should fail, not task id list provided", async () => {
-//         throw new Error("Should fail, not task id list provided is not implemented");
-//     });
-// });
+        expect(result).toBeDefined();
+        expect(result).toHaveLength(3);
 
-// describe("[Tasks]: Test Delete Service", () => {
-//     it("Should succeed deleting the task", async () => {
-//         throw new Error("Should succeed deleting the task is not implemented");
-//     });
+        expect(mockedTasksRepository.listById.mock.calls).toHaveLength(1);
+    });
 
-//     it("Should fail, tasks repository error", async () => {
-//         throw new Error("Should fail, tasks repository error is not implemented");
-//     });
+    it("Should succeed listing tasks by id no ids provided", async () => {
+        const unitOfWork = jest.fn();
+        const dbResult = [];
 
-//     it("Should fail, no unit of work provided", async () => {
-//         throw new Error("Should fail, no unit of work provided is not implemented");
-//     });
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.listById = jest.fn((unitOfWork, taskIds) => dbResult);
 
-//     it("Should fail, no task id is provided", async () => {
-//         throw new Error("Should fail, no task id is provided is not implemented");
-//     });
-// });
+        const underTest = new TaskServices(mockedTasksRepository);
+        const result = await underTest.listById(unitOfWork);
 
-// describe("[Tasks]: Test Delete Multiple Service", () => {
-//     it("Should succeed deleting multiple tasks", async () => {
-//         throw new Error("Should succeed deleting multiple tasks is not implemented");
-//     });
+        expect(result).toBeDefined();
+        expect(result).toHaveLength(0);
 
-//     it("Should succeed deleting a single task", async () => {
-//         throw new Error("Should succeed deleting a single task is not implemented");
-//     });
+        expect(mockedTasksRepository.listById.mock.calls).toHaveLength(1);
+    });
 
-//     it("Should succeed deleting no tasks", async () => {
-//         throw new Error("Should succeed deleting no tasks is not implemented");
-//     });
+    it("Should fail, tasks repository error", async () => {
+        const unitOfWork = jest.fn();
 
-//     it("Should fail, no unit of work provided", async () => {
-//         throw new Error("Should fail, no unit of work provided is not implemented");
-//     });
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.listById = jest.fn((unitOfWork, taskIds) => {
+            throw new Error();
+        });
 
-//     it("Should fail, no task ids provided", async () => {
-//         throw new Error("Should fail, no task ids provided is not implemented");
-//     });
-// });
+        const underTest = new TaskServices(mockedTasksRepository);
+        expect(underTest.listById(unitOfWork, [])).rejects.toThrow(Error);
+
+        expect(mockedTasksRepository.listById.mock.calls).toHaveLength(1);
+    });
+
+    it("Should fail, no unit of work provided", async () => {
+        const mockedTasksRepository = jest.fn();
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        expect(underTest.listById(undefined, [])).rejects.toThrow(Errors.NullArgumentError);
+    });
+});
+
+describe("[Tasks]: Test Delete Service", () => {
+    it("Should succeed deleting the task", async () => {
+        const unitOfWork = jest.fn();
+        const taskId = v4();
+
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.deleteTask = jest.fn((unitOfWork, taskId) => { /* Do nothing */ });
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        await underTest.deleteTask(unitOfWork, taskId);
+
+        expect(mockedTasksRepository.deleteTask.mock.calls).toHaveLength(1);
+    });
+
+    it("Should fail, tasks repository error", async () => {
+        const unitOfWork = jest.fn();
+        const taskId = v4();
+
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.deleteTask = jest.fn((unitOfWork, taskId) => { 
+            throw new Error();
+        });
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        expect(underTest.deleteTask(unitOfWork, taskId)).rejects.toThrow(Error);
+
+        expect(mockedTasksRepository.deleteTask.mock.calls).toHaveLength(1);
+    });
+
+    it("Should fail, no unit of work provided", async () => {
+        const taskId = v4();
+        const mockedTasksRepository = jest.fn();
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        expect(underTest.deleteTask(undefined, taskId)).rejects.toThrow(Errors.NullArgumentError);
+    });
+
+    it("Should fail, no task id is provided", async () => {
+        const unitOfWork = jest.fn();
+        const mockedTasksRepository = jest.fn();
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        expect(underTest.deleteTask(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
+    });
+});
+
+describe("[Tasks]: Test Delete Multiple Service", () => {
+    it("Should succeed deleting multiple tasks", async () => {
+        const unitOfWork = jest.fn();
+        const taskIds = [v4(), v4(), v4()];
+
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.deleteTask = jest.fn((unitOfWork, taskIds) => { /* Do nothing */ });
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        await underTest.deleteMultiple(unitOfWork, taskIds);
+
+        expect(mockedTasksRepository.deleteTask.mock.calls).toHaveLength(3);
+    });
+
+    it("Should succeed deleting a single task", async () => {
+        const unitOfWork = jest.fn();
+        const taskIds = [v4()];
+
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.deleteTask = jest.fn((unitOfWork, taskIds) => { /* Do nothing */ });
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        await underTest.deleteMultiple(unitOfWork, taskIds);
+
+        expect(mockedTasksRepository.deleteTask.mock.calls).toHaveLength(1);
+    });
+
+    it("Should succeed, no task ids provided", async () => {
+        const unitOfWork = jest.fn();
+        const taskIds = [];
+
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.deleteTask = jest.fn((unitOfWork, taskIds) => { /* Do nothing */ });
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        await underTest.deleteMultiple(unitOfWork, taskIds);
+
+        expect(mockedTasksRepository.deleteTask.mock.calls).toHaveLength(0);
+    });
+
+    it("Should succeed deleting no tasks", async () => {
+        const unitOfWork = jest.fn();
+
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.deleteTask = jest.fn((unitOfWork, taskIds) => { /* Do nothing */ });
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        await underTest.deleteMultiple(unitOfWork);
+
+        expect(mockedTasksRepository.deleteTask.mock.calls).toHaveLength(0);
+    });
+
+    it("Should fail, no unit of work provided", async () => {
+        const mockedTasksRepository = jest.fn();
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        expect(underTest.deleteMultiple(undefined)).rejects.toThrow(Errors.NullArgumentError);
+    });
+});
 
 // describe("[Tasks]: Test Delete All For Account Service", () => {
 //     it("Should succeed deleting all tasks for account", async () => {
