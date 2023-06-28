@@ -651,20 +651,48 @@ describe("[Tasks]: Test Delete Multiple Service", () => {
     });
 });
 
-// describe("[Tasks]: Test Delete All For Account Service", () => {
-//     it("Should succeed deleting all tasks for account", async () => {
-//         throw new Error("Should succeed deleting all tasks for account is not implemented");
-//     });
+describe("[Tasks]: Test Delete All For Account Service", () => {
+    it("Should succeed deleting all tasks for account", async () => {
+        const unitOfWork = jest.fn();
+        const accountId = v4();
+        
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.deleteAllForAccount = jest.fn((unitOfWork, accountId) => { /* Do Nothing */ });
 
-//     it("Should fail, tasks repository error", async () => {
-//         throw new Error("Should fail, Should fail, tasks repository error is not implemented");
-//     });
+        const underTest = new TaskServices(mockedTasksRepository);
+        await underTest.deleteAllForAccount(unitOfWork, accountId);
 
-//     it("Should fail, no unit of work provided", async () => {
-//         throw new Error("Should fail, no unit of work provided is not implemented");
-//     });
+        expect(mockedTasksRepository.deleteAllForAccount.mock.calls).toHaveLength(1);
+    });
 
-//     it("Should fail, no account id provided", async () => {
-//         throw new Error("Should fail, no account id provided is not implemented");
-//     });
-// });
+    it("Should fail, tasks repository error", async () => {
+        const unitOfWork = jest.fn();
+        const accountId = v4();
+        
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.deleteAllForAccount = jest.fn((unitOfWork, accountId) => { 
+            throw new Error();
+        });
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        expect(underTest.deleteAllForAccount(unitOfWork, accountId)).rejects.toThrow(Error);
+
+        expect(mockedTasksRepository.deleteAllForAccount.mock.calls).toHaveLength(1);
+    });
+
+    it("Should fail, no unit of work provided", async () => {
+        const accountId = v4();
+        const mockedTasksRepository = jest.fn();
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        expect(underTest.deleteAllForAccount(undefined, accountId)).rejects.toThrow(Errors.NullArgumentError);
+    });
+
+    it("Should fail, no account id provided", async () => {
+        const unitOfWork = jest.fn();
+        const mockedTasksRepository = jest.fn();
+
+        const underTest = new TaskServices(mockedTasksRepository);
+        expect(underTest.deleteAllForAccount(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
+    });
+});
