@@ -15,7 +15,7 @@ const { EventBus } = require('./shared/event-bus');
 const { EventSubscriber } = require('./shared/event-bus');
 const { v4 } = require("uuid");
 const { RunUnitOfWork } = require('./shared/persistence/unitofwork');
-const { TaskServices } = require('./modules/tasks/services');
+const { TaskServicesInstance } = require('./modules/tasks/services');
 
 app.setName('Tasks');
 
@@ -151,7 +151,7 @@ EventBus.registerForSeveralEventTypes(
   , new EventSubscriber(v4(), (event) => {
       setTimeout(async () => {
           const refreshedTasks = await RunUnitOfWork.run(async (unitOfWork) => {
-            return await TaskServices.list(unitOfWork, event.body.accountId);
+            return await TaskServicesInstance.list(unitOfWork, event.body.accountId);
           });
           mainWindow.webContents.send('tasks:refresh', refreshedTasks); 
         }

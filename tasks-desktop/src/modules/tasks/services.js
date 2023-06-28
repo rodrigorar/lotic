@@ -4,7 +4,7 @@ const { Validators } = require("../../shared/utils/utils");
 const { TasksRepository, Task } = require("./data");
 const { v4 } = require("uuid");
 
-class TasksServices {
+class TaskServices {
 
     constructor(tasksRepository) {
         this.tasksRepository = tasksRepository;
@@ -99,7 +99,8 @@ class TasksServices {
     }
 }
 
-module.exports.TaskServices = new TasksServices(new TasksRepository());
+module.exports.TaskServices = TaskServices;
+module.exports.TaskServicesInstance = new TaskServices(new TasksRepository());
 
 // Event Bus Subscribers
 
@@ -107,7 +108,7 @@ EventBus.register(
     EventType.LOGIN_SUCCESS
     , new EventSubscriber(v4(), async (event) => {
         const tasksRepository = new TasksRepository();
-        const tasksServices = new TasksServices(tasksRepository);
+        const tasksServices = new TaskServices(tasksRepository);
         RunUnitOfWork.run(async (unitOfWork) => {
             const tasksWithoutOwner = await tasksServices.listTasksWithoutOwner(unitOfWork);
             tasksWithoutOwner.forEach(async (task) => { 

@@ -4,7 +4,7 @@ const { RunUnitOfWork } = require("../../shared/persistence/unitofwork");
 const { AccountServices } = require("../accounts/services");
 const { AuthServicesInstance } = require("../auth/services");
 const { TasksRPC } = require("../tasks/rpc");
-const { TaskServices } = require("../tasks/services");
+const { TaskServicesInstance } = require("../tasks/services");
 const { TASK_SYNCH_STATUS } = require("../tasks_synch/data");
 const { TasksSyncServices } = require("../tasks_synch/services");
 const { State, StateEffect } = require("./shared");
@@ -116,7 +116,7 @@ class UpdateTasksLocalState extends State {
     async next() {
         // FIXME: This State & StateAction should come from a provider
         return new DeleteTasksLocalState(
-            new DeleteTasksLocalStateEffect(AuthServicesInstance, TaskServices, TasksSyncServices, TasksRPC));
+            new DeleteTasksLocalStateEffect(AuthServicesInstance, TaskServicesInstance, TasksSyncServices, TasksRPC));
     }
 }
 
@@ -174,7 +174,7 @@ class CreateTasksLocalState extends State {
         return new UpdateTasksLocalState(
             new UpdateTasksLocalStateEffect(
                 AuthServicesInstance
-                , TaskServices
+                , TaskServicesInstance
                 , TasksSyncServices
                 , TasksRPC));
     }
@@ -230,7 +230,7 @@ class DeleteTasksRemoteState extends State {
         return new CreateTasksLocalState(
             new CreateTasksLocalStateEffect(
                 AuthServicesInstance
-                , TaskServices
+                , TaskServicesInstance
                 , TasksSyncServices
                 , TasksRPC));
     }
@@ -283,7 +283,7 @@ class UpdateTasksRemoteState extends State {
     async next() {
         // FIXME: This State & StateAction should come from a provider
         return new DeleteTasksRemoteState(
-            new DeleteTasksRemoteStateEffect(TaskServices, TasksSyncServices, TasksRPC));
+            new DeleteTasksRemoteStateEffect(TaskServicesInstance, TasksSyncServices, TasksRPC));
     }
 }
 
@@ -347,7 +347,7 @@ class CreateTasksRemoteState extends State {
     async next() {
         // FIXME: This State & StateAction should come from a provider
         return new UpdateTasksRemoteState(
-            new UpdateTasksRemoteStateEffect(TaskServices, TasksSyncServices, TasksRPC));
+            new UpdateTasksRemoteStateEffect(TaskServicesInstance, TasksSyncServices, TasksRPC));
     }
 }
 
@@ -370,7 +370,7 @@ class StartSyncState extends State {
                     new CreateTasksRemoteStateEffect(
                         AuthServicesInstance
                         , AccountServices
-                        , TaskServices
+                        , TaskServicesInstance
                         , TasksSyncServices
                         , TasksRPC));
             } else {

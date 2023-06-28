@@ -1,4 +1,4 @@
-const { TaskServices } = require('./services');
+const { TaskServicesInstance } = require('./services');
 const { TasksSyncServices } = require('../tasks_synch/services');
 const { AuthServicesInstance } = require('../auth/services');
 const { RunUnitOfWork } = require('../../shared/persistence/unitofwork');
@@ -12,7 +12,7 @@ async function handleCreateTask(event, newTask) {
             newTask.ownerId = activeSession.accountId;
         }
 
-        TaskServices
+        TaskServicesInstance
             .create(unitOfWork, newTask)
             .then(() => {
                 TasksSyncServices.createSyncMonitor(
@@ -26,14 +26,14 @@ async function handleCreateTask(event, newTask) {
 async function handleUpdateTasks(event, taskId, data) {
 
     await RunUnitOfWork.run(async (unitOfWork) => {
-        await TaskServices.update(unitOfWork, data);
+        await TaskServicesInstance.update(unitOfWork, data);
         TasksSyncServices.markDirty(unitOfWork, taskId);
     });
 }
 
 async function handleCompletion(event, taskId) {
     await RunUnitOfWork.run(async (unitOfWork) => {
-        await TaskServices.deleteTask(unitOfWork, taskId);
+        await TaskServicesInstance.deleteTask(unitOfWork, taskId);
         TasksSyncServices.markForRemoval(unitOfWork, taskId);
     }) ;
 }
@@ -43,9 +43,9 @@ async function handleListTasks(event) {
         const activeSession = await AuthServicesInstance.getActiveSession(unitOfWork);
 
         if (activeSession != undefined) {
-            return await TaskServices.list(unitOfWork, activeSession.accountId);
+            return await TaskServicesInstance.list(unitOfWork, activeSession.accountId);
         } else {
-            return await TaskServices.listTasksWithoutOwner(unitOfWork);
+            return await TaskServicesInstance.listTasksWithoutOwner(unitOfWork);
         }
     });
 }
@@ -53,7 +53,7 @@ async function handleListTasks(event) {
 async function handleLogout(event, accountId) {
     await RunUnitOfWork.run(async (unitOfWork) => {
         await TasksSyncServices.deleteAllForAccount(unitOfWork, accountId);
-        await TaskServices.deleteAllForAccount(unitOfWork, accountId);
+        await TaskServicesInstance.deleteAllForAccount(unitOfWork, accountId);
     });
 }
 
