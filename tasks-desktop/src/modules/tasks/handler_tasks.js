@@ -1,5 +1,5 @@
 const { TaskServicesInstance } = require('./services');
-const { TasksSyncServices } = require('../tasks_synch/services');
+const { TasksSyncServicesInstance } = require('../tasks_synch/services');
 const { AuthServicesInstance } = require('../auth/services');
 const { RunUnitOfWork } = require('../../shared/persistence/unitofwork');
 const { TASK_SYNCH_STATUS } = require('../tasks_synch/data');
@@ -15,7 +15,7 @@ async function handleCreateTask(event, newTask) {
         TaskServicesInstance
             .create(unitOfWork, newTask)
             .then(() => {
-                TasksSyncServices.createSyncMonitor(
+                TasksSyncServicesInstance.createSyncMonitor(
                     unitOfWork
                     , newTask.id
                     , TASK_SYNCH_STATUS["LOCAL"]);
@@ -27,14 +27,14 @@ async function handleUpdateTasks(event, taskId, data) {
 
     await RunUnitOfWork.run(async (unitOfWork) => {
         await TaskServicesInstance.update(unitOfWork, data);
-        TasksSyncServices.markDirty(unitOfWork, taskId);
+        TasksSyncServicesInstance.markDirty(unitOfWork, taskId);
     });
 }
 
 async function handleCompletion(event, taskId) {
     await RunUnitOfWork.run(async (unitOfWork) => {
         await TaskServicesInstance.deleteTask(unitOfWork, taskId);
-        TasksSyncServices.markForRemoval(unitOfWork, taskId);
+        TasksSyncServicesInstance.markForRemoval(unitOfWork, taskId);
     }) ;
 }
 
@@ -52,7 +52,7 @@ async function handleListTasks(event) {
 
 async function handleLogout(event, accountId) {
     await RunUnitOfWork.run(async (unitOfWork) => {
-        await TasksSyncServices.deleteAllForAccount(unitOfWork, accountId);
+        await TasksSyncServicesInstance.deleteAllForAccount(unitOfWork, accountId);
         await TaskServicesInstance.deleteAllForAccount(unitOfWork, accountId);
     });
 }

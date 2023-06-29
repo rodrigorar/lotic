@@ -89,4 +89,5 @@ class TasksSyncServices {
     }
 }
 
-module.exports.TasksSyncServices = new TasksSyncServices(new TasksSyncRepository());
+module.exports.TasksSyncServices = TasksSyncServices;
+module.exports.TasksSyncServicesInstance = new TasksSyncServices(new TasksSyncRepository());
