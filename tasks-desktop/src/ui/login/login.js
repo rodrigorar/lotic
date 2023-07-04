@@ -2,6 +2,7 @@
 const emailInput = document.querySelector("#email-input");
 const passwordInput = document.querySelector("#password-input");
 const loginButton = document.querySelector("#submit-button");
+const termsAndConditions = document.querySelector("#terms-conditions");
 
 emailInput.focus();
 
@@ -23,4 +24,8 @@ window.addEventListener('keypress', (key) => {
             , password: passwordInput.value
         });
     }
+});
+
+termsAndConditions.addEventListener('click', async _ => {
+    logger.info("About Was pressed (Not Implemented)");
 });
