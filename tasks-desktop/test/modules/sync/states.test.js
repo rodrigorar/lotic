@@ -1,4 +1,8 @@
-const { StartSyncState, CreateTasksRemoteState, SyncDoneState } = require("../../../src/modules/sync/states");
+const { v4 } = require("uuid");
+const { AuthToken } = require("../../../src/modules/auth/data");
+const { StartSyncState, CreateTasksRemoteState, SyncDoneState, CreateTasksLocalStateEffect, CreateTasksRemoteStateEffect } = require("../../../src/modules/sync/states");
+const { TaskSynch, TASK_SYNCH_STATUS } = require("../../../src/modules/tasks_synch/data");
+const { Task } = require("../../../src/modules/tasks/data");
 
 describe("[Sync]: Test Sync State", () => {
     
@@ -62,27 +66,273 @@ describe("[Sync]: Test Sync State", () => {
 describe("[Sync]: Test Create Tasks Remote State Effect", () => {
     
     it("Should succeed create tasks remotelly", async () => {
-        throw new Error("Should succeed create tasks remotelly is not implemented");
+        const accessToken = v4();
+        const refreshToken = v4();
+        const accountId = v4();
+        const unsyncedTasks = [
+            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+        ];
+        const unsyncedTaskSyncs = [
+            new TaskSynch(v4(), unsyncedTasks[0].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[1].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[2].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+        ];
+
+        const mockedUnitOfWork = jest.fn();
+        const mockedUnitOfWorkProvider = jest.fn();
+        mockedUnitOfWorkProvider.run = jest.fn((work) => work(mockedUnitOfWork));
+        const mockedAuthServices = jest.fn();
+        mockedAuthServices.getActiveSession = jest.fn((unitOfWork) => new AuthToken(accessToken, refreshToken, accountId, new Date()));
+        const mockedAccountServices = jest.fn();
+        const mockedTaskServices = jest.fn();
+        mockedTaskServices.listById = jest.fn((unitOfWork, taskIds) => {
+            expect(taskIds).toHaveLength(3);
+            return unsyncedTasks;
+        });
+        const mockedTaskSyncServices = jest.fn();
+        mockedTaskSyncServices.getNonSynced = jest.fn((unitOfWork) => unsyncedTaskSyncs);
+        mockedTaskSyncServices.markSynced = jest.fn((unitOfWork, taskIds) => {
+            expect(taskIds).toHaveLength(3);
+        });
+        const mockedTasksRPC = jest.fn();
+        mockedTasksRPC.createTasks = jest.fn((unitOfWork, request) => ({
+            status: 200
+            , ids: unsyncedTasks.map(task => task.id)
+        }));
+
+        const underTest = new CreateTasksRemoteStateEffect(
+            mockedUnitOfWorkProvider
+            , mockedAuthServices
+            , mockedAccountServices
+            , mockedTaskServices
+            , mockedTaskSyncServices
+            , mockedTasksRPC);
+        await underTest.execute();
+
+        expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
+        expect(mockedAuthServices.getActiveSession.mock.calls).toHaveLength(1);
+        expect(mockedTaskServices.listById.mock.calls).toHaveLength(1);
+        expect(mockedTaskSyncServices.getNonSynced.mock.calls).toHaveLength(1);
+        expect(mockedTaskSyncServices.markSynced.mock.calls).toHaveLength(1);
+        expect(mockedTasksRPC.createTasks.mock.calls).toHaveLength(1);
     });
 
     it("Should succeed no tasks to create remotely", async () => {
-        throw new Error("Should succeed no tasks to create remotely is not implemented");
+        const accessToken = v4();
+        const refreshToken = v4();
+        const accountId = v4();
+        const unsyncedTasks = [];
+        const unsyncedTaskSyncs = [];
+
+        const mockedUnitOfWork = jest.fn();
+        const mockedUnitOfWorkProvider = jest.fn();
+        mockedUnitOfWorkProvider.run = jest.fn((work) => work(mockedUnitOfWork));
+        const mockedAuthServices = jest.fn();
+        mockedAuthServices.getActiveSession = jest.fn((unitOfWork) => new AuthToken(accessToken, refreshToken, accountId, new Date()));
+        const mockedAccountServices = jest.fn();
+        const mockedTaskServices = jest.fn();
+        const mockedTaskSyncServices = jest.fn();
+        mockedTaskSyncServices.getNonSynced = jest.fn((unitOfWork) => unsyncedTaskSyncs);
+        const mockedTasksRPC = jest.fn();
+
+        const underTest = new CreateTasksRemoteStateEffect(
+            mockedUnitOfWorkProvider
+            , mockedAuthServices
+            , mockedAccountServices
+            , mockedTaskServices
+            , mockedTaskSyncServices
+            , mockedTasksRPC);
+        await underTest.execute();
+
+        expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
+        expect(mockedAuthServices.getActiveSession.mock.calls).toHaveLength(1);
+        expect(mockedTaskSyncServices.getNonSynced.mock.calls).toHaveLength(1);
     });
 
     it("Should succeed remote error 409", async () => {
-        throw new Error("Should succeed remote error 409 is not implemented");
+        const accessToken = v4();
+        const refreshToken = v4();
+        const accountId = v4();
+        const unsyncedTasks = [
+            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+        ];
+        const unsyncedTaskSyncs = [
+            new TaskSynch(v4(), unsyncedTasks[0].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[1].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[2].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+        ];
+
+        const mockedUnitOfWork = jest.fn();
+        const mockedUnitOfWorkProvider = jest.fn();
+        mockedUnitOfWorkProvider.run = jest.fn((work) => work(mockedUnitOfWork));
+        const mockedAuthServices = jest.fn();
+        mockedAuthServices.getActiveSession = jest.fn((unitOfWork) => new AuthToken(accessToken, refreshToken, accountId, new Date()));
+        const mockedAccountServices = jest.fn();
+        const mockedTaskServices = jest.fn();
+        mockedTaskServices.listById = jest.fn((unitOfWork, taskIds) => {
+            expect(taskIds).toHaveLength(3);
+            return unsyncedTasks;
+        });
+        const mockedTaskSyncServices = jest.fn();
+        mockedTaskSyncServices.getNonSynced = jest.fn((unitOfWork) => unsyncedTaskSyncs);
+        mockedTaskSyncServices.markSynced = jest.fn((unitOfWork, taskIds) => {
+            expect(taskIds).toHaveLength(3);
+        });
+        const mockedTasksRPC = jest.fn();
+        mockedTasksRPC.createTasks = jest.fn((unitOfWork, request) => ({
+            status: 409
+            , ids: unsyncedTasks.map(task => task.id)
+        }));
+
+        const underTest = new CreateTasksRemoteStateEffect(
+            mockedUnitOfWorkProvider
+            , mockedAuthServices
+            , mockedAccountServices
+            , mockedTaskServices
+            , mockedTaskSyncServices
+            , mockedTasksRPC);
+        await underTest.execute();
+
+        expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
+        expect(mockedAuthServices.getActiveSession.mock.calls).toHaveLength(1);
+        expect(mockedTaskServices.listById.mock.calls).toHaveLength(1);
+        expect(mockedTaskSyncServices.getNonSynced.mock.calls).toHaveLength(1);
+        expect(mockedTaskSyncServices.markSynced.mock.calls).toHaveLength(1);
+        expect(mockedTasksRPC.createTasks.mock.calls).toHaveLength(1);
     });
 
     it("Should fail, tasks sync services get non synced error", async () => {
-        throw new Error("Should fail, tasks sync services error is not implemented");
+        const accessToken = v4();
+        const refreshToken = v4();
+        const accountId = v4();
+
+        const mockedUnitOfWork = jest.fn();
+        const mockedUnitOfWorkProvider = jest.fn();
+        mockedUnitOfWorkProvider.run = jest.fn((work) => work(mockedUnitOfWork));
+        const mockedAuthServices = jest.fn();
+        mockedAuthServices.getActiveSession = jest.fn((unitOfWork) => new AuthToken(accessToken, refreshToken, accountId, new Date()));
+        const mockedAccountServices = jest.fn();
+        const mockedTaskServices = jest.fn();
+        const mockedTaskSyncServices = jest.fn();
+        mockedTaskSyncServices.getNonSynced = jest.fn((unitOfWork) => {
+            throw new Error();
+        });
+        const mockedTasksRPC = jest.fn();
+
+        const underTest = new CreateTasksRemoteStateEffect(
+            mockedUnitOfWorkProvider
+            , mockedAuthServices
+            , mockedAccountServices
+            , mockedTaskServices
+            , mockedTaskSyncServices
+            , mockedTasksRPC);
+        expect(underTest.execute()).rejects.toThrow(Error);
+
+        expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
+        expect(mockedAuthServices.getActiveSession.mock.calls).toHaveLength(1);
     });
 
     it("Should fail, tasks sync services mark synced error", async () => {
-        throw new Error("Should fail, tasks sync services mark synced error is not implemented");
+        const accessToken = v4();
+        const refreshToken = v4();
+        const accountId = v4();
+        const unsyncedTasks = [
+            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+        ];
+        const unsyncedTaskSyncs = [
+            new TaskSynch(v4(), unsyncedTasks[0].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[1].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[2].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+        ];
+
+        const mockedUnitOfWork = jest.fn();
+        const mockedUnitOfWorkProvider = jest.fn();
+        mockedUnitOfWorkProvider.run = jest.fn((work) => work(mockedUnitOfWork));
+        const mockedAuthServices = jest.fn();
+        mockedAuthServices.getActiveSession = jest.fn((unitOfWork) => new AuthToken(accessToken, refreshToken, accountId, new Date()));
+        const mockedAccountServices = jest.fn();
+        const mockedTaskServices = jest.fn();
+        mockedTaskServices.listById = jest.fn((unitOfWork, taskIds) => {
+            expect(taskIds).toHaveLength(3);
+            return unsyncedTasks;
+        });
+        const mockedTaskSyncServices = jest.fn();
+        mockedTaskSyncServices.getNonSynced = jest.fn((unitOfWork) => unsyncedTaskSyncs);
+        mockedTaskSyncServices.markSynced = jest.fn((unitOfWork, taskIds) => {
+            throw new Error();
+        });
+        const mockedTasksRPC = jest.fn();
+        mockedTasksRPC.createTasks = jest.fn((unitOfWork, request) => ({
+            status: 200
+            , ids: unsyncedTasks.map(task => task.id)
+        }));
+
+        const underTest = new CreateTasksRemoteStateEffect(
+            mockedUnitOfWorkProvider
+            , mockedAuthServices
+            , mockedAccountServices
+            , mockedTaskServices
+            , mockedTaskSyncServices
+            , mockedTasksRPC);
+        expect(underTest.execute()).rejects.toThrow(Error);
+
+        expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
+        expect(mockedAuthServices.getActiveSession.mock.calls).toHaveLength(1);
     });
 
     it("Should fail, remote call error", async () => {
-        throw new Error("Should fail, remote call error is not implemented");
+        const accessToken = v4();
+        const refreshToken = v4();
+        const accountId = v4();
+        const unsyncedTasks = [
+            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+        ];
+        const unsyncedTaskSyncs = [
+            new TaskSynch(v4(), unsyncedTasks[0].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[1].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[2].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+        ];
+
+        const mockedUnitOfWork = jest.fn();
+        const mockedUnitOfWorkProvider = jest.fn();
+        mockedUnitOfWorkProvider.run = jest.fn((work) => work(mockedUnitOfWork));
+        const mockedAuthServices = jest.fn();
+        mockedAuthServices.getActiveSession = jest.fn((unitOfWork) => new AuthToken(accessToken, refreshToken, accountId, new Date()));
+        const mockedAccountServices = jest.fn();
+        const mockedTaskServices = jest.fn();
+        mockedTaskServices.listById = jest.fn((unitOfWork, taskIds) => {
+            expect(taskIds).toHaveLength(3);
+            return unsyncedTasks;
+        });
+        const mockedTaskSyncServices = jest.fn();
+        mockedTaskSyncServices.getNonSynced = jest.fn((unitOfWork) => unsyncedTaskSyncs);
+        mockedTaskSyncServices.markSynced = jest.fn((unitOfWork, taskIds) => {
+            expect(taskIds).toHaveLength(3);
+        });
+        const mockedTasksRPC = jest.fn();
+        mockedTasksRPC.createTasks = jest.fn((unitOfWork, request) => {
+            throw new Error();
+        });
+
+        const underTest = new CreateTasksRemoteStateEffect(
+            mockedUnitOfWorkProvider
+            , mockedAuthServices
+            , mockedAccountServices
+            , mockedTaskServices
+            , mockedTaskSyncServices
+            , mockedTasksRPC);
+        expect(underTest.execute()).rejects.toThrow();
+
+        expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
+        expect(mockedAuthServices.getActiveSession.mock.calls).toHaveLength(1);
     });
 });
 

@@ -349,13 +349,13 @@ class CreateTasksRemoteStateEffect extends StateEffect {
                 const locallyCreatedTasks = await this.taskServices.listById(unitOfWork, locallyCreatedTaskSyncs.map(task_sync => task_sync.taskId));
                 const tasksRequest = locallyCreatedTasks
                     .map(task => ({
-                        task_id: task.id
-                        , title: task.title
-                        , description: task.description ? task.description : ""
-                        , created_at: task.createdAt.toISOString()
-                        , updated_at: task.updatedAt.toISOString()
-                        , owner_id: authToken.accountId
-                    }));
+                            task_id: task.id
+                            , title: task.title
+                            , description: task.description ? task.description : ""
+                            , created_at: task.createdAt.toISOString()
+                            , updated_at: task.updatedAt.toISOString()
+                            , owner_id: authToken.accountId
+                        }));
 
                 const result = await this.tasksRPC.createTasks(unitOfWork, tasksRequest);
                 if (result != undefined && 'ids' in result && result.ids.length == tasksRequest.length) {
