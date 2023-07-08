@@ -1,6 +1,6 @@
 const { v4 } = require("uuid");
 const { AuthToken } = require("../../../src/modules/auth/data");
-const { StartSyncState, CreateTasksRemoteState, SyncDoneState, CreateTasksLocalStateEffect, CreateTasksRemoteStateEffect } = require("../../../src/modules/sync/states");
+const { StartSyncState, CreateTasksRemoteState, SyncDoneState, CreateTasksLocalStateEffect, CreateTasksRemoteStateEffect, UpdateTasksRemoteStateEffect } = require("../../../src/modules/sync/states");
 const { TaskSynch, TASK_SYNCH_STATUS } = require("../../../src/modules/tasks_synch/data");
 const { Task } = require("../../../src/modules/tasks/data");
 
@@ -339,27 +339,185 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
 describe("[Sync]: Test Update Tasks Remote State Effect", () => {
     
     it("Should succeed update tasks remotelly", async () => {
-        throw new Error("Should succeed update tasks remotelly is not implemented");
+        const accountId = v4();
+        const unsyncedTasks = [
+            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+        ];
+        const unsyncedTaskSync = [
+            new TaskSynch(v4(), unsyncedTasks[0].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[1].id, TASK_SYNCH_STATUS["DIRTY"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[2].id, TASK_SYNCH_STATUS["DIRTY"], new Date(), new Date())
+        ];
+
+        const mockedUnitOfWork = jest.fn();
+        const mockedUnitOfWorkProvider = jest.fn();
+        mockedUnitOfWorkProvider.run = jest.fn((work) => work(mockedUnitOfWork));
+        const mockedTaskServices = jest.fn();
+        mockedTaskServices.listById = jest.fn((unitOfWork, taskIds) => unsyncedTasks);
+        const mockedTaskSyncServices = jest.fn();
+        mockedTaskSyncServices.getNonSynced = jest.fn((unitOfWork) => unsyncedTaskSync);
+        mockedTaskSyncServices.markSynced = jest.fn((unitOfWork, taskIds) => { /* Do Nothing */ })
+        const mockedTasksRPC = jest.fn();
+        mockedTasksRPC.updateTasks = jest.fn((unitOfWork, request) => ({ status: 200 }));
+
+        const underTest = new UpdateTasksRemoteStateEffect(
+            mockedUnitOfWorkProvider
+            , mockedTaskServices
+            , mockedTaskSyncServices
+            , mockedTasksRPC);
+        await underTest.execute();
+
+        expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
+        expect(mockedTaskSyncServices.getNonSynced.mock.calls).toHaveLength(1);
+        expect(mockedTaskServices.listById.mock.calls).toHaveLength(1);
+        expect(mockedTasksRPC.updateTasks.mock.calls).toHaveLength(1);
     });
 
     it("Should succeed no tasks to update remotelly", async () => {
-        throw new Error("Should succeed no tasks to update remotelly is not implemented");
+        const unsyncedTaskSync = [];
+
+        const mockedUnitOfWork = jest.fn();
+        const mockedUnitOfWorkProvider = jest.fn();
+        mockedUnitOfWorkProvider.run = jest.fn((work) => work(mockedUnitOfWork));
+        const mockedTaskServices = jest.fn();
+        const mockedTaskSyncServices = jest.fn();
+        mockedTaskSyncServices.getNonSynced = jest.fn((unitOfWork) => unsyncedTaskSync);
+        mockedTaskSyncServices.markSynced = jest.fn((unitOfWork, taskIds) => { /* Do Nothing */ });
+        const mockedTasksRPC = jest.fn();
+
+        const underTest = new UpdateTasksRemoteStateEffect(
+            mockedUnitOfWorkProvider
+            , mockedTaskServices
+            , mockedTaskSyncServices
+            , mockedTasksRPC);
+        await underTest.execute();
+
+        expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
+        expect(mockedTaskSyncServices.getNonSynced.mock.calls).toHaveLength(1);
     });
 
     it("Should fail, get non synced tasks error", async () => {
-        throw new Error("Should fail, get non synced tasks error is not implemented");
+        const mockedUnitOfWork = jest.fn();
+        const mockedUnitOfWorkProvider = jest.fn();
+        mockedUnitOfWorkProvider.run = jest.fn((work) => work(mockedUnitOfWork));
+        const mockedTaskServices = jest.fn();
+        const mockedTaskSyncServices = jest.fn();
+        mockedTaskSyncServices.getNonSynced = jest.fn((unitOfWork) => { throw new Error(); });
+        const mockedTasksRPC = jest.fn();
+
+        const underTest = new UpdateTasksRemoteStateEffect(
+            mockedUnitOfWorkProvider
+            , mockedTaskServices
+            , mockedTaskSyncServices
+            , mockedTasksRPC);
+        expect(underTest.execute()).rejects.toThrow(Error);
+
+        expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
+        expect(mockedTaskSyncServices.getNonSynced.mock.calls).toHaveLength(1);
     });
 
     it("Should fail, list by id error", async () => {
-        throw new Error("Should fail, list by id error is not implemented");
+        const accountId = v4();
+        const unsyncedTasks = [
+            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+        ];
+        const unsyncedTaskSync = [
+            new TaskSynch(v4(), unsyncedTasks[0].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[1].id, TASK_SYNCH_STATUS["DIRTY"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[2].id, TASK_SYNCH_STATUS["DIRTY"], new Date(), new Date())
+        ];
+
+        const mockedUnitOfWork = jest.fn();
+        const mockedUnitOfWorkProvider = jest.fn();
+        mockedUnitOfWorkProvider.run = jest.fn((work) => work(mockedUnitOfWork));
+        const mockedTaskServices = jest.fn();
+        mockedTaskServices.listById = jest.fn((unitOfWork, taskIds) => { throw new Error(); });
+        const mockedTaskSyncServices = jest.fn();
+        mockedTaskSyncServices.getNonSynced = jest.fn((unitOfWork) => unsyncedTaskSync);
+        const mockedTasksRPC = jest.fn();
+
+        const underTest = new UpdateTasksRemoteStateEffect(
+            mockedUnitOfWorkProvider
+            , mockedTaskServices
+            , mockedTaskSyncServices
+            , mockedTasksRPC);
+        expect(underTest.execute()).rejects.toThrow(Error);
+
+        expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
+        expect(mockedTaskSyncServices.getNonSynced.mock.calls).toHaveLength(1);
     });
 
     it("Should fail, remote call error", async () => {
-        throw new Error("Should fail, remote call error is not implemented");
+        const accountId = v4();
+        const unsyncedTasks = [
+            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+        ];
+        const unsyncedTaskSync = [
+            new TaskSynch(v4(), unsyncedTasks[0].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[1].id, TASK_SYNCH_STATUS["DIRTY"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[2].id, TASK_SYNCH_STATUS["DIRTY"], new Date(), new Date())
+        ];
+
+        const mockedUnitOfWork = jest.fn();
+        const mockedUnitOfWorkProvider = jest.fn();
+        mockedUnitOfWorkProvider.run = jest.fn((work) => work(mockedUnitOfWork));
+        const mockedTaskServices = jest.fn();
+        mockedTaskServices.listById = jest.fn((unitOfWork, taskIds) => unsyncedTasks);
+        const mockedTaskSyncServices = jest.fn();
+        mockedTaskSyncServices.getNonSynced = jest.fn((unitOfWork) => unsyncedTaskSync);
+        const mockedTasksRPC = jest.fn();
+        mockedTasksRPC.updateTasks = jest.fn((unitOfWork, request) => { throw new Error(); })
+
+        const underTest = new UpdateTasksRemoteStateEffect(
+            mockedUnitOfWorkProvider
+            , mockedTaskServices
+            , mockedTaskSyncServices
+            , mockedTasksRPC);
+        expect(underTest.execute()).rejects.toThrow(Error);
+
+        expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
+        expect(mockedTaskSyncServices.getNonSynced.mock.calls).toHaveLength(1);
     });
 
     it("Should fail, mark synced error", async () => {
-        throw new Error("Should fail, mark synced error is not implemented");
+        const accountId = v4();
+        const unsyncedTasks = [
+            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+        ];
+        const unsyncedTaskSync = [
+            new TaskSynch(v4(), unsyncedTasks[0].id, TASK_SYNCH_STATUS["LOCAL"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[1].id, TASK_SYNCH_STATUS["DIRTY"], new Date(), new Date())
+            , new TaskSynch(v4(), unsyncedTasks[2].id, TASK_SYNCH_STATUS["DIRTY"], new Date(), new Date())
+        ];
+
+        const mockedUnitOfWork = jest.fn();
+        const mockedUnitOfWorkProvider = jest.fn();
+        mockedUnitOfWorkProvider.run = jest.fn((work) => work(mockedUnitOfWork));
+        const mockedTaskServices = jest.fn();
+        mockedTaskServices.listById = jest.fn((unitOfWork, taskIds) => unsyncedTasks);
+        const mockedTaskSyncServices = jest.fn();
+        mockedTaskSyncServices.getNonSynced = jest.fn((unitOfWork) => unsyncedTaskSync);
+        mockedTaskSyncServices.markSynced = jest.fn((unitOfWork, taskIds) => { throw new Error(); })
+        const mockedTasksRPC = jest.fn();
+        mockedTasksRPC.updateTasks = jest.fn((unitOfWork, request) => ({ status: 200 }));
+
+        const underTest = new UpdateTasksRemoteStateEffect(
+            mockedUnitOfWorkProvider
+            , mockedTaskServices
+            , mockedTaskSyncServices
+            , mockedTasksRPC);
+        expect(underTest.execute()).rejects.toThrow(Error);
+
+        expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
+        expect(mockedTaskSyncServices.getNonSynced.mock.calls).toHaveLength(1);
     });
 });
 
@@ -473,4 +631,8 @@ describe("[Sync]: Test Delete Tasks Local State Effect", () => {
     it("Should fail, delete multiple tasks sync error", async () => {
         throw new Error("Should fail, delete multiple tasks sync error is not implemented");
     });
+});
+
+describe("[Sync]: Test State Machine Transitions", () => {
+    // TODO: Not implemented
 });
