@@ -7,35 +7,30 @@
     <script defer src="./home.js"></script>
   </head>
   <body>
-    <div class="main-body">
-      <div class="top-header">
-        <div class="top-header-left">
-          <!-- Do nothing for now -->
+    <div class="cln-1">
+      <div class="row-1">
+        <div class="h-spacer-70">
         </div>
-        <div id="auth-button-container" class="top-header-right">
-          <!--<button id="login-button" class="login-button general-button">Login</button>-->
+        <div id="header-right" class="top-header-right">
         </div>
       </div>
       <div class="top-container">
-        <h1 class="title app-font">Upcoming</h1>
+        <div class="margin-h-5">
+          <h1 class="left font-hd-2">Upcoming</h1>
+        </div>
+        <div>
+          <hr class="separator">
+        </div>
       </div>
+      <div class="v-spacer-10"></div>
       <div id="loader"></div>
-      <div id="tasks-container" class="container">
-        <!-- Task Entry Div Structure
-          <div id="task-1">
-            <span><textfield id="task-1-textfield>Task # 1</textfield></span>
-            <input id='task-1-completed' class="task-checkbox" type="checkbox">
-            <hr class="separator">
-          </div>
-        -->
+      <div id="tasks-container" class="cln-1">
       </div>
-        <!--<div class="bottom-container">-->
-          <div class="button-container">
-            <button id="add-task-button" class="add-task-button general-button app-font">
-              <img class= "simple-icon" src="../assets/plus_icon.png"/>
-            </button>
-          </div>
-        <!--</div>-->
+        <div class="overlayed-footer">
+          <button id="add-task-button" class="btn-round">
+            <div class="plus"></div>
+          </button>
+        </div>
     </div>
   </body>
 </html>

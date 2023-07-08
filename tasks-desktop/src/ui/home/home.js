@@ -11,6 +11,7 @@ const addTaskButton = document.querySelector("#add-task-button");
 function createTaskDOM(id, title = undefined) {
     const containerDiv = document.createElement('div');
     containerDiv.id = 'container:' + id; // container:task-id
+    containerDiv.classList.add("box");
 
     const text = document.createElement('input');
     text.classList.add('transparent-text-input');
@@ -32,7 +33,7 @@ function createTaskDOM(id, title = undefined) {
     
 
     const separator = document.createElement('hr');
-    separator.classList.add("separator");
+    separator.classList.add("input-marker");
 
     containerDiv.appendChild(span);
     containerDiv.appendChild(completionInput);
@@ -41,39 +42,69 @@ function createTaskDOM(id, title = undefined) {
     return containerDiv;
 }
 
-function createLogoutButtonDOM() {
-    const logoutButton = document.createElement('button');
-    
-    logoutButton.id = 'logout-button';
-    logoutButton.classList.add('login-button');
-    logoutButton.classList.add('general-button');
-    logoutButton.innerText = 'Logout';
-    
-    logoutButton.addEventListener('click', () => {
-        auth.logout();
+async function createMainMenu() {
+    const dropdown = document.createElement("div");
+    dropdown.classList.add("dropdown");
+
+    const dropdownButton = document.createElement("button");
+    dropdownButton.id = "main-menu"
+    dropdownButton.classList.add("btn-dropdown");
+    dropdownButton.classList.add("font-hd-2");
+    dropdownButton.classList.add("right");
+    dropdownButton.innerText = "...";
+    dropdown.appendChild(dropdownButton);
+
+    const dropdownContent = document.createElement("div");
+    dropdownContent.id = "main-menu-content";
+    dropdownContent.classList.add("dropdown-content");
+    dropdown.appendChild(dropdownContent);
+
+    const aboutOption = document.createElement("a");
+    aboutOption.innerText = "About";
+    aboutOption.href = "#";
+    aboutOption.addEventListener("click", async (event) => {
+        logger.info("About Option has been pressed. / Not implemented");
     });
+    dropdownContent.appendChild(aboutOption);
 
-    const authButtonContainer = document.querySelector('#auth-button-container');
-    authButtonContainer.appendChild(logoutButton);
+    const isLoggedIn = await auth.isLoggedIn();
+    logger.info(isLoggedIn);
+    if (isLoggedIn) {
+        const logoutOption = document.createElement("a");
+        logoutOption.href = "#";
+        logoutOption.innerText = "Logout";
+        logoutOption.addEventListener("click", async (event) => {
+            auth.logout();
+        });
+        dropdownContent.appendChild(logoutOption);
+    } else {
+        const signInOption = document.createElement("a");
+        signInOption.href = "#";
+        signInOption.innerText = "Sign In";
+        signInOption.addEventListener("click", async (event) => {
+            auth.openLogin();
+        });
+        dropdownContent.appendChild(signInOption);
 
-    return logoutButton;
+        const signUpOption = document.createElement("a");
+        signUpOption.href = "#";
+        signUpOption.innerText = "Sign Up";
+        signUpOption.addEventListener("click", async (event) => {
+            logger.info("Sign Up has been pressed / Not Implemented");
+        });
+        dropdownContent.appendChild(signUpOption);
+    }
+
+    const headerRight = document.querySelector('#header-right');
+    headerRight.appendChild(dropdown);
 }
 
-function createLoginButtonDOM() {
-    const loginButton = document.createElement('button');
-
-    loginButton.id = 'login-button';
-    loginButton.classList.add('login-button');
-    loginButton.classList.add('general-button');
-    loginButton.innerText = 'Login';
-    
-    loginButton.addEventListener('click', async () => {
-        auth.openLogin();
-    });
-
-    const authButtonContainer = document.querySelector('#auth-button-container');
-    authButtonContainer.appendChild(loginButton);
-
+async function refreshMainMenu() {
+    const headerRight = document.querySelector('#header-right');
+    if (headerRight.children.length > 0) {
+        headerRight.innerHTML = "";
+    }
+    createMainMenu();
 }
 
 let emptyTask = undefined;
@@ -102,17 +133,8 @@ function setInitialFocus() {
     }
 }
 
-async function initLoginUI() {
-    const isLoggedIn = await auth.isLoggedIn();
-    if (isLoggedIn) {
-        createLogoutButtonDOM();
-    } else {
-        createLoginButtonDOM();
-    }
-}
-
 async function initUI() {
-    await initLoginUI();
+    await createMainMenu();
 
     tasks.listTasks()
         .then(taskList => {
@@ -136,6 +158,7 @@ initUI();
 // Template Event Handlers
 
 addTaskButton.addEventListener('click', async () => {
+    logger.info("Add task button clicked");
     if (emptyTask == undefined) {
         const taskId = await createTask();
         document.getElementById('text-input:' + taskId).focus();
@@ -235,8 +258,7 @@ auth.handleLoggedIn(event => {
 auth.handleLoggedOut(event => {
     logger.trace('Handling logged out event');
 
-    createLoginButtonDOM();
-    document.querySelector('#logout-button').remove();
+    refreshMainMenu();
 
     document.querySelector('#tasks-container').innerHTML = '';
     updateEmptyTask();

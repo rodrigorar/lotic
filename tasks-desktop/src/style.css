@@ -9,7 +9,7 @@
   DARK THEME
   
   Primary Color: 
-  Secondary Color: 
+  Secondary Color: col
 ***/
 
 /* HTML */
@@ -18,6 +18,10 @@ body {
   margin: 0;
   padding: 0;
   background: linear-gradient(to bottom right, #fcfbf9, white)
+}
+
+body::-webkit-scrollbar {
+  display: none;
 }
 
 /* Layout */
@@ -37,7 +41,7 @@ body {
 @keyframes slide {
   0% { transform: translateX(-50%) }
   100% { transform: translateX(50%) }
-}text
+}
 
 .top-header {
   overflow: hidden;
@@ -56,6 +60,7 @@ body {
 .top-header-right {
   float: right;
   width: 45%;
+  margin-top: 2%;
   margin-left: 1%;
 }
 
@@ -67,30 +72,25 @@ body {
   display: block;
 }
 
-.container {
-  display: block;
-  width: 100%;
-  height: 82%;
-  margin-bottom: 1rem;
-  overflow-y: auto;
-}
-
 .container::-webkit-scrollbar {
   display: none;
 }
 
-.bottom-container {
-  width: 100%;
-  height: 10%;
-  opacity: 0%;
-}
-
-.footer {~
+.footer {
   margin: 0;
   width: 98.5%;
   position: absolute;
   bottom: 3%;
 }
+
+.overlayed-footer {
+  bottom: 5%;
+  right: 8%;
+  opacity: 100%;
+  position: absolute;
+}
+
+/* Spacers */
 
 .v-spacer-10 {
   margin-top: 10%;
@@ -100,33 +100,78 @@ body {
   margin-top: 20%;
 }
 
+.h-spacer-70 {
+  margin-right: 70%;
+}
+
 .txt-align-center {
   text-align: center;
 }
 
-.button-container {
-  bottom: 5%;
-  right: 8%;
-  opacity: 100%;
-  position: absolute;
+/* Positioning */ 
+
+.left {
+  position: relative;
+  float: left;
 }
+
+.right {
+  position: relative;
+  float: right;
+}
+
+.margin-h-5 {
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
+/* Element */ 
 
 .separator {
-  height: 2px;
-  border-width: 0;
-  color: lightgray;
-  background-color: lightgray
+  width: 75%;
+  height: 0.05rem;
+  float: left;
+  margin-left: 1%;
+  margin-top: 5%;
+  margin-bottom: 5%;
+  padding: 0;
+  background-color:#357ba2;
 }
 
-.main-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif;
-  margin: 0rem;
-  width: 90vw;
-  height: 92vh;
-  padding: 2%;
-  margin: 2%;
-  overflow: hidden;
+.dropdown {
+  position: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #fcfbf9;
+  width: 50%;
+  overflow: auto;
+  border-radius: 5px;
+  box-shadow: 0px 10px 10px 0px rgba(0,0,0,0.4);
+  transform: translate(-10%, 0%);
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-content a {
+  display: block;
+  color: #000000;
+  padding: 5px;
+  text-decoration: none;
+}
+
+.dropdown-content a:hover {
+  color: #FFFFFF;
+  background-color: #00A4BD;
+}
+
+.box {
+  padding: 0;
+  margin: 3%;
 }
 
 .cln-1 {
@@ -145,58 +190,7 @@ body {
   height: 75%;
 }
 
-.login-input-container {
-  margin-bottom: 10%;
-  width: 100%;
-}
-
-.input {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif;
-  font-size: 1.5em;
-  display: inherit;
-  width: 95%;
-  margin: 0 auto;
-  margin-bottom: 2%;
-  text-align: center;
-  background-color: #fcfbf9;
-  border-color: lightgray;
-  border-style: solid;
-  box-shadow: none;
-  border-radius: 10px
-}
-
-.input:focus {
-  outline-color: #357ba2;
-  text-shadow: 0.1rem 0.1rem 0.25rem rgba(0, 0, 0, 0.3);
-  border-style: ridge;
-}
-
-.login-input:not(:last-child) {
-  margin-bottom: 2%;
-}
-
-/* Content */
-
-.app-font {
-  font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
-}
-
-.title {
-  font-size: x-large;
-  font-weight: bolder;
-}
-
-.simple-icon {
-  padding: 0%;
-  margin: 0%;
-  width: 9vw;
-  height: 9vh;
-  float: center;
-  vertical-align: middle;
-}
-
-/* Font */
+/* Fonts */
 
 .font-hd-1 {
   font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
@@ -207,11 +201,46 @@ body {
   text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 0.3);
 }
 
+.font-hd-2 {
+  font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
+  font-size: 1.5em;
+  color: #357ba2;
+  font-weight: bolder;
+  padding: 0;
+  margin: 0;
+  text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 0.3);
+}
+
+.font-hd-3 {
+  font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
+  font-size: 1em;
+  color: #357ba2;
+  font-weight: bolder;
+  padding: 0.10rem;
+  text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 0.3);
+}
+
+.font-hd-4 {
+  font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
+  font-size: 0.5em;
+  color: #357ba2;
+  font-weight: bolder;
+  padding: 0.10rem;
+  text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 0.3);
+}
+
 .font-txt-neutral {
   font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
   font-size: x-large;
   color: white;
   padding: 0.75rem;
+}
+
+.font-sml-blk {
+  font-family: "Open Sans", sans-serif;
+  font-size: small;
+  color: black;
+  padding: 0.5rem;
 }
 
 .font-tiny {
@@ -249,22 +278,70 @@ body {
   font-size: x-large;
 }
 
-.login-button {
-  float: right; 
-  box-shadow: 1px 1px 0 0 darkslategrey;
-  padding: 5%;
-  text-shadow: 5px;
+.btn-dropdown {
+  background-color: #fcfbf9;
+  padding: 0;
+  margin-right: 10%;
+  border-width: 0;
 }
 
-.add-task-button {
-  box-shadow: 1px 1px 0 0 darkslategrey;
-  padding: 0%;
-  -moz-border-radius: 50%;
-  -webkit-border-radius: 50%;
-  border-radius: 75px;
+.btn-round {
+  --b: 4px;
+  width: 30px;
+  height: 30px;
+  position: fixed;
+  transform: translate(-70%, -90%);
+  aspect-ratio:1;
+  border-radius: 50%;
+  border-style: none;
+  display: inline-block;
+  background: conic-gradient(from 90deg at var(--b) var(--b), #fff 90deg,#357ba2 0) 
+    calc(100% + var(--b)/2) calc(100% + var(--b)/2)/
+    calc(50%  + var(--b))   calc(50%  + var(--b));
+}
+
+.btn-round:hover {
+  background: conic-gradient(from 90deg at var(--b) var(--b), #fff 90deg,#355ba2 0) 
+    calc(100% + var(--b)/2) calc(100% + var(--b)/2)/
+    calc(50%  + var(--b))   calc(50%  + var(--b));
+  border-color: #355ba2;
+}
+
+.btn-round:active {
+  width: 28px;
+  height: 28px;
 }
 
 /* Inputs */
+
+.input-marker {
+  height: 2px;
+  border-width: 0;
+  color: lightgray;
+  background-color: lightgray
+}
+
+.input {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  font-size: 1.5em;
+  display: inherit;
+  width: 95%;
+  margin: 0 auto;
+  margin-bottom: 2%;
+  text-align: center;
+  background-color: #fcfbf9;
+  border-color: lightgray;
+  border-style: solid;
+  box-shadow: none;
+  border-radius: 10px
+}
+
+.input:focus {
+  outline-color: #357ba2;
+  text-shadow: 0.1rem 0.1rem 0.25rem rgba(0, 0, 0, 0.3);
+  border-style: ridge;
+}
 
 .task-checkbox {
   float: right;

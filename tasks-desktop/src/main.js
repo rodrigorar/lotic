@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const { runSchemaMigrations } = require('./shared/persistence/database');
-const { app, BrowserWindow, Menu, ipcMain, globalShortcut, Notification } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, globalShortcut, Notification, webContents } = require('electron');
 const path = require('path');
 const { LoggerHandler } = require('./shared/logging/handler_logging');
 const { UtilsHandler } = require('./shared/utils/handler_utils');
@@ -35,9 +35,10 @@ const createWindow = () => {
     width: 400,
     height: 500,
     webPreferences: {
-      nodeIntegration: true,
-      preload: path.join(__dirname, 'preload.js'),
-    },
+      nodeIntegration: true
+      , preload: path.join(__dirname, 'preload.js'),
+    }
+    , resizable: false
   });
 
   mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html'));
@@ -84,7 +85,7 @@ app.on('ready', () => {
     }
   });
 
-  globalShortcut.register("F5", () => {
+  globalShortcut.register("F6", () => {
     SynchManager.execute(mainWindow.webContents);
   });
 });
