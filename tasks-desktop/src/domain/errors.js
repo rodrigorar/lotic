@@ -20,6 +20,13 @@ class UnknownAccountError extends Error {
     }
 }
 
+class NotImplementedError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'UnknownAccountError';
+    }
+}
+
 class LoginFailedError extends Error {
     constructor(message) {
         super(message);
@@ -33,3 +40,5 @@ module.exports.Errors = {
     , UnknownAccountError
     , LoginFailedError
 }
+module.exports.NullArgumentError = NullArgumentError;
+module.exports.NotImplementedError = NotImplementedError;

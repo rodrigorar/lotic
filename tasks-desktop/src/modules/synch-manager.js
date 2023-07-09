@@ -1,4 +1,4 @@
-const { Logger } = require("../shared/logging/logger");
+const { Logger } = require("../domain/shared/logger");
 const { runStateMachine } = require("./sync/statemachine");
 const { StartSyncState } = require("./sync/states");
 const { EventBus, EventType, Event } = require("../shared/event-bus");

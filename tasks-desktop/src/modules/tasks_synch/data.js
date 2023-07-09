@@ -1,4 +1,4 @@
-const { generateId } = require('../../shared/utils/utils');
+const { generateId } = require('../../domain/shared/utils');
 const { Tables, Fields } = require('../../shared/persistence/tables');
 
 

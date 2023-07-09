@@ -1,7 +1,7 @@
 const { v4 } = require("uuid");
 const { TASK_SYNCH_STATUS, TaskSynch } = require("../../../src/modules/tasks_synch/data");
 const { TasksSyncServices } = require("../../../src/modules/tasks_synch/services");
-const { Errors } = require("../../../src/shared/errors/errors");
+const { Errors } = require("../../../src/domain/errors");
 
 describe("[Tasks Sync]: Test Create Sync Monitor Service", () => {
     

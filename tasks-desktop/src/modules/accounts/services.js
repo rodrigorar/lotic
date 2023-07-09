@@ -1,4 +1,4 @@
-const { Validators } = require("../../shared/utils/utils");
+const { Validators } = require("../../domain/shared/utils");
 const { AccountRepository, Account } = require("./data");
 
 class AccountServices {

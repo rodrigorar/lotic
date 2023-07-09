@@ -1,6 +1,6 @@
 const { v4 } = require('uuid');
-const { Errors } = require('../errors/errors');
-const { Logger } = require('../logging/logger');
+const { Errors } = require('../errors');
+const { Logger } = require('./logger');
 
 module.exports.isDev = process.env.NODE_ENV == 'development';
 Logger.trace(`NODE ENV: ${process.env.NODE_ENV}`);

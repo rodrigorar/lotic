@@ -1,4 +1,4 @@
-const { Logger } = require("./logger");
+const { Logger } = require("../../domain/shared/logger");
 
   
 function handleTraceLog(event, message) {

@@ -1,5 +1,5 @@
 const { ServiceUtils } = require("../../shared/utils/service-utils");
-const { Validators } = require("../../shared/utils/utils");
+const { Validators } = require("../../domain/shared/utils");
 const { TaskSynchRepository, TasksSyncRepository, TASK_SYNCH_STATUS } = require("./data");
 
 class TasksSyncServices {

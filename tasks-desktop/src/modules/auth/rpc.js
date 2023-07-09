@@ -1,5 +1,5 @@
 const { Client, BASE_URL, ContentTypes, Headers } = require("../../shared/http/client");
-const { Logger } = require("../../shared/logging/logger");
+const { Logger } = require("../../domain/shared/logger");
 
 const BASE_PATH = BASE_URL + "/auth";
 

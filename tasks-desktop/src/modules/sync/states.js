@@ -1,5 +1,5 @@
 const { EventBus, EventType, Event } = require("../../shared/event-bus");
-const { Logger } = require("../../shared/logging/logger");
+const { Logger } = require("../../domain/shared/logger");
 const { RunUnitOfWork } = require("../../shared/persistence/unitofwork");
 const { AccountServices } = require("../accounts/services");
 const { AuthServicesInstance } = require("../auth/services");

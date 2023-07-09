@@ -1,12 +1,12 @@
 const cron = require('node-cron');
 const { runSchemaMigrations } = require('./shared/persistence/database');
-const { app, BrowserWindow, Menu, ipcMain, globalShortcut, Notification, webContents } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, globalShortcut, webContents } = require('electron');
 const path = require('path');
 const { LoggerHandler } = require('./shared/logging/handler_logging');
 const { UtilsHandler } = require('./shared/utils/handler_utils');
 const { TasksHandler } = require('./modules/tasks/handler_tasks');
 const { OSMask } = require('./shared/os/os-mask');
-const { isDev } = require('./shared/utils/utils');
+const { isDev } = require('./domain/shared/utils');
 const { SynchManager } = require('./modules/synch-manager');
 const { AuthHandlers } = require('./modules/auth/handler_auth');
 const { AuthServicesInstance } = require('./modules/auth/services');

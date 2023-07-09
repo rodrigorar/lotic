@@ -1,6 +1,6 @@
 const { EventBus, EventType, EventSubscriber } = require("../../shared/event-bus");
 const { RunUnitOfWork } = require("../../shared/persistence/unitofwork");
-const { Validators } = require("../../shared/utils/utils");
+const { Validators } = require("../../domain/shared/utils");
 const { TasksRepository, Task } = require("./data");
 const { v4 } = require("uuid");
 

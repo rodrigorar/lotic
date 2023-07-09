@@ -1,6 +1,6 @@
 const { v4 } = require("uuid");
 const { TaskServices } = require("../../../src/modules/tasks/services");
-const { Errors } = require("../../../src/shared/errors/errors");
+const { Errors } = require("../../../src/domain/errors");
 const { Task } = require("../../../src/modules/tasks/data");
 const { UnitOfWork } = require("../../../src/shared/persistence/unitofwork");
 

@@ -1,4 +1,4 @@
-const { Validators } = require("./utils/utils");
+const { Validators } = require("../domain/shared/utils");
 
 const EventType = {
     LOGIN_SUCCESS: "LoginSuccess"

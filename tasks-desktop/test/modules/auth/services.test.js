@@ -2,7 +2,7 @@ const { v4 } = require("uuid");
 const { AuthServices } = require("../../../src/modules/auth/services");
 const { EventType, EventSubscriber, EventBus } = require("../../../src/shared/event-bus");
 const { Account } = require("../../../src/modules/accounts/data");
-const { Errors } = require("../../../src/shared/errors/errors");
+const { Errors } = require("../../../src/domain/errors");
 const { AuthToken } = require("../../../src/modules/auth/data");
 
 
@@ -601,6 +601,6 @@ describe("[Auth]: Test Get Active Session Service", () => {
         const mockedAuthRPC = jest.fn();
 
         const underTest = new AuthServices(mockedAccountServices, mockedAuthRepository, mockedAuthRPC);
-        expect(underTest.getActiveSession(undefined)).rejects.toThrow(Errors.NullArgumentError);
+        expect(underTest.getActiveSession()).rejects.toThrow(Errors.NullArgumentError);
     });
 });

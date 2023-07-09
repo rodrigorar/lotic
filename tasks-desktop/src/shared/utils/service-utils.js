@@ -1,4 +1,4 @@
-const { Logger } = require("../logging/logger");
+const { Logger } = require("../../domain/shared/logger");
 
 function errorWrapper(service) {
     try {

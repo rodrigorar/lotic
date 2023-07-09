@@ -1,4 +1,4 @@
-const { Logger } = require('../logging/logger');
+const { Logger } = require('../../domain/shared/logger');
 const { AuthServicesInstance } = require('../../modules/auth/services');
 const { Client, BASE_URL, Headers, ContentTypes } = require('./client');
 

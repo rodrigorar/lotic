@@ -1,16 +1,18 @@
 const { OSMask } = require('../os/os-mask');
-const { isDev } = require('../utils/utils');
-const { Logger } = require('../logging/logger');
+const { isDev } = require('../../domain/shared/utils');
+const { UnitOfWork } = require("../../domain/shared/unitofwork");
 const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
 
-class UnitOfWork {
+class UnitOfWorkImpl extends UnitOfWork {
 
     constructor() {
+        super();
+
         this.queryManager = undefined;
         this.isInitilized = false;
     }
-
+    
     async init() {
         if (! this.isInitilized) {
             // FIXME: Implement a connection manager in order the manage
@@ -42,7 +44,7 @@ class UnitOfWork {
 
 async function runUnitOfWork(work) {
     let result;
-    const unitOfWork = new UnitOfWork();
+    const unitOfWork = new UnitOfWorkImpl();
     await unitOfWork.init();
 
     try {
@@ -57,7 +59,7 @@ async function runUnitOfWork(work) {
     return result;
 }
 
-module.exports.UnitOfWork = UnitOfWork;
+module.exports.UnitOfWork = UnitOfWorkImpl;
 module.exports.RunUnitOfWork = {
     run: runUnitOfWork
 };

@@ -1,6 +1,6 @@
 const { OSMask } = require('../os/os-mask');
-const { isDev } = require('../utils/utils');
-const { Logger } = require('../logging/logger');
+const { isDev } = require('../../domain/shared/utils');
+const { Logger } = require('../../domain/shared/logger');
 const { open } = require('sqlite');
 const sqlite3 = require('sqlite3').verbose();
 const { v4 } = require("uuid");
