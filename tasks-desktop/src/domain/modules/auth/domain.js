@@ -1,32 +1,42 @@
-const { Validators } = require("../../domain/shared/utils");
-const { AuthRepository, AuthToken } = require("./data");
-const { AccountServicesInstance } = require("../accounts/services");
-const { AuthRPC } = require("./rpc");
-const { Errors } = require("../../domain/errors");
+const { Validators } = require("../../shared/utils");
 const { EventBus, Event, EventType } = require("../../shared/event-bus");
+const { Command, Query } = require("../../shared/ports");
 
-class AuthServices {
+class AuthToken {
+    constructor(token, refreshToken, accountId, expiresAt) {
+        this.token = token;
+        this.refreshToken = refreshToken;
+        this.accountId = accountId;
+        this.expiresAt = expiresAt;
+    }
+}
 
-    constructor(accountServices, authRepository, authRPC) {
-        this.accountServices = accountServices;
+class UseCaseLogin extends Command {
+
+    constructor(useCaseCreateAccount, useCaseGetAccountByEmail, authRepository, loginGateway) {
+        super();
+
+        this.useCaseCreateAccount = useCaseCreateAccount;
+        this.useCaseGetAccountByEmail = useCaseGetAccountByEmail;
         this.authRepository = authRepository;
-        this.authRPC = authRPC;
+        this.loginGateway = loginGateway;
     }
 
-    async login(unitOfWork, principal) {
+    async execute(unitOfWork, principal) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(principal, "No principal provided");
     
-        const account = await this.accountServices.getAccount(unitOfWork, principal.email);
+        const account = await this.useCaseGetAccountByEmail.execute(unitOfWork, principal.email);
 
         let authToken = undefined;
         if (account != undefined) {
-            authToken = await this.authRepository.getAuthToken(unitOfWork, account.id);
+            authToken = await this.authRepository.getByAccountId(unitOfWork, account.id);
         }
     
         if (authToken == undefined) {
-            const loginResult = await this.authRPC.login(principal);
+            const loginResult = await this.loginGateway.call(principal);
             if (loginResult.hasOwnProperty('status')) {
+                // FIXME: Inform the user in case this happens
                 throw new Errors.LoginFailedError('Failed to login account');
             }
             authToken = new AuthToken(
@@ -36,14 +46,14 @@ class AuthServices {
                 , loginResult.expires_at)
     
             if (account == undefined) {
-                await this.accountServices.create(
+                await this.useCaseCreateAccount.execute(
                     unitOfWork
                     , {
                         id: authToken.accountId
                         , email: principal.email
                     });
             }
-            await this.authRepository.persistAuthToken(unitOfWork, authToken);
+            await this.authRepository.save(unitOfWork, authToken);
     
             EventBus.publish(
                 new Event(
@@ -54,20 +64,30 @@ class AuthServices {
                      }));
         }
     }
-    
-    async refresh(unitOfWork, accountId) {
+}
+
+class UseCaseRefresh extends Command {
+
+    constructor(authRepository, refreshGateway) {
+        super();
+
+        this.authRepository = authRepository;
+        this.refreshGateway = refreshGateway;
+    }
+
+    async execute(unitOfWork, accountId) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(accountId, "Account id cannot be empty");
     
-        const oldAuthToken = await this.authRepository.getAuthToken(unitOfWork, accountId);
+        const oldAuthToken = await this.authRepository.getByAccountId(unitOfWork, accountId);
         if (oldAuthToken == undefined) {
             throw new Errors.UnknownAccountError("No session found for account id: " + accountId);
         }
     
-        const refreshResult = await this.authRPC.refresh(oldAuthToken.token, oldAuthToken.refreshToken)
+        const refreshResult = await this.refreshGateway.call(oldAuthToken.token, oldAuthToken.refreshToken)
         if (refreshResult.hasOwnProperty("status") && 
             (refreshResult.status == "404") || refreshResult.status == "401") {
-                await this.authRepository.eraseAuthSessionsForAccount(unitOfWork, accountId);
+                await this.authRepository.eraseForAccountId(unitOfWork, accountId);
                 EventBus.publish(new Event(
                     EventType.REFRESH_FAILED
                     , { 
@@ -83,28 +103,50 @@ class AuthServices {
             , refreshResult.account_id
             , refreshResult.expires_at);
     
-        await this.authRepository.persistAuthToken(unitOfWork, authToken);
+        await this.authRepository.save(unitOfWork, authToken);
     
         EventBus.publish(new Event(EventType.REFRESH_SUCCESS, {}));
     
         return authToken;
     }
-    
-    async logout(unitOfWork, authSession) {
+}
+
+class UseCaseLogout extends Command {
+
+    constructor(authRepository, logoutGateway) {
+        super();
+
+        this.authRepository = authRepository;
+        this.logoutGateway = logoutGateway;
+    }
+
+    async execute(unitOfWork, authSession) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(authSession, "No auth session provided");
     
-        await this.authRepository.eraseAuthSessionsForAccount(unitOfWork, authSession.accountId)
-        await this.authRPC.logout(authSession.token);
+        await this.authRepository.eraseForAccountId(unitOfWork, authSession.accountId)
+        await this.logoutGateway.call(authSession.token);
     
         EventBus.publish(new Event(EventType.LOGOUT_SUCCESS, {}));
     }
-    
-    async getActiveSession(unitOfWork) {
+}
+
+class UseCaseGetActiveSession extends Query {
+
+    constructor(authRepository) {
+        super();
+
+        this.authRepository = authRepository;
+    }
+
+    async execute(unitOfWork) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         return await this.authRepository.getActiveSession(unitOfWork);
     }
 }
 
-module.exports.AuthServices = AuthServices;
-module.exports.AuthServicesInstance = new AuthServices(AccountServicesInstance, AuthRepository, AuthRPC);
+module.exports.AuthToken = AuthToken;
+module.exports.UseCaseLogin = UseCaseLogin;
+module.exports.UseCaseRefresh = UseCaseRefresh;
+module.exports.UseCaseLogout = UseCaseLogout;
+module.exports.UseCaseGetActiveSession = UseCaseGetActiveSession;

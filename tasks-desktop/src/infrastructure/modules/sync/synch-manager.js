@@ -1,7 +1,7 @@
-const { Logger } = require("../domain/shared/logger");
-const { runStateMachine } = require("./sync/statemachine");
-const { StartSyncState } = require("./sync/states");
-const { EventBus, EventType, Event } = require("../shared/event-bus");
+const { Logger } = require("../../../domain/shared/logger");
+const { runStateMachine } = require("../../../domain/modules/sync/statemachine");
+const { StartSyncState } = require("./states");
+const { EventBus, EventType, Event } = require("../../../domain/shared/event-bus");
 
 async function execute() {
     try {

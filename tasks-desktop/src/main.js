@@ -7,9 +7,9 @@ const { UtilsHandler } = require('./shared/utils/handler_utils');
 const { TasksHandler } = require('./modules/tasks/handler_tasks');
 const { OSMask } = require('./shared/os/os-mask');
 const { isDev } = require('./domain/shared/utils');
-const { SynchManager } = require('./modules/synch-manager');
-const { AuthHandlers } = require('./modules/auth/handler_auth');
-const { AuthServicesInstance } = require('./modules/auth/services');
+const { SynchManager } = require('./infrastructure/modules/sync/synch-manager');
+const { AuthHandlers } = require('./infrastructure/modules/auth/handlers');
+const { UseCaseLoginProvider, UseCaseGetActiveSessionProvider } = require("./infrastructure/modules/auth/providers");
 const { EventType } = require('./shared/event-bus');
 const { EventBus } = require('./shared/event-bus');
 const { EventSubscriber } = require('./shared/event-bus');
@@ -111,8 +111,9 @@ ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
 // Auth Event Listeners
 
 ipcMain.on('auth:open:login', async (event) => {
+  const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
   const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
-    return await AuthServicesInstance.getActiveSession(unitOfWork);
+    return await useCaseGetActiveSession.execute(unitOfWork);
   });
   const authFile = 
             activeSession == undefined 
@@ -121,8 +122,9 @@ ipcMain.on('auth:open:login', async (event) => {
   mainWindow.loadFile(path.join(__dirname, authFile));
 });
 ipcMain.on('auth:login', async (event, loginData) => {
+    const useCaseLogin = UseCaseLoginProvider.get();
     await RunUnitOfWork.run(async (unitOfWork) => {
-        await AuthServicesInstance.login(unitOfWork, loginData);
+        await useCaseLogin.execute(unitOfWork, loginData);
     });
 
     mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html'));
@@ -132,8 +134,9 @@ ipcMain.on('auth:login', async (event, loginData) => {
 });
 
 ipcMain.on('auth:logout', async (event) => {
+  const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
   const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
-    return await AuthServicesInstance.getActiveSession(unitOfWork);
+    return await useCaseGetActiveSession.execute(unitOfWork);
   }); 
   await TasksHandler.handleLogout(event, activeSession.accountId);
   await AuthHandlers.handleLogout(event); // This one has to be last, we need to know which account is logging out

@@ -29,6 +29,22 @@ class Query {
     }
 }
 
+class Gateway {
+
+    async call(payload) {
+        throw new NotImplementedException("Gateway#call is not implemented");
+    }
+}
+
+class UseCaseProvider {
+
+    get() {
+        throw new NotImplementedException("UseCaseProvider#get is not implemented");
+    }
+}
+
 module.exports.Repository = Repository;
 module.exports.Command = Command;
 module.exports.Query = Query;
+module.exports.Gateway = Gateway;
+module.exports.UseCaseProvider = UseCaseProvider;

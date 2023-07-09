@@ -1,12 +1,13 @@
 const { TaskServicesInstance } = require('./services');
 const { TasksSyncServicesInstance } = require('../tasks_synch/services');
-const { AuthServicesInstance } = require('../auth/services');
+const { UseCaseGetActiveSessionProvider } = require('../../infrastructure/modules/auth/providers');
 const { RunUnitOfWork } = require('../../shared/persistence/unitofwork');
 const { TASK_SYNCH_STATUS } = require('../tasks_synch/data');
 
 async function handleCreateTask(event, newTask) {
+    const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
     await RunUnitOfWork.run(async (unitOfWork) => {
-        const activeSession = await AuthServicesInstance.getActiveSession(unitOfWork);
+        const activeSession = await useCaseGetActiveSession.execute(unitOfWork);
     
         if (activeSession != undefined) {
             newTask.ownerId = activeSession.accountId;
@@ -39,8 +40,9 @@ async function handleCompletion(event, taskId) {
 }
 
 async function handleListTasks(event) {
+    const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
     return await RunUnitOfWork.run(async (unitOfWork) => {
-        const activeSession = await AuthServicesInstance.getActiveSession(unitOfWork);
+        const activeSession = await useCaseGetActiveSession.execute(unitOfWork);
 
         if (activeSession != undefined) {
             return await TaskServicesInstance.list(unitOfWork, activeSession.accountId);

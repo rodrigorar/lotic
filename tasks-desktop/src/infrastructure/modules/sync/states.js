@@ -1,13 +1,12 @@
-const { EventBus, EventType, Event } = require("../../shared/event-bus");
-const { Logger } = require("../../domain/shared/logger");
-const { RunUnitOfWork } = require("../../shared/persistence/unitofwork");
-const { AccountServices } = require("../accounts/services");
-const { AuthServicesInstance } = require("../auth/services");
-const { TasksRPC } = require("../tasks/rpc");
-const { TaskServicesInstance } = require("../tasks/services");
-const { TASK_SYNCH_STATUS } = require("../tasks_synch/data");
-const { TasksSyncServicesInstance } = require("../tasks_synch/services");
-const { State, StateEffect } = require("./shared");
+const { EventBus, EventType, Event } = require("../../../domain/shared/event-bus");
+const { Logger } = require("../../../domain/shared/logger");
+const { RunUnitOfWork } = require("../../persistence/unitofwork");
+const { UseCaseGetActiveSessionProvider } = require("../auth/providers");
+const { TasksRPC } = require("../../../modules/tasks/rpc");
+const { TaskServicesInstance } = require("../../../modules/tasks/services");
+const { TASK_SYNCH_STATUS } = require("../../../modules/tasks_synch/data");
+const { TasksSyncServicesInstance } = require("../../../modules/tasks_synch/services");
+const { State, StateEffect } = require("../../../domain/modules/sync/domain");
 
 // Sync Done
 
@@ -28,7 +27,7 @@ class DeleteTasksLocalStateEffect extends StateEffect {
 
     constructor(
         unitOfWorkProvider = RunUnitOfWork
-        , authServices
+        , useCaseGetActiveSession
         , taskServices
         , tasksSyncServices
         , tasksRPC) {
@@ -36,7 +35,7 @@ class DeleteTasksLocalStateEffect extends StateEffect {
         super();
 
         this.unitOfWorkProvider = unitOfWorkProvider;
-        this.authServices = authServices;
+        this.useCaseGetActiveSession = useCaseGetActiveSession;
         this.taskServices = taskServices;
         this.tasksSyncServices = tasksSyncServices;
         this.tasksRPC = tasksRPC;
@@ -44,7 +43,7 @@ class DeleteTasksLocalStateEffect extends StateEffect {
 
     async execute() {
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
-            const authToken = await this.authServices.getActiveSession(unitOfWork);
+            const authToken = await this.useCaseGetActiveSession.execute(unitOfWork);
             const remoteTasksResponse = await this.tasksRPC.listTasks(unitOfWork, authToken.accountId);
 
             const localTasks = await this.taskServices.list(unitOfWork, authToken.accountId);
@@ -90,7 +89,7 @@ class UpdateTasksLocalStateEffect extends StateEffect {
 
     constructor(
         unitOfWorkProvider = RunUnitOfWork
-        , authServices
+        , useCaseGetActiveSession
         , taskServices
         , tasksSyncServices
         , tasksRPC) {
@@ -98,15 +97,17 @@ class UpdateTasksLocalStateEffect extends StateEffect {
         super();
 
         this.unitOfWorkProvider = unitOfWorkProvider;
-        this.authServices = authServices;
+        this.useCaseGetActiveSession = useCaseGetActiveSession;
         this.taskServices = taskServices;
         this.tasksSyncServices = tasksSyncServices;
         this.tasksRPC = tasksRPC;
     }
 
     async execute() {
+        console.log("Executing UpdateTasksLocalStateEffect");
+
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
-            const authToken = await this.authServices.getActiveSession(unitOfWork);
+            const authToken = await this.useCaseGetActiveSession.execute(unitOfWork);
             const remoteTasksResponse = await this.tasksRPC.listTasks(unitOfWork, authToken.accountId);
             remoteTasksResponse.data.tasks.map(entry => this.taskServices.update(
                 unitOfWork
@@ -132,7 +133,7 @@ class UpdateTasksLocalState extends State {
         return new DeleteTasksLocalState(
             new DeleteTasksLocalStateEffect(
                 RunUnitOfWork
-                , AuthServicesInstance
+                , UseCaseGetActiveSessionProvider.get()
                 , TaskServicesInstance
                 , TasksSyncServicesInstance
                 , TasksRPC));
@@ -143,19 +144,21 @@ class UpdateTasksLocalState extends State {
 
 class CreateTasksLocalStateEffect extends StateEffect {
 
-    constructor(unitOfWorkProvider = RunUnitOfWork, authServices, taskServices, tasksSyncServices, tasksRPC) {
+    constructor(unitOfWorkProvider = RunUnitOfWork, useCaseGetActiveSession, taskServices, tasksSyncServices, tasksRPC) {
         super();
 
         this.unitOfWorkProvider = unitOfWorkProvider;
-        this.authServices = authServices;
+        this.useCaseGetActiveSession = useCaseGetActiveSession;
         this.taskServices = taskServices;
         this.tasksSyncServices = tasksSyncServices;
         this.tasksRPC = tasksRPC;
     }
 
     async execute() {
+        console.log("Executing CreateTasksLocalStateEffect");
+
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
-            const authToken = await this.authServices.getActiveSession(unitOfWork);
+            const authToken = await this.useCaseGetActiveSession.execute(unitOfWork);
 
             const remoteTasksResponse = await this.tasksRPC.listTasks(unitOfWork, authToken.accountId);
             if (remoteTasksResponse.data.tasks.length > 0) {
@@ -194,7 +197,7 @@ class CreateTasksLocalState extends State {
         return new UpdateTasksLocalState(
             new UpdateTasksLocalStateEffect(
                 RunUnitOfWork
-                , AuthServicesInstance
+                , UseCaseGetActiveSessionProvider.get()
                 , TaskServicesInstance
                 , TasksSyncServicesInstance
                 , TasksRPC));
@@ -215,6 +218,8 @@ class DeleteTasksRemoteStateEffect extends StateEffect {
     }
 
     async execute() {
+        console.log("Executing DeleteTasksRemoteStateEffect");
+
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
             const locallyCompletedTasksSync = await this.tasksSyncServices.getComplete(unitOfWork);
             if (locallyCompletedTasksSync.length > 0) {
@@ -252,7 +257,7 @@ class DeleteTasksRemoteState extends State {
         return new CreateTasksLocalState(
             new CreateTasksLocalStateEffect(
                 RunUnitOfWork
-                , AuthServicesInstance
+                , UseCaseGetActiveSessionProvider.get()
                 , TaskServicesInstance
                 , TasksSyncServicesInstance
                 , TasksRPC));
@@ -273,6 +278,8 @@ class UpdateTasksRemoteStateEffect extends StateEffect {
     }
 
     async execute() {
+        console.log("Executing UpdateTasksRemoteStateEffect");
+
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
             const unsyncedCreatedTaskSyncs = await this.tasksSyncServices.getNonSynced(unitOfWork)
             const locallyUpdatedTaskSyncs = unsyncedCreatedTaskSyncs
@@ -321,8 +328,7 @@ class CreateTasksRemoteStateEffect extends StateEffect {
 
     constructor(
         unitOfWorkProvider = RunUnitOfWork
-        , authServices
-        , accountServices
+        , useCaseGetActiveSession
         , taskServices
         , tasksSyncServices
         , tasksRPC) {
@@ -330,16 +336,17 @@ class CreateTasksRemoteStateEffect extends StateEffect {
         super();
 
         this.unitOfWorkProvider = unitOfWorkProvider
-        this.authServices = authServices;
-        this.accountServices = accountServices;
+        this.useCaseGetActiveSession = useCaseGetActiveSession;
         this.taskServices = taskServices;
         this.tasksSyncServices = tasksSyncServices;
         this.tasksRPC = tasksRPC;
     }
 
     async execute() {
+        console.log("Executing CreateTasksRemoteStateEffect");
+
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
-            const authToken = await this.authServices.getActiveSession(unitOfWork);
+            const authToken = await this.useCaseGetActiveSession.execute(unitOfWork);
 
             const unsyncedCreatedTaskSyncs = await this.tasksSyncServices.getNonSynced(unitOfWork)
             const locallyCreatedTaskSyncs = unsyncedCreatedTaskSyncs
@@ -391,8 +398,7 @@ class StartSyncState extends State {
 
     constructor(
         unitOfWorkRunner = RunUnitOfWork
-        , authServicesProvider = () => AuthServicesInstance
-        , accountServicesProvider = () => AccountServices
+        , useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get()
         , tasksServicesProvider = () => TaskServicesInstance
         , tasksSyncServicesProvider = () => TasksSyncServicesInstance
         , tasksRPCProvider = () => TasksRPC) {
@@ -400,8 +406,7 @@ class StartSyncState extends State {
         super();
 
         this.unitOfWorkRunner = unitOfWorkRunner;
-        this.authServicesProvider = authServicesProvider;
-        this.accountServicesProvider = accountServicesProvider;
+        this.useCaseGetActiveSession = useCaseGetActiveSession;
         this.tasksServicesProvider = tasksServicesProvider;
         this.tasksSyncServicesProvider = tasksSyncServicesProvider;
         this.tasksRPCProvider = tasksRPCProvider;
@@ -409,7 +414,7 @@ class StartSyncState extends State {
 
     async next() {
         return await this.unitOfWorkRunner.run(async (unitOfWork) => {
-            const authSession = await this.authServicesProvider().getActiveSession(unitOfWork);
+            const authSession = await this.useCaseGetActiveSession.execute(unitOfWork);
 
             let result = undefined;
             if (authSession) {
@@ -417,8 +422,7 @@ class StartSyncState extends State {
                 result = new CreateTasksRemoteState(
                     new CreateTasksRemoteStateEffect(
                         this.unitOfWorkRunner
-                        , this.authServicesProvider()
-                        , this.accountServicesProvider()
+                        , UseCaseGetActiveSessionProvider.get()
                         , this.tasksServicesProvider()
                         , this.tasksSyncServicesProvider()
                         , this.tasksRPCProvider()));

@@ -1,8 +1,10 @@
-const { Tables, Fields } = require('../../shared/persistence/tables');
+const { Tables, Fields } = require("../../persistence/tables");
+const { AuthRepository } = require("../../../domain/modules/auth/data");
 
-class AuthRepository {
+class AuthRepositoryImpl extends AuthRepository {
 
-    async persistAuthToken(unitOfWork, authToken) {
+    // FIXME: This should be able to deal with updates as well
+    async save(unitOfWork, authToken) {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
             `DELETE `
@@ -16,7 +18,7 @@ class AuthRepository {
             , [authToken.token, authToken.refreshToken, authToken.accountId, authToken.expiresAt])
     }    
 
-    async getAuthToken(unitOfWork, accountId) {
+    async getByAccountId(unitOfWork, accountId) {
         const queryManager = unitOfWork.getQueryManager();
 
         const queryResult =
@@ -58,7 +60,7 @@ class AuthRepository {
             , queryResult.expires_at);
     }
 
-    async eraseAuthSessionsForAccount(unitOfWork, accountId) {
+    async eraseForAccountId(unitOfWork, accountId) {
         const queryManager = unitOfWork.getQueryManager();
         
         await queryManager.run(
@@ -78,4 +80,4 @@ class AuthToken {
 }
 
 module.exports.AuthToken = AuthToken;
-module.exports.AuthRepository = new AuthRepository();
+module.exports.AuthRepositoryImpl = AuthRepositoryImpl;

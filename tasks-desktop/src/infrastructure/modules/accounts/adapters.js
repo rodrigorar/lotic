@@ -1,5 +1,6 @@
-const { AccountsRepository } = require("../../../domain/modules/accounts/ports");
+const { AccountsRepository } = require("../../../domain/modules/accounts/data");
 const { Account } = require("../../../domain/modules/accounts/domain");
+const { Tables, Fields } = require("../../persistence/tables");
 
 class AccountRepositoryImpl extends AccountsRepository {
 
@@ -39,3 +40,5 @@ class AccountRepositoryImpl extends AccountsRepository {
                 : undefined;
     }
 }
+
+module.exports.AccountRepositoryImpl = AccountRepositoryImpl;
