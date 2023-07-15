@@ -6,7 +6,7 @@ describe("[Accounts]: Test Create Use Case", () => {
 
     it("Should Succeed with Account Creation", async () => {
         const mockedAccountRepository = jest.fn();
-        mockedAccountRepository.createAccount = jest.fn((unitOfWork, account) => { /* Do nothing */ });
+        mockedAccountRepository.save = jest.fn((unitOfWork, account) => { /* Do nothing */ });
 
         const unitOfWork = jest.fn();
         const accountData = {
@@ -16,12 +16,12 @@ describe("[Accounts]: Test Create Use Case", () => {
         const underTest = new UseCaseCreateAccount(mockedAccountRepository);
         await underTest.execute(unitOfWork, accountData);
 
-        expect(mockedAccountRepository.createAccount.mock.calls).toHaveLength(1);
+        expect(mockedAccountRepository.save.mock.calls).toHaveLength(1);
     });
 
     it("Should Fail Account Repository Error", async () => {
         const mockedAccountRepository = jest.fn();
-        mockedAccountRepository.createAccount = jest.fn(async (unitOfWork, account) => { throw new Error("Some error") });
+        mockedAccountRepository.save = jest.fn(async (unitOfWork, account) => { throw new Error("Some error") });
 
         const unitOfWork = jest.fn();
         const accountData = {
@@ -34,7 +34,7 @@ describe("[Accounts]: Test Create Use Case", () => {
 
     it("Should Fail no Unit Of Work provided", async () => {
         const mockedAccountRepository = jest.fn();
-        mockedAccountRepository.createAccount = jest.fn((unitOfWork, account) => { /* Do nothing */ });
+        mockedAccountRepository.save = jest.fn((unitOfWork, account) => { /* Do nothing */ });
 
         const accountData = {
             id: v4()
@@ -46,7 +46,7 @@ describe("[Accounts]: Test Create Use Case", () => {
 
     it("Should Fail no Account Data provided", async () => {
         const mockedAccountRepository = jest.fn();
-        mockedAccountRepository.createAccount = jest.fn((unitOfWork, account) => { /* Do nothing */ });
+        mockedAccountRepository.save = jest.fn((unitOfWork, account) => { /* Do nothing */ });
 
         const unitOfWork = jest.fn();
         const underTest = new UseCaseCreateAccount(mockedAccountRepository);
