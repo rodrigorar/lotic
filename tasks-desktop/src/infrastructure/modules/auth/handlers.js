@@ -46,11 +46,6 @@ async function handleLogin(event, loginData) {
     await RunUnitOfWork.run(async (unitOfWork) => {
         await useCaseLogin.execute(unitOfWork, loginData);
     });
-
-    // FIXME: This should be done with an event in the event bus
-    await SynchManager.execute();
-    // FIXME: This should be done with an event in the event bus
-    webContents.getFocusedWebContents().send('auth:logged_in');
 }
 
 async function handleLogout(event) {

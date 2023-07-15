@@ -109,7 +109,7 @@ ipcMain.on('tasks:update', TasksHandler.handleUpdateTasks);
 ipcMain.on('tasks:complete', TasksHandler.handleCompletion);
 ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
 
-// Auth Event Listeners
+// Auth Event Listeners FIXME: Move this to handlers
 
 ipcMain.on('auth:open:login', async (event) => {
   const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
@@ -127,11 +127,6 @@ ipcMain.on('auth:login', async (event, loginData) => {
     await RunUnitOfWork.run(async (unitOfWork) => {
         await useCaseLogin.execute(unitOfWork, loginData);
     });
-
-    mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html'));
-    await SynchManager.execute();
-
-    webContents.getFocusedWebContents().send('auth:logged_in');
 });
 
 ipcMain.on('auth:logout', async (event) => {
@@ -181,7 +176,6 @@ EventBus.register(
   })
 );
 
-// FIXME: The Event Subscriber should be in the domain
 EventBus.register(
   EventType.LOGIN_SUCCESS
   , new EventSubscriber(v4(), async (event) => {
@@ -194,4 +188,16 @@ EventBus.register(
               await useCaseUpdateTaskOwner.execute(unitOfWork, task)
           });
       });
+
+      mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html'));
+      
+      await SynchManager.execute();
+
+      webContents.getFocusedWebContents().send('auth:logged_in');
+  }));
+
+EventBus.register(
+  EventType.LOGIN_FAILURE
+  , new EventSubscriber(v4(), async (event) => {
+      webContents.getFocusedWebContents().send('auth:login_failed');
   }));

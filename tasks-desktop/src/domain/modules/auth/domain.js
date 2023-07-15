@@ -37,7 +37,7 @@ class UseCaseLogin extends Command {
         if (authToken == undefined) {
             const loginResult = await this.loginGateway.call(principal);
             if (loginResult.hasOwnProperty('status')) {
-                // FIXME: Inform the user in case this happens
+                EventBus.publish(new Event(EventType.LOGIN_FAILURE, {}))
                 throw new Errors.LoginFailedError('Failed to login account');
             }
             authToken = new AuthToken(

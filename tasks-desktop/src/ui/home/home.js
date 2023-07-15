@@ -5,6 +5,7 @@
 
 const taskContainer = document.querySelector("#tasks-container");
 const addTaskButton = document.querySelector("#add-task-button");
+const notificationContainer = document.querySelector("#notification-container");
 
 // DOM Create / Management
 
@@ -180,6 +181,12 @@ let updatedText = "";
 function handleTextInput(event) {
     const taskId = extractId(event.target.id);
 
+    alertMessage("info", "Some text");
+
+    const alertText = document.querySelector("#alert-text");
+    alertText.innerText = "Something is never gonna happen"
+    setTimeout(() => alertText.innerText = "", 500);
+
     if (taskId == emptyTask) {
         tasks.createTask({
             id: taskId
@@ -282,4 +289,43 @@ function extractId(value) {
 function updateEmptyTask(taskId = undefined, taskElement = undefined) {
     emptyTask = taskId;
     emptyTaskElement = taskElement;
+}
+
+// Alert Functions
+
+// types: info, notice, success, warning, error
+function alertMessage(type, message) {
+    logger.info("Launching alert message");
+
+    const alertLabel = document.createElement('label');
+    alertLabel.id = "alert";
+    
+    const inputAlert = document.createElement('input');
+    inputAlert.classList.add("alertCheckbox");
+    inputAlert.type = "checkbox";
+    inputAlert.autocomplete = "off";
+    alertLabel.appendChild(inputAlert);
+
+    const alertContainer = document.createElement('div');
+    alertContainer.classList.add("alert");
+    alertContainer.classList.add(type);
+
+    const closeSpan = document.createElement('span');
+    closeSpan.classList.add("alertClose");
+    closeSpan.innerHTML = "X";
+    alertContainer.appendChild(closeSpan);
+    
+    const textSpan = document.createElement('span');
+    textSpan.classList.add("alertText");
+    textSpan.innerHTML = message;
+    alertContainer.appendChild(textSpan);
+
+    const clearBr = document.createElement('br');
+    clearBr.classList.add("clear");
+    alertContainer.appendChild(clearBr);
+
+    alertLabel.appendChild(alertContainer);
+
+    notificationContainer.appendChild(alertLabel);
+    setTimeout(() => document.querySelector("#alert").remove(), 5000);
 }

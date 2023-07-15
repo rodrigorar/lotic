@@ -33,6 +33,7 @@ contextBridge.exposeInMainWorld('auth', {
     , logout: () => ipcRenderer.send('auth:logout')
     , isLoggedIn: () => ipcRenderer.invoke('auth:is_logged_in')
     , handleLoggedIn: (callback) => ipcRenderer.on('auth:logged_in', callback)
+    , handleLoginFailure: (callback) => ipcRenderer.on('auth:login_failed', callback)
     , handleLoggedOut: (callback) => ipcRenderer.on('auth:logged_out', callback)
 });
 

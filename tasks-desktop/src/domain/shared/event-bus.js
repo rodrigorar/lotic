@@ -2,6 +2,7 @@ const { Validators } = require("./utils");
 
 const EventType = {
     LOGIN_SUCCESS: "LoginSuccess"
+    , LOGIN_FAILURE: "LoginFailure"
     , REFRESH_SUCCESS: "RefreshSuccess"
     , REFRESH_FAILED: "RefreshFailed"
     , LOGOUT_SUCCESS: "LogoutSuccess"
