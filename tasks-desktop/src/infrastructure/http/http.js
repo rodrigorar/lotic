@@ -1,17 +1,20 @@
 const { Logger } = require('../../domain/shared/logger');
-const { AuthServicesInstance } = require('../../modules/auth/services');
+const { UseCaseRefreshProvider, UseCaseGetActiveSessionProvider } = require("../modules/auth/providers");
 const { Client, BASE_URL, Headers, ContentTypes } = require('./client');
 
 async function doCall(unitOfWork, httpCall) {
-    const activeSession = await AuthServicesInstance.getActiveSession(unitOfWork);
+    const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
+
+    const activeSession = await useCaseGetActiveSession.execute(unitOfWork);
     try {
         return await httpCall(activeSession.token);
     } catch (error) {
         if (error.response.status == StatusCode.Unauthorized) {
             // TODO: Abstract Auth Services from here, this is deeply wrong
-            await AuthServicesInstance.refresh(unitOfWork, activeSession.accountId);
+            const useCaseRefresh = UseCaseRefreshProvider.get();
+            await useCaseRefresh.execute(unitOfWork, activeSession.accountId);
 
-            const newActiveSession = await AuthServicesInstance.getActiveSession(unitOfWork);
+            const newActiveSession = await useCaseGetActiveSession.execute(unitOfWork);
             try {
                 return await httpCall(newActiveSession.token);
             } catch (error) {

@@ -2,11 +2,27 @@ const { EventBus, EventType, Event } = require("../../../domain/shared/event-bus
 const { Logger } = require("../../../domain/shared/logger");
 const { RunUnitOfWork } = require("../../persistence/unitofwork");
 const { UseCaseGetActiveSessionProvider } = require("../auth/providers");
-const { TasksRPC } = require("../../../modules/tasks/rpc");
-const { TaskServicesInstance } = require("../../../modules/tasks/services");
-const { TASK_SYNCH_STATUS } = require("../../../modules/tasks_synch/data");
-const { TasksSyncServicesInstance } = require("../../../modules/tasks_synch/services");
 const { State, StateEffect } = require("../../../domain/modules/sync/domain");
+const { TASK_SYNC_STATUS } = require("../../../domain/modules/tasks/domain");
+const { 
+    ListTasksGateway
+    , DeleteTasksGateway
+    , UpdateTasksGateway
+    , CreateTasksGateway
+} = require("../tasks/gateways");
+const { 
+    UseCaseListTasksForAccountProvider
+    , UseCaseDeleteTasksProvider
+    , UseCaseUpdateTaskProvider
+    , UseCaseCreateTasksProvider
+    , UseCaseListTasksByIdProvider
+    , UseCaseGetTaskSyncByTaskIdProvider
+    , UseCaseDeleteTaskSyncsByTaskIdsProvider,
+    UseCaseCreateTaskSyncsProvider,
+    UseCaseGetCompleteTaskSyncsProvider,
+    UseCaseGetNonSyncedTaskSyncsProvider,
+    UseCaseMarkTaskSyncsSyncedProvider
+} = require("../tasks/providers");
 
 // Sync Done
 
@@ -28,30 +44,34 @@ class DeleteTasksLocalStateEffect extends StateEffect {
     constructor(
         unitOfWorkProvider = RunUnitOfWork
         , useCaseGetActiveSession
-        , taskServices
-        , tasksSyncServices
-        , tasksRPC) {
+        , useCaseListByAccountId
+        , useCaseDeleteTasks
+        , useCaseGetTaskSyncByTaskId
+        , useCaseDeleteTaskSyncsByTaskIds
+        , listTasksGateway) {
 
         super();
 
         this.unitOfWorkProvider = unitOfWorkProvider;
         this.useCaseGetActiveSession = useCaseGetActiveSession;
-        this.taskServices = taskServices;
-        this.tasksSyncServices = tasksSyncServices;
-        this.tasksRPC = tasksRPC;
+        this.useCaseListByAccountId = useCaseListByAccountId;
+        this.useCaseDeleteTasks = useCaseDeleteTasks;
+        this.useCaseGetTaskSyncByTaskId = useCaseGetTaskSyncByTaskId;
+        this.useCaseDeleteTaskSyncsByTaskIds = useCaseDeleteTaskSyncsByTaskIds;
+        this.listTasksGateway = listTasksGateway;
     }
 
     async execute() {
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
             const authToken = await this.useCaseGetActiveSession.execute(unitOfWork);
-            const remoteTasksResponse = await this.tasksRPC.listTasks(unitOfWork, authToken.accountId);
+            const remoteTasksResponse = await this.listTasksGateway.call(unitOfWork, authToken.accountId);
 
-            const localTasks = await this.taskServices.list(unitOfWork, authToken.accountId);
+            const localTasks = await this.useCaseListByAccountId.execute(unitOfWork, authToken.accountId);
             const notNewLocalTasks = [];
             // FIXME: This should be done the task sync service
             for (let task of localTasks) {
-                const taskSync = await this.tasksSyncServices.getSyncStatus(unitOfWork, task.id);
-                if (taskSync.status != TASK_SYNCH_STATUS["LOCAL"]) {
+                const taskSync = await this.useCaseGetTaskSyncByTaskId.execute(unitOfWork, task.id);
+                if (taskSync.status != TASK_SYNC_STATUS.LOCAL) {
                     notNewLocalTasks.push(task);
                 }
             }
@@ -63,8 +83,8 @@ class DeleteTasksLocalStateEffect extends StateEffect {
 
             if (tasksToDelete.length > 0) {
                 const tasksToDeleteIds = tasksToDelete.map((task) => task.id);
-                await this.taskServices.deleteMultiple(unitOfWork, tasksToDeleteIds);
-                await this.tasksSyncServices.deleteMultipleByTaskId(unitOfWork, tasksToDeleteIds);
+                await this.useCaseDeleteTasks.execute(unitOfWork, tasksToDeleteIds);
+                await this.useCaseDeleteTaskSyncsByTaskIds.execute(unitOfWork, tasksToDeleteIds);
 
                 EventBus.publish(new Event(EventType.DELETED_LOCAL_TASKS, { accountId: authToken.accountId }));
             }
@@ -90,26 +110,22 @@ class UpdateTasksLocalStateEffect extends StateEffect {
     constructor(
         unitOfWorkProvider = RunUnitOfWork
         , useCaseGetActiveSession
-        , taskServices
-        , tasksSyncServices
-        , tasksRPC) {
+        , useCaseUpdateTask
+        , listTasksGateway) {
 
         super();
 
         this.unitOfWorkProvider = unitOfWorkProvider;
         this.useCaseGetActiveSession = useCaseGetActiveSession;
-        this.taskServices = taskServices;
-        this.tasksSyncServices = tasksSyncServices;
-        this.tasksRPC = tasksRPC;
+        this.useCaseUpdateTask = useCaseUpdateTask;
+        this.listTasksGateway = listTasksGateway;
     }
 
     async execute() {
-        console.log("Executing UpdateTasksLocalStateEffect");
-
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
             const authToken = await this.useCaseGetActiveSession.execute(unitOfWork);
-            const remoteTasksResponse = await this.tasksRPC.listTasks(unitOfWork, authToken.accountId);
-            remoteTasksResponse.data.tasks.map(entry => this.taskServices.update(
+            const remoteTasksResponse = await this.listTasksGateway.call(unitOfWork, authToken.accountId);
+            remoteTasksResponse.data.tasks.map(entry => this.useCaseUpdateTask.execute(
                 unitOfWork
                 , {
                     id: entry.task_id
@@ -134,9 +150,11 @@ class UpdateTasksLocalState extends State {
             new DeleteTasksLocalStateEffect(
                 RunUnitOfWork
                 , UseCaseGetActiveSessionProvider.get()
-                , TaskServicesInstance
-                , TasksSyncServicesInstance
-                , TasksRPC));
+                , UseCaseListTasksForAccountProvider.get()
+                , UseCaseDeleteTasksProvider.get()
+                , UseCaseGetTaskSyncByTaskIdProvider.get()
+                , UseCaseDeleteTaskSyncsByTaskIdsProvider.get()
+                , new ListTasksGateway()));
     }
 }
 
@@ -144,25 +162,30 @@ class UpdateTasksLocalState extends State {
 
 class CreateTasksLocalStateEffect extends StateEffect {
 
-    constructor(unitOfWorkProvider = RunUnitOfWork, useCaseGetActiveSession, taskServices, tasksSyncServices, tasksRPC) {
+    constructor(
+        unitOfWorkProvider = RunUnitOfWork
+        , useCaseGetActiveSession
+        , useCaseListTasksForAccountId
+        , useCaseCreateTasks
+        , useCaseCreateTaskSyncs
+        , listTasksGateway) {
         super();
 
         this.unitOfWorkProvider = unitOfWorkProvider;
         this.useCaseGetActiveSession = useCaseGetActiveSession;
-        this.taskServices = taskServices;
-        this.tasksSyncServices = tasksSyncServices;
-        this.tasksRPC = tasksRPC;
+        this.useCaseListTasksForAccountId = useCaseListTasksForAccountId; 
+        this.useCaseCreateTasks = useCaseCreateTasks;
+        this.useCaseCreateTaskSyncs = useCaseCreateTaskSyncs;
+        this.listTasksGateway = listTasksGateway;
     }
 
     async execute() {
-        console.log("Executing CreateTasksLocalStateEffect");
-
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
             const authToken = await this.useCaseGetActiveSession.execute(unitOfWork);
 
-            const remoteTasksResponse = await this.tasksRPC.listTasks(unitOfWork, authToken.accountId);
+            const remoteTasksResponse = await this.listTasksGateway.call(unitOfWork, authToken.accountId);
             if (remoteTasksResponse.data.tasks.length > 0) {
-                const existingTasks = await this.taskServices.list(unitOfWork, authToken.accountId);
+                const existingTasks = await this.useCaseListTasksForAccountId.execute(unitOfWork, authToken.accountId);
                 const tasksToInsert = remoteTasksResponse.data.tasks
                         .filter(result => existingTasks.filter(entry => entry.id == result.task_id).length == 0)
                         .map(taskData => ({
@@ -173,11 +196,11 @@ class CreateTasksLocalStateEffect extends StateEffect {
                             , ownerId: authToken.accountId
                         }));
 
-                await this.taskServices.createMultiple(unitOfWork, tasksToInsert);
-                await this.tasksSyncServices
-                    .createMultipleSyncMonitor(unitOfWork, tasksToInsert.map(task => ({
+                await this.useCaseCreateTasks.execute(unitOfWork, tasksToInsert);
+                await this.useCaseCreateTaskSyncs
+                    .execute(unitOfWork, tasksToInsert.map(task => ({
                         taskId: task.id
-                        , status: TASK_SYNCH_STATUS['SYNCHED']
+                        , status: TASK_SYNC_STATUS['SYNCED']
                     })));
             }
 
@@ -198,9 +221,8 @@ class CreateTasksLocalState extends State {
             new UpdateTasksLocalStateEffect(
                 RunUnitOfWork
                 , UseCaseGetActiveSessionProvider.get()
-                , TaskServicesInstance
-                , TasksSyncServicesInstance
-                , TasksRPC));
+                , UseCaseUpdateTaskProvider.get()
+                , new ListTasksGateway()));
     }
 }
 
@@ -208,26 +230,29 @@ class CreateTasksLocalState extends State {
 
 class DeleteTasksRemoteStateEffect extends StateEffect {
 
-    constructor(unitOfWorkProvider = RunUnitOfWork, taskServices, tasksSyncServices, tasksRPC) {
+    constructor(
+        unitOfWorkProvider = RunUnitOfWork
+        , useCaseGetCompleteTaskSyncs
+        , useCaseDeleteTaskSyncsByTaskId
+        , deleteTasksGateway) {
+        
         super();
 
         this.unitOfWorkProvider = unitOfWorkProvider;
-        this.taskServices = taskServices;
-        this.tasksSyncServices = tasksSyncServices;
-        this.tasksRPC = tasksRPC;
+        this.useCaseGetCompleteTaskSyncs = useCaseGetCompleteTaskSyncs;
+        this.useCaseDeleteTaskSyncsByTaskId = useCaseDeleteTaskSyncsByTaskId;
+        this.deleteTasksGateway = deleteTasksGateway;
     }
 
     async execute() {
-        console.log("Executing DeleteTasksRemoteStateEffect");
-
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
-            const locallyCompletedTasksSync = await this.tasksSyncServices.getComplete(unitOfWork);
+            const locallyCompletedTasksSync = await this.useCaseGetCompleteTaskSyncs.execute(unitOfWork);
             if (locallyCompletedTasksSync.length > 0) {
                 const taskSyncsToDelete = [];
                 for (const taskSync of locallyCompletedTasksSync) {
                     if (taskSync != undefined) {
                         try {
-                            await this.tasksRPC.deleteTasks(unitOfWork, taskSync.taskId);
+                            await this.deleteTasksGateway.call(unitOfWork, taskSync.taskId);
                             taskSyncsToDelete.push(taskSync);
                         } catch (e) {
                             if (e.response.status == StatusCode.NotFound) {
@@ -239,7 +264,7 @@ class DeleteTasksRemoteStateEffect extends StateEffect {
                     }
                 }
                 if (taskSyncsToDelete.length > 0) {
-                    await this.tasksSyncServices.deleteMultipleByTaskId(unitOfWork, taskSyncsToDelete.map(taskSync => taskSync.taskId));
+                    await this.useCaseDeleteTaskSyncsByTaskId.execute(unitOfWork, taskSyncsToDelete.map(taskSync => taskSync.taskId));
                 }
             }
         });
@@ -258,35 +283,43 @@ class DeleteTasksRemoteState extends State {
             new CreateTasksLocalStateEffect(
                 RunUnitOfWork
                 , UseCaseGetActiveSessionProvider.get()
-                , TaskServicesInstance
-                , TasksSyncServicesInstance
-                , TasksRPC));
+                , UseCaseListTasksForAccountProvider.get()
+                , UseCaseCreateTasksProvider.get()
+                , UseCaseCreateTaskSyncsProvider.get()
+                , new ListTasksGateway()));
     }
 }
 
 // Update Tasks Remote State
 
+// HERE
+
 class UpdateTasksRemoteStateEffect extends StateEffect {
 
-    constructor(unitOfWorkProvider = RunUnitOfWork, taskServices, tasksSyncServices, tasksRPC) {
+    constructor(
+        unitOfWorkProvider = RunUnitOfWork
+        , useCaseListTasksById
+        , useCaseGetNonSyncedTasksSync
+        , useCaseMarkTaskSyncAsSynced
+        , updateTasksGateway) {
+        
         super();
 
         this.unitOfWorkProvider = unitOfWorkProvider;
-        this.taskServices = taskServices;
-        this.tasksSyncServices = tasksSyncServices;
-        this.tasksRPC = tasksRPC;
+        this.useCaseListTasksById = useCaseListTasksById;
+        this.useCaseGetNonSyncedTasksSync = useCaseGetNonSyncedTasksSync;
+        this.useCaseMarkTaskSyncAsSynced = useCaseMarkTaskSyncAsSynced;
+        this.updateTasksGateway = updateTasksGateway;
     }
 
     async execute() {
-        console.log("Executing UpdateTasksRemoteStateEffect");
-
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
-            const unsyncedCreatedTaskSyncs = await this.tasksSyncServices.getNonSynced(unitOfWork)
+            const unsyncedCreatedTaskSyncs = await this.useCaseGetNonSyncedTasksSync.execute(unitOfWork)
             const locallyUpdatedTaskSyncs = unsyncedCreatedTaskSyncs
-                .filter(task => task.synchStatus == TASK_SYNCH_STATUS.DIRTY);
+                .filter(task => task.status == TASK_SYNC_STATUS.DIRTY);
             
                 if (locallyUpdatedTaskSyncs.length > 0) {
-                    const locallyUpdatedTasks = await this.taskServices.listById(unitOfWork, locallyUpdatedTaskSyncs.map(taskSync => taskSync.taskId));
+                    const locallyUpdatedTasks = await this.useCaseListTasksById.execute(unitOfWork, locallyUpdatedTaskSyncs.map(taskSync => taskSync.taskId));
 
                     const tasksRequest = locallyUpdatedTasks
                         .map(task => ({
@@ -296,9 +329,9 @@ class UpdateTasksRemoteStateEffect extends StateEffect {
                             , updated_at: task.updatedAt.toISOString()
                         }));
 
-                    const result = await this.tasksRPC.updateTasks(unitOfWork, tasksRequest);
+                    const result = await this.updateTasksGateway.call(unitOfWork, tasksRequest);
                     if (result != undefined) {
-                        await this.tasksSyncServices.markSynced(unitOfWork, locallyUpdatedTaskSyncs.map(taskSync => taskSync.taskId));
+                        await this.useCaseMarkTaskSyncAsSynced.execute(unitOfWork, locallyUpdatedTaskSyncs.map(taskSync => taskSync.taskId));
                     }
                 }
         });
@@ -316,9 +349,9 @@ class UpdateTasksRemoteState extends State {
         return new DeleteTasksRemoteState(
             new DeleteTasksRemoteStateEffect(
                 RunUnitOfWork
-                , TaskServicesInstance
-                , TasksSyncServicesInstance
-                , TasksRPC));
+                , UseCaseGetCompleteTaskSyncsProvider.get()
+                , UseCaseDeleteTaskSyncsByTaskIdsProvider.get()
+                , new DeleteTasksGateway()));
     }
 }
 
@@ -329,31 +362,31 @@ class CreateTasksRemoteStateEffect extends StateEffect {
     constructor(
         unitOfWorkProvider = RunUnitOfWork
         , useCaseGetActiveSession
-        , taskServices
-        , tasksSyncServices
-        , tasksRPC) {
+        , useCaseListTasksById
+        , useCaseGetNonSyncedTaskSyncs
+        , useCaseMarkTaskSyncSynced
+        , createTasksGateway) {
         
         super();
 
         this.unitOfWorkProvider = unitOfWorkProvider
         this.useCaseGetActiveSession = useCaseGetActiveSession;
-        this.taskServices = taskServices;
-        this.tasksSyncServices = tasksSyncServices;
-        this.tasksRPC = tasksRPC;
+        this.useCaseListTasksById = useCaseListTasksById;
+        this.useCaseGetNonSyncedTaskSyncs = useCaseGetNonSyncedTaskSyncs;
+        this.useCaseMarkTaskSyncSynced = useCaseMarkTaskSyncSynced;
+        this.createTasksGateway = createTasksGateway;
     }
 
     async execute() {
-        console.log("Executing CreateTasksRemoteStateEffect");
-
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
             const authToken = await this.useCaseGetActiveSession.execute(unitOfWork);
 
-            const unsyncedCreatedTaskSyncs = await this.tasksSyncServices.getNonSynced(unitOfWork)
+            const unsyncedCreatedTaskSyncs = await this.useCaseGetNonSyncedTaskSyncs.execute(unitOfWork);
             const locallyCreatedTaskSyncs = unsyncedCreatedTaskSyncs
-                .filter(task => task.synchStatus == TASK_SYNCH_STATUS.LOCAL);
+                .filter(task => task.status == TASK_SYNC_STATUS["LOCAL"]);
 
             if (locallyCreatedTaskSyncs.length > 0) {
-                const locallyCreatedTasks = await this.taskServices.listById(unitOfWork, locallyCreatedTaskSyncs.map(task_sync => task_sync.taskId));
+                const locallyCreatedTasks = await this.useCaseListTasksById.execute(unitOfWork, locallyCreatedTaskSyncs.map(task_sync => task_sync.taskId));
                 const tasksRequest = locallyCreatedTasks
                     .map(task => ({
                             task_id: task.id
@@ -364,11 +397,11 @@ class CreateTasksRemoteStateEffect extends StateEffect {
                             , owner_id: authToken.accountId
                         }));
 
-                const result = await this.tasksRPC.createTasks(unitOfWork, tasksRequest);
+                const result = await this.createTasksGateway.call(unitOfWork, tasksRequest);
                 if (result != undefined && 'ids' in result && result.ids.length == tasksRequest.length) {
-                    await this.tasksSyncServices.markSynced(unitOfWork, locallyCreatedTasks.map(task => task.id));
+                    await this.useCaseMarkTaskSyncSynced.execute(unitOfWork, locallyCreatedTasks.map(task => task.id));
                 } else if ('status' in result && result.status === '409') {
-                    await this.tasksSyncServices.markSynced(unitOfWork, locallyCreatedTasks.map(task => task.id));
+                    await this.useCaseMarkTaskSyncSynced.execute(unitOfWork, locallyCreatedTasks.map(task => task.id));
                 }
             }
         });
@@ -386,9 +419,10 @@ class CreateTasksRemoteState extends State {
         return new UpdateTasksRemoteState(
             new UpdateTasksRemoteStateEffect(
                 RunUnitOfWork
-                , TaskServicesInstance
-                , TasksSyncServicesInstance
-                , TasksRPC));
+                , UseCaseListTasksByIdProvider.get()
+                , UseCaseGetNonSyncedTaskSyncsProvider.get()
+                , UseCaseMarkTaskSyncsSyncedProvider.get()
+                , new UpdateTasksGateway()));
     }
 }
 
@@ -399,17 +433,13 @@ class StartSyncState extends State {
     constructor(
         unitOfWorkRunner = RunUnitOfWork
         , useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get()
-        , tasksServicesProvider = () => TaskServicesInstance
-        , tasksSyncServicesProvider = () => TasksSyncServicesInstance
-        , tasksRPCProvider = () => TasksRPC) {
+        , tasksSyncServicesProvider = () => TasksSyncServicesInstance) {
 
         super();
 
         this.unitOfWorkRunner = unitOfWorkRunner;
         this.useCaseGetActiveSession = useCaseGetActiveSession;
-        this.tasksServicesProvider = tasksServicesProvider;
         this.tasksSyncServicesProvider = tasksSyncServicesProvider;
-        this.tasksRPCProvider = tasksRPCProvider;
     }
 
     async next() {
@@ -423,9 +453,10 @@ class StartSyncState extends State {
                     new CreateTasksRemoteStateEffect(
                         this.unitOfWorkRunner
                         , UseCaseGetActiveSessionProvider.get()
-                        , this.tasksServicesProvider()
-                        , this.tasksSyncServicesProvider()
-                        , this.tasksRPCProvider()));
+                        , UseCaseListTasksByIdProvider.get()
+                        , UseCaseGetNonSyncedTaskSyncsProvider.get()
+                        , UseCaseMarkTaskSyncsSyncedProvider.get()
+                        , new CreateTasksGateway()));
             } else {
                 Logger.info("No account logged in, next state is SyncDoneState");
                 result = new SyncDoneState()

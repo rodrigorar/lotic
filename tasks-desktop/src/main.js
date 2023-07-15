@@ -1,21 +1,22 @@
 const cron = require('node-cron');
-const { runSchemaMigrations } = require('./shared/persistence/database');
+const { runSchemaMigrations } = require('./infrastructure/persistence/database');
 const { app, BrowserWindow, Menu, ipcMain, globalShortcut, webContents } = require('electron');
 const path = require('path');
-const { LoggerHandler } = require('./shared/logging/handler_logging');
-const { UtilsHandler } = require('./shared/utils/handler_utils');
-const { TasksHandler } = require('./modules/tasks/handler_tasks');
-const { OSMask } = require('./shared/os/os-mask');
-const { isDev } = require('./domain/shared/utils');
+const { LoggerHandler } = require('./infrastructure/logging/handlers');
+const { UtilsHandler } = require('./infrastructure/utils/handlers');
+const { TasksHandler } = require('./infrastructure/modules/tasks/handlers');
+const { OSMask, isDev } = require('./infrastructure/os/os-mask');
 const { SynchManager } = require('./infrastructure/modules/sync/synch-manager');
 const { AuthHandlers } = require('./infrastructure/modules/auth/handlers');
-const { UseCaseLoginProvider, UseCaseGetActiveSessionProvider } = require("./infrastructure/modules/auth/providers");
-const { EventType } = require('./shared/event-bus');
-const { EventBus } = require('./shared/event-bus');
-const { EventSubscriber } = require('./shared/event-bus');
-const { v4 } = require("uuid");
-const { RunUnitOfWork } = require('./shared/persistence/unitofwork');
-const { TaskServicesInstance } = require('./modules/tasks/services');
+const { UseCaseLoginProvider, UseCaseGetActiveSessionProvider } = require('./infrastructure/modules/auth/providers');
+const { EventBus, EventType, EventSubscriber } = require('./domain/shared/event-bus');
+const { RunUnitOfWork } = require('./infrastructure/persistence/unitofwork');
+const { v4 } = require('uuid');
+const { 
+  UseCaseListTasksWithoutOwnerProvider
+  , UseCaseUpdateTaskOwnerProvider
+  , UseCaseListTasksForAccountProvider 
+} = require('./infrastructure/modules/tasks/providers');
 
 app.setName('Tasks');
 
@@ -154,8 +155,9 @@ EventBus.registerForSeveralEventTypes(
   [EventType.CREATED_LOCAL_TASKS, EventType.DELETED_LOCAL_TASKS]
   , new EventSubscriber(v4(), (event) => {
       setTimeout(async () => {
+          const useCaseListTasksForAccount = UseCaseListTasksForAccountProvider.get();
           const refreshedTasks = await RunUnitOfWork.run(async (unitOfWork) => {
-            return await TaskServicesInstance.list(unitOfWork, event.body.accountId);
+            return await useCaseListTasksForAccount.execute(unitOfWork, event.body.accountId);
           });
           mainWindow.webContents.send('tasks:refresh', refreshedTasks); 
         }
@@ -178,3 +180,18 @@ EventBus.register(
     mainWindow.webContents.send("ui:loading:end")
   })
 );
+
+// FIXME: The Event Subscriber should be in the domain
+EventBus.register(
+  EventType.LOGIN_SUCCESS
+  , new EventSubscriber(v4(), async (event) => {
+      const useCaseListTasksWithoutOwner = UseCaseListTasksWithoutOwnerProvider.get();
+      const useCaseUpdateTaskOwner = UseCaseUpdateTaskOwnerProvider.get();
+      RunUnitOfWork.run(async (unitOfWork) => {
+          const tasksWithoutOwner = await useCaseListTasksWithoutOwner.execute(unitOfWork);
+          tasksWithoutOwner.forEach(async (task) => { 
+              task.ownerId = event.body.account_id;
+              await useCaseUpdateTaskOwner.execute(unitOfWork, task)
+          });
+      });
+  }));

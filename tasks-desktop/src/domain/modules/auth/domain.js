@@ -1,6 +1,7 @@
 const { Validators } = require("../../shared/utils");
 const { EventBus, Event, EventType } = require("../../shared/event-bus");
 const { Command, Query } = require("../../shared/ports");
+const { Errors } = require("../../errors");
 
 class AuthToken {
     constructor(token, refreshToken, accountId, expiresAt) {
