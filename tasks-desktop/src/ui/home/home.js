@@ -181,8 +181,6 @@ let updatedText = "";
 function handleTextInput(event) {
     const taskId = extractId(event.target.id);
 
-    alertMessage("info", "Some text");
-
     const alertText = document.querySelector("#alert-text");
     alertText.innerText = "Something is never gonna happen"
     setTimeout(() => alertText.innerText = "", 500);
@@ -295,8 +293,6 @@ function updateEmptyTask(taskId = undefined, taskElement = undefined) {
 
 // types: info, notice, success, warning, error
 function alertMessage(type, message) {
-    logger.info("Launching alert message");
-
     const alertLabel = document.createElement('label');
     alertLabel.id = "alert";
     
