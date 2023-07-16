@@ -38,7 +38,7 @@ class UseCaseGetAccount extends Query {
         Validators.isNotNull(unitOfWork, "No Unit of Work provided");
         Validators.isNotNull(accountId, "No accountId provided");
 
-        return await this.accountRepository.get(unitOfWork, accountId);
+        return await this.accountsRepository.get(unitOfWork, accountId);
     }
 }
 
