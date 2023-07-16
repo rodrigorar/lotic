@@ -37,7 +37,7 @@ class UseCaseLogin extends Command {
             EventBus.publish(new Event(
                 EventType.LOGIN_FAILURE
                 , {
-                    message: "The username has to be a valid email"
+                    message: "Invalid email"
                 }));
             throw new Errors.LoginFailedError("Invalid username");
         }
