@@ -23,9 +23,24 @@ class UseCaseLogin extends Command {
         this.loginGateway = loginGateway;
     }
 
+    validateUsername(email) {
+        return email
+            .toLowerCase()
+            .match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+    }
+
     async execute(unitOfWork, principal) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(principal, "No principal provided");
+
+        if (! this.validateUsername(principal.email)) {
+            EventBus.publish(new Event(
+                EventType.LOGIN_FAILURE
+                , {
+                    message: "The username has to be a valid email"
+                }));
+            throw new Errors.LoginFailedError("Invalid username");
+        }
     
         const account = await this.useCaseGetAccountByEmail.execute(unitOfWork, principal.email);
 
@@ -37,7 +52,11 @@ class UseCaseLogin extends Command {
         if (authToken == undefined) {
             const loginResult = await this.loginGateway.call(principal);
             if (loginResult.hasOwnProperty('status')) {
-                EventBus.publish(new Event(EventType.LOGIN_FAILURE, {}))
+                EventBus.publish(new Event(
+                    EventType.LOGIN_FAILURE
+                    , {
+                        message: "Username and/or Password are incorrect"
+                    }));
                 throw new Errors.LoginFailedError('Failed to login account');
             }
             authToken = new AuthToken(

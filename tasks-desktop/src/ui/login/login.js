@@ -31,11 +31,11 @@ termsAndConditions.addEventListener('click', async _ => {
     logger.info("About Was pressed (Not Implemented)");
 });
 
-auth.handleLoginFailure(event => {
-    logger.info("[UI]: Failed to login");
+auth.handleLoginFailure((event, value) => {
+    logger.trace("[UI]: Failed to login");
 
     document.querySelector("#loader").classList = [];
-    alertMessage("error", "Username / password are incorrect");
+    alertMessage("error", value.message);
 });
 
 // Alert Functions

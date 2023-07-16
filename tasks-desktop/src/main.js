@@ -199,5 +199,5 @@ EventBus.register(
 EventBus.register(
   EventType.LOGIN_FAILURE
   , new EventSubscriber(v4(), async (event) => {
-      webContents.getFocusedWebContents().send('auth:login_failed');
+      webContents.getFocusedWebContents().send('auth:login_failed', event.body);
   }));
