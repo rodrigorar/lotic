@@ -103,13 +103,13 @@ jobs:
         run: |
           cd tasks-backend
           hatch build
-      - name: Get Artifact Name
-        run: |
-          echo "ARTIFACT_NAME=$(ls tasks-backend/dist/ | grep -e tasks_server.*.tar.gz)" >> $GITHUB_ENV
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: tasks-backend/dist/tasks_server-*.tar.gz
-          if-no-files-found: error
-          retention-days: 1
+      #- name: Get Artifact Name
+      #  run: |
+      #    echo "ARTIFACT_NAME=$(ls tasks-backend/dist/ | grep -e tasks_server.*.tar.gz)" >> $GITHUB_ENV
+      #- name: Upload a Build Artifact
+      #  uses: actions/upload-artifact@v3.1.2
+      #  with:
+      #    name: ${{ env.ARTIFACT_NAME }}
+      #    path: tasks-backend/dist/tasks_server-*.tar.gz
+      #    if-no-files-found: error
+      #    retention-days: 1
