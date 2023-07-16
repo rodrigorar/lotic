@@ -132,6 +132,7 @@ jobs:
           run: |
             npm install
             npm run make
+            ls out/make
         - name: Get Artifact Name
           run: |
             echo "ARTIFACT_NAME_MACOS=$(ls tasks-desktop/out/make)" >> $GITHUB_ENV
