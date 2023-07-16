@@ -105,10 +105,10 @@ class UseCaseUpdateTasks extends Command {
 
     async execute(unitOfWork, taskDataList) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        Validators.isNotNull(tasksData, "No task data list provided");
+        Validators.isNotNull(taskDataList, "No task data list provided");
 
         for (let taskData of taskDataList) {
-            await this.tasksRepository.updateTask(unitOfWork, taskData)
+            await this.tasksRepository.update(unitOfWork, taskData)
         }
     }
 }
