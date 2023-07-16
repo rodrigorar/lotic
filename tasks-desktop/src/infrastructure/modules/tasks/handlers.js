@@ -39,7 +39,7 @@ async function handleUpdateTasks(event, taskId, data) {
 
     await RunUnitOfWork.run(async (unitOfWork) => {
         await useCaseUpdateTaskProvider.execute(unitOfWork, data);
-        useCaseMarkTaskSyncDirty.execute(unitOfWork, [taskId]);
+        await useCaseMarkTaskSyncDirty.execute(unitOfWork, taskId);
     });
 }
 
@@ -48,7 +48,7 @@ async function handleCompletion(event, taskId) {
     const useCaseMarkTaskSyncsForRemoval = UseCaseMarkTaskSyncForRemovalProvider.get();
     await RunUnitOfWork.run(async (unitOfWork) => {
         await useCaseEraseTask.execute(unitOfWork, taskId);
-        useCaseMarkTaskSyncsForRemoval.execute(unitOfWork, taskId);
+        await useCaseMarkTaskSyncsForRemoval.execute(unitOfWork, taskId);
     });
 }
 

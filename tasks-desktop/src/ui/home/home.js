@@ -181,10 +181,6 @@ let updatedText = "";
 function handleTextInput(event) {
     const taskId = extractId(event.target.id);
 
-    const alertText = document.querySelector("#alert-text");
-    alertText.innerText = "Something is never gonna happen"
-    setTimeout(() => alertText.innerText = "", 500);
-
     if (taskId == emptyTask) {
         tasks.createTask({
             id: taskId
@@ -219,13 +215,16 @@ function handleCompleteInput(event) {
             updateEmptyTask();
             return;
         }
-
-        tasks.completeTask(taskId);
-        event.target.parentElement.remove();
         
         if (document.querySelector('input') == null) {
             createTask();
         }
+
+        setTimeout(() => {
+            event.target.checked = false;
+            event.target.parentElement.remove();
+            tasks.completeTask(taskId);
+        }, 1000);
     }
 }
 
