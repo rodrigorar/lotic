@@ -432,14 +432,12 @@ class StartSyncState extends State {
 
     constructor(
         unitOfWorkRunner = RunUnitOfWork
-        , useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get()
-        , tasksSyncServicesProvider = () => TasksSyncServicesInstance) {
+        , useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get()) {
 
         super();
 
         this.unitOfWorkRunner = unitOfWorkRunner;
         this.useCaseGetActiveSession = useCaseGetActiveSession;
-        this.tasksSyncServicesProvider = tasksSyncServicesProvider;
     }
 
     async next() {
