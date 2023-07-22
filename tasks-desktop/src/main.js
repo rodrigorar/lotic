@@ -109,26 +109,20 @@ ipcMain.on('tasks:update', TasksHandler.handleUpdateTasks);
 ipcMain.on('tasks:complete', TasksHandler.handleCompletion);
 ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
 
+// Navigation Event Listeners
+
+ipcMain.on('nav:open:login', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/login/login.html')));
+ipcMain.on('nav:open:about', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/about/about.html')));
+ipcMain.on('nav:open:home', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html')));
+
 // Auth Event Listeners FIXME: Move this to handlers
 
-ipcMain.on('auth:open:login', async (event) => {
-  const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
-  const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
-    return await useCaseGetActiveSession.execute(unitOfWork);
-  });
-  const authFile = 
-            activeSession == undefined 
-                ? 'ui/login/login.html' 
-                : 'ui/login/logged_in.html';
-  mainWindow.loadFile(path.join(__dirname, authFile));
-});
 ipcMain.on('auth:login', async (event, loginData) => {
     const useCaseLogin = UseCaseLoginProvider.get();
     await RunUnitOfWork.run(async (unitOfWork) => {
         await useCaseLogin.execute(unitOfWork, loginData);
     });
 });
-
 ipcMain.on('auth:logout', async (event) => {
   const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
   const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {

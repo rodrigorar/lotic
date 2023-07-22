@@ -65,6 +65,7 @@ async function createMainMenu() {
     aboutOption.href = "#";
     aboutOption.addEventListener("click", async (event) => {
         logger.info("About Option has been pressed. / Not implemented");
+        nav.openAbout();
     });
     dropdownContent.appendChild(aboutOption);
 
@@ -83,7 +84,8 @@ async function createMainMenu() {
         signInOption.href = "#";
         signInOption.innerText = "Sign In";
         signInOption.addEventListener("click", async (event) => {
-            auth.openLogin();
+            logger.info("In Sign In Operation");
+            nav.openLogin();
         });
         dropdownContent.appendChild(signInOption);
 

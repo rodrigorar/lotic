@@ -28,8 +28,7 @@ contextBridge.exposeInMainWorld('tasks', {
 // auth
 
 contextBridge.exposeInMainWorld('auth', {
-    openLogin: () => ipcRenderer.send('auth:open:login')
-    , login: (loginData) => ipcRenderer.send('auth:login', loginData)
+    login: (loginData) => ipcRenderer.send('auth:login', loginData)
     , logout: () => ipcRenderer.send('auth:logout')
     , isLoggedIn: () => ipcRenderer.invoke('auth:is_logged_in')
     , handleLoggedIn: (callback) => ipcRenderer.on('auth:logged_in', callback)
@@ -43,3 +42,11 @@ contextBridge.exposeInMainWorld('ui', {
     handleLoadingStart: (callback) => ipcRenderer.on("ui:loading:start", callback)
     , handleLoadingEnd: (callback) => ipcRenderer.on("ui:loading:end", callback)
 })
+
+// navigation
+
+contextBridge.exposeInMainWorld('nav', {
+    openLogin: () => ipcRenderer.send('nav:open:login')
+    , openAbout: () => ipcRenderer.send('nav:open:about')
+    , openHome: () => ipcRenderer.send('nav:open:home')
+});

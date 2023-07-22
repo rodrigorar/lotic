@@ -24,6 +24,41 @@ body::-webkit-scrollbar {
   display: none;
 }
 
+/* Effects */
+
+.gradient-background {
+  background: linear-gradient(to right, #ddd5a5, white, #a0d1eb)
+}
+
+.easter-egg {
+  transform: scale(1, 1);
+}
+
+.easter-egg:active {
+  transform: scale(0.8, 0.8);
+}
+
+.easter-egg:hover {
+  animation: spin 1s linear 1
+}
+
+@keyframes spin {
+  50% { rotate: 0.5turn; transform: scale(1.5, 1.5) }
+  100% { rotate: 1turn; transform: scale(1, 1) } 
+}
+
+.link {
+  text-decoration: underline;
+}
+
+.link:hover {
+  color: blue
+}
+
+.link:active {
+  color: blueviolet
+}
+
 /* Layout */
 
 .loader {
@@ -98,6 +133,14 @@ body::-webkit-scrollbar {
 
 .v-spacer-20 {
   margin-top: 20%;
+}
+
+.v-spacer-30 {
+  margin-top: 30%;
+}
+
+.v-spacer-50 {
+  margin-top: 50%;
 }
 
 .h-spacer-70 {
@@ -221,10 +264,28 @@ body::-webkit-scrollbar {
   text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 0.3);
 }
 
+.font-hd-3-blk {
+  font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
+  font-size: 1em;
+  color: black;
+  font-weight: bolder;
+  padding: 0.10rem;
+  text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 0.3);
+}
+
 .font-hd-4 {
   font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
   font-size: 0.5em;
   color: #357ba2;
+  font-weight: bolder;
+  padding: 0.10rem;
+  text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 0.3);
+}
+
+.font-hd-4 {
+  font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
+  font-size: 0.5em;
+  color: black;
   font-weight: bolder;
   padding: 0.10rem;
   text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 0.3);
@@ -244,11 +305,26 @@ body::-webkit-scrollbar {
   padding: 0.5rem;
 }
 
+.font-sml {
+  font-family: "Open Sans", sans-serif;
+  font-size: small;
+  color: #357ba2;
+  padding: 0.5rem;
+}
+
 .font-tiny {
   font-family: "Open Sans", sans-serif;
   font-size: x-small;
   color: #357ba2;
   padding: 0.5rem;
+}
+
+.underlined {
+  text-decoration: underline;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 /* Buttons */

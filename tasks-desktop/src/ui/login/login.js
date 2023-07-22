@@ -2,14 +2,14 @@
 const emailInput = document.querySelector("#email-input");
 const passwordInput = document.querySelector("#password-input");
 const loginButton = document.querySelector("#submit-button");
-const termsAndConditions = document.querySelector("#terms-conditions");
+const about = document.querySelector("#about");
 const notificationContainer = document.querySelector("#notification-container");
 
 emailInput.focus();
 
 // Event Handlers
 
-loginButton.addEventListener('click', async _ => {
+loginButton.addEventListener('click', async (event) => {
     document.querySelector("#loader").classList = ["loader"];
     auth.login({
         email: emailInput.value
@@ -27,8 +27,8 @@ window.addEventListener('keypress', (key) => {
     }
 });
 
-termsAndConditions.addEventListener('click', async _ => {
-    logger.info("About Was pressed (Not Implemented)");
+about.addEventListener('click', async (event) => {
+    nav.openAbout();
 });
 
 auth.handleLoginFailure((event, value) => {
