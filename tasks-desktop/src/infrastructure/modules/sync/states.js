@@ -252,13 +252,15 @@ class DeleteTasksRemoteStateEffect extends StateEffect {
                 for (const taskSync of locallyCompletedTasksSync) {
                     if (taskSync != undefined) {
                         try {
+                            // FIXME: The server should receive a list of tasks instead of only one
                             await this.deleteTasksGateway.call(unitOfWork, taskSync.taskId);
                             taskSyncsToDelete.push(taskSync);
                         } catch (e) {
-                            if (e.response.status == StatusCode.NotFound) {
+                            if (e.response != undefined && e.response.status == StatusCode.NotFound) {
                                 taskSyncsToDelete.push(taskSync);
                             } else {
                                 Logger.error(e);
+                                throw e;
                             }
                         }
                     }

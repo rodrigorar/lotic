@@ -60,15 +60,6 @@ async function createMainMenu() {
     dropdownContent.classList.add("dropdown-content");
     dropdown.appendChild(dropdownContent);
 
-    const aboutOption = document.createElement("a");
-    aboutOption.innerText = "About";
-    aboutOption.href = "#";
-    aboutOption.addEventListener("click", async (event) => {
-        logger.info("About Option has been pressed. / Not implemented");
-        nav.openAbout();
-    });
-    dropdownContent.appendChild(aboutOption);
-
     const isLoggedIn = await auth.isLoggedIn();
     logger.info(isLoggedIn);
     if (isLoggedIn) {
@@ -97,6 +88,15 @@ async function createMainMenu() {
         });
         dropdownContent.appendChild(signUpOption);
     }
+
+    const aboutOption = document.createElement("a");
+    aboutOption.innerText = "About";
+    aboutOption.href = "#";
+    aboutOption.addEventListener("click", async (event) => {
+        logger.info("About Option has been pressed. / Not implemented");
+        nav.openAbout();
+    });
+    dropdownContent.appendChild(aboutOption);
 
     const headerRight = document.querySelector('#header-right');
     headerRight.appendChild(dropdown);
