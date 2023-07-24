@@ -182,6 +182,9 @@ class CreateTasksLocalStateEffect extends StateEffect {
     async execute() {
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
             const authToken = await this.useCaseGetActiveSession.execute(unitOfWork);
+            if (! authToken) {
+                return;
+            }
 
             const remoteTasksResponse = await this.listTasksGateway.call(unitOfWork, authToken.accountId);
             if (remoteTasksResponse.data.tasks.length > 0) {
@@ -216,13 +219,18 @@ class CreateTasksLocalState extends State {
     }
 
     async next() {
-        // FIXME: This State & StateAction should come from a provider
-        return new UpdateTasksLocalState(
-            new UpdateTasksLocalStateEffect(
-                RunUnitOfWork
-                , UseCaseGetActiveSessionProvider.get()
-                , UseCaseUpdateTaskProvider.get()
-                , new ListTasksGateway()));
+        return await this.unitOfWorkProvider.run(async (unitOfWork) => {
+            const authToken = await this.useCaseGetActiveSession.execute(unitOfWork);
+            if (! authToken) {
+                return SyncDoneState();
+            }
+            return new UpdateTasksLocalState(
+                new UpdateTasksLocalStateEffect(
+                    RunUnitOfWork
+                    , UseCaseGetActiveSessionProvider.get()
+                    , UseCaseUpdateTaskProvider.get()
+                    , new ListTasksGateway()));
+        });
     }
 }
 
