@@ -124,16 +124,18 @@ class UpdateTasksLocalStateEffect extends StateEffect {
     async execute() {
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
             const authToken = await this.useCaseGetActiveSession.execute(unitOfWork);
-            const remoteTasksResponse = await this.listTasksGateway.call(unitOfWork, authToken.accountId);
-            remoteTasksResponse.data.tasks.map(entry => this.useCaseUpdateTask.execute(
-                unitOfWork
-                , {
-                    id: entry.task_id
-                    , title: entry.title
-                    , createdAt: new Date() // FIXME: This should come from the server
-                    , updatedAt: new Date() // FIXME: This should come from the server
-                    , ownerId: entry.owner_id
-                }))
+            if (authToken) {
+                const remoteTasksResponse = await this.listTasksGateway.call(unitOfWork, authToken.accountId);
+                remoteTasksResponse.data.tasks.map(entry => this.useCaseUpdateTask.execute(
+                    unitOfWork
+                    , {
+                        id: entry.task_id
+                        , title: entry.title
+                        , createdAt: new Date() // FIXME: This should come from the server
+                        , updatedAt: new Date() // FIXME: This should come from the server
+                        , ownerId: entry.owner_id
+                    }))
+            }
         });
     }
 }
