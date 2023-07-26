@@ -169,6 +169,7 @@ class CreateTasksLocalStateEffect extends StateEffect {
         , useCaseCreateTasks
         , useCaseCreateTaskSyncs
         , listTasksGateway) {
+
         super();
 
         this.unitOfWorkProvider = unitOfWorkProvider;
@@ -214,8 +215,11 @@ class CreateTasksLocalStateEffect extends StateEffect {
 
 class CreateTasksLocalState extends State {
 
-    constructor(effect) {
+    constructor(unitOfWorkProvider, useCaseGetActiveSession, effect) {
         super(effect);
+
+        this.unitOfWorkProvider = unitOfWorkProvider;
+        this.useCaseGetActiveSession = useCaseGetActiveSession;
     }
 
     async next() {
@@ -290,7 +294,9 @@ class DeleteTasksRemoteState extends State {
     async next() {
         // FIXME: This State & StateAction should come from a provider
         return new CreateTasksLocalState(
-            new CreateTasksLocalStateEffect(
+            RunUnitOfWork
+            , UseCaseGetActiveSessionProvider.get()
+            , new CreateTasksLocalStateEffect(
                 RunUnitOfWork
                 , UseCaseGetActiveSessionProvider.get()
                 , UseCaseListTasksForAccountProvider.get()
