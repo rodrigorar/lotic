@@ -1,6 +1,6 @@
 const { Logger } = require("../../../domain/shared/logger");
 const { Gateway } = require("../../../domain/shared/ports");
-const { BASE_URL, Client } = require("../../http/client");
+const { BASE_URL, Client, Headers, ContentTypes } = require("../../http/client");
 
 const BASE_PATH = BASE_URL + "/accounts";
 
@@ -8,8 +8,9 @@ async function doCall(operation) {
     try {
         return await operation();
     } catch (error) {
+        console.log(error);
         Logger.error(error.response);
-        return error.response;
+        throw error;
     }
 }
 
@@ -35,6 +36,7 @@ class CreateAccountGateway extends Gateway {
                 }
             });
         });
+
         return result.data;
     }
 }

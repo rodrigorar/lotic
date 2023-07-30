@@ -84,7 +84,7 @@ async function createMainMenu() {
         signUpOption.href = "#";
         signUpOption.innerText = "Sign Up";
         signUpOption.addEventListener("click", async (event) => {
-            logger.info("Sign Up has been pressed / Not Implemented");
+            nav.openSignUp();
         });
         dropdownContent.appendChild(signUpOption);
     }

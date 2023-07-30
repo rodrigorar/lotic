@@ -35,6 +35,7 @@ class LoginGateway extends Gateway {
                 }
             });
         });
+        
         return result.data;
     }
 }

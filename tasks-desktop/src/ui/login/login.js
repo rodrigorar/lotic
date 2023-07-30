@@ -38,6 +38,11 @@ auth.handleLoginFailure((event, value) => {
     alertMessage("error", value.message);
 });
 
+accounts.handleSignUpSuccess((event, value) => {
+    logger.trace("[UI]: Account Successfully created");
+    alertMessage("success", value.message);
+});
+
 // Alert Functions
 
 // types: info, notice, success, warning, error

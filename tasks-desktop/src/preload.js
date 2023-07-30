@@ -29,6 +29,8 @@ contextBridge.exposeInMainWorld('tasks', {
 
 contextBridge.exposeInMainWorld('accounts', {
     signup: (signUpData) => ipcRenderer.send('accounts:signup', signUpData)
+    , handleSignUpFailure: (callback) => ipcRenderer.on('accounts:signup_failure', callback)
+    , handleSignUpSuccess: (callback) => ipcRenderer.on('accounts:signup_success', callback)
 })
 
 // auth
@@ -53,6 +55,7 @@ contextBridge.exposeInMainWorld('ui', {
 
 contextBridge.exposeInMainWorld('nav', {
     openLogin: () => ipcRenderer.send('nav:open:login')
+    , openSignUp: () => ipcRenderer.send('nav:open:signup')
     , openAbout: () => ipcRenderer.send('nav:open:about')
     , openHome: () => ipcRenderer.send('nav:open:home')
 });

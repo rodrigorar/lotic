@@ -1,5 +1,6 @@
 const { Validators } = require("../../shared/utils");
 const { Command, Query } = require("../../shared/ports");
+const { EventBus, EventType, Event } = require("../../shared/event-bus");
 
 class Account {
     constructor(id, email) {
@@ -32,6 +33,8 @@ class UseCaseCreateLocalAccount extends Command {
 class UseCaseCreateAccount extends Command {
 
     constructor(accountsRepository, createAccountGateway) {
+        super();
+        
         this.accountsRepository = accountsRepository;
         this.createAccountGateway = createAccountGateway;
     }
@@ -40,10 +43,18 @@ class UseCaseCreateAccount extends Command {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(accountData, "No account data provided");
 
-        await this.createAccountGateway.call(unitOfWork, accountData);
+        try {
+            const result = await this.createAccountGateway.call(accountData);
 
-        const newAccount = new Account(accountData.id, accountData.email);
-        await this.accountsRepository.save(unitOfWork, newAccount);
+            const newAccount = new Account(result.id, accountData.email);
+            await this.accountsRepository.save(unitOfWork, newAccount);
+
+            EventBus.publish(new Event(EventType.SIGN_UP_SUCCESS, {}));
+        } catch (error) {
+            EventBus.publish(new Event(EventType.SIGN_UP_FAILURE, {
+                message: "Failed to create account"
+            }));
+        }
     }
 }
 

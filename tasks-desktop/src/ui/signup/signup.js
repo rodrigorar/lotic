@@ -1,7 +1,8 @@
 
 const emailInput = document.querySelector("#email-input");
 const passwordInput = document.querySelector("#password-input");
-const loginButton = document.querySelector("#submit-button");
+const passwordInputRepeat = document.querySelector("#password-input-repeat");
+const signUpButton = document.querySelector("#submit-button");
 const about = document.querySelector("#about");
 const notificationContainer = document.querySelector("#notification-container");
 
@@ -9,18 +10,18 @@ emailInput.focus();
 
 // Event Handlers
 
-loginButton.addEventListener('click', async (event) => {
+signUpButton.addEventListener('click', async (event) => {
     document.querySelector("#loader").classList = ["loader"];
-    auth.signup({
+    accounts.signup({
         email: emailInput.value
         , password: passwordInput.value
     });
 });
 
 window.addEventListener('keypress', (key) => {
-    if (key.code === 'Enter') {
+    if (key.code === 'Enter' && signUpButton.disabled == "") {
         document.querySelector("#loader").classList = ["loader"];
-        auth.signup({
+        accounts.signup({
             email: emailInput.value
             , password: passwordInput.value
         });
@@ -31,8 +32,16 @@ about.addEventListener('click', async (event) => {
     nav.openAbout();
 });
 
-auth.handleLoginFailure((event, value) => {
-    logger.trace("[UI]: Failed to login");
+passwordInputRepeat.addEventListener('input', (event) => {
+    if (passwordInput.value == event.target.value) {
+        signUpButton.disabled = "";
+    } else {
+        signUpButton.disabled = "disabled";
+    }
+});
+
+accounts.handleSignUpFailure((event, value) => {
+    logger.trace("[UI]: Failed to Sign Up");
 
     document.querySelector("#loader").classList = [];
     alertMessage("error", value.message);

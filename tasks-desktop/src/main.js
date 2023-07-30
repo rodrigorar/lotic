@@ -17,7 +17,7 @@ const {
   , UseCaseUpdateTaskOwnerProvider
   , UseCaseListTasksForAccountProvider 
 } = require('./infrastructure/modules/tasks/providers');
-const { UseCaseCreateLocalAccountProvider } = require('./infrastructure/modules/accounts/providers');
+const { UseCaseCreateAccountProvider } = require('./infrastructure/modules/accounts/providers');
 
 app.setName('Tasks');
 
@@ -115,13 +115,23 @@ ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
 ipcMain.on('nav:open:login', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/login/login.html')));
 ipcMain.on('nav:open:about', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/about/about.html')));
 ipcMain.on('nav:open:home', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html')));
+ipcMain.on('nav:open:signup', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/signup/signup.html')))
 
 // Auth Event Listeners FIXME: Move this to handlers
 
 ipcMain.on('accounts:signup', async (event, signUpData) => {
-  const useCaseCreateLocalAccount = UseCaseCreateLocalAccountProvider.get();
-  await useCaseCreateLocalAccount.execute(signUpData);
+  RunUnitOfWork.run(async (unitOfWork) => {
+    const useCaseCreateLocalAccount = UseCaseCreateAccountProvider.get();
+    await useCaseCreateLocalAccount.execute(unitOfWork, signUpData);
 
+    mainWindow.loadFile(path.join(__dirname, 'ui/login/login.html'));
+
+    setTimeout(() => {
+      webContents.getFocusedWebContents().send('accounts:signup_success', {
+        message: "Account Created, Please Log In"
+      });
+    }, 250);
+  });
 });
 ipcMain.on('auth:login', async (event, loginData) => {
     const useCaseLogin = UseCaseLoginProvider.get();
@@ -175,6 +185,12 @@ EventBus.register(
     mainWindow.webContents.send("ui:loading:end")
   })
 );
+
+EventBus.register(
+  EventType.SIGN_UP_FAILURE
+  , new EventSubscriber(v4(), async (event) => {
+      webContents.getFocusedWebContents().send('accounts:signup_failure', event.body);
+  }));
 
 EventBus.register(
   EventType.LOGIN_SUCCESS
