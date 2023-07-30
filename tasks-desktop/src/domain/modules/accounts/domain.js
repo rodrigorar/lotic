@@ -27,9 +27,6 @@ class UseCaseCreateLocalAccount extends Command {
     
 }
 
-// CONTINUE HERE
-
-// TODO: Create Unit tests for this use case
 class UseCaseCreateAccount extends Command {
 
     constructor(accountsRepository, createAccountGateway) {
@@ -54,6 +51,7 @@ class UseCaseCreateAccount extends Command {
             EventBus.publish(new Event(EventType.SIGN_UP_FAILURE, {
                 message: "Failed to create account"
             }));
+            throw error;
         }
     }
 }

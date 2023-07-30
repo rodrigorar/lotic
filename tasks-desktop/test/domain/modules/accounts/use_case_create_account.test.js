@@ -1,55 +1,70 @@
-const { UseCaseCreateLocalAccount } = require("../../../../src/domain/modules/accounts/domain");
-const { NullArgumentError } = require("../../../../src/domain/errors");
 const { v4 } = require("uuid");
+const { UseCaseCreateAccount } = require("../../../../src/domain/modules/accounts/domain");
 
-describe("[Accounts]: Test Create Use Case", () => {
+describe("[Accounts]: Test Create Account Use Case", () => {
 
-    it("Should Succeed with Account Creation", async () => {
-        const mockedAccountRepository = jest.fn();
-        mockedAccountRepository.save = jest.fn((unitOfWork, account) => { /* Do nothing */ });
-
-        const unitOfWork = jest.fn();
+    it("Should succeed", async () => {
+        const mockedUnitOfWork = jest.fn();
         const accountData = {
-            id: v4()
-            , email: "test.mail@mail.not"
-        }
-        const underTest = new UseCaseCreateLocalAccount(mockedAccountRepository);
-        await underTest.execute(unitOfWork, accountData);
+            email: "test@mail.not"
+            , password: "qwerty"
+        };
 
-        expect(mockedAccountRepository.save.mock.calls).toHaveLength(1);
+        const mockedAccountRepository = jest.fn();
+        mockedAccountRepository.save = jest.fn((unitOfWork, account) => { /* Do Nothing */ });
+
+        const mockedCreateAccountGateway = jest.fn();
+        mockedCreateAccountGateway.call = jest.fn((accountData) => ({
+            id: v4()
+        }));
+
+        const underTest = new UseCaseCreateAccount(mockedAccountRepository, mockedCreateAccountGateway);
+        await underTest.execute(mockedUnitOfWork, accountData);
+        
+        expect(mockedCreateAccountGateway.call.mock.calls).toHaveLength(1);
     });
 
-    it("Should Fail Account Repository Error", async () => {
-        const mockedAccountRepository = jest.fn();
-        mockedAccountRepository.save = jest.fn(async (unitOfWork, account) => { throw new Error("Some error") });
-
-        const unitOfWork = jest.fn();
+    it("Should fail Remote Call Error", async () => {
+        const mockedUnitOfWork = jest.fn();
         const accountData = {
-            id: v4()
-            , email: "test.mail@mail.not"
-        }
-        const underTest = new UseCaseCreateLocalAccount(mockedAccountRepository);
-        expect(underTest.execute(unitOfWork, accountData)).rejects.toThrow(Error);
+            email: "test@mail.not"
+            , password: "qwerty"
+        };
+
+        const mockedAccountRepository = jest.fn();
+        mockedAccountRepository.save = jest.fn((unitOfWork, account) => { /* Do Nothing */ });
+
+        const mockedCreateAccountGateway = jest.fn();
+        mockedCreateAccountGateway.call = jest.fn((accountData) => {
+            throw new Error();
+        });
+
+        const underTest = new UseCaseCreateAccount(mockedAccountRepository, mockedCreateAccountGateway);
+        expect(underTest.execute(mockedUnitOfWork, accountData)).rejects.toThrow(Error);
+        
+        expect(mockedCreateAccountGateway.call.mock.calls).toHaveLength(1);
     });
 
-    it("Should Fail no Unit Of Work provided", async () => {
-        const mockedAccountRepository = jest.fn();
-        mockedAccountRepository.save = jest.fn((unitOfWork, account) => { /* Do nothing */ });
-
+    it("Should fail Repository Error", async () => {
+        const mockedUnitOfWork = jest.fn();
         const accountData = {
-            id: v4()
-            , email: "test.mail@mail.not"
-        }
-        const underTest = new UseCaseCreateLocalAccount(mockedAccountRepository);
-        expect(underTest.execute(undefined, accountData)).rejects.toThrow(NullArgumentError);
-    });
+            email: "test@mail.not"
+            , password: "qwerty"
+        };
 
-    it("Should Fail no Account Data provided", async () => {
         const mockedAccountRepository = jest.fn();
-        mockedAccountRepository.save = jest.fn((unitOfWork, account) => { /* Do nothing */ });
+        mockedAccountRepository.save = jest.fn((unitOfWork, account) => {
+            throw new Error();
+        });
 
-        const unitOfWork = jest.fn();
-        const underTest = new UseCaseCreateLocalAccount(mockedAccountRepository);
-        expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(NullArgumentError);
+        const mockedCreateAccountGateway = jest.fn();
+        mockedCreateAccountGateway.call = jest.fn((accountData) => ({
+            id: v4()
+        }));
+
+        const underTest = new UseCaseCreateAccount(mockedAccountRepository, mockedCreateAccountGateway);
+        expect(underTest.execute(mockedUnitOfWork, accountData)).rejects.toThrow(Error);
+        
+        expect(mockedCreateAccountGateway.call.mock.calls).toHaveLength(1);
     });
 });
