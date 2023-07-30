@@ -64,29 +64,31 @@ class DeleteTasksLocalStateEffect extends StateEffect {
     async execute() {
         await this.unitOfWorkProvider.run(async (unitOfWork) => {
             const authToken = await this.useCaseGetActiveSession.execute(unitOfWork);
-            const remoteTasksResponse = await this.listTasksGateway.call(unitOfWork, authToken.accountId);
+            if (authToken) {
+                const remoteTasksResponse = await this.listTasksGateway.call(unitOfWork, authToken.accountId);
 
-            const localTasks = await this.useCaseListByAccountId.execute(unitOfWork, authToken.accountId);
-            const notNewLocalTasks = [];
-            // FIXME: This should be done the task sync service
-            for (let task of localTasks) {
-                const taskSync = await this.useCaseGetTaskSyncByTaskId.execute(unitOfWork, task.id);
-                if (taskSync.status != TASK_SYNC_STATUS.LOCAL) {
-                    notNewLocalTasks.push(task);
+                const localTasks = await this.useCaseListByAccountId.execute(unitOfWork, authToken.accountId);
+                const notNewLocalTasks = [];
+                // FIXME: This should be done the task sync service
+                for (let task of localTasks) {
+                    const taskSync = await this.useCaseGetTaskSyncByTaskId.execute(unitOfWork, task.id);
+                    if (taskSync.status != TASK_SYNC_STATUS.LOCAL) {
+                        notNewLocalTasks.push(task);
+                    }
                 }
-            }
 
-            const tasksToDelete = notNewLocalTasks
-                    .filter(entry => {
-                        return remoteTasksResponse.data.tasks.filter(value => value.task_id == entry.id) == 0
-                    })
+                const tasksToDelete = notNewLocalTasks
+                        .filter(entry => {
+                            return remoteTasksResponse.data.tasks.filter(value => value.task_id == entry.id) == 0
+                        })
 
-            if (tasksToDelete.length > 0) {
-                const tasksToDeleteIds = tasksToDelete.map((task) => task.id);
-                await this.useCaseDeleteTasks.execute(unitOfWork, tasksToDeleteIds);
-                await this.useCaseDeleteTaskSyncsByTaskIds.execute(unitOfWork, tasksToDeleteIds);
+                if (tasksToDelete.length > 0) {
+                    const tasksToDeleteIds = tasksToDelete.map((task) => task.id);
+                    await this.useCaseDeleteTasks.execute(unitOfWork, tasksToDeleteIds);
+                    await this.useCaseDeleteTaskSyncsByTaskIds.execute(unitOfWork, tasksToDeleteIds);
 
-                EventBus.publish(new Event(EventType.DELETED_LOCAL_TASKS, { accountId: authToken.accountId }));
+                    EventBus.publish(new Event(EventType.DELETED_LOCAL_TASKS, { accountId: authToken.accountId }));
+                }
             }
         });
     }
