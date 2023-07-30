@@ -109,6 +109,9 @@ ipcMain.on('tasks:create', TasksHandler.handleCreateTask);
 ipcMain.on('tasks:update', TasksHandler.handleUpdateTasks);
 ipcMain.on('tasks:complete', TasksHandler.handleCompletion);
 ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
+ipcMain.on('tasks:refresh', (event) => {
+  SynchManager.execute();
+});
 
 // Navigation Event Listeners
 

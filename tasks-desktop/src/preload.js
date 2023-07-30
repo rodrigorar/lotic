@@ -22,6 +22,7 @@ contextBridge.exposeInMainWorld('tasks', {
     , updateTask: (taskId, data) => ipcRenderer.send('tasks:update', taskId, data)
     , completeTask: (taskId) => ipcRenderer.send('tasks:complete', taskId)
     , listTasks: () => ipcRenderer.invoke('tasks:list')
+    , refresh: () => ipcRenderer.send('tasks:refresh')
     , handleRefresh: (callback) => ipcRenderer.on('tasks:refresh', callback)
 });
 

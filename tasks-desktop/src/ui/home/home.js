@@ -6,6 +6,7 @@
 const taskContainer = document.querySelector("#tasks-container");
 const addTaskButton = document.querySelector("#add-task-button");
 const notificationContainer = document.querySelector("#notification-container");
+const refreshButton = document.querySelector("#refresh-button");
 
 // DOM Create / Management
 
@@ -176,6 +177,12 @@ window.addEventListener('keypress', (key) => {
     }
 });
 
+refreshButton.addEventListener('click', async () => {
+    logger.info("Refreshing info");
+    refreshButton.classList.add('press-spinner');
+    tasks.refresh();
+});
+
 // UI Handlers
 
 let debouncedUpdateOperation;
@@ -236,6 +243,8 @@ tasks.handleRefresh((event, tasks) => {
     const activeElementId = document.activeElement.id;
 
     logger.trace('Refreshing tasks');
+
+    refreshButton.classList = [];
 
     if (tasks != undefined) {
         taskContainer.innerHTML = null;

@@ -59,6 +59,15 @@ body::-webkit-scrollbar {
   color: blueviolet
 }
 
+.press-spinner {
+  animation: press-spin 1s ease-in infinite
+}
+
+@keyframes press-spin {
+  50% { rotate: 0.5turn; }
+  100% { rotate: 1turn; }
+}
+
 /* Layout */
 
 .loader {
