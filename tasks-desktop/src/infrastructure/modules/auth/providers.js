@@ -1,14 +1,14 @@
 const { AuthRepositoryImpl } = require("./adapters");
 const { LoginGateway, RefreshGateway, LogoutGateway } = require("./gateways");
-const { UseCaseCreateAccountProvider, UseCaseGetAccountByEmailProvider } = require("../accounts/providers");
 const { UseCaseProvider } = require("../../../domain/shared/ports");
 const { UseCaseLogin, UseCaseRefresh, UseCaseLogout, UseCaseGetActiveSession } = require("../../../domain/modules/auth/domain");
+const { UseCaseCreateLocalAccountProvider, UseCaseGetAccountByEmailProvider } = require("../accounts/providers");
 
 class UseCaseLoginProvider extends UseCaseProvider {
 
     get() {
         return new UseCaseLogin(
-            UseCaseCreateAccountProvider.get()
+            UseCaseCreateLocalAccountProvider.get()
             , UseCaseGetAccountByEmailProvider.get()
             , new AuthRepositoryImpl()
             , new LoginGateway())

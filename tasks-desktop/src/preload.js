@@ -25,6 +25,12 @@ contextBridge.exposeInMainWorld('tasks', {
     , handleRefresh: (callback) => ipcRenderer.on('tasks:refresh', callback)
 });
 
+// accounts
+
+contextBridge.exposeInMainWorld('accounts', {
+    signup: (signUpData) => ipcRenderer.send('accounts:signup', signUpData)
+})
+
 // auth
 
 contextBridge.exposeInMainWorld('auth', {

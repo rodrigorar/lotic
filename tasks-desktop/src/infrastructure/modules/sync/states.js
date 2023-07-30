@@ -310,8 +310,6 @@ class DeleteTasksRemoteState extends State {
 
 // Update Tasks Remote State
 
-// HERE
-
 class UpdateTasksRemoteStateEffect extends StateEffect {
 
     constructor(

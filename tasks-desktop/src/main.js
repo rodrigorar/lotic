@@ -17,6 +17,7 @@ const {
   , UseCaseUpdateTaskOwnerProvider
   , UseCaseListTasksForAccountProvider 
 } = require('./infrastructure/modules/tasks/providers');
+const { UseCaseCreateLocalAccountProvider } = require('./infrastructure/modules/accounts/providers');
 
 app.setName('Tasks');
 
@@ -117,6 +118,11 @@ ipcMain.on('nav:open:home', async (event) => mainWindow.loadFile(path.join(__dir
 
 // Auth Event Listeners FIXME: Move this to handlers
 
+ipcMain.on('accounts:signup', async (event, signUpData) => {
+  const useCaseCreateLocalAccount = UseCaseCreateLocalAccountProvider.get();
+  await useCaseCreateLocalAccount.execute(signUpData);
+
+});
 ipcMain.on('auth:login', async (event, loginData) => {
     const useCaseLogin = UseCaseLoginProvider.get();
     await RunUnitOfWork.run(async (unitOfWork) => {

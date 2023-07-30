@@ -1,4 +1,4 @@
-const { UseCaseCreateAccount } = require("../../../../src/domain/modules/accounts/domain");
+const { UseCaseCreateLocalAccount } = require("../../../../src/domain/modules/accounts/domain");
 const { NullArgumentError } = require("../../../../src/domain/errors");
 const { v4 } = require("uuid");
 
@@ -13,7 +13,7 @@ describe("[Accounts]: Test Create Use Case", () => {
             id: v4()
             , email: "test.mail@mail.not"
         }
-        const underTest = new UseCaseCreateAccount(mockedAccountRepository);
+        const underTest = new UseCaseCreateLocalAccount(mockedAccountRepository);
         await underTest.execute(unitOfWork, accountData);
 
         expect(mockedAccountRepository.save.mock.calls).toHaveLength(1);
@@ -28,7 +28,7 @@ describe("[Accounts]: Test Create Use Case", () => {
             id: v4()
             , email: "test.mail@mail.not"
         }
-        const underTest = new UseCaseCreateAccount(mockedAccountRepository);
+        const underTest = new UseCaseCreateLocalAccount(mockedAccountRepository);
         expect(underTest.execute(unitOfWork, accountData)).rejects.toThrow(Error);
     });
 
@@ -40,7 +40,7 @@ describe("[Accounts]: Test Create Use Case", () => {
             id: v4()
             , email: "test.mail@mail.not"
         }
-        const underTest = new UseCaseCreateAccount(mockedAccountRepository);
+        const underTest = new UseCaseCreateLocalAccount(mockedAccountRepository);
         expect(underTest.execute(undefined, accountData)).rejects.toThrow(NullArgumentError);
     });
 
@@ -49,7 +49,7 @@ describe("[Accounts]: Test Create Use Case", () => {
         mockedAccountRepository.save = jest.fn((unitOfWork, account) => { /* Do nothing */ });
 
         const unitOfWork = jest.fn();
-        const underTest = new UseCaseCreateAccount(mockedAccountRepository);
+        const underTest = new UseCaseCreateLocalAccount(mockedAccountRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(NullArgumentError);
     });
 });

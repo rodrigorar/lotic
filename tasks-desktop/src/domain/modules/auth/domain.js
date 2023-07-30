@@ -14,10 +14,10 @@ class AuthToken {
 
 class UseCaseLogin extends Command {
 
-    constructor(useCaseCreateAccount, useCaseGetAccountByEmail, authRepository, loginGateway) {
+    constructor(useCaseCreateLocalAccount, useCaseGetAccountByEmail, authRepository, loginGateway) {
         super();
 
-        this.useCaseCreateAccount = useCaseCreateAccount;
+        this.useCaseCreateLocalAccount = useCaseCreateLocalAccount;
         this.useCaseGetAccountByEmail = useCaseGetAccountByEmail;
         this.authRepository = authRepository;
         this.loginGateway = loginGateway;
@@ -66,7 +66,7 @@ class UseCaseLogin extends Command {
                 , loginResult.expires_at)
     
             if (account == undefined) {
-                await this.useCaseCreateAccount.execute(
+                await this.useCaseCreateLocalAccount.execute(
                     unitOfWork
                     , {
                         id: authToken.accountId

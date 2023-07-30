@@ -8,7 +8,7 @@ class Account {
     }
 }
 
-class UseCaseCreateAccount extends Command {
+class UseCaseCreateLocalAccount extends Command {
 
     constructor(accountsRepository) {
         super();
@@ -24,6 +24,27 @@ class UseCaseCreateAccount extends Command {
         await this.accountsRepository.save(unitOfWork, newAccount);
     }
     
+}
+
+// CONTINUE HERE
+
+// TODO: Create Unit tests for this use case
+class UseCaseCreateAccount extends Command {
+
+    constructor(accountsRepository, createAccountGateway) {
+        this.accountsRepository = accountsRepository;
+        this.createAccountGateway = createAccountGateway;
+    }
+
+    async execute(unitOfWork, accountData) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        Validators.isNotNull(accountData, "No account data provided");
+
+        await this.createAccountGateway.call(unitOfWork, accountData);
+
+        const newAccount = new Account(accountData.id, accountData.email);
+        await this.accountsRepository.save(unitOfWork, newAccount);
+    }
 }
 
 class UseCaseGetAccount extends Query {
@@ -59,6 +80,7 @@ class UseCaseGetAccountByEmail extends Query {
 }
 
 module.exports.Account = Account;
+module.exports.UseCaseCreateLocalAccount = UseCaseCreateLocalAccount;
 module.exports.UseCaseCreateAccount = UseCaseCreateAccount;
 module.exports.UseCaseGetAccount = UseCaseGetAccount;
 module.exports.UseCaseGetAccountByEmail = UseCaseGetAccountByEmail;
