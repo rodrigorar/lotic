@@ -115,31 +115,30 @@ jobs:
             path: tasks-desktop/out/make/
             if-no-files-found: error
             retention-days: 1
-  #build-windows:
-  #    runs-on: windows-latest
-  #    strategy:
-  #      matrix:
-  #        node-version: [18.x]
-  #        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-  #    steps:      
-  #      - uses: actions/checkout@v3
-  #      - name: Use Node.js ${{ matrix.node-version }}
-  #        uses: actions/setup-node@v3
-  #        with:
-  #          node-version: ${{ matrix.node-version }}
-  #      - name: Run CI
-  #        working-directory: ./tasks-desktop
-  #        run: |
-  #          npm install
-  #          npm run make
-  #          ls out/make
-  #      - name: Get Artifact Name
-  #        run: |
-  #          echo "ARTIFACT_NAME_MACOS=$(ls tasks-desktop/out/make)" >> $GITHUB_ENV
-  #      - name: Upload a Build Artifact
-  #        uses: actions/upload-artifact@v3.1.2
-  #        with:
-  #          name: ${{ env.ARTIFACT_NAME_MACOS }}
-  #          path: tasks-desktop/out/make/
-  #          if-no-files-found: error
-  #          retention-days: 1
+  build-windows:
+      runs-on: windows-latest
+      strategy:
+        matrix:
+          node-version: [18.x]
+          # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+      steps:      
+        - uses: actions/checkout@v3
+        - name: Use Node.js ${{ matrix.node-version }}
+          uses: actions/setup-node@v3
+          with:
+            node-version: ${{ matrix.node-version }}
+        - name: Run CI
+          working-directory: \tasks-desktop
+          run: |
+            npm install
+            npm run make
+        - name: Get Artifact Name
+          run: |
+            echo "ARTIFACT_NAME_WINDOWS=$(ls tasks-desktop\out\make\squirrel.windows\x64)" >> $GITHUB_ENV
+        - name: Upload a Build Artifact
+          uses: actions/upload-artifact@v3.1.2
+          with:
+            name: ${{ env.ARTIFACT_NAME_WINDOWS }}
+            path: tasks-desktop\out\make\squirrel.windows\x64
+            if-no-files-found: error
+            retention-days: 1
