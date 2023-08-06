@@ -20,14 +20,12 @@ module.exports = {
       }
     },
     {
-      name: '@electron-forge/maker-wix',
+      name: '@electron-forge/maker-squirrel',
       config: {
-        manufacturer: 'rodrigorar',
-        name: 'Tasks',
+        author: 'rodrigorar',
         description: 'Todo and daily planner app',
         icon: 'images/icon.ico',
-        setupIcon: 'images/icon.ico',
-        exe: 'Tasks-5.0.0 Setup'
+        setupIcon: 'images/icon.ico'
       },
     }
   ],
