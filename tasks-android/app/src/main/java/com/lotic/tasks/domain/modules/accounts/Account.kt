@@ -1,6 +1,6 @@
-package com.lotic.tasks.domain.modules.accounts.dto
+package com.lotic.tasks.domain.modules.accounts
 
-import com.lotic.tasks.domain.modules.accounts.data.EntityAccount
+import com.lotic.tasks.adapters.modules.accounts.EntityAccount
 import com.lotic.tasks.domain.shared.FromEntity
 import com.lotic.tasks.domain.shared.ToEntity
 import java.util.*

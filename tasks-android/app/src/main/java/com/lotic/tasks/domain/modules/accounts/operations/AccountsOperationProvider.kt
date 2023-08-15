@@ -2,9 +2,8 @@ package com.lotic.tasks.domain.modules.accounts.operations
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.lotic.tasks.domain.modules.accounts.dto.Account
-import com.lotic.tasks.domain.modules.accounts.repositories.AccountsRepository
-import com.lotic.tasks.domain.persistence.TasksDatabase
+import com.lotic.tasks.domain.modules.accounts.Account
+import com.lotic.tasks.domain.modules.accounts.AccountsRepository
 import com.lotic.tasks.domain.shared.Command
 import com.lotic.tasks.domain.shared.OperationsProvider
 import com.lotic.tasks.domain.shared.Provider
@@ -21,11 +20,9 @@ object AccountsOperationProvider : OperationsProvider {
         return this
     }
 
-    fun init(): AccountsOperationProvider {
+    fun init(accountsRepository: AccountsRepository): AccountsOperationProvider {
         // FIXME: This should come from a accounts repo provider instead of being instantiated here
-        this.accountsRepository = AccountsRepository(
-            TasksDatabase.getDatabase(AccountsOperationProvider.contextProvider.get()).daoAccounts()
-        )
+        this.accountsRepository = accountsRepository;
         return this
     }
 

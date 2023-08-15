@@ -1,4 +1,4 @@
-package com.lotic.tasks.domain.http
+package com.lotic.tasks.adapters.http
 
 import android.util.Log
 import com.google.gson.Gson

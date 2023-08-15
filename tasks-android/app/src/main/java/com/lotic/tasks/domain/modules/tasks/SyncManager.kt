@@ -8,7 +8,7 @@ import com.lotic.tasks.domain.events.Event
 import com.lotic.tasks.domain.events.EventBus
 import com.lotic.tasks.domain.events.EventType
 import com.lotic.tasks.domain.events.payloads.TasksSyncedEventInfo
-import com.lotic.tasks.domain.http.RetrofitClientProvider
+import com.lotic.tasks.adapters.http.RetrofitClientProvider
 import com.lotic.tasks.domain.modules.auth.dto.AuthToken
 import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionProvider

@@ -3,7 +3,7 @@ package com.lotic.tasks.domain.modules.auth.operations
 import android.content.Context
 import com.lotic.tasks.domain.modules.accounts.operations.AccountsOperationProvider
 import com.lotic.tasks.domain.modules.auth.repositories.RepositoryAuthToken
-import com.lotic.tasks.domain.persistence.TasksDatabase
+import com.lotic.tasks.adapters.TasksDatabase
 import com.lotic.tasks.domain.shared.OperationsProvider
 import com.lotic.tasks.domain.shared.Provider
 

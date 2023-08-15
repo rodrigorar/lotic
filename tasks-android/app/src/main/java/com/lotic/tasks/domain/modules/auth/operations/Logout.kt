@@ -3,7 +3,7 @@ package com.lotic.tasks.domain.modules.auth.operations
 import com.lotic.tasks.domain.events.Event
 import com.lotic.tasks.domain.events.EventBus
 import com.lotic.tasks.domain.events.EventType
-import com.lotic.tasks.domain.http.RetrofitClientProvider
+import com.lotic.tasks.adapters.http.RetrofitClientProvider
 import com.lotic.tasks.domain.modules.auth.client.AccountIdRequest
 import com.lotic.tasks.domain.modules.auth.client.AuthClient
 import com.lotic.tasks.domain.modules.auth.dto.AuthToken

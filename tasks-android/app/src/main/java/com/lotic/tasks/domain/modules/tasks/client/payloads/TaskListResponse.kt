@@ -1,7 +1,7 @@
 package com.lotic.tasks.domain.modules.tasks.client.payloads
 
 import com.google.gson.annotations.SerializedName
-import com.lotic.tasks.domain.http.translators.ToDTO
+import com.lotic.tasks.adapters.http.translators.ToDTO
 import com.lotic.tasks.domain.modules.tasks.dtos.Task
 import java.time.ZonedDateTime
 import java.util.*

@@ -1,11 +1,11 @@
-package com.lotic.tasks.domain.persistence
+package com.lotic.tasks.adapters
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.lotic.tasks.domain.modules.accounts.data.DAOAccounts
-import com.lotic.tasks.domain.modules.accounts.data.EntityAccount
+import com.lotic.tasks.adapters.modules.accounts.DAOAccounts
+import com.lotic.tasks.adapters.modules.accounts.EntityAccount
 import com.lotic.tasks.domain.modules.auth.data.DAOAuthToken
 import com.lotic.tasks.domain.modules.auth.data.EntityAuthToken
 import com.lotic.tasks.domain.modules.tasks.data.DAOTasks

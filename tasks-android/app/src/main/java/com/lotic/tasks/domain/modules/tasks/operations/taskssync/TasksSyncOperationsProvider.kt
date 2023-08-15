@@ -7,7 +7,7 @@ import com.lotic.tasks.domain.modules.tasks.operations.taskssync.observers.Compl
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.observers.CreateTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.observers.UpdateTasksSync
 import com.lotic.tasks.domain.modules.tasks.repositories.TasksSyncRepository
-import com.lotic.tasks.domain.persistence.TasksDatabase
+import com.lotic.tasks.adapters.TasksDatabase
 import com.lotic.tasks.domain.shared.OperationsProvider
 import com.lotic.tasks.domain.shared.Provider
 

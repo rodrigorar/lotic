@@ -1,4 +1,4 @@
-package com.lotic.tasks.domain.http.adapters
+package com.lotic.tasks.adapters.http.adapters
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
