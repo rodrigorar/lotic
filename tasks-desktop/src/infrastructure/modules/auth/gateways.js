@@ -6,9 +6,11 @@ const BASE_PATH = BASE_URL + "/auth";
 
 async function doCall(operation) {
     try {
-        return await operation();
+        const response = await operation();
+        console.log(response);
+        return response;
     } catch (error) {
-        Logger.error(error.response);
+        console.log(error); // Logged like this because its an object
         return error.response;
     }
 }
@@ -46,20 +48,24 @@ class RefreshGateway extends Gateway {
         super();
     }
 
-    async call(refreshToken) {
-        Logger.trace(`Calling URL: #POST ${BASE_PATH}/refresh/${refreshToken}`);
+    async call(authSession) {
+        Logger.trace(`Calling URL: #POST ${BASE_PATH}/refresh/${authSession.refreshToken}`);
 
         const result = await doCall(async () => {
             return await Client.post(
-                BASE_PATH + "/refresh/" + refreshToken
+                BASE_PATH + "/refresh/" + authSession.refreshToken
                 , {}
                 , {
                     headers: {
                         [Headers.Accept]: ContentTypes.ApplicationJson 
-                        , [Headers.XAuthorization]: accessToken
+                        , [Headers.XAuthorization]: authSession.token
                     }
                 });
         });
+
+        console.log("Result:");
+        console.log(result);
+
         return result.data;
     }
 }

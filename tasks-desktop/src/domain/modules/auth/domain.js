@@ -104,7 +104,7 @@ class UseCaseRefresh extends Command {
             throw new Errors.UnknownAccountError("No session found for account id: " + accountId);
         }
     
-        const refreshResult = await this.refreshGateway.call(oldAuthToken.token, oldAuthToken.refreshToken)
+        const refreshResult = await this.refreshGateway.call(oldAuthToken)
         if (refreshResult.hasOwnProperty("status") && 
             (refreshResult.status == "404") || refreshResult.status == "401") {
                 await this.authRepository.eraseForAccountId(unitOfWork, accountId);
