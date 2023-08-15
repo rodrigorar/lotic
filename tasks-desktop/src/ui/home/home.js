@@ -281,11 +281,15 @@ auth.handleLoggedOut(event => {
 });
 
 ui.handleLoadingStart((event) => {
+    refreshButton.classList.add('press-spinner');
     document.querySelector("#loader").classList = ["loader"];
 });
 
 ui.handleLoadingEnd((event) => {
-    document.querySelector("#loader").classList = [""];
+    setTimeout(() => {
+        refreshButton.classList = [];
+        document.querySelector("#loader").classList = [""];
+    }, 500);
 });
 
 // Helper functions
