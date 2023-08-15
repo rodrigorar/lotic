@@ -1,7 +1,7 @@
-package com.lotic.tasks.domain.modules.auth.client
+package com.lotic.tasks.adapters.modules.auth.gateways
 
-import com.lotic.tasks.domain.modules.auth.dto.AuthToken
-import com.lotic.tasks.domain.modules.auth.dto.Credentials
+import com.lotic.tasks.domain.modules.auth.AuthToken
+import com.lotic.tasks.domain.modules.auth.Credentials
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

@@ -9,8 +9,8 @@ import com.lotic.tasks.domain.events.EventBus
 import com.lotic.tasks.domain.events.EventType
 import com.lotic.tasks.domain.events.payloads.TasksSyncedEventInfo
 import com.lotic.tasks.adapters.http.RetrofitClientProvider
-import com.lotic.tasks.domain.modules.auth.dto.AuthToken
-import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
+import com.lotic.tasks.domain.modules.auth.AuthToken
+import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionProvider
 import com.lotic.tasks.domain.modules.tasks.client.TasksClient
 import com.lotic.tasks.domain.modules.tasks.client.payloads.CreateTasksRequest
@@ -21,7 +21,6 @@ import com.lotic.tasks.domain.modules.tasks.operations.tasks.CreateTasksSynced
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.GetTasksById
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.ListTasks
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.TasksOperationsProvider
-import com.lotic.tasks.domain.modules.tasks.operations.tasks.UpdateTask
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.UpdateTasksSynced
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.DeleteTaskSyncByTaskId
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetCompleteTasksSync

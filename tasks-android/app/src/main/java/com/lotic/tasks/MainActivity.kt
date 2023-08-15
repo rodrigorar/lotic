@@ -11,11 +11,12 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.lotic.tasks.adapters.modules.accounts.AccountsRepositoryImpl
 import com.lotic.tasks.domain.modules.accounts.operations.AccountsOperationProvider
-import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
+import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.SyncManager
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.TasksOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.TasksSyncOperationsProvider
 import com.lotic.tasks.adapters.TasksDatabase
+import com.lotic.tasks.adapters.modules.auth.AuthTokenRepositoryImpl
 import com.lotic.tasks.domain.shared.Provider
 import com.lotic.tasks.ui.theme.TasksTheme
 import java.util.concurrent.TimeUnit
@@ -30,14 +31,18 @@ class MainActivity : ComponentActivity() {
             .setContextProvider(contextProvider)
             .init(
                 AccountsRepositoryImpl(
-                    TasksDatabase.getDatabase(contextProvider.get()).daoAccounts()
+                    TasksDatabase.getDatabase(contextProvider).daoAccounts()
                 )
             )
 
         val authOperationsProvider = AuthOperationsProvider
             .setContextProvider(contextProvider)
             .setAccountOperationsProvider(accountsOperationsProvider)
-            .init()
+            .init(
+                AuthTokenRepositoryImpl(
+                    TasksDatabase.getDatabase(contextProvider).daoAuthToken()
+                )
+            )
 
         TasksOperationsProvider
             .setContextProvider(contextProvider)

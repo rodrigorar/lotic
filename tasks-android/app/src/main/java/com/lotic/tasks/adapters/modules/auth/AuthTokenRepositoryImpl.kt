@@ -1,11 +1,10 @@
-package com.lotic.tasks.domain.modules.auth.repositories
+package com.lotic.tasks.adapters.modules.auth
 
-import com.lotic.tasks.domain.modules.auth.data.DAOAuthToken
-import com.lotic.tasks.domain.modules.auth.dto.AuthToken
-import com.lotic.tasks.domain.persistence.Repository
+import com.lotic.tasks.domain.modules.auth.AuthTokenRepository
+import com.lotic.tasks.domain.modules.auth.AuthToken
 import java.util.*
 
-class RepositoryAuthToken(private val daoAuthToken: DAOAuthToken) : Repository<Int, AuthToken> {
+class AuthTokenRepositoryImpl(private val daoAuthToken: DAOAuthToken) : AuthTokenRepository {
 
     override suspend fun insert(authToken: AuthToken) {
         daoAuthToken.insert(authToken.toEntity())
@@ -19,15 +18,15 @@ class RepositoryAuthToken(private val daoAuthToken: DAOAuthToken) : Repository<I
         throw NotImplementedError("RepositoryAuthToken#getById is not implemented")
     }
 
-    suspend fun getByAccountId(accountId: UUID): AuthToken? {
+    override suspend fun getByAccountId(accountId: UUID): AuthToken? {
         return daoAuthToken.getByAccountId(accountId)?.let { AuthToken.fromEntity(it) }
     }
 
-    suspend fun getActiveAuthSession(): AuthToken? {
+    override suspend fun getActiveAuthSession(): AuthToken? {
         return daoAuthToken.getActiveAuthSession()?.let { AuthToken.fromEntity(it) }
     }
 
-    suspend fun deleteAllForAccount(accountId: UUID) {
+    override suspend fun deleteAllForAccount(accountId: UUID) {
         daoAuthToken.deleteAllForAccount(accountId)
     }
 
@@ -37,5 +36,4 @@ class RepositoryAuthToken(private val daoAuthToken: DAOAuthToken) : Repository<I
             daoAuthToken.delete(it)
         }
     }
-
 }

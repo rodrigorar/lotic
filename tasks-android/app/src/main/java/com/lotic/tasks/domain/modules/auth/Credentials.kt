@@ -1,4 +1,4 @@
-package com.lotic.tasks.domain.modules.auth.dto
+package com.lotic.tasks.domain.modules.auth
 
 import com.google.gson.annotations.SerializedName
 

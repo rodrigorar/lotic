@@ -1,4 +1,4 @@
-package com.lotic.tasks.domain.modules.auth.client
+package com.lotic.tasks.adapters.modules.auth.gateways
 
 import com.google.gson.annotations.SerializedName
 import java.util.*

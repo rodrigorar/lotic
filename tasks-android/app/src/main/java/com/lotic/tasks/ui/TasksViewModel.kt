@@ -10,8 +10,8 @@ import com.lotic.tasks.domain.events.Event
 import com.lotic.tasks.domain.events.EventBus
 import com.lotic.tasks.domain.events.EventObserver
 import com.lotic.tasks.domain.events.EventType
-import com.lotic.tasks.domain.modules.auth.dto.AuthToken
-import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
+import com.lotic.tasks.domain.modules.auth.AuthToken
+import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.TasksOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.dtos.Task
 import kotlinx.coroutines.delay

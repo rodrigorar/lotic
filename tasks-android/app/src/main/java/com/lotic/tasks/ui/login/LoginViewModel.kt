@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lotic.tasks.domain.modules.auth.operations.Login
-import com.lotic.tasks.domain.modules.auth.dto.Credentials
-import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
+import com.lotic.tasks.domain.modules.auth.Credentials
+import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
 import kotlinx.coroutines.launch
 
 class LoginViewModel() : ViewModel() {

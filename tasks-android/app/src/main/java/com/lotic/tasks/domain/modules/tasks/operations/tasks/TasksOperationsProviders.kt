@@ -1,7 +1,7 @@
 package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
 import android.content.Context
-import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
+import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.repositories.TasksRepository
 import com.lotic.tasks.adapters.TasksDatabase
 import com.lotic.tasks.domain.shared.OperationsProvider

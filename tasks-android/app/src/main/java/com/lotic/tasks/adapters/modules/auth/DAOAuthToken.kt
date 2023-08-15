@@ -1,4 +1,4 @@
-package com.lotic.tasks.domain.modules.auth.data
+package com.lotic.tasks.adapters.modules.auth
 
 import androidx.room.Dao
 import androidx.room.Delete

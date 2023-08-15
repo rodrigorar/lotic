@@ -2,8 +2,8 @@ package com.lotic.tasks.adapters.http
 
 import android.util.Log
 import com.google.gson.Gson
-import com.lotic.tasks.domain.modules.auth.dto.AuthToken
-import com.lotic.tasks.domain.modules.auth.operations.AuthOperationsProvider
+import com.lotic.tasks.domain.modules.auth.AuthToken
+import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionProvider
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor

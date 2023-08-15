@@ -1,16 +1,16 @@
 package com.lotic.tasks.domain.modules.auth.operations
 
-import com.lotic.tasks.adapters.http.RetrofitClientProvider
-import com.lotic.tasks.domain.modules.auth.client.AuthClient
-import com.lotic.tasks.domain.modules.auth.dto.AuthToken
-import com.lotic.tasks.domain.modules.auth.repositories.RepositoryAuthToken
+import com.lotic.tasks.domain.modules.auth.AuthToken
+import com.lotic.tasks.domain.modules.auth.AuthTokenRepository
 import com.lotic.tasks.domain.shared.Command
+import com.lotic.tasks.domain.shared.Gateway
 
-class Refresh(private val authTokenRepository: RepositoryAuthToken) : Command<AuthToken> {
+class Refresh(
+    private val authTokenRepository: AuthTokenRepository
+    , private val refreshGateway: Gateway<AuthToken, AuthToken?>) : Command<AuthToken> {
 
     override suspend fun execute(input: AuthToken) {
-        val authClient: AuthClient? = RetrofitClientProvider.get()?.create(AuthClient::class.java)
-        val result: AuthToken? = authClient?.refresh(input.refreshToken)
+        val result: AuthToken? = this.refreshGateway.call(input)
         if (result != null) {
             authTokenRepository.deleteAllForAccount(input.accountId)
             authTokenRepository.insert(result)
