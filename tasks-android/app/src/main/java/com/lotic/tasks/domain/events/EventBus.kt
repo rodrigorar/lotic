@@ -30,4 +30,10 @@ object EventBus {
             }
         }
     }
+
+    fun clear() {
+        synchronized(this) {
+            observers.clear()
+        }
+    }
 }

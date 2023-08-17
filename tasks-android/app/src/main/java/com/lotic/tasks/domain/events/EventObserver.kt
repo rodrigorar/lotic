@@ -1,5 +1,5 @@
 package com.lotic.tasks.domain.events
 
-interface EventObserver {
+fun interface EventObserver {
     fun notify(event: Event)
 }

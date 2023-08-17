@@ -11,11 +11,9 @@ class Refresh(
 
     override suspend fun execute(input: AuthToken) {
         val result: AuthToken? = this.refreshGateway.call(input)
-        if (result != null) {
-            authTokenRepository.deleteAllForAccount(input.accountId)
-            authTokenRepository.insert(result)
-        } else {
-            authTokenRepository.deleteAllForAccount(input.accountId)
+        authTokenRepository.deleteAllForAccount(input.accountId)
+        result?.let {
+            authTokenRepository.insert(it)
         }
     }
 

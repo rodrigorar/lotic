@@ -21,15 +21,17 @@ class Login(
     override suspend fun execute(input: Credentials) {
         try {
             val result: AuthToken? = loginGateway.call(input)
-            result?.also {
+            result?.let {
                 repositoryAuthToken.deleteAllForAccount(it.accountId)
                 repositoryAuthToken.insert(it)
                 if (getAccountByEmailQuery.execute(input.subject) == null) {
                     newAccountCommand.execute(Account(it.accountId, input.subject))
                 }
-            }
 
-            EventBus.post(Event(EventType.LOGIN_SUCCESS))
+                EventBus.post(Event(EventType.LOGIN_SUCCESS))
+            } ?:run {
+                EventBus.post(Event(EventType.LOGIN_FAILURE))
+            }
         } catch (e: Exception) {
             val localAccount: Account? = getAccountByEmailQuery.execute(input.subject)
             localAccount?.also {
