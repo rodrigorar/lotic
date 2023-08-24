@@ -19,7 +19,7 @@ import java.util.*
 class TestLogin {
 
     @Test
-    fun testShouldSucceedNoNewAccount() {
+    fun shouldSucceedNoNewAccount() {
         val input = Credentials("test@mail.net", "passwd")
         val authToken = AuthToken(
             UUID.randomUUID().toString()
@@ -65,7 +65,7 @@ class TestLogin {
     }
 
     @Test
-    fun testShouldSucceedNewAccount() {
+    fun shouldSucceed_newAccount() {
         val input = Credentials("test@mail.net", "passwd")
         val authToken = AuthToken(
             UUID.randomUUID().toString()
@@ -115,7 +115,7 @@ class TestLogin {
     }
 
     @Test
-    fun testShouldFailNoResult() {
+    fun shouldFail_noResult() {
         val input = Credentials("test@mail.net", "passwd")
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>();
@@ -146,7 +146,7 @@ class TestLogin {
     }
 
     @Test
-    fun testShouldFailGatewayError() {
+    fun shouldFail_gatewayError() {
         val input = Credentials("test@mail.net", "passwd")
         val authToken = AuthToken(
             UUID.randomUUID().toString()
@@ -188,7 +188,7 @@ class TestLogin {
     }
 
     @Test
-    fun testShouldFailRepositoryError() {
+    fun shouldFail_repositoryError() {
         val input = Credentials("test@mail.net", "passwd")
         val authToken = AuthToken(
             UUID.randomUUID().toString()

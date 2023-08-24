@@ -11,7 +11,7 @@ import java.util.*
 class TestCurrentActiveAuthSessionProvider {
 
     @Test
-    fun testShouldSucceed() {
+    fun shouldSucceed() {
         val authSession = AuthToken(
             UUID.randomUUID().toString()
             , UUID.randomUUID().toString()
@@ -33,7 +33,7 @@ class TestCurrentActiveAuthSessionProvider {
     }
 
     @Test
-    fun testShouldFailAuthTokenRepositoryError() {
+    fun shouldFail_authTokenRepositoryError() {
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
         coEvery { mockedAuthTokenRepository.getActiveAuthSession() } throws Exception()
 

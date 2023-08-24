@@ -1,5 +1,6 @@
 package com.lotic.tasks.adapters.modules.auth
 
+import com.lotic.tasks.adapters.modules.auth.persistence.DAOAuthToken
 import com.lotic.tasks.domain.modules.auth.AuthTokenRepository
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import java.util.*

@@ -11,7 +11,7 @@ import java.util.*
 class TestGetAccountByEmail {
 
     @Test
-    fun testShouldSucceed() {
+    fun shouldSucceed() {
         val resultAccount = Account(UUID.randomUUID(), "test@mail.net")
 
         val mockedAccountsRepository = mockk<AccountsRepository>()
@@ -29,7 +29,7 @@ class TestGetAccountByEmail {
     }
 
     @Test
-    fun testShouldSucceedNoResult() {
+    fun shouldSucceed_noResult() {
         val mockedAccountsRepository = mockk<AccountsRepository>()
         coEvery { mockedAccountsRepository.getByEmail(any()) } returns null
 

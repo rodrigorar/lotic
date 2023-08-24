@@ -13,7 +13,7 @@ import java.util.*
 class TestRefresh {
 
     @Test
-    fun testShouldSucceed() {
+    fun shouldSucceed() {
         val oldAuthToken = AuthToken(
             UUID.randomUUID().toStr()
             , UUID.randomUUID().toStr()
@@ -43,7 +43,7 @@ class TestRefresh {
     }
 
     @Test
-    fun testShouldSucceedNoResult() {
+    fun shouldSucceed_noResult() {
         val oldAuthToken = AuthToken(
             UUID.randomUUID().toStr()
             , UUID.randomUUID().toStr()
@@ -66,7 +66,7 @@ class TestRefresh {
     }
 
     @Test
-    fun testShouldFailGatewayError() {
+    fun shouldFail_gatewayError() {
         val oldAuthToken = AuthToken(
             UUID.randomUUID().toStr()
             , UUID.randomUUID().toStr()
@@ -95,7 +95,7 @@ class TestRefresh {
     }
 
     @Test
-    fun testShouldFailRepositoryError() {
+    fun shouldFail_repositoryError() {
         val oldAuthToken = AuthToken(
             UUID.randomUUID().toStr()
             , UUID.randomUUID().toStr()

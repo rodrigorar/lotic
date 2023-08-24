@@ -3,7 +3,6 @@ package com.lotic.tasks.domain.modules.accounts
 import com.lotic.tasks.domain.modules.accounts.operations.NewAccount
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -12,7 +11,7 @@ import java.util.*
 class TestNewAccount {
 
     @Test
-    fun testShouldSucceed() {
+    fun shouldSucceed() {
         val mockedAccountsRepository = mockk<AccountsRepository>()
         coEvery { mockedAccountsRepository.insert(any()) } returns Unit
 
@@ -27,7 +26,7 @@ class TestNewAccount {
     }
 
     @Test
-    fun testShouldFailAccountsRepositoryError() {
+    fun shouldFail_accountsRepositoryError() {
         val mockedAccountsRepository = mockk<AccountsRepository>()
         coEvery { mockedAccountsRepository.insert(any()) } throws Exception("")
 

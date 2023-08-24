@@ -1,5 +1,7 @@
 package com.lotic.tasks.adapters.modules.accounts
 
+import com.lotic.tasks.adapters.modules.accounts.persistence.DAOAccounts
+import com.lotic.tasks.adapters.modules.accounts.persistence.EntityAccount
 import com.lotic.tasks.domain.modules.accounts.AccountsRepository
 import com.lotic.tasks.domain.modules.accounts.Account
 import java.util.*

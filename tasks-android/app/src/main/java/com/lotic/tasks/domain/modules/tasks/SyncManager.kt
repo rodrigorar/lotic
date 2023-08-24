@@ -12,28 +12,28 @@ import com.lotic.tasks.adapters.http.RetrofitClientProvider
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionProvider
-import com.lotic.tasks.domain.modules.tasks.client.TasksClient
 import com.lotic.tasks.domain.modules.tasks.client.payloads.CreateTasksRequest
 import com.lotic.tasks.domain.modules.tasks.client.payloads.UpdateTasksRequest
-import com.lotic.tasks.domain.modules.tasks.dtos.Task
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.CompleteTask
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.CreateTasksSynced
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.GetTasksById
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.ListTasks
-import com.lotic.tasks.domain.modules.tasks.operations.tasks.TasksOperationsProvider
+import com.lotic.tasks.adapters.modules.tasks.TasksOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.UpdateTasksSynced
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.DeleteTaskSyncByTaskId
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetCompleteTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetDirtyTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetLocalTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.MarkTasksSynced
-import com.lotic.tasks.domain.modules.tasks.operations.taskssync.TasksSyncOperationsProvider
+import com.lotic.tasks.adapters.modules.tasks.TasksSyncOperationsProvider
+import com.lotic.tasks.adapters.modules.tasks.gateways.TasksClient
 import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
 import java.util.*
 
 class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 
+    // FIXME: Migrate the use of this client to use Gateways instead
     private val tasksClient: TasksClient? = RetrofitClientProvider.get()?.create(TasksClient::class.java)
 
     private val currentActiveAuthSessionProvider: CurrentActiveAuthSessionProvider = AuthOperationsProvider.currentActiveAuthSessionProvider()

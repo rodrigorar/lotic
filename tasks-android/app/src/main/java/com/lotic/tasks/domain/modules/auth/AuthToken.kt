@@ -1,7 +1,7 @@
 package com.lotic.tasks.domain.modules.auth
 
 import com.google.gson.annotations.SerializedName
-import com.lotic.tasks.adapters.modules.auth.EntityAuthToken
+import com.lotic.tasks.adapters.modules.auth.persistence.EntityAuthToken
 import com.lotic.tasks.domain.shared.FromEntity
 import com.lotic.tasks.domain.shared.ToEntity
 import java.util.*
@@ -14,6 +14,8 @@ data class AuthToken(
 : ToEntity<EntityAuthToken> {
 
     companion object : FromEntity<AuthToken, EntityAuthToken> {
+
+        // FIXME: Move this to the Persistence Entity (EntityAuthToken)
         override fun fromEntity(entity: EntityAuthToken): AuthToken {
             return AuthToken(
                 token = entity.accessToken
@@ -23,6 +25,7 @@ data class AuthToken(
         }
     }
 
+    // FIXME: Move this to the Persistence Entity (EntityAuthToken)
     override fun toEntity(): EntityAuthToken {
         return EntityAuthToken(
             accessToken = token

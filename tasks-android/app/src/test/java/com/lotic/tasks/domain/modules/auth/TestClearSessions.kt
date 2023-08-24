@@ -11,7 +11,7 @@ import java.util.*
 class TestClearSessions {
 
     @Test
-    fun testShouldSucceed() {
+    fun shouldSucceed() {
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
         coEvery { mockedAuthTokenRepository.deleteAllForAccount(any()) } returns Unit
 
@@ -24,7 +24,7 @@ class TestClearSessions {
     }
 
     @Test
-    fun testShouldFailRepositoryError() {
+    fun shouldFail_repositoryError() {
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
         coEvery { mockedAuthTokenRepository.deleteAllForAccount(any()) } throws Exception()
 

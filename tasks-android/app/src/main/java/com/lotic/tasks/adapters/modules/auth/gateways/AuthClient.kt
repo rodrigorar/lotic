@@ -1,5 +1,6 @@
 package com.lotic.tasks.adapters.modules.auth.gateways
 
+import com.lotic.tasks.adapters.modules.auth.gateways.payloads.AccountIdRequest
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.domain.modules.auth.Credentials
 import retrofit2.Response

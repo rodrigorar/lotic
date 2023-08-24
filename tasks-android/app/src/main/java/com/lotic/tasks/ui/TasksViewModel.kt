@@ -12,8 +12,8 @@ import com.lotic.tasks.domain.events.EventObserver
 import com.lotic.tasks.domain.events.EventType
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
-import com.lotic.tasks.domain.modules.tasks.operations.tasks.TasksOperationsProvider
-import com.lotic.tasks.domain.modules.tasks.dtos.Task
+import com.lotic.tasks.adapters.modules.tasks.TasksOperationsProvider
+import com.lotic.tasks.domain.modules.tasks.Task
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
@@ -73,7 +73,8 @@ class TasksViewModel : ViewModel(), EventObserver {
                     , description = ""
                     , createdAt = ZonedDateTime.now()
                     , updatedAt = ZonedDateTime.now()
-                    , ownerId = currentActiveAuthSessionProvider.get()?.accountId))
+                    , ownerId = currentActiveAuthSessionProvider.get()?.accountId)
+            )
         }
     }
 

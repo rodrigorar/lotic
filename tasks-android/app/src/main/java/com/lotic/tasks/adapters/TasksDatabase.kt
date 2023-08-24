@@ -4,14 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.lotic.tasks.adapters.modules.accounts.DAOAccounts
-import com.lotic.tasks.adapters.modules.accounts.EntityAccount
-import com.lotic.tasks.adapters.modules.auth.DAOAuthToken
-import com.lotic.tasks.adapters.modules.auth.EntityAuthToken
-import com.lotic.tasks.domain.modules.tasks.data.DAOTasks
-import com.lotic.tasks.domain.modules.tasks.data.DAOTasksSync
-import com.lotic.tasks.domain.modules.tasks.data.EntityTask
-import com.lotic.tasks.domain.modules.tasks.data.EntityTasksSync
+import com.lotic.tasks.adapters.modules.accounts.persistence.DAOAccounts
+import com.lotic.tasks.adapters.modules.accounts.persistence.EntityAccount
+import com.lotic.tasks.adapters.modules.auth.persistence.DAOAuthToken
+import com.lotic.tasks.adapters.modules.auth.persistence.EntityAuthToken
+import com.lotic.tasks.adapters.modules.tasks.persistence.DAOTasks
+import com.lotic.tasks.adapters.modules.tasks.persistence.DAOTasksSync
+import com.lotic.tasks.adapters.modules.tasks.persistence.EntityTask
+import com.lotic.tasks.adapters.modules.tasks.persistence.EntityTasksSync
 import com.lotic.tasks.domain.shared.Provider
 
 @Database(

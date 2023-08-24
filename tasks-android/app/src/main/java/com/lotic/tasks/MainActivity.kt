@@ -13,10 +13,12 @@ import com.lotic.tasks.adapters.modules.accounts.AccountsRepositoryImpl
 import com.lotic.tasks.domain.modules.accounts.operations.AccountsOperationProvider
 import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.SyncManager
-import com.lotic.tasks.domain.modules.tasks.operations.tasks.TasksOperationsProvider
-import com.lotic.tasks.domain.modules.tasks.operations.taskssync.TasksSyncOperationsProvider
+import com.lotic.tasks.adapters.modules.tasks.TasksOperationsProvider
+import com.lotic.tasks.adapters.modules.tasks.TasksSyncOperationsProvider
 import com.lotic.tasks.adapters.TasksDatabase
 import com.lotic.tasks.adapters.modules.auth.AuthTokenRepositoryImpl
+import com.lotic.tasks.adapters.modules.tasks.TasksRepositoryImpl
+import com.lotic.tasks.adapters.modules.tasks.TasksSyncRepositoryImpl
 import com.lotic.tasks.domain.shared.Provider
 import com.lotic.tasks.ui.theme.TasksTheme
 import java.util.concurrent.TimeUnit
@@ -47,11 +49,19 @@ class MainActivity : ComponentActivity() {
         TasksOperationsProvider
             .setContextProvider(contextProvider)
             .setAuthOperationsProvider(authOperationsProvider = authOperationsProvider)
-            .init()
+            .init(
+                TasksRepositoryImpl(
+                    TasksDatabase.getDatabase(contextProvider).daoTasks()
+                )
+            )
 
         TasksSyncOperationsProvider
             .setContextProvider(contextProvider)
-            .init()
+            .init(
+                TasksSyncRepositoryImpl(
+                    TasksDatabase.getDatabase(contextProvider).daoTasksSync()
+                )
+            )
 
         WorkManager
             .getInstance(this)

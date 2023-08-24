@@ -4,7 +4,7 @@ import com.lotic.tasks.domain.events.Event
 import com.lotic.tasks.domain.events.EventBus
 import com.lotic.tasks.domain.events.EventType
 import com.lotic.tasks.domain.events.payloads.TaskCompletedEventInfo
-import com.lotic.tasks.domain.modules.tasks.repositories.TasksRepository
+import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import com.lotic.tasks.domain.shared.Command
 import java.util.*
 

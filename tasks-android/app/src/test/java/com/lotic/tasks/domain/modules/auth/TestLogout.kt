@@ -16,7 +16,7 @@ import java.util.*
 class TestLogout {
 
     @Test
-    fun testShouldSucceed() {
+    fun shouldSucceed() {
         val authToken = AuthToken(
             UUID.randomUUID().toStr()
             , UUID.randomUUID().toStr()
@@ -54,7 +54,7 @@ class TestLogout {
     }
 
     @Test
-    fun testShouldSucceedNoActiveSession() {
+    fun shouldSucceed_noActiveSession() {
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
 
         val mockedCurrentActiveAuthSessionProvider = mockk<CurrentActiveAuthSessionProvider>()
@@ -82,7 +82,7 @@ class TestLogout {
     }
 
     @Test
-    fun testShouldFailCurrentSessionProviderError() {
+    fun shouldFail_currentSessionProviderError() {
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
         val mockedCurrentActiveAuthSessionProvider = mockk<CurrentActiveAuthSessionProvider>()
         coEvery { mockedCurrentActiveAuthSessionProvider.get() } throws Exception()
@@ -113,7 +113,7 @@ class TestLogout {
     }
 
     @Test
-    fun testShouldFailGatewayError() {
+    fun shouldFail_gatewayError() {
         val authToken = AuthToken(
             UUID.randomUUID().toStr()
             , UUID.randomUUID().toStr()
@@ -152,7 +152,7 @@ class TestLogout {
     }
 
     @Test
-    fun testShouldFailRepositoryError() {
+    fun shouldFail_repositoryError() {
         val authToken = AuthToken(
             UUID.randomUUID().toStr()
             , UUID.randomUUID().toStr()
