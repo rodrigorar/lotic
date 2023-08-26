@@ -1,6 +1,7 @@
-package com.lotic.tasks.domain.modules.tasks
+package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
-import com.lotic.tasks.domain.modules.tasks.operations.tasks.ClearTasksForAccount
+import com.lotic.tasks.domain.modules.tasks.Task
+import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

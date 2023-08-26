@@ -1,6 +1,7 @@
-package com.lotic.tasks.domain.modules.tasks
+package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
-import com.lotic.tasks.domain.modules.tasks.operations.tasks.UpdateTask
+import com.lotic.tasks.domain.modules.tasks.Task
+import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -9,27 +10,27 @@ import org.junit.Test
 import java.time.ZonedDateTime
 import java.util.*
 
-class TestUpdateTask {
+class TestCreateTask {
 
     @Test
     fun shouldSucceed() {
         val input = Task(
             UUID.randomUUID()
             , "Task #1"
-            , ""
+            , "Task #1 Description"
             , ZonedDateTime.now()
             , ZonedDateTime.now()
             , UUID.randomUUID())
 
         val mockedTasksRepository = mockk<TasksRepository>()
-        coEvery { mockedTasksRepository.update(any(), any()) } returns Unit
+        coEvery { mockedTasksRepository.insert(input) } returns Unit
 
-        val underTest = UpdateTask(mockedTasksRepository)
         runBlocking {
+            val underTest = CreateTask(mockedTasksRepository)
             underTest.execute(input)
         }
 
-        coVerify { mockedTasksRepository.update(any(), any()) }
+        coVerify { mockedTasksRepository.insert(input) }
     }
 
     @Test
@@ -37,16 +38,16 @@ class TestUpdateTask {
         val input = Task(
             UUID.randomUUID()
             , "Task #1"
-            , ""
+            , "Task #1 Description"
             , ZonedDateTime.now()
             , ZonedDateTime.now()
             , UUID.randomUUID())
 
         val mockedTasksRepository = mockk<TasksRepository>()
-        coEvery { mockedTasksRepository.update(any(), any()) } throws Exception()
+        coEvery { mockedTasksRepository.insert(input) } throws Exception()
 
-        val underTest = UpdateTask(mockedTasksRepository)
         runBlocking {
+            val underTest = CreateTask(mockedTasksRepository)
             try {
                 underTest.execute(input)
             } catch (e: Exception) {
@@ -54,6 +55,6 @@ class TestUpdateTask {
             }
         }
 
-        coVerify { mockedTasksRepository.update(any(), any()) }
+        coVerify { mockedTasksRepository.insert(input) }
     }
 }

@@ -15,7 +15,9 @@ class MarkTasksSynced(
         val updatedTasksSync: List<TasksSync> = this.tasksSyncRepository
             .getByTaskIds(input)
             .map { it.copy(syncStatus = SyncStatus.SYNCHED, updatedAt = ZonedDateTime.now()) }
-        this.tasksSyncRepository.updateMultiple(updatedTasksSync)
+        if (updatedTasksSync.isNotEmpty()) {
+            this.tasksSyncRepository.updateMultiple(updatedTasksSync)
+        }
     }
 
 }
