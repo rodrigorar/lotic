@@ -1,10 +1,9 @@
 package com.lotic.tasks.adapters.modules.auth.gateways
 
-import com.lotic.tasks.adapters.modules.auth.gateways.payloads.AccountIdRequest
-import java.util.*
+import com.lotic.tasks.domain.modules.auth.AuthToken
 
-class LogoutGateway : RetrofitAuthGateway<UUID, Unit>() {
-    override suspend fun call(payload: UUID) {
-        this.authClient?.logout(AccountIdRequest(payload))
+class LogoutGateway : RetrofitAuthGateway<AuthToken, Unit>() {
+    override suspend fun call(payload: AuthToken) {
+        this.authClient?.logout(payload.token)
     }
 }

@@ -51,6 +51,8 @@ class TestLogout {
         coVerify { mockedAuthTokenRepository.deleteAllForAccount(any()) }
         coVerify { mockedCurrentActiveAuthSessionProvider.get() }
         coVerify { mockedLogoutGateway.call(any()) }
+
+        EventBus.clear()
     }
 
     @Test
@@ -79,6 +81,8 @@ class TestLogout {
         }
 
         coVerify { mockedCurrentActiveAuthSessionProvider.get() }
+
+        EventBus.clear()
     }
 
     @Test
@@ -110,6 +114,8 @@ class TestLogout {
         }
 
         coVerify { mockedCurrentActiveAuthSessionProvider.get() }
+
+        EventBus.clear()
     }
 
     @Test
@@ -149,6 +155,8 @@ class TestLogout {
 
         coVerify { mockedCurrentActiveAuthSessionProvider.get() }
         coVerify { mockedLogoutGateway.call(any()) }
+
+        EventBus.clear()
     }
 
     @Test
@@ -191,5 +199,7 @@ class TestLogout {
         coVerify { mockedAuthTokenRepository.deleteAllForAccount(any()) }
         coVerify { mockedCurrentActiveAuthSessionProvider.get() }
         coVerify { mockedLogoutGateway.call(any()) }
+
+        EventBus.clear()
     }
 }

@@ -1,6 +1,6 @@
 package com.lotic.tasks.domain.modules.auth
 
-import com.lotic.tasks.domain.persistence.Repository
+import com.lotic.tasks.domain.shared.Repository
 import java.util.*
 
 interface AuthTokenRepository : Repository<Int, AuthToken> {

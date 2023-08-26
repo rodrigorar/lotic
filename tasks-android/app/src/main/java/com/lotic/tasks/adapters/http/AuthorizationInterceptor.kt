@@ -20,8 +20,7 @@ class AuthorizationInterceptor(private val authTokenProvider: CurrentActiveAuthS
     }
 
     private fun isAuthorizationNecessary(chain: Interceptor.Chain): Boolean {
-        return ! chain.request().url().toString().contains("auth", ignoreCase = true)
-                || chain.request().url().toString().contains("logout", ignoreCase = true)
+        return ! chain.request().url().toString().contains("login", ignoreCase = true)
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {

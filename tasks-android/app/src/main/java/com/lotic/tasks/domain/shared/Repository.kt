@@ -1,6 +1,4 @@
-package com.lotic.tasks.domain.persistence
-
-import kotlinx.coroutines.flow.Flow
+package com.lotic.tasks.domain.shared
 
 interface Repository<I, T> {
     suspend fun insert(entity: T)

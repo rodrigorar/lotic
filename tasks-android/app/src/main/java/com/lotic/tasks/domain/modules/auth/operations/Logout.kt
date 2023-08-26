@@ -7,12 +7,11 @@ import com.lotic.tasks.domain.modules.auth.AuthTokenRepository
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.domain.shared.Gateway
 import com.lotic.tasks.domain.shared.NoInputCommand
-import java.util.*
 
 class Logout(
     private val authTokenRepository: AuthTokenRepository
     , private val currentActiveAuthSessionProvider: CurrentActiveAuthSessionProvider
-    , private val logoutGateway: Gateway<UUID, Unit>
+    , private val logoutGateway: Gateway<AuthToken, Unit>
 ) : NoInputCommand {
 
     override suspend fun execute() {
@@ -20,7 +19,7 @@ class Logout(
             val currentActiveAuthSession: AuthToken? = currentActiveAuthSessionProvider.get()
 
             currentActiveAuthSession?.also {
-                this.logoutGateway.call(it.accountId)
+                this.logoutGateway.call(it)
                 authTokenRepository.deleteAllForAccount(it.accountId)
             }
 
