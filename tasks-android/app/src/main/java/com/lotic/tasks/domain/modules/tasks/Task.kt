@@ -1,8 +1,8 @@
 package com.lotic.tasks.domain.modules.tasks
 
 import com.lotic.tasks.adapters.modules.tasks.persistence.EntityTask
-import com.lotic.tasks.domain.shared.FromEntity
-import com.lotic.tasks.domain.shared.ToEntity
+import com.lotic.tasks.domain.shared.mappers.FromEntity
+import com.lotic.tasks.domain.shared.mappers.ToEntity
 import java.time.ZonedDateTime
 import java.util.UUID
 

@@ -12,8 +12,8 @@ import com.lotic.tasks.domain.modules.tasks.operations.tasks.GetTasksById
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.ListTasks
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.UpdateTask
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.UpdateTasksSynced
-import com.lotic.tasks.domain.shared.OperationsProvider
-import com.lotic.tasks.domain.shared.Provider
+import com.lotic.tasks.domain.shared.operations.OperationsProvider
+import com.lotic.tasks.domain.shared.operations.Provider
 
 object TasksOperationsProvider : OperationsProvider {
 

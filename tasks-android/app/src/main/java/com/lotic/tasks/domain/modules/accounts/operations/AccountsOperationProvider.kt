@@ -4,10 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.accounts.AccountsRepository
-import com.lotic.tasks.domain.shared.Command
-import com.lotic.tasks.domain.shared.OperationsProvider
-import com.lotic.tasks.domain.shared.Provider
-import com.lotic.tasks.domain.shared.Query
+import com.lotic.tasks.domain.shared.operations.Command
+import com.lotic.tasks.domain.shared.operations.OperationsProvider
+import com.lotic.tasks.domain.shared.operations.Provider
+import com.lotic.tasks.domain.shared.operations.Query
 
 @SuppressLint("StaticFieldLeak")
 object AccountsOperationProvider : OperationsProvider {

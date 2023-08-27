@@ -2,7 +2,7 @@ package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
 import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
-import com.lotic.tasks.domain.shared.Command
+import com.lotic.tasks.domain.shared.operations.Command
 import java.util.*
 
 class ClearTasksForAccount(private val tasksRepository: TasksRepository) : Command<UUID> {

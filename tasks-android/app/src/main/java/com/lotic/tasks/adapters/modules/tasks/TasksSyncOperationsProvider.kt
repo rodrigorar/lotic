@@ -6,15 +6,14 @@ import com.lotic.tasks.domain.events.EventType
 import com.lotic.tasks.domain.modules.tasks.events.CompleteTasksSync
 import com.lotic.tasks.domain.modules.tasks.events.CreateTasksSync
 import com.lotic.tasks.domain.modules.tasks.events.UpdateTasksSync
-import com.lotic.tasks.adapters.TasksDatabase
 import com.lotic.tasks.domain.modules.tasks.TasksSyncRepository
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.DeleteTaskSyncByTaskId
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetCompleteTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetDirtyTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetLocalTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.MarkTasksSynced
-import com.lotic.tasks.domain.shared.OperationsProvider
-import com.lotic.tasks.domain.shared.Provider
+import com.lotic.tasks.domain.shared.operations.OperationsProvider
+import com.lotic.tasks.domain.shared.operations.Provider
 
 object TasksSyncOperationsProvider : OperationsProvider {
 

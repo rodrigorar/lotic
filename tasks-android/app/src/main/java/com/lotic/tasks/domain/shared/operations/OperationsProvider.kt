@@ -1,4 +1,4 @@
-package com.lotic.tasks.domain.shared
+package com.lotic.tasks.domain.shared.operations
 
 import android.content.Context
 

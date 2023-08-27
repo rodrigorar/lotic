@@ -2,7 +2,7 @@ package com.lotic.tasks.domain.modules.auth.operations
 
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.domain.modules.auth.AuthTokenRepository
-import com.lotic.tasks.domain.shared.Command
+import com.lotic.tasks.domain.shared.operations.Command
 import com.lotic.tasks.domain.shared.Gateway
 
 class Refresh(

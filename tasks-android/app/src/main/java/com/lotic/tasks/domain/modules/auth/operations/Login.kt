@@ -1,20 +1,20 @@
 package com.lotic.tasks.domain.modules.auth.operations
 
-import com.lotic.tasks.domain.events.Event
-import com.lotic.tasks.domain.events.EventBus
-import com.lotic.tasks.domain.events.EventType
 import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.domain.modules.auth.Credentials
-import com.lotic.tasks.domain.shared.Command
+import com.lotic.tasks.domain.shared.operations.Command
 import com.lotic.tasks.domain.modules.auth.AuthTokenRepository
 import com.lotic.tasks.domain.shared.Gateway
-import com.lotic.tasks.domain.shared.Query
+import com.lotic.tasks.domain.shared.events.Event
+import com.lotic.tasks.domain.shared.events.Publisher
+import com.lotic.tasks.domain.shared.operations.Query
 
 class Login(
     private val repositoryAuthToken: AuthTokenRepository
     , private val getAccountByEmailQuery: Query<String, Account?>
     , private val newAccountCommand: Command<Account>
+    , private val loginSuccessPublisher: Publisher<AuthToken>
     , private val loginGateway: Gateway<Credentials, AuthToken?>
 ) : Command<Credentials> {
 
@@ -28,17 +28,15 @@ class Login(
                     newAccountCommand.execute(Account(it.accountId, input.subject))
                 }
 
-                EventBus.post(Event(EventType.LOGIN_SUCCESS))
-            } ?:run {
-                EventBus.post(Event(EventType.LOGIN_FAILURE))
+                result.let { authToken ->
+                    this.loginSuccessPublisher.publish(Event(authToken))
+                }
             }
         } catch (e: Exception) {
             val localAccount: Account? = getAccountByEmailQuery.execute(input.subject)
             localAccount?.also {
                 repositoryAuthToken.deleteAllForAccount(it.id)
             }
-
-            EventBus.post(Event(EventType.LOGIN_FAILURE))
         }
     }
 }

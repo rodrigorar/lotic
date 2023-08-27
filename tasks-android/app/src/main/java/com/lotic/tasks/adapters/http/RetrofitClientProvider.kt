@@ -3,7 +3,7 @@ package com.lotic.tasks.adapters.http
 import com.google.gson.GsonBuilder
 import com.lotic.tasks.adapters.http.adapters.ZonedTypeTimeDeserializer
 import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
-import com.lotic.tasks.domain.shared.Provider
+import com.lotic.tasks.domain.shared.operations.Provider
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

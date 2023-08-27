@@ -19,7 +19,7 @@ import com.lotic.tasks.adapters.TasksDatabase
 import com.lotic.tasks.adapters.modules.auth.AuthTokenRepositoryImpl
 import com.lotic.tasks.adapters.modules.tasks.TasksRepositoryImpl
 import com.lotic.tasks.adapters.modules.tasks.TasksSyncRepositoryImpl
-import com.lotic.tasks.domain.shared.Provider
+import com.lotic.tasks.domain.shared.operations.Provider
 import com.lotic.tasks.ui.theme.TasksTheme
 import java.util.concurrent.TimeUnit
 

@@ -12,7 +12,7 @@ import com.lotic.tasks.adapters.modules.tasks.persistence.DAOTasks
 import com.lotic.tasks.adapters.modules.tasks.persistence.DAOTasksSync
 import com.lotic.tasks.adapters.modules.tasks.persistence.EntityTask
 import com.lotic.tasks.adapters.modules.tasks.persistence.EntityTasksSync
-import com.lotic.tasks.domain.shared.Provider
+import com.lotic.tasks.domain.shared.operations.Provider
 
 @Database(
     entities = [

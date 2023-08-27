@@ -1,6 +1,8 @@
 package com.lotic.tasks.adapters.modules.auth
 
 import android.content.Context
+import com.lotic.tasks.adapters.modules.auth.events.LoginSuccessPublisher
+import com.lotic.tasks.adapters.modules.auth.events.LogoutSuccessPublisher
 import com.lotic.tasks.domain.modules.accounts.operations.AccountsOperationProvider
 import com.lotic.tasks.adapters.modules.auth.gateways.LoginGateway
 import com.lotic.tasks.adapters.modules.auth.gateways.LogoutGateway
@@ -11,8 +13,8 @@ import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionPr
 import com.lotic.tasks.domain.modules.auth.operations.Login
 import com.lotic.tasks.domain.modules.auth.operations.Logout
 import com.lotic.tasks.domain.modules.auth.operations.Refresh
-import com.lotic.tasks.domain.shared.OperationsProvider
-import com.lotic.tasks.domain.shared.Provider
+import com.lotic.tasks.domain.shared.operations.OperationsProvider
+import com.lotic.tasks.domain.shared.operations.Provider
 
 object AuthOperationsProvider : OperationsProvider {
 
@@ -42,6 +44,7 @@ object AuthOperationsProvider : OperationsProvider {
             repositoryAuthToken
             , accountOperationsProvider.getAccountByEmail()
             , accountOperationsProvider.newAccount()
+            , LoginSuccessPublisher
             , LoginGateway()
         )
     }
@@ -54,6 +57,7 @@ object AuthOperationsProvider : OperationsProvider {
         return Logout(
             repositoryAuthToken
             , currentActiveAuthSessionProvider()
+            , LogoutSuccessPublisher
             , LogoutGateway()
         )
     }

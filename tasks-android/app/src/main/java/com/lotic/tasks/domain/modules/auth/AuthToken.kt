@@ -2,8 +2,8 @@ package com.lotic.tasks.domain.modules.auth
 
 import com.google.gson.annotations.SerializedName
 import com.lotic.tasks.adapters.modules.auth.persistence.EntityAuthToken
-import com.lotic.tasks.domain.shared.FromEntity
-import com.lotic.tasks.domain.shared.ToEntity
+import com.lotic.tasks.domain.shared.mappers.FromEntity
+import com.lotic.tasks.domain.shared.mappers.ToEntity
 import java.util.*
 
 data class AuthToken(

@@ -1,10 +1,9 @@
 package com.lotic.tasks.domain.modules.auth
 
 import com.lotic.tasks.adapters.modules.auth.gateways.LogoutGateway
-import com.lotic.tasks.domain.events.EventBus
-import com.lotic.tasks.domain.events.EventType
 import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionProvider
 import com.lotic.tasks.domain.modules.auth.operations.Logout
+import com.lotic.tasks.domain.shared.events.Publisher
 import io.mockk.InternalPlatformDsl.toStr
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -32,18 +31,14 @@ class TestLogout {
         val mockedLogoutGateway = mockk<LogoutGateway>()
         coEvery { mockedLogoutGateway.call(any()) } returns Unit
 
-        EventBus.subscribe(EventType.LOGIN_SUCCESS) {
-            // Do Nothing
-        }
-
-        EventBus.subscribe(EventType.LOGIN_FAILURE) {
-            assert(false)
-        }
+        val mockedLogoutSuccessPublisher = mockk<Publisher<UUID>>()
+        coEvery { mockedLogoutSuccessPublisher.publish(any()) } returns Unit
 
         runBlocking {
             val underTest = Logout(
                 mockedAuthTokenRepository
                 , mockedCurrentActiveAuthSessionProvider
+                , mockedLogoutSuccessPublisher
                 , mockedLogoutGateway)
             underTest.execute()
         }
@@ -51,8 +46,7 @@ class TestLogout {
         coVerify { mockedAuthTokenRepository.deleteAllForAccount(any()) }
         coVerify { mockedCurrentActiveAuthSessionProvider.get() }
         coVerify { mockedLogoutGateway.call(any()) }
-
-        EventBus.clear()
+        coVerify { mockedLogoutSuccessPublisher.publish(any()) }
     }
 
     @Test
@@ -64,25 +58,18 @@ class TestLogout {
 
         val mockedLogoutGateway = mockk<LogoutGateway>()
 
-        EventBus.subscribe(EventType.LOGIN_SUCCESS) {
-            // Do Nothing
-        }
-
-        EventBus.subscribe(EventType.LOGIN_FAILURE) {
-            assert(false)
-        }
+        val mockedLogoutSuccessPublisher = mockk<Publisher<UUID>>()
 
         runBlocking {
             val underTest = Logout(
                 mockedAuthTokenRepository
                 , mockedCurrentActiveAuthSessionProvider
+                , mockedLogoutSuccessPublisher
                 , mockedLogoutGateway)
             underTest.execute()
         }
 
         coVerify { mockedCurrentActiveAuthSessionProvider.get() }
-
-        EventBus.clear()
     }
 
     @Test
@@ -93,18 +80,13 @@ class TestLogout {
 
         val mockedLogoutGateway = mockk<LogoutGateway>()
 
-        EventBus.subscribe(EventType.LOGIN_SUCCESS) {
-            assert(false)
-        }
-
-        EventBus.subscribe(EventType.LOGIN_FAILURE) {
-            // Do Nothing
-        }
+        val mockedLogoutSuccessPublisher = mockk<Publisher<UUID>>()
 
         runBlocking {
             val underTest = Logout(
                 mockedAuthTokenRepository
                 , mockedCurrentActiveAuthSessionProvider
+                , mockedLogoutSuccessPublisher
                 , mockedLogoutGateway)
             try {
                 underTest.execute()
@@ -114,8 +96,6 @@ class TestLogout {
         }
 
         coVerify { mockedCurrentActiveAuthSessionProvider.get() }
-
-        EventBus.clear()
     }
 
     @Test
@@ -133,18 +113,13 @@ class TestLogout {
         val mockedLogoutGateway = mockk<LogoutGateway>()
         coEvery { mockedLogoutGateway.call(any()) } throws Exception()
 
-        EventBus.subscribe(EventType.LOGIN_SUCCESS) {
-            assert(false)
-        }
-
-        EventBus.subscribe(EventType.LOGIN_FAILURE) {
-            // Do Nothing
-        }
+        val mockedLogoutSuccessPublisher = mockk<Publisher<UUID>>()
 
         runBlocking {
             val underTest = Logout(
                 mockedAuthTokenRepository
                 , mockedCurrentActiveAuthSessionProvider
+                , mockedLogoutSuccessPublisher
                 , mockedLogoutGateway)
             try {
                 underTest.execute()
@@ -155,8 +130,6 @@ class TestLogout {
 
         coVerify { mockedCurrentActiveAuthSessionProvider.get() }
         coVerify { mockedLogoutGateway.call(any()) }
-
-        EventBus.clear()
     }
 
     @Test
@@ -176,18 +149,13 @@ class TestLogout {
         val mockedLogoutGateway = mockk<LogoutGateway>()
         coEvery { mockedLogoutGateway.call(any()) } returns Unit
 
-        EventBus.subscribe(EventType.LOGIN_SUCCESS) {
-            // Do Nothing
-        }
-
-        EventBus.subscribe(EventType.LOGIN_FAILURE) {
-            assert(false)
-        }
+        val mockedLogoutSuccessPublisher = mockk<Publisher<UUID>>()
 
         runBlocking {
             val underTest = Logout(
                 mockedAuthTokenRepository
                 , mockedCurrentActiveAuthSessionProvider
+                , mockedLogoutSuccessPublisher
                 , mockedLogoutGateway)
             try {
                 underTest.execute()
@@ -199,7 +167,5 @@ class TestLogout {
         coVerify { mockedAuthTokenRepository.deleteAllForAccount(any()) }
         coVerify { mockedCurrentActiveAuthSessionProvider.get() }
         coVerify { mockedLogoutGateway.call(any()) }
-
-        EventBus.clear()
     }
 }

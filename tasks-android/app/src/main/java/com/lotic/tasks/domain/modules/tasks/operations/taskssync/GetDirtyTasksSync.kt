@@ -3,7 +3,7 @@ package com.lotic.tasks.domain.modules.tasks.operations.taskssync
 import com.lotic.tasks.domain.modules.tasks.SyncStatus
 import com.lotic.tasks.domain.modules.tasks.TasksSync
 import com.lotic.tasks.domain.modules.tasks.TasksSyncRepository
-import com.lotic.tasks.domain.shared.SuspendedProvider
+import com.lotic.tasks.domain.shared.operations.SuspendedProvider
 
 class GetDirtyTasksSync(
     private val tasksSyncRepository: TasksSyncRepository

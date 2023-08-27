@@ -3,7 +3,7 @@ package com.lotic.tasks.domain.modules.tasks.operations.taskssync
 import com.lotic.tasks.domain.modules.tasks.SyncStatus
 import com.lotic.tasks.domain.modules.tasks.TasksSync
 import com.lotic.tasks.domain.modules.tasks.TasksSyncRepository
-import com.lotic.tasks.domain.shared.Command
+import com.lotic.tasks.domain.shared.operations.Command
 import java.time.ZonedDateTime
 import java.util.*
 

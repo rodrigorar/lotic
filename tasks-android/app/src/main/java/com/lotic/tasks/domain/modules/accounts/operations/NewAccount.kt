@@ -2,7 +2,7 @@ package com.lotic.tasks.domain.modules.accounts.operations
 
 import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.accounts.AccountsRepository
-import com.lotic.tasks.domain.shared.Command
+import com.lotic.tasks.domain.shared.operations.Command
 
 class NewAccount(private val accountsRepository: AccountsRepository) : Command<Account> {
 

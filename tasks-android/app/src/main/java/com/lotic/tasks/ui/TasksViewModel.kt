@@ -12,8 +12,10 @@ import com.lotic.tasks.domain.events.EventObserver
 import com.lotic.tasks.domain.events.EventType
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
+import com.lotic.tasks.adapters.modules.auth.events.LoginSuccessPublisher
 import com.lotic.tasks.adapters.modules.tasks.TasksOperationsProvider
 import com.lotic.tasks.domain.modules.tasks.Task
+import com.lotic.tasks.domain.shared.events.Subscriber
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
@@ -28,15 +30,48 @@ data class TasksUIState(
     // Do nothing for now
 }
 
+class LoginSuccessSubscriber(private val viewModel: TasksViewModel) : Subscriber<AuthToken>() {
+    override fun notify(event: com.lotic.tasks.domain.shared.events.Event<AuthToken>) {
+        this.viewModel.updateState(this.viewModel.uiState.copy(isLoggedIn = true))
+    }
+}
+
+class LogoutSuccessPublisher(private val viewModel: TasksViewModel) : Subscriber<UUID>() {
+    override fun notify(event: com.lotic.tasks.domain.shared.events.Event<UUID>) {
+        this.viewModel.updateState(this.viewModel.uiState.copy(isLoggedIn = false))
+        this.viewModel.viewModelScope.launch {
+            delay(100)
+            viewModel.refreshTaskList()
+        }
+    }
+}
+
 class TasksViewModel : ViewModel(), EventObserver {
     var uiState by mutableStateOf(TasksUIState(isLoggedIn = false))
         private set
 
+    override fun notify(event: Event) {
+        if (event.isOfType(EventType.SYNC_SUCCESS)
+            || event.isOfType(EventType.TASKS_UPDATED)
+            || event.isOfType(EventType.TASKS_CREATED)
+            || event.isOfType(EventType.TASKS_COMPLETED)) {
+            viewModelScope.launch {
+                delay(200)
+                refreshTaskList()
+            }
+        }
+    }
+
+    fun updateState(uiState: TasksUIState) {
+        this.uiState = uiState
+    }
+
     init {
+        LoginSuccessPublisher.register(LoginSuccessSubscriber(this))
+
         EventBus.subscribe(
             eventTypes = listOf(
                 EventType.SYNC_SUCCESS
-                , EventType.LOGIN_SUCCESS
                 , EventType.LOGOUT_SUCCESS
                 , EventType.TASKS_UPDATED
                 , EventType.TASKS_CREATED
@@ -99,36 +134,16 @@ class TasksViewModel : ViewModel(), EventObserver {
         }
     }
 
-    private suspend fun verifyIfLoggedIn() {
+    suspend fun verifyIfLoggedIn() {
         val authToken: AuthToken? = AuthOperationsProvider.currentActiveAuthSessionProvider().get()
         uiState = uiState.copy(isLoggedIn = authToken != null)
     }
 
-    private suspend fun refreshTaskList() {
+    suspend fun refreshTaskList() {
         val taskList = TasksOperationsProvider.listTasks().get()
         uiState = uiState.copy(
             taskList = taskList
             , taskTitles = taskList.map { it.id to it.title }.toMutableStateMap()
             , taskCheckboxes = taskList.map { it.id to false }.toMutableStateMap())
-    }
-
-    override fun notify(event: Event) {
-        if (event.isOfType(EventType.SYNC_SUCCESS)
-            || event.isOfType(EventType.TASKS_UPDATED)
-            || event.isOfType(EventType.TASKS_CREATED)
-            || event.isOfType(EventType.TASKS_COMPLETED)) {
-            viewModelScope.launch {
-                delay(200)
-                refreshTaskList()
-            }
-        } else if (event.isOfType(EventType.LOGIN_SUCCESS)) {
-            this.uiState = this.uiState.copy(isLoggedIn = true)
-        } else if (event.isOfType(EventType.LOGOUT_SUCCESS)) {
-            this.uiState = this.uiState.copy(isLoggedIn = false)
-            viewModelScope.launch {
-                delay(100)
-                refreshTaskList()
-            }
-        }
     }
 }
