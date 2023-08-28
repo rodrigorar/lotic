@@ -1,5 +1,6 @@
 package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
+import com.lotic.tasks.adapters.modules.tasks.events.TasksCompletedPublisher
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -15,12 +16,16 @@ class TestCompleteTask {
         val mockedTasksRepository = mockk<TasksRepository>()
         coEvery { mockedTasksRepository.delete(any()) } returns Unit
 
-        val underTest = CompleteTask(mockedTasksRepository)
+        val mockedTasksCompletedPublisher = mockk<TasksCompletedPublisher>()
+        coEvery { mockedTasksCompletedPublisher.publish(any()) } returns Unit
+
+        val underTest = CompleteTask(mockedTasksRepository, mockedTasksCompletedPublisher)
         runBlocking {
             underTest.execute(UUID.randomUUID())
         }
 
         coVerify { mockedTasksRepository.delete(any()) }
+        coVerify { mockedTasksCompletedPublisher.publish(any()) }
     }
 
     @Test
@@ -28,7 +33,9 @@ class TestCompleteTask {
         val mockedTasksRepository = mockk<TasksRepository>()
         coEvery { mockedTasksRepository.delete(any()) } throws Exception()
 
-        val underTest = CompleteTask(mockedTasksRepository)
+        val mockedTasksCompletedPublisher = mockk<TasksCompletedPublisher>()
+
+        val underTest = CompleteTask(mockedTasksRepository, mockedTasksCompletedPublisher)
         runBlocking {
             try {
                 underTest.execute(UUID.randomUUID())

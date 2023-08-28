@@ -2,6 +2,10 @@ package com.lotic.tasks.adapters.modules.tasks
 
 import android.content.Context
 import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
+import com.lotic.tasks.adapters.modules.tasks.events.TasksCompletedPublisher
+import com.lotic.tasks.adapters.modules.tasks.events.TasksCreatedPublisher
+import com.lotic.tasks.adapters.modules.tasks.events.TasksCreatedSyncedPublisher
+import com.lotic.tasks.adapters.modules.tasks.events.TasksUpdatedPublisher
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.ClearTasksForAccount
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.CompleteTask
@@ -50,19 +54,19 @@ object TasksOperationsProvider : OperationsProvider {
     }
 
     fun createTask(): CreateTask {
-        return CreateTask(tasksRepository)
+        return CreateTask(tasksRepository, TasksCreatedPublisher)
     }
 
     fun createTasks(): CreateTasks {
-        return CreateTasks(tasksRepository)
+        return CreateTasks(tasksRepository, TasksCreatedPublisher)
     }
 
     fun createTasksSynced(): CreateTasksSynced {
-        return CreateTasksSynced(tasksRepository)
+        return CreateTasksSynced(tasksRepository, TasksCreatedSyncedPublisher)
     }
 
     fun updateTask(): UpdateTask {
-        return UpdateTask(tasksRepository)
+        return UpdateTask(tasksRepository, TasksUpdatedPublisher)
     }
 
     fun updateTaskSynced(): UpdateTasksSynced {
@@ -70,7 +74,7 @@ object TasksOperationsProvider : OperationsProvider {
     }
 
     fun completeTasks(): CompleteTask {
-        return CompleteTask(tasksRepository)
+        return CompleteTask(tasksRepository, TasksCompletedPublisher)
     }
 
     fun clearTasksForAccount(): ClearTasksForAccount {

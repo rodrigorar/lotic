@@ -2,6 +2,7 @@ package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
 import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
+import com.lotic.tasks.domain.shared.events.Publisher
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -24,12 +25,16 @@ class TestCreateTasks {
         val mockedTasksRepository = mockk<TasksRepository>()
         coEvery { mockedTasksRepository.insertMultiple(input) } returns Unit
 
+        val mockedTasksCreatedPublisher = mockk<Publisher<List<UUID>>>()
+        coEvery { mockedTasksCreatedPublisher.publish(any()) } returns Unit
+
         runBlocking {
-            val underTest = CreateTasks(mockedTasksRepository)
+            val underTest = CreateTasks(mockedTasksRepository, mockedTasksCreatedPublisher)
             underTest.execute(input)
         }
 
         coVerify { mockedTasksRepository.insertMultiple(input) }
+        coVerify { mockedTasksCreatedPublisher.publish(any()) }
     }
 
     @Test
@@ -44,8 +49,10 @@ class TestCreateTasks {
         val mockedTasksRepository = mockk<TasksRepository>()
         coEvery { mockedTasksRepository.insertMultiple(input) } throws Exception()
 
+        val mockedTasksCreatedPublisher = mockk<Publisher<List<UUID>>>()
+
         runBlocking {
-            val underTest = CreateTasks(mockedTasksRepository)
+            val underTest = CreateTasks(mockedTasksRepository, mockedTasksCreatedPublisher)
             try {
                 underTest.execute(input)
             } catch (e: Exception) {

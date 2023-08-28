@@ -6,14 +6,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lotic.tasks.domain.events.Event
-import com.lotic.tasks.domain.events.EventBus
-import com.lotic.tasks.domain.events.EventObserver
-import com.lotic.tasks.domain.events.EventType
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
 import com.lotic.tasks.adapters.modules.auth.events.LoginSuccessPublisher
+import com.lotic.tasks.adapters.modules.auth.events.LogoutSuccessPublisher
 import com.lotic.tasks.adapters.modules.tasks.TasksOperationsProvider
+import com.lotic.tasks.adapters.modules.tasks.events.TasksCompletedPublisher
+import com.lotic.tasks.adapters.modules.tasks.events.TasksCreatedPublisher
+import com.lotic.tasks.adapters.modules.tasks.events.TasksSyncSuccessPublisher
+import com.lotic.tasks.adapters.modules.tasks.events.TasksUpdatedPublisher
 import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.shared.events.Subscriber
 import kotlinx.coroutines.delay
@@ -36,7 +37,7 @@ class LoginSuccessSubscriber(private val viewModel: TasksViewModel) : Subscriber
     }
 }
 
-class LogoutSuccessPublisher(private val viewModel: TasksViewModel) : Subscriber<UUID>() {
+class LogoutSuccessSubscriber(private val viewModel: TasksViewModel) : Subscriber<UUID>() {
     override fun notify(event: com.lotic.tasks.domain.shared.events.Event<UUID>) {
         this.viewModel.updateState(this.viewModel.uiState.copy(isLoggedIn = false))
         this.viewModel.viewModelScope.launch {
@@ -46,21 +47,36 @@ class LogoutSuccessPublisher(private val viewModel: TasksViewModel) : Subscriber
     }
 }
 
-class TasksViewModel : ViewModel(), EventObserver {
-    var uiState by mutableStateOf(TasksUIState(isLoggedIn = false))
-        private set
-
-    override fun notify(event: Event) {
-        if (event.isOfType(EventType.SYNC_SUCCESS)
-            || event.isOfType(EventType.TASKS_UPDATED)
-            || event.isOfType(EventType.TASKS_CREATED)
-            || event.isOfType(EventType.TASKS_COMPLETED)) {
-            viewModelScope.launch {
-                delay(200)
-                refreshTaskList()
-            }
+class TasksCreatedSubscriber(private val viewModel: TasksViewModel) : Subscriber<List<UUID>>() {
+    override fun notify(event: com.lotic.tasks.domain.shared.events.Event<List<UUID>>) {
+        this.viewModel.viewModelScope.launch {
+            delay(100)
+            viewModel.refreshTaskList()
         }
     }
+}
+
+class TasksUpdatedSubscriber(private val viewModel: TasksViewModel) : Subscriber<UUID>() {
+    override fun notify(event: com.lotic.tasks.domain.shared.events.Event<UUID>) {
+        this.viewModel.viewModelScope.launch {
+            delay(100)
+            viewModel.refreshTaskList()
+        }
+    }
+}
+
+class TasksCompletedSubscriber(private val viewModel: TasksViewModel) : Subscriber<UUID>() {
+    override fun notify(event: com.lotic.tasks.domain.shared.events.Event<UUID>) {
+        this.viewModel.viewModelScope.launch {
+            delay(100)
+            viewModel.refreshTaskList()
+        }
+    }
+}
+
+class TasksViewModel : ViewModel() {
+    var uiState by mutableStateOf(TasksUIState(isLoggedIn = false))
+        private set
 
     fun updateState(uiState: TasksUIState) {
         this.uiState = uiState
@@ -68,16 +84,11 @@ class TasksViewModel : ViewModel(), EventObserver {
 
     init {
         LoginSuccessPublisher.register(LoginSuccessSubscriber(this))
-
-        EventBus.subscribe(
-            eventTypes = listOf(
-                EventType.SYNC_SUCCESS
-                , EventType.LOGOUT_SUCCESS
-                , EventType.TASKS_UPDATED
-                , EventType.TASKS_CREATED
-                , EventType.TASKS_COMPLETED)
-            , observer = this
-        )
+        LogoutSuccessPublisher.register(LogoutSuccessSubscriber(this))
+        TasksCreatedPublisher.register(TasksCreatedSubscriber(this))
+        TasksSyncSuccessPublisher.register(TasksCreatedSubscriber(this))
+        TasksUpdatedPublisher.register(TasksUpdatedSubscriber(this))
+        TasksCompletedPublisher.register(TasksCompletedSubscriber(this))
 
         viewModelScope.launch {
             verifyIfLoggedIn()

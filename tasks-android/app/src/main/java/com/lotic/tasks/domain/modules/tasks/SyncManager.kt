@@ -4,10 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.lotic.tasks.domain.events.Event
-import com.lotic.tasks.domain.events.EventBus
-import com.lotic.tasks.domain.events.EventType
-import com.lotic.tasks.domain.events.payloads.TasksSyncedEventInfo
 import com.lotic.tasks.adapters.http.RetrofitClientProvider
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
@@ -26,7 +22,9 @@ import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetDirtyTasksSy
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetLocalTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.MarkTasksSynced
 import com.lotic.tasks.adapters.modules.tasks.TasksSyncOperationsProvider
+import com.lotic.tasks.adapters.modules.tasks.events.TasksSyncSuccessPublisher
 import com.lotic.tasks.adapters.modules.tasks.gateways.TasksClient
+import com.lotic.tasks.domain.shared.events.Event
 import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
 import java.util.*
@@ -129,17 +127,9 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                             }
                         }
 
-                        EventBus.post(
-                            Event(
-                                EventType.SYNC_SUCCESS
-                                , TasksSyncedEventInfo(
-                                    listOf(/* Will have locally created tasks */)
-                                    , listOf(/* Will have the remotely deleted tasks */))))
-
+                        TasksSyncSuccessPublisher.publish(Event(listOf()))
                     } catch (e: HttpException) {
                         Log.d("SyncManager", e.toString())
-                        // FIXME: We should refresh the token not delete them all
-                        EventBus.post(Event(EventType.SYNC_FAILURE))
                     }
                 }
 

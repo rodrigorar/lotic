@@ -1,12 +1,16 @@
 package com.lotic.tasks.adapters.modules.tasks
 
 import android.content.Context
-import com.lotic.tasks.domain.events.EventBus
-import com.lotic.tasks.domain.events.EventType
-import com.lotic.tasks.domain.modules.tasks.events.CompleteTasksSync
-import com.lotic.tasks.domain.modules.tasks.events.CreateTasksSync
-import com.lotic.tasks.domain.modules.tasks.events.UpdateTasksSync
+import com.lotic.tasks.adapters.modules.tasks.events.TasksCompletedPublisher
+import com.lotic.tasks.adapters.modules.tasks.events.TasksCreatedPublisher
+import com.lotic.tasks.adapters.modules.tasks.events.TasksCreatedSyncedPublisher
+import com.lotic.tasks.adapters.modules.tasks.events.TasksSyncSuccessPublisher
+import com.lotic.tasks.adapters.modules.tasks.events.TasksUpdatedPublisher
 import com.lotic.tasks.domain.modules.tasks.TasksSyncRepository
+import com.lotic.tasks.domain.modules.tasks.events.CompleteTasksSyncSubscriber
+import com.lotic.tasks.domain.modules.tasks.events.CreateLocalTasksSyncSubscriber
+import com.lotic.tasks.domain.modules.tasks.events.CreateSyncedTasksSyncSubscriber
+import com.lotic.tasks.domain.modules.tasks.events.UpdateTasksSyncSubscriber
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.DeleteTaskSyncByTaskId
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetCompleteTasksSync
 import com.lotic.tasks.domain.modules.tasks.operations.taskssync.GetDirtyTasksSync
@@ -28,16 +32,11 @@ object TasksSyncOperationsProvider : OperationsProvider {
     fun init(tasksSyncRepository: TasksSyncRepository): TasksSyncOperationsProvider {
         this.tasksSyncRepository = tasksSyncRepository
 
-        // XXX: This probably should not be done here, but i have no better idea
-        EventBus.subscribe(
-            listOf(
-                EventType.TASKS_CREATED
-                , EventType.TASKS_CREATED_SYNCED
-                , EventType.SYNC_SUCCESS)
-            , CreateTasksSync(tasksSyncRepository)
-        )
-        EventBus.subscribe(EventType.TASKS_UPDATED, UpdateTasksSync(tasksSyncRepository))
-        EventBus.subscribe(EventType.TASKS_COMPLETED, CompleteTasksSync(tasksSyncRepository))
+        TasksCreatedPublisher.register(CreateLocalTasksSyncSubscriber(this.tasksSyncRepository))
+        TasksCreatedSyncedPublisher.register(CreateSyncedTasksSyncSubscriber(this.tasksSyncRepository))
+        TasksUpdatedPublisher.register(UpdateTasksSyncSubscriber(this.tasksSyncRepository))
+        TasksCompletedPublisher.register(CompleteTasksSyncSubscriber(this.tasksSyncRepository))
+        TasksSyncSuccessPublisher.register(CreateLocalTasksSyncSubscriber(this.tasksSyncRepository))
 
         return this
     }

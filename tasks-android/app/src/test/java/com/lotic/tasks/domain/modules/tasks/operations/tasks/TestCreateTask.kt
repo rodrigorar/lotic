@@ -1,5 +1,6 @@
 package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
+import com.lotic.tasks.adapters.modules.tasks.events.TasksCreatedPublisher
 import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import io.mockk.coEvery
@@ -25,12 +26,16 @@ class TestCreateTask {
         val mockedTasksRepository = mockk<TasksRepository>()
         coEvery { mockedTasksRepository.insert(input) } returns Unit
 
+        val mockedTasksCreatedPublisher = mockk<TasksCreatedPublisher>()
+        coEvery { mockedTasksCreatedPublisher.publish(any()) } returns Unit
+
         runBlocking {
-            val underTest = CreateTask(mockedTasksRepository)
+            val underTest = CreateTask(mockedTasksRepository, mockedTasksCreatedPublisher)
             underTest.execute(input)
         }
 
         coVerify { mockedTasksRepository.insert(input) }
+        coVerify { mockedTasksCreatedPublisher.publish(any()) }
     }
 
     @Test
@@ -46,8 +51,10 @@ class TestCreateTask {
         val mockedTasksRepository = mockk<TasksRepository>()
         coEvery { mockedTasksRepository.insert(input) } throws Exception()
 
+        val mockedTasksCreatedPublisher = mockk<TasksCreatedPublisher>()
+
         runBlocking {
-            val underTest = CreateTask(mockedTasksRepository)
+            val underTest = CreateTask(mockedTasksRepository, mockedTasksCreatedPublisher)
             try {
                 underTest.execute(input)
             } catch (e: Exception) {

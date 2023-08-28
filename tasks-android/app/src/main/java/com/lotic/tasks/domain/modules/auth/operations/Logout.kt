@@ -1,8 +1,5 @@
 package com.lotic.tasks.domain.modules.auth.operations
 
-import com.lotic.tasks.domain.events.Event
-import com.lotic.tasks.domain.events.EventBus
-import com.lotic.tasks.domain.events.EventType
 import com.lotic.tasks.domain.modules.auth.AuthTokenRepository
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.domain.shared.Gateway
@@ -18,25 +15,13 @@ class Logout(
 ) : NoInputCommand {
 
     override suspend fun execute() {
-        try {
-            val currentActiveAuthSession: AuthToken? = currentActiveAuthSessionProvider.get()
+        val currentActiveAuthSession: AuthToken? = currentActiveAuthSessionProvider.get()
 
-            currentActiveAuthSession?.also {
-                this.logoutGateway.call(it)
-                authTokenRepository.deleteAllForAccount(it.accountId)
+        currentActiveAuthSession?.also {
+            this.logoutGateway.call(it)
+            authTokenRepository.deleteAllForAccount(it.accountId)
 
-                logoutSuccessPublisher.publish(com.lotic.tasks.domain.shared.events.Event(it.accountId))
-            }
-
-            // CONTINUE HERE
-
-            // FIXME: Use a Logout Success Publisher
-            EventBus.post(Event(EventType.LOGOUT_SUCCESS))
-        } catch (e: Exception) {
-            // FIXME: Use a Logout Failure Publisher
-            EventBus.post(Event(EventType.LOGOUT_FAILURE))
-
-            throw e
+            logoutSuccessPublisher.publish(com.lotic.tasks.domain.shared.events.Event(it.accountId))
         }
     }
 
