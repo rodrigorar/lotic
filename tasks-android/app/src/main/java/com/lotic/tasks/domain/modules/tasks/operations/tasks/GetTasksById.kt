@@ -5,17 +5,18 @@ import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionPr
 import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import com.lotic.tasks.domain.shared.operations.Query
+import com.lotic.tasks.domain.shared.value_objects.Id
 import java.util.*
 
 class GetTasksById(
     private val tasksRepository: TasksRepository
     , private val authSessionProvider: CurrentActiveAuthSessionProvider) :
-    Query<List<UUID>, List<Task>> {
+    Query<List<Id<Task>>, List<Task>> {
 
-    override suspend fun execute(parameter: List<UUID>): List<Task> {
+    override suspend fun execute(parameter: List<Id<Task>>): List<Task> {
         val authSession: AuthToken? = authSessionProvider.get()
         return authSession?.let {
-            this.tasksRepository.getTasksById(it.accountId, parameter)
+            this.tasksRepository.getTasksById(it.accountId.value, parameter)
         }.orEmpty()
     }
 

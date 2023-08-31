@@ -69,6 +69,7 @@ def logout_session(path: LogoutSessionTokenPath):
     return "", 204
 
 
+# DEPRECATED: To be Removed
 @auth_bp.post(
     "/logout"
     , responses={

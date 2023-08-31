@@ -2,8 +2,10 @@ package com.lotic.tasks.adapters.modules.tasks
 
 import com.lotic.tasks.adapters.modules.tasks.persistence.DAOTasks
 import com.lotic.tasks.adapters.modules.tasks.persistence.EntityTask
+import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import com.lotic.tasks.domain.modules.tasks.Task
+import com.lotic.tasks.domain.shared.value_objects.Id
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -17,41 +19,41 @@ class TasksRepositoryImpl(private val tasksDAO: DAOTasks) : TasksRepository {
         entities.forEach { entry ->  tasksDAO.insert(entry.toEntity())}
     }
 
-    override suspend fun update(id: UUID, entity: Task) {
-        val currentTask : EntityTask? = this.tasksDAO.getById(id)
+    override suspend fun update(entity: Task) {
+        val currentTask : EntityTask? = this.tasksDAO.getById(entity.id.value)
         val updatedTask: EntityTask? = currentTask?.let {
             it.copy(
-                title = if (entity.title != it.title) entity.title else it.title
-                , description = if (entity.description != it.description) entity.description else it.description
+                title = if (entity.title.value != it.title) entity.title.value else it.title
+                , description = if (entity.description.value != it.description) entity.description.value else it.description
                 , updatedAt = ZonedDateTime.now().toString())
         }
         updatedTask?.also { this.tasksDAO.update(it) }
     }
 
-    override suspend fun getById(id: UUID): Task? {
+    override suspend fun getById(id: Id<Task>): Task? {
         throw NotImplementedError("TasksRepository#getById is not implemented")
     }
 
-    override suspend fun listTasksForAccount(accountId: UUID): List<Task> {
-        val result: List<EntityTask> = this.tasksDAO.listTasksForAccount(accountId)
+    override suspend fun listTasksForAccount(accountId: Id<Account>): List<Task> {
+        val result: List<EntityTask> = this.tasksDAO.listTasksForAccount(accountId.value)
         return result.map {
             Task.fromEntity(it)
         }
     }
 
-    override suspend fun getTasksById(accountId: UUID, taskIds: List<UUID>): List<Task> {
+    override suspend fun getTasksById(accountId: UUID, taskIds: List<Id<Task>>): List<Task> {
         // FIXME: Eventually all these operations should have a context (logged user, etc)
-        return this.tasksDAO.getByIds(taskIds)
+        return this.tasksDAO.getByIds(taskIds.map { it.value })
             .map { Task.fromEntity(it) }
     }
 
-    override suspend fun delete(id: UUID) {
-        val result: EntityTask? = this.tasksDAO.getById(id)
+    override suspend fun delete(id: Id<Task>) {
+        val result: EntityTask? = this.tasksDAO.getById(id.value)
         result?.also { this.tasksDAO.delete(it) }
     }
 
-    override suspend fun deleteMultiple(idList: List<UUID>) {
-        val taskEntities: List<EntityTask> = this.tasksDAO.getByIds(idList)
+    override suspend fun deleteMultiple(taskIds: List<Id<Task>>) {
+        val taskEntities: List<EntityTask> = this.tasksDAO.getByIds(taskIds.map { it.value })
         taskEntities.forEach {
             this.tasksDAO.delete(it)
         }

@@ -1,8 +1,12 @@
 package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
+import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import com.lotic.tasks.domain.shared.events.Publisher
+import com.lotic.tasks.domain.shared.value_objects.Description
+import com.lotic.tasks.domain.shared.value_objects.Id
+import com.lotic.tasks.domain.shared.value_objects.Title
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -16,17 +20,17 @@ class TestUpdateTask {
     @Test
     fun shouldSucceed() {
         val input = Task(
-            UUID.randomUUID()
-            , "Task #1"
-            , ""
+            Task.newId()
+            , Title.of("Task #1")
+            , Description.of("")
             , ZonedDateTime.now()
             , ZonedDateTime.now()
-            , UUID.randomUUID())
+            , Account.newId())
 
         val mockedTasksRepository = mockk<TasksRepository>()
-        coEvery { mockedTasksRepository.update(any(), any()) } returns Unit
+        coEvery { mockedTasksRepository.update(any()) } returns Unit
 
-        val mockedTasksUpdatedPublisher = mockk<Publisher<UUID>>()
+        val mockedTasksUpdatedPublisher = mockk<Publisher<Id<Task>>>()
         coEvery { mockedTasksUpdatedPublisher.publish(any()) } returns Unit
 
         val underTest = UpdateTask(mockedTasksRepository, mockedTasksUpdatedPublisher)
@@ -34,24 +38,24 @@ class TestUpdateTask {
             underTest.execute(input)
         }
 
-        coVerify { mockedTasksRepository.update(any(), any()) }
+        coVerify { mockedTasksRepository.update(any()) }
         coVerify { mockedTasksUpdatedPublisher.publish(any()) }
     }
 
     @Test
     fun shouldFail_tasksRepositoryError() {
         val input = Task(
-            UUID.randomUUID()
-            , "Task #1"
-            , ""
+            Task.newId()
+            , Title.of("Task #1")
+            , Description.of("")
             , ZonedDateTime.now()
             , ZonedDateTime.now()
-            , UUID.randomUUID())
+            , Account.newId())
 
         val mockedTasksRepository = mockk<TasksRepository>()
-        coEvery { mockedTasksRepository.update(any(), any()) } throws Exception()
+        coEvery { mockedTasksRepository.update(any()) } throws Exception()
 
-        val mockedTasksUpdatedPublisher = mockk<Publisher<UUID>>()
+        val mockedTasksUpdatedPublisher = mockk<Publisher<Id<Task>>>()
 
         val underTest = UpdateTask(mockedTasksRepository, mockedTasksUpdatedPublisher)
         runBlocking {
@@ -62,6 +66,6 @@ class TestUpdateTask {
             }
         }
 
-        coVerify { mockedTasksRepository.update(any(), any()) }
+        coVerify { mockedTasksRepository.update(any()) }
     }
 }

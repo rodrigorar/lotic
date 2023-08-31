@@ -1,7 +1,7 @@
 package com.lotic.tasks.adapters.modules.tasks.gateways
 
-import com.lotic.tasks.domain.modules.tasks.client.payloads.CreateTasksRequest
-import com.lotic.tasks.domain.modules.tasks.client.payloads.TaskListResponse
+import com.lotic.tasks.adapters.modules.tasks.gateways.payloads.CreateTasksRequest
+import com.lotic.tasks.adapters.modules.tasks.gateways.payloads.TaskListResponse
 import com.lotic.tasks.domain.modules.tasks.client.payloads.UpdateTasksRequest
 import retrofit2.Response
 import retrofit2.http.Body

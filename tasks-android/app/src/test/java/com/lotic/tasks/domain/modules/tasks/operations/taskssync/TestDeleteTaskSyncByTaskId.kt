@@ -1,6 +1,7 @@
 package com.lotic.tasks.domain.modules.tasks.operations.taskssync
 
 import com.lotic.tasks.domain.modules.tasks.SyncStatus
+import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksSync
 import com.lotic.tasks.domain.modules.tasks.TasksSyncRepository
 import io.mockk.coEvery
@@ -16,8 +17,8 @@ class TestDeleteTaskSyncByTaskId {
     @Test
     fun shouldSucceed() {
         val dataResult = TasksSync(
-            UUID.randomUUID()
-            , UUID.randomUUID()
+            TasksSync.newId()
+            , Task.newId()
             , SyncStatus.LOCAL
             , ZonedDateTime.now()
             , ZonedDateTime.now())
@@ -28,7 +29,7 @@ class TestDeleteTaskSyncByTaskId {
 
         val underTest = DeleteTaskSyncByTaskId(mockedTasksSyncRepository)
         runBlocking {
-            underTest.execute(UUID.randomUUID())
+            underTest.execute(Task.newId())
         }
 
         coVerify { mockedTasksSyncRepository.getByTaskId(any()) }
@@ -42,7 +43,7 @@ class TestDeleteTaskSyncByTaskId {
 
         val underTest = DeleteTaskSyncByTaskId(mockedTasksSyncRepository)
         runBlocking {
-            underTest.execute(UUID.randomUUID())
+            underTest.execute(Task.newId())
         }
 
         coVerify { mockedTasksSyncRepository.getByTaskId(any()) }
@@ -51,8 +52,8 @@ class TestDeleteTaskSyncByTaskId {
     @Test
     fun shouldFail_tasksSyncRepositoryError() {
         val dataResult = TasksSync(
-            UUID.randomUUID()
-            , UUID.randomUUID()
+            TasksSync.newId()
+            , Task.newId()
             , SyncStatus.LOCAL
             , ZonedDateTime.now()
             , ZonedDateTime.now())
@@ -64,7 +65,7 @@ class TestDeleteTaskSyncByTaskId {
         val underTest = DeleteTaskSyncByTaskId(mockedTasksSyncRepository)
         runBlocking {
             try {
-                underTest.execute(UUID.randomUUID())
+                underTest.execute(Task.newId())
             } catch (e: Exception) {
                 // Do Nothing
             }

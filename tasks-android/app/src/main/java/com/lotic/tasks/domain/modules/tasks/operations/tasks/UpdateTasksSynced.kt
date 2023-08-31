@@ -7,7 +7,7 @@ import com.lotic.tasks.domain.shared.operations.Command
 class UpdateTasksSynced(private val tasksRepository: TasksRepository) : Command<Task> {
 
     override suspend fun execute(input: Task) {
-        this.tasksRepository.update(input.id, input)
+        this.tasksRepository.update(input)
     }
 
 }

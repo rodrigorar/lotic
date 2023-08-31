@@ -1,9 +1,13 @@
 package com.lotic.tasks.domain.modules.auth
 
 import com.lotic.tasks.adapters.modules.auth.gateways.LogoutGateway
+import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionProvider
 import com.lotic.tasks.domain.modules.auth.operations.Logout
+import com.lotic.tasks.domain.modules.auth.value_objects.AccessToken
+import com.lotic.tasks.domain.modules.auth.value_objects.RefreshToken
 import com.lotic.tasks.domain.shared.events.Publisher
+import com.lotic.tasks.domain.shared.value_objects.Id
 import io.mockk.InternalPlatformDsl.toStr
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -17,9 +21,9 @@ class TestLogout {
     @Test
     fun shouldSucceed() {
         val authToken = AuthToken(
-            UUID.randomUUID().toStr()
-            , UUID.randomUUID().toStr()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , "")
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
@@ -31,7 +35,7 @@ class TestLogout {
         val mockedLogoutGateway = mockk<LogoutGateway>()
         coEvery { mockedLogoutGateway.call(any()) } returns Unit
 
-        val mockedLogoutSuccessPublisher = mockk<Publisher<UUID>>()
+        val mockedLogoutSuccessPublisher = mockk<Publisher<Id<Account>>>()
         coEvery { mockedLogoutSuccessPublisher.publish(any()) } returns Unit
 
         runBlocking {
@@ -58,7 +62,7 @@ class TestLogout {
 
         val mockedLogoutGateway = mockk<LogoutGateway>()
 
-        val mockedLogoutSuccessPublisher = mockk<Publisher<UUID>>()
+        val mockedLogoutSuccessPublisher = mockk<Publisher<Id<Account>>>()
 
         runBlocking {
             val underTest = Logout(
@@ -80,7 +84,7 @@ class TestLogout {
 
         val mockedLogoutGateway = mockk<LogoutGateway>()
 
-        val mockedLogoutSuccessPublisher = mockk<Publisher<UUID>>()
+        val mockedLogoutSuccessPublisher = mockk<Publisher<Id<Account>>>()
 
         runBlocking {
             val underTest = Logout(
@@ -101,9 +105,9 @@ class TestLogout {
     @Test
     fun shouldFail_gatewayError() {
         val authToken = AuthToken(
-            UUID.randomUUID().toStr()
-            , UUID.randomUUID().toStr()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , "")
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
@@ -113,7 +117,7 @@ class TestLogout {
         val mockedLogoutGateway = mockk<LogoutGateway>()
         coEvery { mockedLogoutGateway.call(any()) } throws Exception()
 
-        val mockedLogoutSuccessPublisher = mockk<Publisher<UUID>>()
+        val mockedLogoutSuccessPublisher = mockk<Publisher<Id<Account>>>()
 
         runBlocking {
             val underTest = Logout(
@@ -135,9 +139,9 @@ class TestLogout {
     @Test
     fun shouldFail_repositoryError() {
         val authToken = AuthToken(
-            UUID.randomUUID().toStr()
-            , UUID.randomUUID().toStr()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , "")
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
@@ -149,7 +153,7 @@ class TestLogout {
         val mockedLogoutGateway = mockk<LogoutGateway>()
         coEvery { mockedLogoutGateway.call(any()) } returns Unit
 
-        val mockedLogoutSuccessPublisher = mockk<Publisher<UUID>>()
+        val mockedLogoutSuccessPublisher = mockk<Publisher<Id<Account>>>()
 
         runBlocking {
             val underTest = Logout(

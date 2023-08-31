@@ -1,9 +1,14 @@
 package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
+import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionProvider
+import com.lotic.tasks.domain.modules.auth.value_objects.AccessToken
+import com.lotic.tasks.domain.modules.auth.value_objects.RefreshToken
 import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
+import com.lotic.tasks.domain.shared.value_objects.Description
+import com.lotic.tasks.domain.shared.value_objects.Title
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -16,11 +21,29 @@ class TestGetTasksById {
 
     @Test
     fun shouldSucceed() {
-        val authSession = AuthToken(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID(), "")
+        val authSession = AuthToken(AccessToken.new(), RefreshToken.new(), Account.newId(), "")
         val dataResult = listOf(
-            Task(UUID.randomUUID(), "Task #1", "", ZonedDateTime.now(), ZonedDateTime.now(), authSession.accountId)
-            , Task(UUID.randomUUID(), "Task #2", "", ZonedDateTime.now(), ZonedDateTime.now(), authSession.accountId)
-            , Task(UUID.randomUUID(), "Task #3", "", ZonedDateTime.now(), ZonedDateTime.now(), authSession.accountId)
+            Task(
+                Task.newId()
+                , Title.of("Task #1")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , authSession.accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #2")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , authSession.accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #3")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , authSession.accountId)
         )
 
         val mockedTasksRepository = mockk<TasksRepository>()
@@ -43,7 +66,7 @@ class TestGetTasksById {
 
     @Test
     fun shouldSucceed_noResult() {
-        val authSession = AuthToken(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID(), "")
+        val authSession = AuthToken(AccessToken.new(), RefreshToken.new(), Account.newId(), "")
         val dataResult: List<Task> = listOf()
 
         val mockedTasksRepository = mockk<TasksRepository>()
@@ -65,11 +88,29 @@ class TestGetTasksById {
 
     @Test
     fun shouldFail_authSessionProviderError() {
-        val authSession = AuthToken(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID(), "")
+        val authSession = AuthToken(AccessToken.new(), RefreshToken.new(), Account.newId(), "")
         val dataResult = listOf(
-            Task(UUID.randomUUID(), "Task #1", "", ZonedDateTime.now(), ZonedDateTime.now(), authSession.accountId)
-            , Task(UUID.randomUUID(), "Task #2", "", ZonedDateTime.now(), ZonedDateTime.now(), authSession.accountId)
-            , Task(UUID.randomUUID(), "Task #3", "", ZonedDateTime.now(), ZonedDateTime.now(), authSession.accountId)
+            Task(
+                Task.newId()
+                , Title.of("Task #1")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , authSession.accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #2")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , authSession.accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #3")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , authSession.accountId)
         )
 
         val mockedTasksRepository = mockk<TasksRepository>()
@@ -92,11 +133,29 @@ class TestGetTasksById {
 
     @Test
     fun shouldFail_tasksRepositoryError() {
-        val authSession = AuthToken(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID(), "")
+        val authSession = AuthToken(AccessToken.new(), RefreshToken.new(), Account.newId(), "")
         val dataResult = listOf(
-            Task(UUID.randomUUID(), "Task #1", "", ZonedDateTime.now(), ZonedDateTime.now(), authSession.accountId)
-            , Task(UUID.randomUUID(), "Task #2", "", ZonedDateTime.now(), ZonedDateTime.now(), authSession.accountId)
-            , Task(UUID.randomUUID(), "Task #3", "", ZonedDateTime.now(), ZonedDateTime.now(), authSession.accountId)
+            Task(
+                Task.newId()
+                , Title.of("Task #1")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , authSession.accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #2")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , authSession.accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #3")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , authSession.accountId)
         )
 
         val mockedTasksRepository = mockk<TasksRepository>()

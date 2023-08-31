@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.lotic.tasks.domain.modules.auth.operations.Login
 import com.lotic.tasks.domain.modules.auth.Credentials
 import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
+import com.lotic.tasks.domain.shared.value_objects.Email
+import com.lotic.tasks.domain.shared.value_objects.Password
 import kotlinx.coroutines.launch
 
 class LoginViewModel() : ViewModel() {
@@ -27,7 +29,7 @@ class LoginViewModel() : ViewModel() {
     // TODO: Move this to the shared view model
     fun login(subject: String, secret: String) {
         viewModelScope.launch {
-            loginOperation.execute(Credentials(subject, secret))
+            loginOperation.execute(Credentials(Email.of(subject), Password.of(secret)))
         }
     }
 }

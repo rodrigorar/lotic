@@ -1,31 +1,52 @@
 package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
+import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import com.lotic.tasks.domain.shared.events.Publisher
+import com.lotic.tasks.domain.shared.value_objects.Description
+import com.lotic.tasks.domain.shared.value_objects.Id
+import com.lotic.tasks.domain.shared.value_objects.Title
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import java.time.ZonedDateTime
-import java.util.*
 
 class TestCreateTasks {
 
     @Test
     fun shouldSucceed() {
-        val accountId = UUID.randomUUID()
+        val accountId = Account.newId()
         val input = listOf(
-            Task(UUID.randomUUID(), "Task #1", "", ZonedDateTime.now(), ZonedDateTime.now(), accountId)
-            , Task(UUID.randomUUID(), "Task #2", "", ZonedDateTime.now(), ZonedDateTime.now(), accountId)
-            , Task(UUID.randomUUID(), "Task #3", "", ZonedDateTime.now(), ZonedDateTime.now(), accountId)
+            Task(
+                Task.newId()
+                , Title.of("Task #1")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #2")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #3")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , accountId)
         )
 
         val mockedTasksRepository = mockk<TasksRepository>()
         coEvery { mockedTasksRepository.insertMultiple(input) } returns Unit
 
-        val mockedTasksCreatedPublisher = mockk<Publisher<List<UUID>>>()
+        val mockedTasksCreatedPublisher = mockk<Publisher<List<Id<Task>>>>()
         coEvery { mockedTasksCreatedPublisher.publish(any()) } returns Unit
 
         runBlocking {
@@ -39,17 +60,35 @@ class TestCreateTasks {
 
     @Test
     fun shouldFail_tasksRepositoryError() {
-        val accountId = UUID.randomUUID()
+        val accountId = Account.newId()
         val input = listOf(
-            Task(UUID.randomUUID(), "Task #1", "", ZonedDateTime.now(), ZonedDateTime.now(), accountId)
-            , Task(UUID.randomUUID(), "Task #2", "", ZonedDateTime.now(), ZonedDateTime.now(), accountId)
-            , Task(UUID.randomUUID(), "Task #3", "", ZonedDateTime.now(), ZonedDateTime.now(), accountId)
+            Task(
+                Task.newId()
+                , Title.of("Task #1")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #2")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #3")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , accountId)
         )
 
         val mockedTasksRepository = mockk<TasksRepository>()
         coEvery { mockedTasksRepository.insertMultiple(input) } throws Exception()
 
-        val mockedTasksCreatedPublisher = mockk<Publisher<List<UUID>>>()
+        val mockedTasksCreatedPublisher = mockk<Publisher<List<Id<Task>>>>()
 
         runBlocking {
             val underTest = CreateTasks(mockedTasksRepository, mockedTasksCreatedPublisher)

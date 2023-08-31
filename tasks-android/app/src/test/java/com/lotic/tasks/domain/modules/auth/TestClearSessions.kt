@@ -1,5 +1,6 @@
 package com.lotic.tasks.domain.modules.auth
 
+import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.auth.operations.ClearSessions
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -17,7 +18,7 @@ class TestClearSessions {
 
         val underTest = ClearSessions(mockedAuthTokenRepository)
         runBlocking {
-            underTest.execute(UUID.randomUUID())
+            underTest.execute(Account.newId())
         }
 
         coVerify { mockedAuthTokenRepository.deleteAllForAccount(any()) }
@@ -31,7 +32,7 @@ class TestClearSessions {
         val underTest = ClearSessions(mockedAuthTokenRepository)
         runBlocking {
             try {
-                underTest.execute(UUID.randomUUID())
+                underTest.execute(Account.newId())
             } catch (e: Exception) {
                 // Do Nothing
             }

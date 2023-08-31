@@ -1,6 +1,7 @@
 package com.lotic.tasks.domain.modules.accounts
 
 import com.lotic.tasks.domain.modules.accounts.operations.GetAccountByEmail
+import com.lotic.tasks.domain.shared.value_objects.Email
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -12,14 +13,15 @@ class TestGetAccountByEmail {
 
     @Test
     fun shouldSucceed() {
-        val resultAccount = Account(UUID.randomUUID(), "test@mail.net")
+        val testEmail = Email.of("test@mail.net")
+        val resultAccount = Account(Account.newId(), testEmail)
 
         val mockedAccountsRepository = mockk<AccountsRepository>()
         coEvery { mockedAccountsRepository.getByEmail(any()) } returns resultAccount
 
         runBlocking {
             val underTest = GetAccountByEmail(mockedAccountsRepository)
-            val result = underTest.execute("test@mail.net")
+            val result = underTest.execute(testEmail)
 
             assert(resultAccount.id == result?.id)
             assert(resultAccount.email == result?.email)
@@ -35,7 +37,7 @@ class TestGetAccountByEmail {
 
         runBlocking {
             val underTest = GetAccountByEmail(mockedAccountsRepository)
-            val result = underTest.execute("test@mail.net")
+            val result = underTest.execute(Email.of("test@mail.net"))
 
             assert(result == null)
         }
@@ -45,15 +47,13 @@ class TestGetAccountByEmail {
 
     @Test
     fun testShouldFailRepositoryError() {
-        val resultAccount = Account(UUID.randomUUID(), "test@mail.net")
-
         val mockedAccountsRepository = mockk<AccountsRepository>()
         coEvery { mockedAccountsRepository.getByEmail(any()) } throws Exception()
 
         runBlocking {
             val underTest = GetAccountByEmail(mockedAccountsRepository)
             try {
-                underTest.execute("test@mail.net")
+                underTest.execute(Email.of("test@mail.net"))
             } catch (e: Exception) {
                 // Do Nothing
             }

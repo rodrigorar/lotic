@@ -2,10 +2,14 @@ package com.lotic.tasks.domain.modules.auth
 
 import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.auth.operations.Login
+import com.lotic.tasks.domain.modules.auth.value_objects.AccessToken
+import com.lotic.tasks.domain.modules.auth.value_objects.RefreshToken
 import com.lotic.tasks.domain.shared.operations.Command
 import com.lotic.tasks.domain.shared.Gateway
 import com.lotic.tasks.domain.shared.events.Publisher
 import com.lotic.tasks.domain.shared.operations.Query
+import com.lotic.tasks.domain.shared.value_objects.Email
+import com.lotic.tasks.domain.shared.value_objects.Password
 import io.mockk.InternalPlatformDsl.toStr
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -16,22 +20,24 @@ import java.time.Instant
 import java.util.*
 
 class TestLogin {
+    val EMAIL = Email.of("test@mail.net")
+    val PASSWORD = Password.of("passwd")
 
     @Test
     fun shouldSucceedNoNewAccount() {
-        val input = Credentials("test@mail.net", "passwd")
+        val input = Credentials(EMAIL, PASSWORD)
         val authToken = AuthToken(
-            UUID.randomUUID().toString()
-            , UUID.randomUUID().toString()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , Instant.now().toStr())
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>();
         coEvery { mockedAuthTokenRepository.deleteAllForAccount(authToken.accountId) } returns Unit
         coEvery { mockedAuthTokenRepository.insert(any()) } returns Unit
 
-        val mockedGetAccountByEmailQuery = mockk<Query<String, Account?>>();
-        coEvery { mockedGetAccountByEmailQuery.execute(any()) } returns Account(authToken.accountId, "test@mail.net")
+        val mockedGetAccountByEmailQuery = mockk<Query<Email, Account?>>();
+        coEvery { mockedGetAccountByEmailQuery.execute(any()) } returns Account(authToken.accountId, EMAIL)
 
         val mockedNewAccountCommand = mockk<Command<Account>>();
         val mockedLoginGateway = mockk<Gateway<Credentials, AuthToken?>>();
@@ -59,18 +65,18 @@ class TestLogin {
 
     @Test
     fun shouldSucceed_newAccount() {
-        val input = Credentials("test@mail.net", "passwd")
+        val input = Credentials(EMAIL, PASSWORD)
         val authToken = AuthToken(
-            UUID.randomUUID().toString()
-            , UUID.randomUUID().toString()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , Instant.now().toStr())
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>();
         coEvery { mockedAuthTokenRepository.deleteAllForAccount(authToken.accountId) } returns Unit
         coEvery { mockedAuthTokenRepository.insert(any()) } returns Unit
 
-        val mockedGetAccountByEmailQuery = mockk<Query<String, Account?>>();
+        val mockedGetAccountByEmailQuery = mockk<Query<Email, Account?>>();
         coEvery { mockedGetAccountByEmailQuery.execute(any()) } returns null
 
         val mockedNewAccountCommand = mockk<Command<Account>>()
@@ -102,10 +108,10 @@ class TestLogin {
 
     @Test
     fun shouldFail_noResult() {
-        val input = Credentials("test@mail.net", "passwd")
+        val input = Credentials(EMAIL, PASSWORD)
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>();
-        val mockedGetAccountByEmailQuery = mockk<Query<String, Account?>>();
+        val mockedGetAccountByEmailQuery = mockk<Query<Email, Account?>>();
         val mockedNewAccountCommand = mockk<Command<Account>>();
         val mockedLoginGateway = mockk<Gateway<Credentials, AuthToken?>>();
         coEvery { mockedLoginGateway.call(any()) } returns null
@@ -127,18 +133,18 @@ class TestLogin {
 
     @Test
     fun shouldFail_gatewayError() {
-        val input = Credentials("test@mail.net", "passwd")
+        val input = Credentials(EMAIL, PASSWORD)
         val authToken = AuthToken(
-            UUID.randomUUID().toString()
-            , UUID.randomUUID().toString()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , Instant.now().toStr())
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>();
         coEvery { mockedAuthTokenRepository.deleteAllForAccount(authToken.accountId) } returns Unit
 
-        val mockedGetAccountByEmailQuery = mockk<Query<String, Account?>>();
-        coEvery { mockedGetAccountByEmailQuery.execute(any()) } returns Account(authToken.accountId, "test@mail.net")
+        val mockedGetAccountByEmailQuery = mockk<Query<Email, Account?>>();
+        coEvery { mockedGetAccountByEmailQuery.execute(any()) } returns Account(authToken.accountId, EMAIL)
 
         val mockedNewAccountCommand = mockk<Command<Account>>();
         val mockedLoginGateway = mockk<Gateway<Credentials, AuthToken?>>();
@@ -163,19 +169,19 @@ class TestLogin {
 
     @Test
     fun shouldFail_repositoryError() {
-        val input = Credentials("test@mail.net", "passwd")
+        val input = Credentials(EMAIL, PASSWORD)
         val authToken = AuthToken(
-            UUID.randomUUID().toString()
-            , UUID.randomUUID().toString()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , Instant.now().toStr())
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>();
         coEvery { mockedAuthTokenRepository.deleteAllForAccount(authToken.accountId) } returns Unit
         coEvery { mockedAuthTokenRepository.insert(any()) } throws Exception()
 
-        val mockedGetAccountByEmailQuery = mockk<Query<String, Account?>>();
-        coEvery { mockedGetAccountByEmailQuery.execute(any()) } returns Account(authToken.accountId, "test@mail.net")
+        val mockedGetAccountByEmailQuery = mockk<Query<Email, Account?>>();
+        coEvery { mockedGetAccountByEmailQuery.execute(any()) } returns Account(authToken.accountId, EMAIL)
 
         val mockedNewAccountCommand = mockk<Command<Account>>();
         val mockedLoginGateway = mockk<Gateway<Credentials, AuthToken?>>();

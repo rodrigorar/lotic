@@ -15,8 +15,13 @@ import com.lotic.tasks.adapters.modules.tasks.events.TasksCompletedPublisher
 import com.lotic.tasks.adapters.modules.tasks.events.TasksCreatedPublisher
 import com.lotic.tasks.adapters.modules.tasks.events.TasksSyncSuccessPublisher
 import com.lotic.tasks.adapters.modules.tasks.events.TasksUpdatedPublisher
+import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.tasks.Task
+import com.lotic.tasks.domain.shared.events.Event
 import com.lotic.tasks.domain.shared.events.Subscriber
+import com.lotic.tasks.domain.shared.value_objects.Description
+import com.lotic.tasks.domain.shared.value_objects.Id
+import com.lotic.tasks.domain.shared.value_objects.Title
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
@@ -32,13 +37,13 @@ data class TasksUIState(
 }
 
 class LoginSuccessSubscriber(private val viewModel: TasksViewModel) : Subscriber<AuthToken>() {
-    override fun notify(event: com.lotic.tasks.domain.shared.events.Event<AuthToken>) {
+    override fun notify(event: Event<AuthToken>) {
         this.viewModel.updateState(this.viewModel.uiState.copy(isLoggedIn = true))
     }
 }
 
-class LogoutSuccessSubscriber(private val viewModel: TasksViewModel) : Subscriber<UUID>() {
-    override fun notify(event: com.lotic.tasks.domain.shared.events.Event<UUID>) {
+class LogoutSuccessSubscriber(private val viewModel: TasksViewModel) : Subscriber<Id<Account>>() {
+    override fun notify(event: Event<Id<Account>>) {
         this.viewModel.updateState(this.viewModel.uiState.copy(isLoggedIn = false))
         this.viewModel.viewModelScope.launch {
             delay(100)
@@ -47,8 +52,8 @@ class LogoutSuccessSubscriber(private val viewModel: TasksViewModel) : Subscribe
     }
 }
 
-class TasksCreatedSubscriber(private val viewModel: TasksViewModel) : Subscriber<List<UUID>>() {
-    override fun notify(event: com.lotic.tasks.domain.shared.events.Event<List<UUID>>) {
+class TasksCreatedSubscriber(private val viewModel: TasksViewModel) : Subscriber<List<Id<Task>>>() {
+    override fun notify(event: Event<List<Id<Task>>>) {
         this.viewModel.viewModelScope.launch {
             delay(100)
             viewModel.refreshTaskList()
@@ -56,8 +61,8 @@ class TasksCreatedSubscriber(private val viewModel: TasksViewModel) : Subscriber
     }
 }
 
-class TasksUpdatedSubscriber(private val viewModel: TasksViewModel) : Subscriber<UUID>() {
-    override fun notify(event: com.lotic.tasks.domain.shared.events.Event<UUID>) {
+class TasksUpdatedSubscriber(private val viewModel: TasksViewModel) : Subscriber<Id<Task>>() {
+    override fun notify(event: Event<Id<Task>>) {
         this.viewModel.viewModelScope.launch {
             delay(100)
             viewModel.refreshTaskList()
@@ -65,8 +70,8 @@ class TasksUpdatedSubscriber(private val viewModel: TasksViewModel) : Subscriber
     }
 }
 
-class TasksCompletedSubscriber(private val viewModel: TasksViewModel) : Subscriber<UUID>() {
-    override fun notify(event: com.lotic.tasks.domain.shared.events.Event<UUID>) {
+class TasksCompletedSubscriber(private val viewModel: TasksViewModel) : Subscriber<Id<Task>>() {
+    override fun notify(event: Event<Id<Task>>) {
         this.viewModel.viewModelScope.launch {
             delay(100)
             viewModel.refreshTaskList()
@@ -114,9 +119,9 @@ class TasksViewModel : ViewModel() {
 
             createTaskOperation.execute(
                 Task(
-                    id = UUID.randomUUID()
-                    , title = ""
-                    , description = ""
+                    id = Task.newId()
+                    , title = Title.of("")
+                    , description = Description.of("")
                     , createdAt = ZonedDateTime.now()
                     , updatedAt = ZonedDateTime.now()
                     , ownerId = currentActiveAuthSessionProvider.get()?.accountId)
@@ -125,22 +130,22 @@ class TasksViewModel : ViewModel() {
     }
 
     fun updateTaskTitle(task: Task, newTaskTitle: String) {
-        this.uiState.taskTitles[task.id] = newTaskTitle
+        this.uiState.taskTitles[task.id.value] = newTaskTitle
         viewModelScope.launch {
             val updateTaskOperation = TasksOperationsProvider.updateTask()
-            updateTaskOperation.execute(task.copy(title = newTaskTitle))
+            updateTaskOperation.execute(task.copy(title = Title.of(newTaskTitle)))
         }
     }
 
     fun toggleComplete(task: Task) {
-        this.uiState.taskCheckboxes[task.id] = this.uiState.taskCheckboxes[task.id]?.not() ?: false
+        this.uiState.taskCheckboxes[task.id.value] = this.uiState.taskCheckboxes[task.id.value]?.not() ?: false
         viewModelScope.launch {
             delay(1000)
             // I was force to do this idiocracy == true :facepalm:
-            if (uiState.taskCheckboxes[task.id] == true) {
+            if (uiState.taskCheckboxes[task.id.value] == true) {
                 val completeTaskOperation = TasksOperationsProvider.completeTasks()
                 completeTaskOperation.execute(task.id)
-                uiState.taskCheckboxes[task.id] = false
+                uiState.taskCheckboxes[task.id.value] = false
             }
         }
     }
@@ -154,7 +159,7 @@ class TasksViewModel : ViewModel() {
         val taskList = TasksOperationsProvider.listTasks().get()
         uiState = uiState.copy(
             taskList = taskList
-            , taskTitles = taskList.map { it.id to it.title }.toMutableStateMap()
-            , taskCheckboxes = taskList.map { it.id to false }.toMutableStateMap())
+            , taskTitles = taskList.map { it.id.value to it.title.value }.toMutableStateMap()
+            , taskCheckboxes = taskList.map { it.id.value to false }.toMutableStateMap())
     }
 }

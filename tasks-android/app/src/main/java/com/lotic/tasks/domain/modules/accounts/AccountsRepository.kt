@@ -1,8 +1,9 @@
 package com.lotic.tasks.domain.modules.accounts
 
 import com.lotic.tasks.domain.shared.Repository
-import java.util.*
+import com.lotic.tasks.domain.shared.value_objects.Email
+import com.lotic.tasks.domain.shared.value_objects.Id
 
-interface AccountsRepository : Repository<UUID, Account> {
-    suspend fun getByEmail(email: String): Account?
+interface AccountsRepository : Repository<Id<Account>, Account> {
+    suspend fun getByEmail(email: Email): Account?
 }

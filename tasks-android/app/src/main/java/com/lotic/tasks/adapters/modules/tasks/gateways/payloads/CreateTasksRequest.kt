@@ -1,4 +1,4 @@
-package com.lotic.tasks.domain.modules.tasks.client.payloads
+package com.lotic.tasks.adapters.modules.tasks.gateways.payloads
 
 import com.google.gson.annotations.SerializedName
 import com.lotic.tasks.domain.modules.tasks.Task
@@ -16,8 +16,8 @@ data class CreateTaskRequest(
         fun fromDTO(task: Task): CreateTaskRequest {
             return CreateTaskRequest(
                 task.id.toString()
-                , task.title
-                , task.description
+                , task.title.value
+                , task.description.value
                 , task.createdAt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
                 , task.updatedAt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
                 , task.ownerId.toString())

@@ -15,7 +15,7 @@ class AuthorizationInterceptor(private val authTokenProvider: CurrentActiveAuthS
     private fun buildAuthorizedRequest(chain: Interceptor.Chain, authToken: AuthToken): Request {
         return chain.request()
             .newBuilder()
-            .header("X-Authorization", authToken.token)
+            .header("X-Authorization", authToken.token.value)
             .build()
     }
 

@@ -1,6 +1,7 @@
 package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
 import com.lotic.tasks.adapters.modules.tasks.events.TasksCompletedPublisher
+import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -21,7 +22,7 @@ class TestCompleteTask {
 
         val underTest = CompleteTask(mockedTasksRepository, mockedTasksCompletedPublisher)
         runBlocking {
-            underTest.execute(UUID.randomUUID())
+            underTest.execute(Task.newId())
         }
 
         coVerify { mockedTasksRepository.delete(any()) }
@@ -38,7 +39,7 @@ class TestCompleteTask {
         val underTest = CompleteTask(mockedTasksRepository, mockedTasksCompletedPublisher)
         runBlocking {
             try {
-                underTest.execute(UUID.randomUUID())
+                underTest.execute(Task.newId())
             } catch (e: Exception) {
                 // Do Nothing
             }

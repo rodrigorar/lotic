@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.lotic.tasks.domain.modules.accounts.Account
+import com.lotic.tasks.domain.shared.value_objects.Email
 import org.jetbrains.annotations.NotNull
 import java.util.*
 
@@ -18,11 +19,11 @@ data class EntityAccount(
 
     companion object {
         fun fromDomain(account: Account) : EntityAccount {
-            return EntityAccount(account.id, account.email)
+            return EntityAccount(account.id.value, account.email.value)
         }
     }
 
     fun toDomain() : Account {
-        return Account(this.id, this.email)
+        return Account(Account.idOf(this.id), Email(this.email))
     }
 }

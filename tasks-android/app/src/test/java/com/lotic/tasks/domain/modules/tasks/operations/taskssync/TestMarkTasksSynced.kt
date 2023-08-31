@@ -1,6 +1,7 @@
 package com.lotic.tasks.domain.modules.tasks.operations.taskssync
 
 import com.lotic.tasks.domain.modules.tasks.SyncStatus
+import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksSync
 import com.lotic.tasks.domain.modules.tasks.TasksSyncRepository
 import io.mockk.coEvery
@@ -16,9 +17,9 @@ class TestMarkTasksSynced {
     @Test
     fun shouldSucceed() {
         val dataResult = listOf(
-            TasksSync(UUID.randomUUID(), UUID.randomUUID(), SyncStatus.DIRTY, ZonedDateTime.now(), ZonedDateTime.now())
-            , TasksSync(UUID.randomUUID(), UUID.randomUUID(), SyncStatus.LOCAL, ZonedDateTime.now(), ZonedDateTime.now())
-            , TasksSync(UUID.randomUUID(), UUID.randomUUID(), SyncStatus.DIRTY, ZonedDateTime.now(), ZonedDateTime.now())
+            TasksSync(TasksSync.newId(), Task.newId(), SyncStatus.DIRTY, ZonedDateTime.now(), ZonedDateTime.now())
+            , TasksSync(TasksSync.newId(), Task.newId(), SyncStatus.LOCAL, ZonedDateTime.now(), ZonedDateTime.now())
+            , TasksSync(TasksSync.newId(), Task.newId(), SyncStatus.DIRTY, ZonedDateTime.now(), ZonedDateTime.now())
         )
         val mockedTasksSyncRepository = mockk<TasksSyncRepository>()
         coEvery { mockedTasksSyncRepository.getByTaskIds(any()) } returns dataResult
@@ -50,9 +51,9 @@ class TestMarkTasksSynced {
     @Test
     fun shouldFail_tasksSyncRepositoryError() {
         val dataResult = listOf(
-            TasksSync(UUID.randomUUID(), UUID.randomUUID(), SyncStatus.DIRTY, ZonedDateTime.now(), ZonedDateTime.now())
-            , TasksSync(UUID.randomUUID(), UUID.randomUUID(), SyncStatus.LOCAL, ZonedDateTime.now(), ZonedDateTime.now())
-            , TasksSync(UUID.randomUUID(), UUID.randomUUID(), SyncStatus.DIRTY, ZonedDateTime.now(), ZonedDateTime.now())
+            TasksSync(TasksSync.newId(), Task.newId(), SyncStatus.DIRTY, ZonedDateTime.now(), ZonedDateTime.now())
+            , TasksSync(TasksSync.newId(), Task.newId(), SyncStatus.LOCAL, ZonedDateTime.now(), ZonedDateTime.now())
+            , TasksSync(TasksSync.newId(), Task.newId(), SyncStatus.DIRTY, ZonedDateTime.now(), ZonedDateTime.now())
         )
         val mockedTasksSyncRepository = mockk<TasksSyncRepository>()
         coEvery { mockedTasksSyncRepository.getByTaskIds(any()) } returns dataResult

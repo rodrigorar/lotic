@@ -1,6 +1,9 @@
 package com.lotic.tasks.domain.modules.auth
 
+import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionProvider
+import com.lotic.tasks.domain.modules.auth.value_objects.AccessToken
+import com.lotic.tasks.domain.modules.auth.value_objects.RefreshToken
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -13,9 +16,9 @@ class TestCurrentActiveAuthSessionProvider {
     @Test
     fun shouldSucceed() {
         val authSession = AuthToken(
-            UUID.randomUUID().toString()
-            , UUID.randomUUID().toString()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , "")
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()

@@ -101,7 +101,7 @@ fun MainScreen(
                         val focusManager = LocalFocusManager.current
 
                         TextField(
-                            value = viewModel.uiState.taskTitles[task.id].orEmpty()
+                            value = viewModel.uiState.taskTitles[task.id.value].orEmpty()
                             , onValueChange = {
                                 viewModel.updateTaskTitle(task, it)
                             }
@@ -118,14 +118,14 @@ fun MainScreen(
                                 .focusRequester(focusRequester))
 
                         Checkbox(
-                            checked = viewModel.uiState.taskCheckboxes[task.id] ?: false
+                            checked = viewModel.uiState.taskCheckboxes[task.id.value] ?: false
                             , colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colors.primary)
                             , onCheckedChange = { viewModel.toggleComplete(task) }
                             , modifier = modifier
                                 .weight(1f)
                                 .wrapContentWidth(Alignment.End))
 
-                        if (viewModel.uiState.taskTitles[task.id] == "") {
+                        if (viewModel.uiState.taskTitles[task.id.value] == "") {
                             LaunchedEffect(Unit) {
                                 focusRequester.requestFocus()
                             }

@@ -9,10 +9,11 @@ import com.lotic.tasks.domain.shared.Gateway
 import com.lotic.tasks.domain.shared.events.Event
 import com.lotic.tasks.domain.shared.events.Publisher
 import com.lotic.tasks.domain.shared.operations.Query
+import com.lotic.tasks.domain.shared.value_objects.Email
 
 class Login(
     private val repositoryAuthToken: AuthTokenRepository
-    , private val getAccountByEmailQuery: Query<String, Account?>
+    , private val getAccountByEmailQuery: Query<Email, Account?>
     , private val newAccountCommand: Command<Account>
     , private val loginSuccessPublisher: Publisher<AuthToken>
     , private val loginGateway: Gateway<Credentials, AuthToken?>

@@ -1,15 +1,17 @@
 package com.lotic.tasks.adapters.modules.tasks.events
 
 import com.lotic.tasks.domain.errors.DuplicateEntryException
+import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.shared.events.Event
 import com.lotic.tasks.domain.shared.events.Publisher
 import com.lotic.tasks.domain.shared.events.Subscriber
+import com.lotic.tasks.domain.shared.value_objects.Id
 import java.util.*
 
-object TasksCompletedPublisher : Publisher<UUID> {
-    private val subscribers: MutableMap<UUID, Subscriber<UUID>> = HashMap<UUID, Subscriber<UUID>>().toMutableMap()
+object TasksCompletedPublisher : Publisher<Id<Task>> {
+    private val subscribers: MutableMap<UUID, Subscriber<Id<Task>>> = HashMap<UUID, Subscriber<Id<Task>>>().toMutableMap()
 
-    override fun register(subscriber: Subscriber<UUID>) {
+    override fun register(subscriber: Subscriber<Id<Task>>) {
         if (this.subscribers.containsKey(subscriber.key())) {
             throw DuplicateEntryException(
                 "A subscriber already exists for " + subscriber.key().toString()
@@ -18,11 +20,11 @@ object TasksCompletedPublisher : Publisher<UUID> {
         this.subscribers[subscriber.key()] = subscriber
     }
 
-    override fun deregister(subscriber: Subscriber<UUID>) {
+    override fun deregister(subscriber: Subscriber<Id<Task>>) {
         this.subscribers.remove(subscriber.key())
     }
 
-    override suspend fun publish(event: Event<UUID>) {
+    override suspend fun publish(event: Event<Id<Task>>) {
         this.subscribers.forEach { it.value.notify(event) }
     }
 }

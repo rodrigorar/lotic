@@ -5,11 +5,11 @@ import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import com.lotic.tasks.domain.shared.events.Event
 import com.lotic.tasks.domain.shared.events.Publisher
 import com.lotic.tasks.domain.shared.operations.Command
-import java.util.*
+import com.lotic.tasks.domain.shared.value_objects.Id
 
 class CreateTasksSynced(
     private val tasksRepository: TasksRepository
-    , private val tasksCreatedSyncedPublisher: Publisher<List<UUID>>
+    , private val tasksCreatedSyncedPublisher: Publisher<List<Id<Task>>>
 ) : Command<List<Task>> {
 
     override suspend fun execute(input: List<Task>) {

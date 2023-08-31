@@ -1,7 +1,10 @@
 package com.lotic.tasks.domain.modules.tasks.operations.tasks
 
+import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
+import com.lotic.tasks.domain.shared.value_objects.Description
+import com.lotic.tasks.domain.shared.value_objects.Title
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -14,11 +17,29 @@ class TestClearTasksForAccount {
 
     @Test
     fun shouldSucceed() {
-        val accountId = UUID.randomUUID()
+        val accountId = Account.newId()
         val dataResult = listOf(
-            Task(UUID.randomUUID(), "Task #1", "", ZonedDateTime.now(), ZonedDateTime.now(), accountId)
-            , Task(UUID.randomUUID(), "Task #2", "", ZonedDateTime.now(), ZonedDateTime.now(), accountId)
-            , Task(UUID.randomUUID(), "Task #3", "", ZonedDateTime.now(), ZonedDateTime.now(), accountId)
+            Task(
+                Task.newId()
+                , Title.of("Task #1")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #2")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #3")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , accountId)
         )
 
         val mockedTasksRepository = mockk<TasksRepository>()
@@ -27,7 +48,7 @@ class TestClearTasksForAccount {
 
         val underTest = ClearTasksForAccount(mockedTasksRepository)
         runBlocking {
-            underTest.execute(UUID.randomUUID())
+            underTest.execute(Account.newId())
         }
 
         coVerify { mockedTasksRepository.listTasksForAccount(any()) }
@@ -43,7 +64,7 @@ class TestClearTasksForAccount {
 
         val underTest = ClearTasksForAccount(mockedTasksRepository)
         runBlocking {
-            underTest.execute(UUID.randomUUID())
+            underTest.execute(Account.newId())
         }
 
         coVerify { mockedTasksRepository.listTasksForAccount(any()) }
@@ -51,11 +72,29 @@ class TestClearTasksForAccount {
 
     @Test
     fun shouldFail_tasksRepositoryError() {
-        val accountId = UUID.randomUUID()
+        val accountId = Account.newId()
         val dataResult = listOf(
-            Task(UUID.randomUUID(), "Task #1", "", ZonedDateTime.now(), ZonedDateTime.now(), accountId)
-            , Task(UUID.randomUUID(), "Task #2", "", ZonedDateTime.now(), ZonedDateTime.now(), accountId)
-            , Task(UUID.randomUUID(), "Task #3", "", ZonedDateTime.now(), ZonedDateTime.now(), accountId)
+            Task(
+                Task.newId()
+                , Title.of("Task #1")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #2")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , accountId)
+            , Task(
+                Task.newId()
+                , Title.of("Task #3")
+                , Description.of("")
+                , ZonedDateTime.now()
+                , ZonedDateTime.now()
+                , accountId)
         )
 
         val mockedTasksRepository = mockk<TasksRepository>()
@@ -65,7 +104,7 @@ class TestClearTasksForAccount {
         val underTest = ClearTasksForAccount(mockedTasksRepository)
         runBlocking {
             try {
-                underTest.execute(UUID.randomUUID())
+                underTest.execute(Account.newId())
             } catch (e: Exception) {
                 // Do Nothing
             }

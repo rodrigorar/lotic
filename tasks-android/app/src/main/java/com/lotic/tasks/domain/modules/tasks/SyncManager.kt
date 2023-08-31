@@ -8,7 +8,7 @@ import com.lotic.tasks.adapters.http.RetrofitClientProvider
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
 import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionProvider
-import com.lotic.tasks.domain.modules.tasks.client.payloads.CreateTasksRequest
+import com.lotic.tasks.adapters.modules.tasks.gateways.payloads.CreateTasksRequest
 import com.lotic.tasks.domain.modules.tasks.client.payloads.UpdateTasksRequest
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.CompleteTask
 import com.lotic.tasks.domain.modules.tasks.operations.tasks.CreateTasksSynced
@@ -25,9 +25,9 @@ import com.lotic.tasks.adapters.modules.tasks.TasksSyncOperationsProvider
 import com.lotic.tasks.adapters.modules.tasks.events.TasksSyncSuccessPublisher
 import com.lotic.tasks.adapters.modules.tasks.gateways.TasksClient
 import com.lotic.tasks.domain.shared.events.Event
+import com.lotic.tasks.domain.shared.value_objects.Id
 import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
-import java.util.*
 
 class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 
@@ -57,7 +57,7 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                     try {
                         // Step 1: Persist local tasks remotely
 
-                        val localTaskIds: List<UUID> = getLocalTasksSync.get().map { it.taskId }
+                        val localTaskIds: List<Id<Task>> = getLocalTasksSync.get().map { it.taskId }
                         if (localTaskIds.isNotEmpty()) {
                             val tasksToCreateRemotely: List<Task> =
                                 getTasksById.execute(localTaskIds)
@@ -70,7 +70,7 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
 
                         // Step 2: Update local tasks remotely
 
-                        val dirtyTaskIds: List<UUID> = getDirtyTasksSync.get().map { it.taskId }
+                        val dirtyTaskIds: List<Id<Task>> = getDirtyTasksSync.get().map { it.taskId }
                         if (dirtyTaskIds.isNotEmpty()) {
                             val tasksToUpdateRemotely: List<Task> =
                                 getTasksById.execute(dirtyTaskIds)
@@ -84,7 +84,7 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
 
                         // Step 3: Delete complete tasks remotely
 
-                        val completedTaskIds: List<UUID> = getCompleteTasksSync.get().map { it.taskId }
+                        val completedTaskIds: List<Id<Task>> = getCompleteTasksSync.get().map { it.taskId }
                         if (completedTaskIds.isNotEmpty()) {
                             // FIXME: This should be a single call, and not a loop
                             completedTaskIds.forEach {
@@ -97,10 +97,10 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
 
                         tasksClient?.run {
                             val remoteTasks: List<Task> =
-                                this.listTasksForAccount(authSession.accountId).tasks
+                                this.listTasksForAccount(authSession.accountId.value).tasks
                                     .map { it.toDTO() }
 
-                            val accountTaskIds: List<UUID> = listTasks
+                            val accountTaskIds: List<Id<Task>> = listTasks
                                 .get()
                                 .map { it.id }
 
@@ -118,8 +118,8 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                             }
 
                             // Step 6: Delete tasks locally that do not exist remotely
-                            val remoteTaskIds: List<UUID>  = remoteTasks.map { it.id }
-                            val taskToDeleteLocally: List<UUID> = accountTaskIds
+                            val remoteTaskIds: List<Id<Task>>  = remoteTasks.map { it.id }
+                            val taskToDeleteLocally: List<Id<Task>> = accountTaskIds
                                 .filter { ! remoteTaskIds.contains(it) }
                             taskToDeleteLocally.forEach {
                                 completeTask.execute(it)

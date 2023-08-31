@@ -1,8 +1,11 @@
-package com.lotic.tasks.domain.modules.tasks.client.payloads
+package com.lotic.tasks.adapters.modules.tasks.gateways.payloads
 
 import com.google.gson.annotations.SerializedName
 import com.lotic.tasks.adapters.http.translators.ToDTO
+import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.tasks.Task
+import com.lotic.tasks.domain.shared.value_objects.Description
+import com.lotic.tasks.domain.shared.value_objects.Title
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -15,12 +18,12 @@ data class TaskResponse(
 
     override fun toDTO(): Task {
         return Task(
-            id = this.id
-            , title = this.title
-            , description = this.description
+            id = Task.idOf(this.id)
+            , title = Title(this.title)
+            , description = Description(this.description)
             , createdAt = ZonedDateTime.now() // FIXME: This info should come from the server
             , updatedAt = ZonedDateTime.now() // FIXME: This info should come from the server
-            , ownerId = this.ownerId)
+            , ownerId = Account.idOf(this.ownerId))
     }
 }
 

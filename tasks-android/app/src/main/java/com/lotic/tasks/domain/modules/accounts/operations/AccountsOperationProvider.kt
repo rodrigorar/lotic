@@ -8,6 +8,7 @@ import com.lotic.tasks.domain.shared.operations.Command
 import com.lotic.tasks.domain.shared.operations.OperationsProvider
 import com.lotic.tasks.domain.shared.operations.Provider
 import com.lotic.tasks.domain.shared.operations.Query
+import com.lotic.tasks.domain.shared.value_objects.Email
 
 @SuppressLint("StaticFieldLeak")
 object AccountsOperationProvider : OperationsProvider {
@@ -26,7 +27,7 @@ object AccountsOperationProvider : OperationsProvider {
         return this
     }
 
-    fun getAccountByEmail(): Query<String, Account?> {
+    fun getAccountByEmail(): Query<Email, Account?> {
         return GetAccountByEmail(this.accountsRepository)
     }
 

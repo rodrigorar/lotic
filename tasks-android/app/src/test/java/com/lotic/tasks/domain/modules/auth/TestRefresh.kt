@@ -1,6 +1,9 @@
 package com.lotic.tasks.domain.modules.auth
 
+import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.auth.operations.Refresh
+import com.lotic.tasks.domain.modules.auth.value_objects.AccessToken
+import com.lotic.tasks.domain.modules.auth.value_objects.RefreshToken
 import com.lotic.tasks.domain.shared.Gateway
 import io.mockk.InternalPlatformDsl.toStr
 import io.mockk.coEvery
@@ -15,14 +18,14 @@ class TestRefresh {
     @Test
     fun shouldSucceed() {
         val oldAuthToken = AuthToken(
-            UUID.randomUUID().toStr()
-            , UUID.randomUUID().toStr()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , "")
         val authToken = AuthToken(
-            UUID.randomUUID().toStr()
-            , UUID.randomUUID().toStr()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , "")
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
@@ -45,9 +48,9 @@ class TestRefresh {
     @Test
     fun shouldSucceed_noResult() {
         val oldAuthToken = AuthToken(
-            UUID.randomUUID().toStr()
-            , UUID.randomUUID().toStr()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , "")
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
@@ -68,14 +71,14 @@ class TestRefresh {
     @Test
     fun shouldFail_gatewayError() {
         val oldAuthToken = AuthToken(
-            UUID.randomUUID().toStr()
-            , UUID.randomUUID().toStr()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , "")
         val authToken = AuthToken(
-            UUID.randomUUID().toStr()
-            , UUID.randomUUID().toStr()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , "")
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
@@ -97,14 +100,14 @@ class TestRefresh {
     @Test
     fun shouldFail_repositoryError() {
         val oldAuthToken = AuthToken(
-            UUID.randomUUID().toStr()
-            , UUID.randomUUID().toStr()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , "")
         val authToken = AuthToken(
-            UUID.randomUUID().toStr()
-            , UUID.randomUUID().toStr()
-            , UUID.randomUUID()
+            AccessToken.new()
+            , RefreshToken.new()
+            , Account.newId()
             , "")
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()

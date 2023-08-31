@@ -4,7 +4,9 @@ import com.lotic.tasks.adapters.modules.tasks.persistence.DAOTasksSync
 import com.lotic.tasks.adapters.modules.tasks.persistence.EntityTasksSync
 import com.lotic.tasks.domain.modules.tasks.TasksSyncRepository
 import com.lotic.tasks.domain.modules.tasks.SyncStatus
+import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksSync
+import com.lotic.tasks.domain.shared.value_objects.Id
 import java.util.*
 
 class TasksSyncRepositoryImpl(private val tasksSyncDAO: DAOTasksSync) : TasksSyncRepository {
@@ -13,7 +15,7 @@ class TasksSyncRepositoryImpl(private val tasksSyncDAO: DAOTasksSync) : TasksSyn
         this.tasksSyncDAO.insert(entity.toEntity())
     }
 
-    override suspend fun update(id: UUID, entity: TasksSync) {
+    override suspend fun update(entity: TasksSync) {
         this.tasksSyncDAO.update(entity.toEntity())
     }
 
@@ -23,20 +25,20 @@ class TasksSyncRepositoryImpl(private val tasksSyncDAO: DAOTasksSync) : TasksSyn
         }
     }
 
-    override suspend fun getById(id: UUID): TasksSync? {
-        return this.tasksSyncDAO.getById(id)?.let { TasksSync.fromEntity(it) }
+    override suspend fun getById(id: Id<TasksSync>): TasksSync? {
+        return this.tasksSyncDAO.getById(id.value)?.let { TasksSync.fromEntity(it) }
     }
 
-    override suspend fun getByTaskId(taskId: UUID): TasksSync? {
+    override suspend fun getByTaskId(taskId: Id<Task>): TasksSync? {
         return this.tasksSyncDAO
-            .getByTaskId(taskId)
+            .getByTaskId(taskId.value)
             ?.let { TasksSync.fromEntity(it) }
 
     }
 
-    override suspend fun getByTaskIds(taskIds: List<UUID>): List<TasksSync> {
+    override suspend fun getByTaskIds(taskIds: List<Id<Task>>): List<TasksSync> {
         return this.tasksSyncDAO
-            .getByTaskIds(taskIds)
+            .getByTaskIds(taskIds.map { it.value })
             .map { TasksSync.fromEntity(it) }
 
     }
@@ -47,8 +49,8 @@ class TasksSyncRepositoryImpl(private val tasksSyncDAO: DAOTasksSync) : TasksSyn
             .map { TasksSync.fromEntity(it) }
     }
 
-    override suspend fun delete(id: UUID) {
-        val taskSync: EntityTasksSync? = this.tasksSyncDAO.getById(id)
+    override suspend fun delete(id: Id<TasksSync>) {
+        val taskSync: EntityTasksSync? = this.tasksSyncDAO.getById(id.value)
         taskSync?.run { tasksSyncDAO.delete(this) }
     }
 }
