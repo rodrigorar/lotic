@@ -75,11 +75,6 @@ class TestRefresh {
             , RefreshToken.new()
             , Account.newId()
             , "")
-        val authToken = AuthToken(
-            AccessToken.new()
-            , RefreshToken.new()
-            , Account.newId()
-            , "")
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
         val mockedRefreshGateway = mockk<Gateway<AuthToken, AuthToken?>>()

@@ -1,6 +1,7 @@
 package com.lotic.tasks.adapters.modules.auth
 
 import com.lotic.tasks.adapters.modules.auth.persistence.DAOAuthToken
+import com.lotic.tasks.adapters.modules.auth.persistence.EntityAuthToken
 import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.auth.AuthTokenRepository
 import com.lotic.tasks.domain.modules.auth.AuthToken
@@ -9,7 +10,7 @@ import com.lotic.tasks.domain.shared.value_objects.Id
 class AuthTokenRepositoryImpl(private val daoAuthToken: DAOAuthToken) : AuthTokenRepository {
 
     override suspend fun insert(entity: AuthToken) {
-        daoAuthToken.insert(entity.toEntity())
+        daoAuthToken.insert(EntityAuthToken.fromDomain(entity))
     }
 
     override suspend fun update(entity: AuthToken) {
@@ -21,11 +22,11 @@ class AuthTokenRepositoryImpl(private val daoAuthToken: DAOAuthToken) : AuthToke
     }
 
     override suspend fun getByAccountId(accountId: Id<Account>): AuthToken? {
-        return daoAuthToken.getByAccountId(accountId.value)?.let { AuthToken.fromEntity(it) }
+        return daoAuthToken.getByAccountId(accountId.value)?.toDomain()
     }
 
     override suspend fun getActiveAuthSession(): AuthToken? {
-        return daoAuthToken.getActiveAuthSession()?.let { AuthToken.fromEntity(it) }
+        return daoAuthToken.getActiveAuthSession()?.toDomain()
     }
 
     override suspend fun deleteAllForAccount(accountId: Id<Account>) {

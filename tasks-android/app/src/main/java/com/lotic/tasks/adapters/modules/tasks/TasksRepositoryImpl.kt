@@ -12,11 +12,11 @@ import java.util.*
 class TasksRepositoryImpl(private val tasksDAO: DAOTasks) : TasksRepository {
 
     override suspend fun insert(entity: Task) {
-        this.tasksDAO.insert(entity.toEntity())
+        this.tasksDAO.insert(EntityTask.fromDomain(entity))
     }
 
     override suspend fun insertMultiple(entities: List<Task>) {
-        entities.forEach { entry ->  tasksDAO.insert(entry.toEntity())}
+        entities.forEach { tasksDAO.insert(EntityTask.fromDomain(it)) }
     }
 
     override suspend fun update(entity: Task) {
@@ -36,15 +36,13 @@ class TasksRepositoryImpl(private val tasksDAO: DAOTasks) : TasksRepository {
 
     override suspend fun listTasksForAccount(accountId: Id<Account>): List<Task> {
         val result: List<EntityTask> = this.tasksDAO.listTasksForAccount(accountId.value)
-        return result.map {
-            Task.fromEntity(it)
-        }
+        return result.map { it.toDomain() }
     }
 
     override suspend fun getTasksById(accountId: UUID, taskIds: List<Id<Task>>): List<Task> {
-        // FIXME: Eventually all these operations should have a context (logged user, etc)
-        return this.tasksDAO.getByIds(taskIds.map { it.value })
-            .map { Task.fromEntity(it) }
+        return this.tasksDAO
+            .getByIds(taskIds.map { it.value })
+            .map { it.toDomain() }
     }
 
     override suspend fun delete(id: Id<Task>) {
