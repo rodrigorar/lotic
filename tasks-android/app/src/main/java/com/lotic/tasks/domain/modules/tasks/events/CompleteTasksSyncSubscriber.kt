@@ -1,5 +1,6 @@
 package com.lotic.tasks.domain.modules.tasks.events
 
+import android.util.Log
 import com.lotic.tasks.domain.modules.tasks.SyncStatus
 import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksSync

@@ -15,12 +15,12 @@ data class CreateTaskRequest(
     companion object {
         fun fromDTO(task: Task): CreateTaskRequest {
             return CreateTaskRequest(
-                task.id.toString()
+                task.id.value.toString()
                 , task.title.value
                 , task.description.value
                 , task.createdAt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
                 , task.updatedAt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-                , task.ownerId.toString())
+                , task.ownerId?.value.toString())
         }
     }
 }

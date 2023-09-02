@@ -18,7 +18,6 @@ class Logout(
 
     override suspend fun execute() {
         val currentActiveAuthSession: AuthToken? = currentActiveAuthSessionProvider.get()
-
         currentActiveAuthSession?.also {
             this.logoutGateway.call(it)
             authTokenRepository.deleteAllForAccount(it.accountId)

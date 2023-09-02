@@ -13,7 +13,7 @@ data class UpdateTaskRequest(
     companion object {
         fun fromDTO(task: Task): UpdateTaskRequest {
             return UpdateTaskRequest(
-                task.id.toString()
+                task.id.value.toString()
                 , task.title.value
                 , task.description.value
                 , task.updatedAt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))

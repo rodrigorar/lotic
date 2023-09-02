@@ -77,7 +77,6 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
 
                             tasksClient?.run {
                                 this.updateTasks(UpdateTasksRequest.fromDTO(tasksToUpdateRemotely))
-                                Log.d("SyncManager", "Will Call mark tasks synced")
                                 markTasksSynced.execute(tasksToUpdateRemotely.map { it.id })
                             }
                         }
@@ -89,7 +88,7 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                             // FIXME: This should be a single call, and not a loop
                             completedTaskIds.forEach {
                                 tasksClient?.run {
-                                    this.deleteTask(it.toString())
+                                    this.deleteTask(it.value.toString())
                                     deleteTaskSyncByTaskId.execute(it)
                                 }
                             }
