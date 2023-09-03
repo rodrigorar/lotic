@@ -12,7 +12,7 @@ import androidx.work.WorkManager
 import com.lotic.tasks.adapters.modules.accounts.AccountsRepositoryImpl
 import com.lotic.tasks.domain.modules.accounts.operations.AccountsOperationProvider
 import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
-import com.lotic.tasks.domain.modules.tasks.SyncManager
+import com.lotic.tasks.domain.modules.tasks.SyncManagerWorker
 import com.lotic.tasks.adapters.modules.tasks.TasksOperationsProvider
 import com.lotic.tasks.adapters.modules.tasks.TasksSyncOperationsProvider
 import com.lotic.tasks.adapters.TasksDatabase
@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
             .enqueueUniquePeriodicWork(
                 "synch-manager"
                 , ExistingPeriodicWorkPolicy.REPLACE
-                , PeriodicWorkRequestBuilder<SyncManager>(15L, TimeUnit.SECONDS)
+                , PeriodicWorkRequestBuilder<SyncManagerWorker>(15L, TimeUnit.SECONDS)
                     .addTag("tasks-synch-manager-tag")
                     /*.setConstraints(
                         Constraints.Builder()

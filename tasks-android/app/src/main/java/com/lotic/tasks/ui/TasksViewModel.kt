@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.adapters.modules.auth.AuthOperationsProvider
 import com.lotic.tasks.adapters.modules.auth.events.LoginSuccessPublisher
 import com.lotic.tasks.adapters.modules.auth.events.LogoutSuccessPublisher
@@ -16,6 +15,9 @@ import com.lotic.tasks.adapters.modules.tasks.events.TasksCreatedPublisher
 import com.lotic.tasks.adapters.modules.tasks.events.TasksSyncSuccessPublisher
 import com.lotic.tasks.adapters.modules.tasks.events.TasksUpdatedPublisher
 import com.lotic.tasks.domain.modules.accounts.Account
+import com.lotic.tasks.domain.modules.auth.AuthToken
+import com.lotic.tasks.domain.modules.tasks.SyncManager
+import com.lotic.tasks.domain.modules.tasks.SyncManagerWorker
 import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.shared.events.Event
 import com.lotic.tasks.domain.shared.events.Subscriber
@@ -32,7 +34,8 @@ data class TasksUIState(
     val taskList: List<Task> = listOf()
     , val taskTitles: MutableMap<UUID, String> = mutableMapOf()
     , val taskCheckboxes: MutableMap<UUID, Boolean> = mutableMapOf()
-    , val isLoggedIn: Boolean) {
+    , val isLoggedIn: Boolean = false
+    , val isRefreshing: Boolean = false) {
     // Do nothing for now
 }
 
@@ -80,7 +83,7 @@ class TasksCompletedSubscriber(private val viewModel: TasksViewModel) : Subscrib
 }
 
 class TasksViewModel : ViewModel() {
-    var uiState by mutableStateOf(TasksUIState(isLoggedIn = false))
+    var uiState by mutableStateOf(TasksUIState())
         private set
 
     fun updateState(uiState: TasksUIState) {
@@ -153,6 +156,13 @@ class TasksViewModel : ViewModel() {
     suspend fun verifyIfLoggedIn() {
         val authToken: AuthToken? = AuthOperationsProvider.currentActiveAuthSessionProvider().get()
         uiState = uiState.copy(isLoggedIn = authToken != null)
+    }
+
+    // FIXME: Coalesce these two functions, it will be easier to understand
+    fun refresh() {
+        uiState = uiState.copy(isRefreshing = true)
+        SyncManager.execute()
+        uiState = uiState.copy(isRefreshing = false)
     }
 
     suspend fun refreshTaskList() {
