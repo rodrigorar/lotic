@@ -50,7 +50,7 @@ object AuthOperationsProvider : OperationsProvider {
     }
 
     fun refresh(): Refresh {
-        return Refresh(repositoryAuthToken, RefreshGateway())
+        return Refresh(repositoryAuthToken, logout(), RefreshGateway())
     }
 
     fun logout(): Logout {

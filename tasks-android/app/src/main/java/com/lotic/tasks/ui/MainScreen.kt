@@ -48,7 +48,7 @@ fun MainScreen(
     , viewModel: TasksViewModel = viewModel()) {
 
     val focusRequester = FocusRequester()
-
+    
     Column(modifier = modifier.background(color = MaterialTheme.colors.background)) {
         Row(
             modifier = modifier.fillMaxWidth()

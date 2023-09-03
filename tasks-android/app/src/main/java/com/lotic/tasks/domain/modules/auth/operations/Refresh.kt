@@ -7,13 +7,18 @@ import com.lotic.tasks.domain.shared.Gateway
 
 class Refresh(
     private val authTokenRepository: AuthTokenRepository
+    , private val logoutOperation: Logout
     , private val refreshGateway: Gateway<AuthToken, AuthToken?>) : Command<AuthToken> {
 
     override suspend fun execute(input: AuthToken) {
-        val result: AuthToken? = this.refreshGateway.call(input)
-        authTokenRepository.deleteAllForAccount(input.accountId)
-        result?.let {
-            authTokenRepository.insert(it)
+        try {
+            val result: AuthToken? = this.refreshGateway.call(input)
+            authTokenRepository.deleteAllForAccount(input.accountId)
+            result?.let {
+                authTokenRepository.insert(it)
+            }
+        } catch (e: Exception) {
+            logoutOperation.execute()
         }
     }
 
