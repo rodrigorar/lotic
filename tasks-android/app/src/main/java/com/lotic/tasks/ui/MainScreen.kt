@@ -14,8 +14,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -58,19 +62,45 @@ fun MainScreen(
             Row(
                 modifier = modifier.fillMaxWidth()
                 , horizontalArrangement = Arrangement.End) {
-                OutlinedButton(
-                    // FIXME: This should be called on the login screen
-                    onClick = { doLoginOrLogout(viewModel, loginNavigation) }
-                    , shape = MaterialTheme.shapes.medium
-                    , colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.colors.primary)
-                    , modifier = modifier.padding(15.dp)
-                ) {
-                    if (viewModel.uiState.isLoggedIn) {
-                        Text(text = stringResource(R.string.logout_btn))
+                Box(contentAlignment = Alignment.Center, modifier = modifier) {
+                    IconButton(onClick = { viewModel.toggleDropdownMenu() }) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Open options",
+                            modifier = modifier.size(30.dp)
+                        )
                     }
-                    else {
-                        Text(text = stringResource(R.string.login_btn))
+                    DropdownMenu(
+                        expanded = viewModel.uiState.isDropdownMenuExpanded, onDismissRequest = {
+                            viewModel.toggleDropdownMenu()
+                        }) {
+
+                        DropdownMenuItem(onClick = {
+                            Log.d("MainScreen", "About as been pressed")
+                        }) {
+                            Text(text = stringResource(R.string.about_btn))
+                        }
+
+                        if (! viewModel.uiState.isLoggedIn) {
+                            DropdownMenuItem(onClick = {
+                                Log.d("MainScreen", "Create account has been pressed")
+                            }) {
+                                Text(text = stringResource(R.string.sign_up_btn))
+                            }
+                        }
+
+                        DropdownMenuItem(onClick = {
+                            doLoginOrLogout(
+                                viewModel,
+                                loginNavigation
+                            )
+                        }) {
+                            if (viewModel.uiState.isLoggedIn) {
+                                Text(text = stringResource(R.string.logout_btn))
+                            } else {
+                                Text(text = stringResource(R.string.sign_in_btn))
+                            }
+                        }
                     }
                 }
             }

@@ -5,9 +5,10 @@
     <string name="tip_amount">Tip amount: %s</string>
     <string name="how_was_the_service">Tip (%)</string>
     <string name="round_up_tip">Round up tip?</string>
-    <string name="login_btn">Login</string>
     <string name="upcoming_title">Upcoming</string>
     <string name="sign_in_btn">Sign In</string>
     <string name="sign_in_title">Sign In</string>
     <string name="logout_btn">Logout</string>
+    <string name="about_btn">About</string>
+    <string name="sign_up_btn">Sign Up</string>
 </resources>

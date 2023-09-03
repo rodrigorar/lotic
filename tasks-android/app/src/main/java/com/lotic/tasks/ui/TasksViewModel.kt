@@ -35,7 +35,8 @@ data class TasksUIState(
     , val taskTitles: MutableMap<UUID, String> = mutableMapOf()
     , val taskCheckboxes: MutableMap<UUID, Boolean> = mutableMapOf()
     , val isLoggedIn: Boolean = false
-    , val isRefreshing: Boolean = false) {
+    , val isRefreshing: Boolean = false
+    , val isDropdownMenuExpanded: Boolean = false) {
     // Do nothing for now
 }
 
@@ -112,6 +113,10 @@ class TasksViewModel : ViewModel() {
             }
             AuthOperationsProvider.logout().execute()
         }
+    }
+
+    fun toggleDropdownMenu() {
+        this.uiState = this.uiState.copy(isDropdownMenuExpanded = ! this.uiState.isDropdownMenuExpanded)
     }
 
     fun createNewTask() {
