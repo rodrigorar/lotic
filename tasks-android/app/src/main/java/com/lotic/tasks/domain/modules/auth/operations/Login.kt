@@ -8,6 +8,7 @@ import com.lotic.tasks.domain.modules.auth.AuthTokenRepository
 import com.lotic.tasks.domain.shared.Gateway
 import com.lotic.tasks.domain.shared.events.Event
 import com.lotic.tasks.domain.shared.events.Publisher
+import com.lotic.tasks.domain.shared.operations.Operation
 import com.lotic.tasks.domain.shared.operations.Query
 import com.lotic.tasks.domain.shared.value_objects.Email
 
@@ -15,11 +16,16 @@ class Login(
     private val repositoryAuthToken: AuthTokenRepository
     , private val getAccountByEmailQuery: Query<Email, Account?>
     , private val newAccountCommand: Command<Account>
+    , private val emailValidate: Operation<Email, Boolean>
     , private val loginSuccessPublisher: Publisher<AuthToken>
     , private val loginGateway: Gateway<Credentials, AuthToken?>
 ) : Command<Credentials> {
 
     override suspend fun execute(input: Credentials) {
+        if (! this.emailValidate.execute(input.subject)) {
+            throw IllegalArgumentException("Invalid email")
+        }
+
         try {
             val result: AuthToken? = loginGateway.call(input)
             result?.let {

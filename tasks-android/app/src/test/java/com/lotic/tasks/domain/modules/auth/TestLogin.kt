@@ -7,6 +7,7 @@ import com.lotic.tasks.domain.modules.auth.value_objects.RefreshToken
 import com.lotic.tasks.domain.shared.operations.Command
 import com.lotic.tasks.domain.shared.Gateway
 import com.lotic.tasks.domain.shared.events.Publisher
+import com.lotic.tasks.domain.shared.operations.Operation
 import com.lotic.tasks.domain.shared.operations.Query
 import com.lotic.tasks.domain.shared.value_objects.Email
 import com.lotic.tasks.domain.shared.value_objects.Password
@@ -17,7 +18,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import java.time.Instant
-import java.util.*
 
 class TestLogin {
     val EMAIL = Email.of("test@mail.net")
@@ -39,6 +39,9 @@ class TestLogin {
         val mockedGetAccountByEmailQuery = mockk<Query<Email, Account?>>();
         coEvery { mockedGetAccountByEmailQuery.execute(any()) } returns Account(authToken.accountId, EMAIL)
 
+        val mockedEmailValidate = mockk<Operation<Email, Boolean>>()
+        coEvery { mockedEmailValidate.execute(any()) } returns true
+
         val mockedNewAccountCommand = mockk<Command<Account>>();
         val mockedLoginGateway = mockk<Gateway<Credentials, AuthToken?>>();
         coEvery { mockedLoginGateway.call(any()) } returns authToken
@@ -51,6 +54,7 @@ class TestLogin {
                 mockedAuthTokenRepository
                 , mockedGetAccountByEmailQuery
                 , mockedNewAccountCommand
+                , mockedEmailValidate
                 , mockedLoginSuccessPublisher
                 , mockedLoginGateway)
             underTest.execute(input)
@@ -59,6 +63,7 @@ class TestLogin {
         coVerify { mockedAuthTokenRepository.deleteAllForAccount(authToken.accountId) }
         coVerify { mockedAuthTokenRepository.insert(any()) }
         coVerify { mockedGetAccountByEmailQuery.execute(any()) }
+        coVerify { mockedEmailValidate.execute(any()) }
         coVerify { mockedLoginGateway.call(any()) }
         coVerify { mockedLoginSuccessPublisher.publish(any()) }
     }
@@ -82,6 +87,9 @@ class TestLogin {
         val mockedNewAccountCommand = mockk<Command<Account>>()
         coEvery { mockedNewAccountCommand.execute(any()) } returns Unit
 
+        val mockedEmailValidate = mockk<Operation<Email, Boolean>>()
+        coEvery { mockedEmailValidate.execute(any()) } returns true
+
         val mockedLoginGateway = mockk<Gateway<Credentials, AuthToken?>>();
         coEvery { mockedLoginGateway.call(any()) } returns authToken
 
@@ -93,6 +101,7 @@ class TestLogin {
                 mockedAuthTokenRepository
                 , mockedGetAccountByEmailQuery
                 , mockedNewAccountCommand
+                , mockedEmailValidate
                 , mockedLoginSuccessPublisher
                 , mockedLoginGateway)
             underTest.execute(input)
@@ -102,6 +111,7 @@ class TestLogin {
         coVerify { mockedAuthTokenRepository.insert(any()) }
         coVerify { mockedGetAccountByEmailQuery.execute(any()) }
         coVerify { mockedNewAccountCommand.execute(any()) }
+        coVerify { mockedEmailValidate.execute(any()) }
         coVerify { mockedLoginGateway.call(any()) }
         coVerify { mockedLoginSuccessPublisher.publish(any()) }
     }
@@ -113,6 +123,8 @@ class TestLogin {
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>();
         val mockedGetAccountByEmailQuery = mockk<Query<Email, Account?>>();
         val mockedNewAccountCommand = mockk<Command<Account>>();
+        val mockedEmailValidate = mockk<Operation<Email, Boolean>>()
+        coEvery { mockedEmailValidate.execute(any()) } returns true
         val mockedLoginGateway = mockk<Gateway<Credentials, AuthToken?>>();
         coEvery { mockedLoginGateway.call(any()) } returns null
 
@@ -123,12 +135,14 @@ class TestLogin {
                 mockedAuthTokenRepository
                 , mockedGetAccountByEmailQuery
                 , mockedNewAccountCommand
+                , mockedEmailValidate
                 , mockedLoginSuccessPublisher
                 , mockedLoginGateway)
             underTest.execute(input)
         }
 
         coVerify { mockedLoginGateway.call(any()) }
+        coVerify { mockedEmailValidate.execute(any()) }
     }
 
     @Test
@@ -146,6 +160,9 @@ class TestLogin {
         val mockedGetAccountByEmailQuery = mockk<Query<Email, Account?>>();
         coEvery { mockedGetAccountByEmailQuery.execute(any()) } returns Account(authToken.accountId, EMAIL)
 
+        val mockedEmailValidate = mockk<Operation<Email, Boolean>>()
+        coEvery { mockedEmailValidate.execute(any()) } returns true
+
         val mockedNewAccountCommand = mockk<Command<Account>>();
         val mockedLoginGateway = mockk<Gateway<Credentials, AuthToken?>>();
         coEvery { mockedLoginGateway.call(any()) } throws Exception()
@@ -157,6 +174,7 @@ class TestLogin {
                 mockedAuthTokenRepository
                 , mockedGetAccountByEmailQuery
                 , mockedNewAccountCommand
+                , mockedEmailValidate
                 , mockedLoginSuccessPublisher
                 , mockedLoginGateway)
             underTest.execute(input)
@@ -164,6 +182,7 @@ class TestLogin {
 
         coVerify { mockedAuthTokenRepository.deleteAllForAccount(authToken.accountId) }
         coVerify { mockedGetAccountByEmailQuery.execute(any()) }
+        coVerify { mockedEmailValidate.execute(any()) }
         coVerify { mockedLoginGateway.call(any()) }
     }
 
@@ -183,6 +202,9 @@ class TestLogin {
         val mockedGetAccountByEmailQuery = mockk<Query<Email, Account?>>();
         coEvery { mockedGetAccountByEmailQuery.execute(any()) } returns Account(authToken.accountId, EMAIL)
 
+        val mockedEmailValidate = mockk<Operation<Email, Boolean>>()
+        coEvery { mockedEmailValidate.execute(any()) } returns true
+
         val mockedNewAccountCommand = mockk<Command<Account>>();
         val mockedLoginGateway = mockk<Gateway<Credentials, AuthToken?>>();
         coEvery { mockedLoginGateway.call(any()) } returns authToken
@@ -194,6 +216,7 @@ class TestLogin {
                 mockedAuthTokenRepository
                 , mockedGetAccountByEmailQuery
                 , mockedNewAccountCommand
+                , mockedEmailValidate
                 , mockedLoginSuccessPublisher
                 , mockedLoginGateway)
             underTest.execute(input)
@@ -202,6 +225,38 @@ class TestLogin {
         coVerify { mockedAuthTokenRepository.deleteAllForAccount(authToken.accountId) }
         coVerify { mockedAuthTokenRepository.insert(any()) }
         coVerify { mockedGetAccountByEmailQuery.execute(any()) }
+        coVerify { mockedEmailValidate.execute(any()) }
         coVerify { mockedLoginGateway.call(any()) }
+    }
+
+    @Test
+    fun shouldFail_invalidEmail() {
+        val input = Credentials(EMAIL, PASSWORD)
+        val mockedAuthTokenRepository = mockk<AuthTokenRepository>();
+        val mockedGetAccountByEmailQuery = mockk<Query<Email, Account?>>();
+
+        val mockedEmailValidate = mockk<Operation<Email, Boolean>>()
+        coEvery { mockedEmailValidate.execute(any()) } returns false
+
+        val mockedNewAccountCommand = mockk<Command<Account>>();
+        val mockedLoginGateway = mockk<Gateway<Credentials, AuthToken?>>();
+        val mockedLoginSuccessPublisher = mockk<Publisher<AuthToken>>()
+
+        runBlocking {
+            val underTest = Login(
+                mockedAuthTokenRepository
+                , mockedGetAccountByEmailQuery
+                , mockedNewAccountCommand
+                , mockedEmailValidate
+                , mockedLoginSuccessPublisher
+                , mockedLoginGateway)
+            try {
+                underTest.execute(input)
+            } catch (e: IllegalArgumentException) {
+                // Do nothing
+            }
+        }
+
+        coVerify { mockedEmailValidate.execute(any()) }
     }
 }
