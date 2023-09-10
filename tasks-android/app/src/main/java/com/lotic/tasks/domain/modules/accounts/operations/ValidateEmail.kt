@@ -1,4 +1,4 @@
-package com.lotic.tasks.domain.modules.auth.operations
+package com.lotic.tasks.domain.modules.accounts.operations
 
 import com.lotic.tasks.domain.shared.operations.Operation
 import com.lotic.tasks.domain.shared.value_objects.Email

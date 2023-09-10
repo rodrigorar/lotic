@@ -11,6 +11,10 @@ data class Account(val id: Id<Account>, val email: Email) {
             return Id(id)
         }
 
+        fun idOf(id: String): Id<Account> {
+            return idOf(UUID.fromString(id))
+        }
+
         fun newId(): Id<Account> {
             return Id(UUID.randomUUID())
         }

@@ -26,7 +26,6 @@ class LoginViewModel() : ViewModel() {
         this.uiState = this.uiState.copy(secret = newSecret)
     }
 
-    // TODO: Move this to the shared view model
     fun login(subject: String, secret: String) {
         viewModelScope.launch {
             loginOperation.execute(Credentials(Email.of(subject), Password.of(secret)))

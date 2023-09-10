@@ -50,6 +50,7 @@ fun doLoginOrLogout(
 @Composable
 fun MainScreen(
     loginNavigation: () -> Unit
+    , signUpNavigation: () -> Unit
     , modifier: Modifier = Modifier
     , viewModel: TasksViewModel = viewModel()) {
 
@@ -82,23 +83,15 @@ fun MainScreen(
                         }
 
                         if (! viewModel.uiState.isLoggedIn) {
-                            DropdownMenuItem(onClick = {
-                                Log.d("MainScreen", "Create account has been pressed")
-                            }) {
+                            DropdownMenuItem(onClick = { signUpNavigation() }) {
                                 Text(text = stringResource(R.string.sign_up_btn))
                             }
-                        }
-
-                        DropdownMenuItem(onClick = {
-                            doLoginOrLogout(
-                                viewModel,
-                                loginNavigation
-                            )
-                        }) {
-                            if (viewModel.uiState.isLoggedIn) {
-                                Text(text = stringResource(R.string.logout_btn))
-                            } else {
+                            DropdownMenuItem(onClick = { loginNavigation() }) {
                                 Text(text = stringResource(R.string.sign_in_btn))
+                            }
+                        } else {
+                            DropdownMenuItem(onClick = { viewModel.logout() }) {
+                                Text(text = stringResource(R.string.logout_btn))
                             }
                         }
                     }

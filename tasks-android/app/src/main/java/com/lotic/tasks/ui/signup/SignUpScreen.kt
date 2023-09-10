@@ -1,4 +1,4 @@
-package com.lotic.tasks.ui.login
+package com.lotic.tasks.ui.signup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,36 +22,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lotic.tasks.R
 
-private fun doLogin(uiState: LoginUIState, signInNavigation: () -> Unit, viewModel: LoginViewModel) {
-    viewModel.login(uiState.subject.toLowerCase(Locale.current), uiState.secret)
-    signInNavigation()
-}
-
 @Composable
-fun LoginScreen(
-    signInNavigation: () -> Unit
+fun SignUpScreen(
+    navigationCallback: () -> Unit
     , modifier: Modifier = Modifier
-    , loginViewModel: LoginViewModel = viewModel()) {
+    , viewModel: SignUpViewModel = viewModel()) {
 
-    val uiState = loginViewModel.uiState
     val focusManager = LocalFocusManager.current
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+    Column(horizontalAlignment = Alignment.CenterHorizontally
         , verticalArrangement = Arrangement.Center
         , modifier = modifier
             .fillMaxWidth()
-            .fillMaxHeight()
-    ) {
+            .fillMaxHeight()) {
 
         Text(
-            text = stringResource(R.string.sign_in_title)
+            text = stringResource(R.string.sign_up_title)
             , fontSize = MaterialTheme.typography.h1.fontSize
             , fontWeight = MaterialTheme.typography.h1.fontWeight
             , color = MaterialTheme.colors.primary)
@@ -59,38 +49,41 @@ fun LoginScreen(
         Spacer(modifier = modifier.padding(15.dp))
 
         OutlinedTextField(
-            value = uiState.subject
-            , onValueChange = { loginViewModel.updateSubject(it) }
-            , keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
-            , keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
+            value = viewModel.uiState.username
+            , onValueChange = { viewModel.updateUsername(it) }
+            , keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next)
+            , keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down )})
             , shape = MaterialTheme.shapes.medium)
 
         Spacer(modifier = modifier.padding(6.dp))
 
         OutlinedTextField(
-            value = uiState.secret
-            , onValueChange = { loginViewModel.updateSecret(it) }
+            value = viewModel.uiState.password
+            , onValueChange = { viewModel.updatePassword(it) }
             , visualTransformation = PasswordVisualTransformation()
-            , keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
-            , keyboardActions = KeyboardActions(onDone = { doLogin(
-                uiState = uiState
-                , signInNavigation = signInNavigation
-                , viewModel = loginViewModel) })
+            , keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next)
+            , keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down )})
             , shape = MaterialTheme.shapes.medium)
 
         Spacer(modifier = modifier.padding(10.dp))
 
+        OutlinedTextField(
+            value = viewModel.uiState.passwordMatch
+            , onValueChange = { viewModel.updatePasswordMatch(it) }
+            , visualTransformation = PasswordVisualTransformation()
+            , keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
+            , keyboardActions = KeyboardActions(onDone = { viewModel.signUp(navigationCallback) })
+            , shape = MaterialTheme.shapes.medium)
+
+        Spacer(modifier = modifier.padding(6.dp))
+
         OutlinedButton(
-            onClick = { doLogin(
-                uiState = uiState
-                , signInNavigation = signInNavigation
-                , viewModel = loginViewModel) }
+            onClick = { viewModel.signUp(navigationCallback) }
             , shape = MaterialTheme.shapes.medium
-            , colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.primary)
-            , modifier = modifier.padding(15.dp)
-        ) {
-            Text(text = stringResource(R.string.sign_in_btn))
+            , colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
+            , enabled = viewModel.uiState.canSignUp
+            , modifier = modifier.padding(15.dp)) {
+            Text(text = stringResource(R.string.sign_up_btn))
         }
     }
 }

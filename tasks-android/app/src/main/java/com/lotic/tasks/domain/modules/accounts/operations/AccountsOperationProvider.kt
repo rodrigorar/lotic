@@ -2,8 +2,10 @@ package com.lotic.tasks.domain.modules.accounts.operations
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.lotic.tasks.adapters.modules.accounts.gateways.SignUpGateway
 import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.accounts.AccountsRepository
+import com.lotic.tasks.domain.modules.accounts.dto.SignUpDTO
 import com.lotic.tasks.domain.shared.operations.Command
 import com.lotic.tasks.domain.shared.operations.OperationsProvider
 import com.lotic.tasks.domain.shared.operations.Provider
@@ -33,5 +35,9 @@ object AccountsOperationProvider : OperationsProvider {
 
     fun newAccount(): Command<Account> {
         return NewAccount(this.accountsRepository)
+    }
+
+    fun signUp(): Command<SignUpDTO> {
+        return SignUp(this.accountsRepository, ValidateEmail(), SignUpGateway())
     }
 }

@@ -13,7 +13,7 @@ import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionPr
 import com.lotic.tasks.domain.modules.auth.operations.Login
 import com.lotic.tasks.domain.modules.auth.operations.Logout
 import com.lotic.tasks.domain.modules.auth.operations.Refresh
-import com.lotic.tasks.domain.modules.auth.operations.ValidateEmail
+import com.lotic.tasks.domain.modules.accounts.operations.ValidateEmail
 import com.lotic.tasks.domain.shared.operations.OperationsProvider
 import com.lotic.tasks.domain.shared.operations.Provider
 

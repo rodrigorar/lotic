@@ -2,7 +2,6 @@ package com.lotic.tasks.adapters.modules.auth.gateways
 
 import com.lotic.tasks.adapters.modules.auth.gateways.payloads.AuthTokenResponse
 import com.lotic.tasks.adapters.modules.auth.gateways.payloads.LoginRequest
-import com.lotic.tasks.domain.modules.auth.AuthToken
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
