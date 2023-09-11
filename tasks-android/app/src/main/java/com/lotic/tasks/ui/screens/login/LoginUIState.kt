@@ -1,4 +1,4 @@
-package com.lotic.tasks.ui.login
+package com.lotic.tasks.ui.screens.login
 
 data class LoginUIState(
     val subject: String = ""

@@ -17,7 +17,6 @@ import com.lotic.tasks.adapters.modules.tasks.events.TasksUpdatedPublisher
 import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.auth.AuthToken
 import com.lotic.tasks.domain.modules.tasks.SyncManager
-import com.lotic.tasks.domain.modules.tasks.SyncManagerWorker
 import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.shared.events.Event
 import com.lotic.tasks.domain.shared.events.Subscriber

@@ -1,4 +1,4 @@
-package com.lotic.tasks.ui.about
+package com.lotic.tasks.ui.screens.about
 
 import androidx.lifecycle.ViewModel
 

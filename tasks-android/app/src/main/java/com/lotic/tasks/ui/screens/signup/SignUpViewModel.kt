@@ -1,4 +1,4 @@
-package com.lotic.tasks.ui.signup
+package com.lotic.tasks.ui.screens.signup
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

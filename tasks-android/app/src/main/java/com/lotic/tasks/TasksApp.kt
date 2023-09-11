@@ -7,10 +7,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.lotic.tasks.ui.MainScreen
-import com.lotic.tasks.ui.about.AboutScreen
-import com.lotic.tasks.ui.login.LoginScreen
-import com.lotic.tasks.ui.signup.SignUpScreen
+import com.lotic.tasks.ui.screens.MainScreen
+import com.lotic.tasks.ui.screens.about.AboutScreen
+import com.lotic.tasks.ui.screens.login.LoginScreen
+import com.lotic.tasks.ui.screens.signup.SignUpScreen
 
 enum class TasksScreen {
     Main

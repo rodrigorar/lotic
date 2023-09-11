@@ -1,4 +1,4 @@
-package com.lotic.tasks.ui.signup
+package com.lotic.tasks.ui.screens.signup
 
 data class SignUpUIState(
     val username: String = ""
