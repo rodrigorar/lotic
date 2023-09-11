@@ -149,11 +149,13 @@ class TasksViewModel : ViewModel() {
         this.uiState.taskCheckboxes[task.id.value] = this.uiState.taskCheckboxes[task.id.value]?.not() ?: false
         viewModelScope.launch {
             delay(1000)
-            // I was force to do this idiocracy == true :facepalm:
-            if (uiState.taskCheckboxes[task.id.value] == true) {
-                val completeTaskOperation = TasksOperationsProvider.completeTasks()
-                completeTaskOperation.execute(task.id)
-                uiState.taskCheckboxes[task.id.value] = false
+            // I was forced to do this idiocracy == true :facepalm:
+            uiState.taskCheckboxes.entries.forEach {
+                if (it.value) {
+                    val completeTaskOperation = TasksOperationsProvider.completeTasks()
+                    completeTaskOperation.execute(Task.idOf(it.key))
+                    uiState.taskCheckboxes[it.key] = false
+                }
             }
         }
     }
