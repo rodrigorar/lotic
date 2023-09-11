@@ -51,6 +51,7 @@ fun doLoginOrLogout(
 fun MainScreen(
     loginNavigation: () -> Unit
     , signUpNavigation: () -> Unit
+    , aboutNavigation: () -> Unit
     , modifier: Modifier = Modifier
     , viewModel: TasksViewModel = viewModel()) {
 
@@ -76,9 +77,7 @@ fun MainScreen(
                             viewModel.toggleDropdownMenu()
                         }) {
 
-                        DropdownMenuItem(onClick = {
-                            Log.d("MainScreen", "About as been pressed")
-                        }) {
+                        DropdownMenuItem(onClick = { aboutNavigation() }) {
                             Text(text = stringResource(R.string.about_btn))
                         }
 
