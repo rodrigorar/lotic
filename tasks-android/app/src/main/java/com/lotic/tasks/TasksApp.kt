@@ -1,9 +1,6 @@
 package com.lotic.tasks
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import com.lotic.tasks.ui.TasksViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -20,7 +17,7 @@ enum class TasksScreen {
 }
 
 @Composable
-fun TasksApp(modifier: Modifier = Modifier, viewModel: TasksViewModel = viewModel()) {
+fun TasksApp() {
     val navController = rememberNavController()
 
     NavHost(
