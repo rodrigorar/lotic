@@ -74,7 +74,6 @@ fun MainScreen(
 
             Box(modifier = modifier
                 .padding(2.dp)) {
-                // Used instead of LazyColumn because its faster
                 Column(modifier = modifier.verticalScroll(rememberScrollState())) {
                     viewModel.uiState.taskList.forEach { task ->
                         TaskComponent(
@@ -82,7 +81,7 @@ fun MainScreen(
                             , viewModel.uiState.taskTitles[task.id.value].orEmpty()
                             , { newTitle -> viewModel.updateTaskTitle(task, newTitle) }
                             , viewModel.uiState.taskCheckboxes[task.id.value] ?: false
-                            , { task -> viewModel.toggleComplete(task) }
+                            , { taskData -> viewModel.toggleComplete(taskData) }
                             , focusRequester)
                     }
                 }

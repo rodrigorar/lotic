@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +25,7 @@ import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lotic.tasks.R
+import com.lotic.tasks.ui.components.ActionButtonComponent
 
 private fun doLogin(uiState: LoginUIState, signInNavigation: () -> Unit, viewModel: LoginViewModel) {
     viewModel.login(uiState.subject.toLowerCase(Locale.current), uiState.secret)
@@ -80,17 +79,13 @@ fun LoginScreen(
 
         Spacer(modifier = modifier.padding(10.dp))
 
-        OutlinedButton(
-            onClick = { doLogin(
-                uiState = uiState
-                , signInNavigation = signInNavigation
-                , viewModel = loginViewModel) }
-            , shape = MaterialTheme.shapes.medium
-            , colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.primary)
-            , modifier = modifier.padding(15.dp)
-        ) {
-            Text(text = stringResource(R.string.sign_in_btn))
-        }
+        ActionButtonComponent(
+            {
+                doLogin(
+                    uiState = uiState
+                    , signInNavigation = signInNavigation
+                    , viewModel = loginViewModel)
+            }
+            , stringResource(R.string.sign_in_btn))
     }
 }

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lotic.tasks.R
+import com.lotic.tasks.ui.components.ActionButtonComponent
 
 @Composable
 fun SignUpScreen(
@@ -77,13 +78,11 @@ fun SignUpScreen(
 
         Spacer(modifier = modifier.padding(6.dp))
 
-        OutlinedButton(
-            onClick = { viewModel.signUp(navigationCallback) }
-            , shape = MaterialTheme.shapes.medium
-            , colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
-            , enabled = viewModel.uiState.canSignUp
-            , modifier = modifier.padding(15.dp)) {
-            Text(text = stringResource(R.string.sign_up_btn))
-        }
+        ActionButtonComponent(
+            onClick = {
+                      viewModel.signUp(navigationCallback)
+            }
+            , buttonText = stringResource(R.string.sign_up_btn)
+            , enabled = viewModel.uiState.canSignUp)
     }
 }

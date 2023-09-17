@@ -26,9 +26,9 @@ import com.lotic.tasks.domain.shared.value_objects.Id
 import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
 
+// FIXME: Refactor this code into a Chain of Responsibility Pattern
 object SyncManager {
 
-    // FIXME: Migrate the use of this client to use Gateways instead
     private val tasksClient: TasksClient? = RetrofitClientProvider.get()?.create(TasksClient::class.java)
 
     private val currentActiveAuthSessionProvider: CurrentActiveAuthSessionProvider = AuthOperationsProvider.currentActiveAuthSessionProvider()
