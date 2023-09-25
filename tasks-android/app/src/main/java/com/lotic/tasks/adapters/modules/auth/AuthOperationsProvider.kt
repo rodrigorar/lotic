@@ -10,8 +10,8 @@ import com.lotic.tasks.adapters.modules.auth.gateways.RefreshGateway
 import com.lotic.tasks.domain.modules.auth.AuthTokenRepository
 import com.lotic.tasks.domain.modules.auth.operations.ClearSessions
 import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionProvider
-import com.lotic.tasks.domain.modules.auth.operations.Login
-import com.lotic.tasks.domain.modules.auth.operations.Logout
+import com.lotic.tasks.domain.modules.auth.operations.SignIn
+import com.lotic.tasks.domain.modules.auth.operations.SignOut
 import com.lotic.tasks.domain.modules.auth.operations.Refresh
 import com.lotic.tasks.domain.modules.accounts.operations.ValidateEmail
 import com.lotic.tasks.domain.shared.operations.OperationsProvider
@@ -40,8 +40,8 @@ object AuthOperationsProvider : OperationsProvider {
         return this
     }
 
-    fun login(): Login {
-        return Login(
+    fun login(): SignIn {
+        return SignIn(
             repositoryAuthToken
             , accountOperationsProvider.getAccountByEmail()
             , accountOperationsProvider.newAccount()
@@ -55,8 +55,8 @@ object AuthOperationsProvider : OperationsProvider {
         return Refresh(repositoryAuthToken, logout(), RefreshGateway())
     }
 
-    fun logout(): Logout {
-        return Logout(
+    fun logout(): SignOut {
+        return SignOut(
             repositoryAuthToken
             , currentActiveAuthSessionProvider()
             , LogoutSuccessPublisher

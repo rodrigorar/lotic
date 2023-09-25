@@ -7,7 +7,7 @@ import com.lotic.tasks.domain.shared.Gateway
 
 class Refresh(
     private val authTokenRepository: AuthTokenRepository
-    , private val logoutOperation: Logout
+    , private val logoutOperation: SignOut
     , private val refreshGateway: Gateway<AuthToken, AuthToken?>) : Command<AuthToken> {
 
     override suspend fun execute(input: AuthToken) {

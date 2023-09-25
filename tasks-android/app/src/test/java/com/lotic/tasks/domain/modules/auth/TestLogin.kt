@@ -1,7 +1,7 @@
 package com.lotic.tasks.domain.modules.auth
 
 import com.lotic.tasks.domain.modules.accounts.Account
-import com.lotic.tasks.domain.modules.auth.operations.Login
+import com.lotic.tasks.domain.modules.auth.operations.SignIn
 import com.lotic.tasks.domain.modules.auth.value_objects.AccessToken
 import com.lotic.tasks.domain.modules.auth.value_objects.RefreshToken
 import com.lotic.tasks.domain.shared.operations.Command
@@ -50,7 +50,7 @@ class TestLogin {
         coEvery { mockedLoginSuccessPublisher.publish(any()) } returns Unit
 
         runBlocking {
-            val underTest = Login(
+            val underTest = SignIn(
                 mockedAuthTokenRepository
                 , mockedGetAccountByEmailQuery
                 , mockedNewAccountCommand
@@ -97,7 +97,7 @@ class TestLogin {
         coEvery { mockedLoginSuccessPublisher.publish(any()) } returns Unit
 
         runBlocking {
-            val underTest = Login(
+            val underTest = SignIn(
                 mockedAuthTokenRepository
                 , mockedGetAccountByEmailQuery
                 , mockedNewAccountCommand
@@ -131,7 +131,7 @@ class TestLogin {
         val mockedLoginSuccessPublisher = mockk<Publisher<AuthToken>>()
 
         runBlocking {
-            val underTest = Login(
+            val underTest = SignIn(
                 mockedAuthTokenRepository
                 , mockedGetAccountByEmailQuery
                 , mockedNewAccountCommand
@@ -170,7 +170,7 @@ class TestLogin {
         val mockedLoginSuccessPublisher = mockk<Publisher<AuthToken>>()
 
         runBlocking {
-            val underTest = Login(
+            val underTest = SignIn(
                 mockedAuthTokenRepository
                 , mockedGetAccountByEmailQuery
                 , mockedNewAccountCommand
@@ -212,7 +212,7 @@ class TestLogin {
         val mockedLoginSuccessPublisher = mockk<Publisher<AuthToken>>()
 
         runBlocking {
-            val underTest = Login(
+            val underTest = SignIn(
                 mockedAuthTokenRepository
                 , mockedGetAccountByEmailQuery
                 , mockedNewAccountCommand
@@ -243,7 +243,7 @@ class TestLogin {
         val mockedLoginSuccessPublisher = mockk<Publisher<AuthToken>>()
 
         runBlocking {
-            val underTest = Login(
+            val underTest = SignIn(
                 mockedAuthTokenRepository
                 , mockedGetAccountByEmailQuery
                 , mockedNewAccountCommand

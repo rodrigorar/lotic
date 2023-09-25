@@ -12,7 +12,7 @@ import com.lotic.tasks.domain.shared.operations.Operation
 import com.lotic.tasks.domain.shared.operations.Query
 import com.lotic.tasks.domain.shared.value_objects.Email
 
-class Login(
+class SignIn(
     private val repositoryAuthToken: AuthTokenRepository
     , private val getAccountByEmailQuery: Query<Email, Account?>
     , private val newAccountCommand: Command<Account>

@@ -1,7 +1,7 @@
 package com.lotic.tasks.domain.modules.auth
 
 import com.lotic.tasks.domain.modules.accounts.Account
-import com.lotic.tasks.domain.modules.auth.operations.Logout
+import com.lotic.tasks.domain.modules.auth.operations.SignOut
 import com.lotic.tasks.domain.modules.auth.operations.Refresh
 import com.lotic.tasks.domain.modules.auth.value_objects.AccessToken
 import com.lotic.tasks.domain.modules.auth.value_objects.RefreshToken
@@ -31,7 +31,7 @@ class TestRefresh {
         coEvery { mockedAuthTokenRepository.deleteAllForAccount(any()) } returns Unit
         coEvery { mockedAuthTokenRepository.insert(any()) } returns Unit
 
-        val mockedLogoutOperation = mockk<Logout>()
+        val mockedLogoutOperation = mockk<SignOut>()
 
         val mockedRefreshGateway = mockk<Gateway<AuthToken, AuthToken?>>()
         coEvery { mockedRefreshGateway.call(any()) } returns authToken
@@ -57,7 +57,7 @@ class TestRefresh {
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
         coEvery { mockedAuthTokenRepository.deleteAllForAccount(any()) } returns Unit
 
-        val mockedLogoutOperation = mockk<Logout>()
+        val mockedLogoutOperation = mockk<SignOut>()
 
         val mockedRefreshGateway = mockk<Gateway<AuthToken, AuthToken?>>()
         coEvery { mockedRefreshGateway.call(any()) } returns null
@@ -81,7 +81,7 @@ class TestRefresh {
 
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
 
-        val mockedLogoutOperation = mockk<Logout>()
+        val mockedLogoutOperation = mockk<SignOut>()
         coEvery { mockedLogoutOperation.execute() } returns Unit
 
         val mockedRefreshGateway = mockk<Gateway<AuthToken, AuthToken?>>()
@@ -111,7 +111,7 @@ class TestRefresh {
         val mockedAuthTokenRepository = mockk<AuthTokenRepository>()
         coEvery { mockedAuthTokenRepository.deleteAllForAccount(any()) } throws Exception()
 
-        val mockedLogoutOperation = mockk<Logout>()
+        val mockedLogoutOperation = mockk<SignOut>()
         coEvery { mockedLogoutOperation.execute() } returns Unit
 
         val mockedRefreshGateway = mockk<Gateway<AuthToken, AuthToken?>>()

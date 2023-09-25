@@ -3,18 +3,16 @@ package com.lotic.tasks.domain.modules.auth
 import com.lotic.tasks.adapters.modules.auth.gateways.LogoutGateway
 import com.lotic.tasks.domain.modules.accounts.Account
 import com.lotic.tasks.domain.modules.auth.operations.CurrentActiveAuthSessionProvider
-import com.lotic.tasks.domain.modules.auth.operations.Logout
+import com.lotic.tasks.domain.modules.auth.operations.SignOut
 import com.lotic.tasks.domain.modules.auth.value_objects.AccessToken
 import com.lotic.tasks.domain.modules.auth.value_objects.RefreshToken
 import com.lotic.tasks.domain.shared.events.Publisher
 import com.lotic.tasks.domain.shared.value_objects.Id
-import io.mockk.InternalPlatformDsl.toStr
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import java.util.*
 
 class TestLogout {
 
@@ -39,7 +37,7 @@ class TestLogout {
         coEvery { mockedLogoutSuccessPublisher.publish(any()) } returns Unit
 
         runBlocking {
-            val underTest = Logout(
+            val underTest = SignOut(
                 mockedAuthTokenRepository
                 , mockedCurrentActiveAuthSessionProvider
                 , mockedLogoutSuccessPublisher
@@ -65,7 +63,7 @@ class TestLogout {
         val mockedLogoutSuccessPublisher = mockk<Publisher<Id<Account>>>()
 
         runBlocking {
-            val underTest = Logout(
+            val underTest = SignOut(
                 mockedAuthTokenRepository
                 , mockedCurrentActiveAuthSessionProvider
                 , mockedLogoutSuccessPublisher
@@ -87,7 +85,7 @@ class TestLogout {
         val mockedLogoutSuccessPublisher = mockk<Publisher<Id<Account>>>()
 
         runBlocking {
-            val underTest = Logout(
+            val underTest = SignOut(
                 mockedAuthTokenRepository
                 , mockedCurrentActiveAuthSessionProvider
                 , mockedLogoutSuccessPublisher
@@ -120,7 +118,7 @@ class TestLogout {
         val mockedLogoutSuccessPublisher = mockk<Publisher<Id<Account>>>()
 
         runBlocking {
-            val underTest = Logout(
+            val underTest = SignOut(
                 mockedAuthTokenRepository
                 , mockedCurrentActiveAuthSessionProvider
                 , mockedLogoutSuccessPublisher
@@ -156,7 +154,7 @@ class TestLogout {
         val mockedLogoutSuccessPublisher = mockk<Publisher<Id<Account>>>()
 
         runBlocking {
-            val underTest = Logout(
+            val underTest = SignOut(
                 mockedAuthTokenRepository
                 , mockedCurrentActiveAuthSessionProvider
                 , mockedLogoutSuccessPublisher

@@ -92,6 +92,7 @@ fun LoginScreen(
                     , signInNavigation = signInNavigation
                     , viewModel = loginViewModel)
             }
-            , stringResource(R.string.sign_in_btn))
+            , enabled = uiState.canSignIn
+            , buttonText = stringResource(R.string.sign_in_btn))
     }
 }

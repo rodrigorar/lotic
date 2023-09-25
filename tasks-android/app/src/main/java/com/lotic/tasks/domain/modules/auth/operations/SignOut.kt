@@ -9,7 +9,7 @@ import com.lotic.tasks.domain.shared.events.Publisher
 import com.lotic.tasks.domain.shared.operations.NoInputCommand
 import com.lotic.tasks.domain.shared.value_objects.Id
 
-class Logout(
+class SignOut(
     private val authTokenRepository: AuthTokenRepository
     , private val currentActiveAuthSessionProvider: CurrentActiveAuthSessionProvider
     , private val logoutSuccessPublisher: Publisher<Id<Account>>
