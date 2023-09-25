@@ -17,4 +17,7 @@
     <string name="version">1.0.0</string>
     <string name="tasks_description"><![CDATA[Todos & Daily Planner App]]></string>
     <string name="copyright">Copyright @ 2023</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="repeat_password">Repeat Password</string>
 </resources>

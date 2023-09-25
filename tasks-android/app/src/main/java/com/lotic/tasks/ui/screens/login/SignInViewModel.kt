@@ -12,8 +12,8 @@ import com.lotic.tasks.domain.shared.value_objects.Email
 import com.lotic.tasks.domain.shared.value_objects.Password
 import kotlinx.coroutines.launch
 
-class LoginViewModel() : ViewModel() {
-    var uiState by mutableStateOf(LoginUIState())
+class SignInViewModel() : ViewModel() {
+    var uiState by mutableStateOf(SignInUIState())
         private set
 
     private var loginOperation: Login = AuthOperationsProvider.login()

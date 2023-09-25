@@ -27,7 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lotic.tasks.R
 import com.lotic.tasks.ui.components.ActionButtonComponent
 
-private fun doLogin(uiState: LoginUIState, signInNavigation: () -> Unit, viewModel: LoginViewModel) {
+private fun doLogin(uiState: SignInUIState, signInNavigation: () -> Unit, viewModel: SignInViewModel) {
     viewModel.login(uiState.subject.toLowerCase(Locale.current), uiState.secret)
     signInNavigation()
 }
@@ -36,7 +36,7 @@ private fun doLogin(uiState: LoginUIState, signInNavigation: () -> Unit, viewMod
 fun LoginScreen(
     signInNavigation: () -> Unit
     , modifier: Modifier = Modifier
-    , loginViewModel: LoginViewModel = viewModel()) {
+    , loginViewModel: SignInViewModel = viewModel()) {
 
     val uiState = loginViewModel.uiState
     val focusManager = LocalFocusManager.current
@@ -60,6 +60,9 @@ fun LoginScreen(
         OutlinedTextField(
             value = uiState.subject
             , onValueChange = { loginViewModel.updateSubject(it) }
+            , placeholder = {
+                Text(text = stringResource(R.string.username))
+            }
             , keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
             , keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
             , shape = MaterialTheme.shapes.medium)
@@ -69,6 +72,9 @@ fun LoginScreen(
         OutlinedTextField(
             value = uiState.secret
             , onValueChange = { loginViewModel.updateSecret(it) }
+            , placeholder = {
+                Text(text = stringResource(R.string.password))
+            }
             , visualTransformation = PasswordVisualTransformation()
             , keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
             , keyboardActions = KeyboardActions(onDone = { doLogin(

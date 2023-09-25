@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -52,6 +50,9 @@ fun SignUpScreen(
         OutlinedTextField(
             value = viewModel.uiState.username
             , onValueChange = { viewModel.updateUsername(it) }
+            , placeholder = {
+                Text(text = stringResource(R.string.username))
+            }
             , keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next)
             , keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down )})
             , shape = MaterialTheme.shapes.medium)
@@ -61,6 +62,9 @@ fun SignUpScreen(
         OutlinedTextField(
             value = viewModel.uiState.password
             , onValueChange = { viewModel.updatePassword(it) }
+            , placeholder = {
+                Text(text = stringResource(R.string.password))
+            }
             , visualTransformation = PasswordVisualTransformation()
             , keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next)
             , keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down )})
@@ -71,6 +75,9 @@ fun SignUpScreen(
         OutlinedTextField(
             value = viewModel.uiState.passwordMatch
             , onValueChange = { viewModel.updatePasswordMatch(it) }
+            , placeholder = {
+                Text(text = stringResource(R.string.repeat_password))
+            }
             , visualTransformation = PasswordVisualTransformation()
             , keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
             , keyboardActions = KeyboardActions(onDone = { viewModel.signUp(navigationCallback) })
