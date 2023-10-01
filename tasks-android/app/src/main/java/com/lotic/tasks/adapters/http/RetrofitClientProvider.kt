@@ -7,7 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClientProvider : Provider<Retrofit?> {
-    private const val SERVER_URL = "http://lotic.eu:8080/api/v1/"
+    private const val SERVER_URL = "https://lotic.eu/api/v1/"
 
     private var client: Retrofit? = null;
     @Volatile
