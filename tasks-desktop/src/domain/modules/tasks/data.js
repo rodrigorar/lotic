@@ -15,6 +15,10 @@ class TasksRepository extends Repository {
         throw new NotImplementedError("TasksRepository#listById is not implemented");
     }
 
+    async getMaxPosition(unitOfWork) {
+        throw new NotImplementedError("TasksRepository#getLastPositionValue is not implemented");
+    }
+
     // FIXME: This should be on the save function
     async update(unitOfWork, taskData) {
         throw new NotImplementedError("TasksRepository#update is not implemented");

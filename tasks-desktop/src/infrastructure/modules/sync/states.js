@@ -133,6 +133,7 @@ class UpdateTasksLocalStateEffect extends StateEffect {
                     , {
                         id: entry.task_id
                         , title: entry.title
+                        , position: entry.position ? entry.position : undefined
                         , createdAt: new Date() // FIXME: This should come from the server
                         , updatedAt: new Date() // FIXME: This should come from the server
                         , ownerId: entry.owner_id
@@ -199,6 +200,7 @@ class CreateTasksLocalStateEffect extends StateEffect {
                         .map(taskData => ({
                             id: taskData.task_id
                             , title: taskData.title
+                            , position: taskData.position ? taskData.position : undefined
                             , createdAt: new Date() // FIXME: This should come from the server
                             , updatedAt: new Date() // FIXME: This should come from the server
                             , ownerId: authToken.accountId
@@ -344,6 +346,7 @@ class UpdateTasksRemoteStateEffect extends StateEffect {
                             task_id: task.id
                             , title: task.title
                             , description: task.description ? task.description : ""
+                            , position: task.position
                             , updated_at: task.updatedAt.toISOString()
                         }));
 
@@ -410,6 +413,7 @@ class CreateTasksRemoteStateEffect extends StateEffect {
                             task_id: task.id
                             , title: task.title
                             , description: task.description ? task.description : ""
+                            , position: task.position
                             , created_at: task.createdAt.toISOString()
                             , updated_at: task.updatedAt.toISOString()
                             , owner_id: authToken.accountId

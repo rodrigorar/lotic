@@ -109,6 +109,7 @@ ipcMain.on('tasks:create', TasksHandler.handleCreateTask);
 ipcMain.on('tasks:update', TasksHandler.handleUpdateTasks);
 ipcMain.on('tasks:complete', TasksHandler.handleCompletion);
 ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
+ipcMain.on('tasks:reposition', TasksHandler.handleTaskRepositioning);
 ipcMain.on('tasks:refresh', (event) => {
   SynchManager.execute();
 });
@@ -151,6 +152,13 @@ ipcMain.on('auth:logout', async (event) => {
   await AuthHandlers.handleLogout(event); // This one has to be last, we need to know which account is logging out
 });
 ipcMain.handle('auth:is_logged_in', AuthHandlers.handleIsLoggedIn);
+
+// UI Event Listeners
+
+
+EventBus.register(
+  EventType.REPOSITION_TASKS_SUCCESS
+  , new EventSubscriber(v4(), (event) => mainWindow.webContents.send("ui:refresh")))
 
 
 // EventBus Listeners

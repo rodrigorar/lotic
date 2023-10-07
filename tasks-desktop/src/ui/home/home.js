@@ -8,12 +8,22 @@ const addTaskButton = document.querySelector("#add-task-button");
 const notificationContainer = document.querySelector("#notification-container");
 const refreshButton = document.querySelector("#refresh-button");
 
-// DOM Create / Management
+// DOM Create / 
 
 function createTaskDOM(id, title = undefined) {
     const containerDiv = document.createElement('div');
     containerDiv.id = 'container:' + id; // container:task-id
     containerDiv.classList.add("box");
+    containerDiv.draggable = true;
+    containerDiv.addEventListener('dragstart', (event) => {
+        event.dataTransfer.setData("draggedTaskId", extractId(event.target.id));
+    })
+    containerDiv.addEventListener('dragover', (event) => event.preventDefault());
+    containerDiv.addEventListener('drop', (event) => {
+        const targetTaskId = extractId(event.target.id);
+        const draggedTaskId = event.dataTransfer.getData('draggedTaskId');
+        tasks.repositionTasks(targetTaskId, draggedTaskId);
+    })
 
     const text = document.createElement('input');
     text.classList.add('transparent-text-input');
@@ -62,7 +72,7 @@ async function createMainMenu() {
     dropdown.appendChild(dropdownContent);
 
     const isLoggedIn = await auth.isLoggedIn();
-    logger.info(isLoggedIn);
+    
     if (isLoggedIn) {
         const logoutOption = document.createElement("a");
         logoutOption.href = "#";
@@ -76,7 +86,6 @@ async function createMainMenu() {
         signInOption.href = "#";
         signInOption.innerText = "Sign In";
         signInOption.addEventListener("click", async (event) => {
-            logger.info("In Sign In Operation");
             nav.openLogin();
         });
         dropdownContent.appendChild(signInOption);
@@ -135,6 +144,10 @@ function setInitialFocus() {
     if (emptyTask != undefined) {
         document.getElementById('text-input:' + emptyTask.focus());
     }
+}
+
+function refreshTaskList() {
+    
 }
 
 async function initUI() {
@@ -290,6 +303,25 @@ ui.handleLoadingEnd((event) => {
         refreshButton.classList = [];
         document.querySelector("#loader").classList = [""];
     }, 500);
+});
+
+ui.handleUIRefresh((event) => {
+    taskContainer.innerHTML = "";
+    tasks.listTasks()
+        .then(taskList => {
+            if (taskList == undefined || taskList.length == 0) {
+                createTask();
+            } else {
+                taskList.forEach(entry => {
+                    const taskElement = createTaskDOM(entry.id, entry.title)
+                    if (entry.title === '') {
+                        updateEmptyTask(entry.id, taskElement);
+                    }
+                    taskContainer.appendChild(taskElement);
+                });
+            }
+            setInitialFocus();
+        });
 });
 
 // Helper functions

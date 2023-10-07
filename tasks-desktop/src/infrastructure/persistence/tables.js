@@ -21,6 +21,7 @@ const Fields = {
     , Tasks: {
         Id: "task_id"
         , Title: "title"
+        , Position: "position"
         , CreatedAt: "created_at"
         , UpdatedAt: "updated_at"
         , OwnerId: "owner_id"

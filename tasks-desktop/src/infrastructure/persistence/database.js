@@ -130,5 +130,10 @@ const migrations = [
         version: 6
         , description: "Rename auth_tokens table to auth_sessions"
         , migration: "ALTER TABLE auth_tokens RENAME TO auth_sessions"
+    },
+    {
+        version: 7
+        , description: "Add position field tasks table"
+        , migration: "ALTER TABLE tasks ADD position INTEGER NOT NULL DEFAULT 0"
     }
 ];

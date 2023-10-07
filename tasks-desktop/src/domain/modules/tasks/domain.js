@@ -2,9 +2,10 @@ const { Validators } = require("../../shared/utils");
 const { Command, Query } = require("../../shared/ports");
 
 class Task {
-    constructor(id, title, createdAt, updatedAt, ownerId) {
+    constructor(id, title, position, createdAt, updatedAt, ownerId) {
         this.id = id;
         this.title = title;
+        this.position = position;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.ownerId = ownerId;
@@ -42,10 +43,15 @@ class UseCaseCreateTask extends Command {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskData, "No task data was provided!");
 
+        if (! taskData.position) {
+            taskData.position = await this.tasksRepository.getMaxPosition(unitOfWork) + 1;
+        }
+
         const task = 
             new Task(
                 taskData.id
                 , taskData.title
+                , taskData.position
                 , taskData.createdAt
                 , taskData.updatedAt
                 , taskData.ownerId);
@@ -64,15 +70,25 @@ class UseCaseCreateTasks extends Command {
     async execute(unitOfWork, taskDataList) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskDataList, "No tasks where provided");
+
+        let maxPosition = await this.tasksRepository.getMaxPosition(unitOfWork);
     
         const tasks = taskDataList
-            .map(taskData => 
-                    new Task(
-                        taskData.id
-                        , taskData.title
-                        , taskData.createdAt
-                        , taskData.updatedAt
-                        , taskData.ownerId));
+            .map(taskData => {
+                
+                if (! taskData.position) {
+                    maxPosition++;
+                    taskData.position = maxPosition;
+                }
+
+                return new Task(
+                    taskData.id
+                    , taskData.title
+                    , taskData.position
+                    , taskData.createdAt
+                    , taskData.updatedAt
+                    , taskData.ownerId)
+            });
         for (let task of tasks) {
             await this.tasksRepository.save(unitOfWork, task);
         }
@@ -113,6 +129,22 @@ class UseCaseUpdateTasks extends Command {
     }
 }
 
+class UseCaseGetTaskById extends Query {
+    
+    constructor(tasksRepository) {
+        super();
+
+        this.tasksRepository = tasksRepository;
+    }
+
+    async execute(unitOfWork, taskId) {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        Validators.isNotNull(taskId, "No task id provided");
+
+        return await this.tasksRepository.get(unitOfWork, taskId);
+    }
+}
+
 class UseCaseListTasksForAccount extends Query {
 
     constructor(tasksRepository) {
@@ -125,7 +157,9 @@ class UseCaseListTasksForAccount extends Query {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(accountId, "No account id provided");
         
-        return await this.tasksRepository.listByAccountId(unitOfWork, accountId);
+        const result = await this.tasksRepository.listByAccountId(unitOfWork, accountId);
+        result.sort((a, b) => a.position - b.position);
+        return result;
     }
 }
 
@@ -155,7 +189,9 @@ class UseCaseListTasksById extends Query {
     async execute(unitOfWork, taskIdList = []) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
 
-        return await this.tasksRepository.listById(unitOfWork, taskIdList);
+        const result = await this.tasksRepository.listById(unitOfWork, taskIdList);
+        result.sort((a, b) => a.position - b.position);
+        return result;
     }
 }
 
@@ -413,6 +449,7 @@ module.exports.UseCaseCreateTask = UseCaseCreateTask;
 module.exports.UseCaseCreateTasks = UseCaseCreateTasks;
 module.exports.UseCaseUpdateTask = UseCaseUpdateTask;
 module.exports.UseCaseUpdateTasks = UseCaseUpdateTasks;
+module.exports.UseCaseGetTaskById = UseCaseGetTaskById;
 module.exports.UseCaseListTasksForAccount = UseCaseListTasksForAccount;
 module.exports.UseCaseListTasksWithoutOwner = UseCaseListTasksWithoutOwner;
 module.exports.UseCaseListTasksById = UseCaseListTasksById;

@@ -13,6 +13,7 @@ const EventType = {
     , DELETED_LOCAL_TASKS: "DeletedLocalTasks"
     , SYNC_STARTED: "SyncStarted"
     , SYNC_ENDED: "SyncEnded"
+    , REPOSITION_TASKS_SUCCESS: "RepositionTasksSuccess"
 }
 
 class Event {

@@ -9,19 +9,27 @@ class TasksRepositoryImpl extends TasksRepository {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
             `INSERT INTO ${Tables.Tasks}`
-            + `(${Fields.Tasks.Id}, ${Fields.Tasks.Title}, ${Fields.Tasks.CreatedAt}, ${Fields.Tasks.UpdatedAt}, ${Fields.Tasks.OwnerId}) `
-            + `VALUES(?, ?, ?, ?, ?)`,
-            [task.id, task.title, task.createdAt.toISOString(), task.updatedAt.toISOString(), task.ownerId]);
+            + `(${Fields.Tasks.Id}, ${Fields.Tasks.Title}, ${Fields.Tasks.Position}, ${Fields.Tasks.CreatedAt}, ${Fields.Tasks.UpdatedAt}, ${Fields.Tasks.OwnerId}) `
+            + `VALUES(?, ?, ?, ?, ?, ?)`,
+            [task.id, task.title, task.position, task.createdAt.toISOString(), task.updatedAt.toISOString(), task.ownerId]);
     }
 
-    // FIXME: This should be on the save function
+    // FIXME: This is horrendous
     async update(unitOfWork, task) {
         const queryManager = unitOfWork.getQueryManager();
-        await queryManager.run(
-            `UPDATE ${Tables.Tasks} `
-            + `SET ${Fields.Tasks.Title}=?, ${Fields.Tasks.UpdatedAt}=? `
-            + `WHERE ${Fields.Tasks.Id}=?`, 
-            [task.title, task.updatedAt.toISOString(), task.id]);
+        if (task.position != undefined) {
+            await queryManager.run(
+                `UPDATE ${Tables.Tasks} `
+                + `SET ${Fields.Tasks.Title}=?, ${Fields.Tasks.Position}=?, ${Fields.Tasks.UpdatedAt}=? `
+                + `WHERE ${Fields.Tasks.Id}=?`, 
+                [task.title, task.position, task.updatedAt.toISOString(), task.id]);
+        } else {
+            await queryManager.run(
+                `UPDATE ${Tables.Tasks} `
+                + `SET ${Fields.Tasks.Title}=?, ${Fields.Tasks.UpdatedAt}=? `
+                + `WHERE ${Fields.Tasks.Id}=?`, 
+                [task.title, task.updatedAt.toISOString(), task.id]);
+        }
     }
 
     // FIXME: This should be on the save function
@@ -29,9 +37,26 @@ class TasksRepositoryImpl extends TasksRepository {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
             `UPDATE ${Tables.Tasks} `
-            + `SET ${Fields.Tasks.OwnerId}=?, ${Fields.Tasks.UpdatedAt}=? `
+            + `SET ${Fields.Tasks.OwnerId}=?, ${Fields.Tasks.UpdatedAt}=?`
             + `WHERE ${Fields.Tasks.Id}=?`
             , [task.ownerId, new Date().toISOString(), task.id]);
+    }
+
+    async get(unitOfWork, taskId) {
+        const queryManager = unitOfWork.getQueryManager();
+        const result = await queryManager
+            .all(`SELECT *`
+                + `FROM ${Tables.Tasks} `
+                + `WHERE ${Fields.Tasks.Id} = ?`, [taskId]);
+        return result 
+            ? result.map((entity) => new Task(
+                entity.task_id
+                , entity.title
+                , entity.position
+                , new Date(entity.created_at)
+                , new Date(entity.updated_at)
+                , entity.owner_id))[0] 
+            : undefined;
     }
 
     async listByAccountId(unitOfWork, accountId) {
@@ -43,6 +68,7 @@ class TasksRepositoryImpl extends TasksRepository {
         return result.map(entry => new Task(
                 entry.task_id
                 , entry.title
+                , entry.position
                 , new Date(entry.created_at)
                 , new Date(entry.updated_at)
                 , entry.owner_id));
@@ -57,6 +83,7 @@ class TasksRepositoryImpl extends TasksRepository {
         return result.map(entry => new Task(
                 entry.task_id
                 , entry.title
+                , entry.position
                 , new Date(entry.created_at)
                 , new Date(entry.updated_at)
                 , entry.owner_id));
@@ -71,9 +98,19 @@ class TasksRepositoryImpl extends TasksRepository {
         return result.map(entry => new Task(
                 entry.task_id
                 , entry.title
+                , entry.position
                 , new Date(entry.created_at)
                 , new Date(entry.updated_at)
                 , entry.owner_id));
+    }
+
+    async getMaxPosition(unitOfWork) {
+        const queryManager = unitOfWork.getQueryManager();
+        const queryResult = await queryManager
+            .all(`SELECT MAX(${Fields.Tasks.Position}) as 'max_position'`
+                + `FROM ${Tables.Tasks} `);
+        const result = queryResult.map(entry => entry.max_position)[0];
+        return result ? result : -1;
     }
     
     async erase(unitOfWork, id) {

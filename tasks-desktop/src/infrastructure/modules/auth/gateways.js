@@ -7,7 +7,6 @@ const BASE_PATH = BASE_URL + "/auth";
 async function doCall(operation) {
     try {
         const response = await operation();
-        console.log(response);
         return response;
     } catch (error) {
         console.log(error); // Logged like this because its an object
@@ -62,9 +61,6 @@ class RefreshGateway extends Gateway {
                     }
                 });
         });
-
-        console.log("Result:");
-        console.log(result);
 
         return result.data;
     }

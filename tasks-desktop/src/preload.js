@@ -22,6 +22,7 @@ contextBridge.exposeInMainWorld('tasks', {
     , updateTask: (taskId, data) => ipcRenderer.send('tasks:update', taskId, data)
     , completeTask: (taskId) => ipcRenderer.send('tasks:complete', taskId)
     , listTasks: () => ipcRenderer.invoke('tasks:list')
+    , repositionTasks: (targetTaskId, draggedTaskId) => ipcRenderer.send('tasks:reposition', targetTaskId, draggedTaskId)
     , refresh: () => ipcRenderer.send('tasks:refresh')
     , handleRefresh: (callback) => ipcRenderer.on('tasks:refresh', callback)
 });
@@ -50,6 +51,7 @@ contextBridge.exposeInMainWorld('auth', {
 contextBridge.exposeInMainWorld('ui', {
     handleLoadingStart: (callback) => ipcRenderer.on("ui:loading:start", callback)
     , handleLoadingEnd: (callback) => ipcRenderer.on("ui:loading:end", callback)
+    , handleUIRefresh: (callback) => ipcRenderer.on("ui:refresh", callback)
 })
 
 // navigation

@@ -4,6 +4,7 @@ const {
     , UseCaseCreateTasks
     , UseCaseUpdateTask 
     , UseCaseUpdateTasks
+    , UseCaseGetTaskById
     , UseCaseListTasksForAccount
     , UseCaseListTasksWithoutOwner
     , UseCaseListTasksById
@@ -52,6 +53,12 @@ class UseCaseUpdateTasksProvider extends UseCaseProvider {
 
     get() {
         return new UseCaseUpdateTasks(new TasksRepositoryImpl());
+    }
+}
+
+class UseCaseGetTaskByIdProvider extends UseCaseProvider {
+    get() {
+        return new UseCaseGetTaskById(new TasksRepositoryImpl());
     }
 }
 
@@ -170,6 +177,7 @@ module.exports.UseCaseCreateTaskProvider = new UseCaseCreateTaskProvider();
 module.exports.UseCaseCreateTasksProvider = new UseCaseCreateTasksProvider();
 module.exports.UseCaseUpdateTaskProvider = new UseCaseUpdateTaskProvider();
 module.exports.UseCaseUpdateTasksProvider = new UseCaseUpdateTasksProvider();
+module.exports.UseCaseGetTaskByIdProvider = new UseCaseGetTaskByIdProvider();
 module.exports.UseCaseListTasksForAccountProvider = new UseCaseListTasksForAccountProvider();
 module.exports.UseCaseListTasksWithoutOwnerProvider = new UseCaseListTasksWithoutOwnerProvider();
 module.exports.UseCaseListTasksByIdProvider = new UseCaseListTasksByIdProvider();
