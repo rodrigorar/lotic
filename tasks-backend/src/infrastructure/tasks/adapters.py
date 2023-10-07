@@ -60,6 +60,7 @@ class TasksRepositoryImpl(TasksRepository):
                 entry.get_id()
                 , entry.title
                 , entry.description
+                , entry.position
                 , entry.created_at
                 , entry.updated_at
                 , entry.get_owner_id()

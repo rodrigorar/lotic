@@ -53,6 +53,7 @@ def step_impl(context):
                             "task_id": str(context.result)
                             , "title": "Yet another task #1"
                             , "description": "Yet another task description #1"
+                            , "position": 3
                             , "created_at": str(datetime.now())
                             , "updated_at": str(datetime.now())
                             , "owner_id": str(context.account_ids[0])
@@ -76,6 +77,7 @@ def step_impl(context):
                             "task_id": str(context.result[0])
                             , "title": "Yet another task #1"
                             , "description": "Yet another task description #1"
+                            , "position": 0
                             , "created_at": str(datetime.now())
                             , "updated_at": str(datetime.now())
                             , "owner_id": str(context.account_ids[0])
@@ -84,6 +86,7 @@ def step_impl(context):
                             "task_id": str(context.result[1])
                             , "title": "Yet another task #2"
                             , "description": "Yet another task description #2"
+                            , "position": 1
                             , "created_at": str(datetime.now())
                             , "updated_at": str(datetime.now())
                             , "owner_id": str(context.account_ids[0])
@@ -92,6 +95,7 @@ def step_impl(context):
                             "task_id": str(context.result[2])
                             , "title": "Yet another task #3"
                             , "description": "Yet another task description #3"
+                            , "position": 2
                             , "created_at": str(datetime.now())
                             , "updated_at": str(datetime.now())
                             , "owner_id": str(context.account_ids[0]
@@ -127,6 +131,7 @@ def step_impl(context):
             uuid4()
             , "Yet another task #1"
             , "Yet another task description #1"
+            , 0
             , datetime.now()
             , datetime.now()
             , context.account_ids[0])
@@ -142,6 +147,7 @@ def step_impl(context):
                             "task_id": data.id
                             , "title": "Yet another task #1 - Updated"
                             , "description": "Yet another task description #1 - Updated"
+                            , "position": 0
                             , "updated_at": "2023-02-10T09:00:00Z"
                         }
                     ]
@@ -161,6 +167,7 @@ def step_impl(context):
                 uuid4()
                 , "Yet another task #1"
                 , "Yet another task description #1"
+                , 0
                 , datetime.now()
                 , datetime.now()
                 , context.account_ids[0]
@@ -169,6 +176,7 @@ def step_impl(context):
                 uuid4()
                 , "Yet another task #2"
                 , "Yet another task description #2"
+                , 1
                 , datetime.now()
                 , datetime.now()
                 , context.account_ids[0]
@@ -177,6 +185,7 @@ def step_impl(context):
                 uuid4()
                 , "Yet another task #3"
                 , "Yet another task description #3"
+                , 2
                 , datetime.now()
                 , datetime.now()
                 , context.account_ids[0]
@@ -202,18 +211,21 @@ def step_impl(context):
                             "task_id": data[0].id
                             , "title": "Yet another task #1"
                             , "description": "Yet another task description #1"
+                            , "position": 0
                             , "updated_at": "2023-02-01T09:00:00.000Z"
                         },
                         {
                             "task_id": data[1].id
                             , "title": "Yet another task #2"
                             , "description": "Yet another task description #2"
+                            , "position": 1
                             , "updated_at": "2022-01-12T14:53:34.000Z"
                         },
                         {
                             "task_id": data[2].id
                             , "title": "Yet another task #3"
                             , "description": "Yet another task description #3"
+                            , "position": 2
                             , "updated_at": "2022-01-24T23:51:00.000Z"
                         }
                     ]
@@ -235,6 +247,7 @@ def step_impl(context):
                 uuid4()
                 , "Yet another task #1"
                 , "Yet another task description #1"
+                , 0
                 , datetime.now()
                 , datetime.now()
                 , random_user
@@ -243,6 +256,7 @@ def step_impl(context):
                 uuid4()
                 , "Yet another task #2"
                 , "Yet another task description #2"
+                , 1
                 , datetime.now()
                 , datetime.now()
                 , random_user
@@ -251,6 +265,7 @@ def step_impl(context):
                 uuid4()
                 , "Yet another task #3"
                 , "Yet another task description #3"
+                , 2
                 , datetime.now()
                 , datetime.now()
                 , random_user
@@ -276,18 +291,21 @@ def step_impl(context):
                             "task_id": data[0].id
                             , "title": "Yet another task #1"
                             , "description": "Yet another task description #1"
+                            , "position": 0
                             , "updated_at": "2023-02-01T09:00:00.000Z"
                         },
                         {
                             "task_id": data[1].id
                             , "title": "Yet another task #2"
                             , "description": "Yet another task description #2"
+                            , "position": 1
                             , "updated_at": "2022-01-12T14:53:34.000Z"
                         },
                         {
                             "task_id": data[2].id
                             , "title": "Yet another task #3"
                             , "description": "Yet another task description #3"
+                            , "position": 2
                             , "updated_at": "2022-01-24T23:51:00.000Z"
                         }
                     ]
@@ -321,6 +339,7 @@ def step_impl(context):
                 uuid4()
                 , "Yet another task #1"
                 , "Yet another task description #1"
+                , 0
                 , datetime.now()
                 , datetime.now()
                 , context.account_ids[0]
@@ -329,6 +348,7 @@ def step_impl(context):
                 uuid4()
                 , "Yet another task #2"
                 , "Yet another task description #2"
+                , 1
                 , datetime.now()
                 , datetime.now()
                 , uuid4()
@@ -337,6 +357,7 @@ def step_impl(context):
                 uuid4()
                 , "Yet another task #3"
                 , "Yet another task description #3"
+                , 2
                 , datetime.now()
                 , datetime.now()
                 , context.account_ids[0]
@@ -362,18 +383,21 @@ def step_impl(context):
                             "task_id": data[0].id
                             , "title": "Yet another task #1"
                             , "description": "Yet another task description #1"
+                            , "position": 0
                             , "updated_at": "2023-02-01T09:00:00.000Z"
                         },
                         {
                             "task_id": data[1].id
                             , "title": "Yet another task #2"
                             , "description": "Yet another task description #2"
+                            , "position": 1
                             , "updated_at": "2022-01-12T14:53:34.000Z"
                         },
                         {
                             "task_id": data[2].id
                             , "title": "Yet another task #3"
                             , "description": "Yet another task description #3"
+                            , "position": 2
                             , "updated_at": "2022-01-24T23:51:00.000Z"
                         }
                     ]
@@ -393,6 +417,7 @@ def step_impl(context):
             context.task_id
             , "Yet another task #1"
             , "Yet another task description #1"
+            , 0
             , datetime.now()
             , datetime.now()
             , context.account_ids[0]

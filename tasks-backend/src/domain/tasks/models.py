@@ -15,6 +15,7 @@ class Task(db.Model):
     id = Column(String, primary_key=True)
     title = Column(String)
     description = Column(String)
+    position = Column(Integer)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
     owner_id = Column(String, nullable=False)
@@ -24,6 +25,7 @@ class Task(db.Model):
             task_id: uuid,
             title: str,
             description: str,
+            position: int,
             created_at: datetime,
             updated_at: datetime,
             owner_id: uuid):
@@ -31,6 +33,7 @@ class Task(db.Model):
         self.id = str(task_id)
         self.title = title
         self.description = description
+        self.position = position
         self.created_at = created_at
         self.updated_at = updated_at
         self.owner_id = str(owner_id) if owner_id is not None else None
@@ -47,13 +50,14 @@ class Task(db.Model):
             task_id: uuid,
             title: str,
             description: str,
+            position: int,
             created_at: datetime,
             updated_at: datetime,
             owner_id: uuid):
 
         assert task_id is not None, "Task Id cannot be empty"
 
-        return cls(task_id, title, description, created_at, updated_at, owner_id)
+        return cls(task_id, title, description, position, created_at, updated_at, owner_id)
 
 
 class AccountTasks(db.Model):

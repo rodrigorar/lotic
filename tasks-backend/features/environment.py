@@ -98,6 +98,7 @@ def before_scenario(context, scenario):
                 JOHN_DOE_TASK_1
                 , 'John Doe Task #1'
                 , 'John Doe Task #1 Description'
+                , 0
                 , datetime.now()
                 , datetime.now()
                 , JOHN_DOE_ID))
@@ -106,6 +107,7 @@ def before_scenario(context, scenario):
                 JOHN_DOE_TASK_2
                 , 'John Doe Task #2'
                 , 'John Doe Task #2 Description'
+                , 1
                 , datetime.now()
                 , datetime.now()
                 , JOHN_DOE_ID))
@@ -114,6 +116,7 @@ def before_scenario(context, scenario):
                 JOHN_DOE_TASK_3
                 , 'John Doe Task #3'
                 , 'John Doe Task #3 Description'
+                , 2
                 , datetime.now()
                 , datetime.now()
                 , JOHN_DOE_ID))
@@ -146,6 +149,7 @@ def before_scenario(context, scenario):
                 JANE_DOE_TASK_1
                 , 'Jane Doe Task #1'
                 , 'Jane Doe Task #1 Description'
+                , 0
                 , datetime.now()
                 , datetime.now()
                 , JANE_DOE_ID))
@@ -154,6 +158,7 @@ def before_scenario(context, scenario):
                 JANE_DOE_TASK_2
                 , 'Jane Doe Task #2'
                 , 'Jane Doe Task #2 Description'
+                , 1
                 , datetime.now()
                 , datetime.now()
                 , JANE_DOE_ID))

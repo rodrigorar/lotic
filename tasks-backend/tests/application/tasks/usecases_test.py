@@ -72,18 +72,21 @@ TASK_1_ID = uuid4()
 TASK_1_TITLE = "Task #1 Title"
 TASK_1_NEW_TITLE = "Task #1 New Title"
 TASK_1_DESCRIPTION = "Task #1 Description"
+TASK_1_POSITION = 0
 TASK_1_NEW_DESCRIPTION = "Task #1 New Description"
 
 TASK_2_ID = uuid4()
 TASK_2_TITLE = "Task #2 Title"
 TASK_2_NEW_TITLE = "Task #2 New Title"
 TASK_2_DESCRIPTION = "Task #2 Description"
+TASK_2_POSITION = 1
 TASK_2_NEW_DESCRIPTION = "Task #2 New Description"
 
 TASK_3_ID = uuid4()
 TASK_3_TITLE = "Task #3 Title"
 TASK_3_NEW_TITLE = "Task #3 New Title"
 TASK_3_DESCRIPTION = "Task #3 Description"
+TASK_3_POSITION = 2
 TASK_3_NEW_DESCRIPTION = "Task #3 New Description"
 
 NOW = datetime.now()
@@ -130,9 +133,9 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
             .thenReturn(br_result)
 
         input_data = [
-            TaskDTO(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            TaskDTO(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            TaskDTO(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
+            TaskDTO(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, TASK_2_POSITION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, TASK_3_POSITION, NOW, NOW, ACCOUNT_ID)
         ]
 
         under_test = UseCaseCreateTasks(
@@ -164,7 +167,7 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
             .execute(...) \
             .thenReturn(br_result)
 
-        input_data = [TaskDTO(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID)]
+        input_data = [TaskDTO(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, NOW, NOW, ACCOUNT_ID)]
 
         under_test = UseCaseCreateTasks(
             MockedLogger()
@@ -220,9 +223,9 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
             .thenRaise(InternalError("Something went very wrong here"))
 
         input_data = [
-            TaskDTO(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            TaskDTO(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            TaskDTO(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
+            TaskDTO(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, TASK_2_POSITION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, TASK_3_POSITION, NOW, NOW, ACCOUNT_ID)
         ]
 
         under_test = UseCaseCreateTasks(
@@ -246,9 +249,9 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
             .thenReturn(None)
 
         input_data = [
-            TaskDTO(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            TaskDTO(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            TaskDTO(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
+            TaskDTO(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, TASK_2_POSITION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, TASK_3_POSITION, NOW, NOW, ACCOUNT_ID)
         ]
 
         under_test = UseCaseCreateTasks(
@@ -270,9 +273,9 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed(self):
         list_task_br_result = [
-            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(), ACCOUNT_ID)
-            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, datetime.now(), datetime.now(), ACCOUNT_ID)
-            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, datetime.now(), datetime.now(), ACCOUNT_ID)
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, datetime.now(), datetime.now(), ACCOUNT_ID)
+            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, TASK_2_POSITION, datetime.now(), datetime.now(), ACCOUNT_ID)
+            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, TASK_3_POSITION, datetime.now(), datetime.now(), ACCOUNT_ID)
         ]
         when(list_tasks_br) \
             .execute(...) \
@@ -284,9 +287,9 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
             .thenReturn(update_br_result)
 
         test_input = [
-            TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            TaskDTO(TASK_2_ID, TASK_2_NEW_TITLE, TASK_2_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            TaskDTO(TASK_3_ID, TASK_3_NEW_TITLE, TASK_3_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
+            TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, TASK_1_POSITION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_2_ID, TASK_2_NEW_TITLE, TASK_2_NEW_DESCRIPTION, TASK_2_POSITION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_3_ID, TASK_3_NEW_TITLE, TASK_3_NEW_DESCRIPTION, TASK_3_POSITION, NOW, NOW, ACCOUNT_ID)
         ]
         under_test = UseCaseUpdateTasks(
             MockedLogger()
@@ -307,7 +310,7 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_single_task(self):
         list_task_br_result = [
-            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, datetime.now(), datetime.now(),
                  ACCOUNT_ID)
         ]
         when(list_tasks_br) \
@@ -319,7 +322,7 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
             .execute(...) \
             .thenReturn(update_tasks_br_result)
 
-        test_input = [TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID)]
+        test_input = [TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, TASK_1_POSITION, NOW, NOW, ACCOUNT_ID)]
         under_test = UseCaseUpdateTasks(
             MockedLogger()
             , MockedUnitOfWorkProvider()
@@ -338,11 +341,11 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_with_partial_errors(self):
         list_task_br_result = [
-            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, datetime.now(), datetime.now(),
                  ACCOUNT_ID)
-            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, datetime.now(), datetime.now(),
+            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, TASK_2_POSITION, datetime.now(), datetime.now(),
                    ACCOUNT_ID)
-            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, datetime.now(), datetime.now(),
+            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, TASK_3_POSITION, datetime.now(), datetime.now(),
                    ACCOUNT_ID)
         ]
         when(list_tasks_br) \
@@ -356,9 +359,9 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
             .thenReturn((update_tasks_br_not_found_result, update_tasks_br_result))
 
         test_input = [
-            TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            TaskDTO(TASK_2_ID, TASK_2_NEW_TITLE, TASK_2_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            TaskDTO(TASK_3_ID, TASK_3_NEW_TITLE, TASK_3_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
+            TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, TASK_1_POSITION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_2_ID, TASK_2_NEW_TITLE, TASK_2_NEW_DESCRIPTION, TASK_2_POSITION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_3_ID, TASK_3_NEW_TITLE, TASK_3_NEW_DESCRIPTION, TASK_3_POSITION, NOW, NOW, ACCOUNT_ID)
         ]
         under_test = UseCaseUpdateTasks(
             MockedLogger()
@@ -384,7 +387,7 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
             .execute(...) \
             .thenReturn(list_task_br_result)
 
-        test_input = [TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID)]
+        test_input = [TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, TASK_1_POSITION, NOW, NOW, ACCOUNT_ID)]
         under_test = UseCaseUpdateTasks(
             MockedLogger()
             , MockedUnitOfWorkProvider()
@@ -410,11 +413,11 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_update_tasks_br_error(self):
         list_task_br_result = [
-            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, datetime.now(), datetime.now(),
                  ACCOUNT_ID)
-            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, datetime.now(), datetime.now(),
+            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, TASK_2_POSITION, datetime.now(), datetime.now(),
                    ACCOUNT_ID)
-            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, datetime.now(), datetime.now(),
+            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, TASK_3_POSITION, datetime.now(), datetime.now(),
                    ACCOUNT_ID)
         ]
         when(list_tasks_br) \
@@ -426,9 +429,9 @@ class TestUseCaseUpdateTasks(TasksUseCaseBaseTest):
             .thenRaise(InternalError("Something went very very wrong"))
 
         test_input = [
-            TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            TaskDTO(TASK_2_ID, TASK_2_NEW_TITLE, TASK_2_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            TaskDTO(TASK_3_ID, TASK_3_NEW_TITLE, TASK_3_NEW_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
+            TaskDTO(TASK_1_ID, TASK_1_NEW_TITLE, TASK_1_NEW_DESCRIPTION, TASK_1_POSITION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_2_ID, TASK_2_NEW_TITLE, TASK_2_NEW_DESCRIPTION, TASK_2_POSITION, NOW, NOW, ACCOUNT_ID),
+            TaskDTO(TASK_3_ID, TASK_3_NEW_TITLE, TASK_3_NEW_DESCRIPTION, TASK_3_POSITION, NOW, NOW, ACCOUNT_ID)
         ]
         under_test = UseCaseUpdateTasks(
             MockedLogger()
@@ -448,11 +451,11 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed(self):
         list_task_br_result = [
-            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, datetime.now(), datetime.now(),
                  ACCOUNT_ID)
-            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, datetime.now(), datetime.now(),
+            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, TASK_2_POSITION, datetime.now(), datetime.now(),
                    ACCOUNT_ID)
-            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, datetime.now(), datetime.now(),
+            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, TASK_3_POSITION, datetime.now(), datetime.now(),
                    ACCOUNT_ID)
         ]
         when(list_tasks_br) \
@@ -478,7 +481,7 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_single_task_id(self):
         list_task_br_result = [
-            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, datetime.now(), datetime.now(),
                  ACCOUNT_ID)
         ]
         when(list_tasks_br) \
@@ -515,11 +518,11 @@ class TestUseCaseDeleteTasks(TasksUseCaseBaseTest):
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_fail_delete_tasks_br_error(self):
         list_task_br_result = [
-            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, datetime.now(), datetime.now(),
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, datetime.now(), datetime.now(),
                  ACCOUNT_ID)
-            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, datetime.now(), datetime.now(),
+            , Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, TASK_2_POSITION, datetime.now(), datetime.now(),
                    ACCOUNT_ID)
-            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, datetime.now(), datetime.now(),
+            , Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, TASK_3_POSITION, datetime.now(), datetime.now(),
                    ACCOUNT_ID)
         ]
         when(list_tasks_br) \
@@ -550,9 +553,9 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed(self):
         br_result = [
-            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, NOW, NOW, ACCOUNT_ID),
-            Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, NOW, NOW, ACCOUNT_ID)
+            Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, NOW, NOW, ACCOUNT_ID),
+            Task(TASK_2_ID, TASK_2_TITLE, TASK_2_DESCRIPTION, TASK_2_POSITION, NOW, NOW, ACCOUNT_ID),
+            Task(TASK_3_ID, TASK_3_TITLE, TASK_3_DESCRIPTION, TASK_3_POSITION, NOW, NOW, ACCOUNT_ID)
         ]
         when(list_account_tasks_br) \
             .execute(...) \
@@ -577,7 +580,7 @@ class TestUseCaseListAccountTasks(TasksUseCaseBaseTest):
 
     @patch.object(AuthorizationContext, 'is_matching_account', MagicMock(return_value=True))
     def test_should_succeed_single_result(self):
-        br_result = [Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, NOW, NOW, ACCOUNT_ID)]
+        br_result = [Task(TASK_1_ID, TASK_1_TITLE, TASK_1_DESCRIPTION, TASK_1_POSITION, NOW, NOW, ACCOUNT_ID)]
         when(list_account_tasks_br) \
             .execute(...) \
             .thenReturn(br_result)

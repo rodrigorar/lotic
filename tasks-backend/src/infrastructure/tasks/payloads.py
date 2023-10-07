@@ -1,4 +1,3 @@
-import json
 import uuid
 
 from dateutil import parser
@@ -11,6 +10,7 @@ class CreateTaskRequest(BaseModel):
     id: str = Field(None, description="Task id")
     title: str = Field(None, description="Task title")
     description: str = Field(None, description="Task description")
+    position: int = Field(None, description="Task position in list")
     created_at: str = Field(None, description="Date when the task was created")
     updated_at: str = Field(None, description="Date of the last time the task was updated")
     owner_id: str = Field(None, description="Task owner information")
@@ -20,6 +20,7 @@ class CreateTaskRequest(BaseModel):
             , task_id: str
             , title: str
             , description: str
+            , position: int
             , created_at: str
             , updated_at: str
             , owner_id: str):
@@ -28,6 +29,7 @@ class CreateTaskRequest(BaseModel):
         self.id = task_id
         self.title = title
         self.description = description
+        self.position = position
         self.created_at = created_at
         self.updated_at = updated_at
         self.owner_id = owner_id
@@ -37,6 +39,7 @@ class CreateTaskRequest(BaseModel):
             uuid.UUID(self.id)
             , self.title
             , self.description
+            , self.position
             , parser.parse(self.created_at)
             , parser.parse(self.updated_at)
             , uuid.UUID(self.owner_id))
@@ -56,6 +59,7 @@ class CreateTasksRequest(BaseModel):
                         task["task_id"]
                         , task["title"]
                         , task["description"]
+                        , task["position"]
                         , task["created_at"]
                         , task["updated_at"]
                         , task["owner_id"]
@@ -78,6 +82,7 @@ class UpdateTaskRequest(BaseModel):
     id: str = Field(None, description="Task id")
     title: str = Field(None, description="Task title")
     description: str = Field(None, description="Task description")
+    position: int = Field(None, description="Task position in list")
     updated_at: str = Field(None, description="Last time the task was updated")
 
     def __init__(
@@ -85,12 +90,14 @@ class UpdateTaskRequest(BaseModel):
             , task_id: str
             , title: str
             , description: str
+            , position: int
             , updated_at: str):
         super().__init__()
 
         self.id = task_id
         self.title = title
         self.description = description
+        self.position = position
         self.updated_at = updated_at
 
     def to_dto(self):
@@ -98,6 +105,7 @@ class UpdateTaskRequest(BaseModel):
             uuid.UUID(self.id)
             , self.title
             , self.description
+            , self.position
             , None
             , parser.parse(self.updated_at)
             , None
@@ -117,6 +125,7 @@ class UpdateTasksRequest(BaseModel):
                     task["task_id"]
                     , task["title"]
                     , task["description"]
+                    , task["position"]
                     , task["updated_at"]))
         self.tasks = task_entries
 
@@ -128,6 +137,7 @@ class TaskResponse(BaseModel):
     task_id: str = Field(None, description="Task id")
     title: str = Field(None, description="Task title")
     description: str = Field(None, description="Task description")
+    position: int = Field(None, description="Task position in list")
     owner_id: str = Field(None, description="Tasks owner id")
 
     def __init__(self, task: TaskDTO):
@@ -136,6 +146,7 @@ class TaskResponse(BaseModel):
         self.task_id = task.id
         self.title = task.title
         self.description = task.description
+        self.position = task.position
         self.owner_id = task.owner_id
 
 

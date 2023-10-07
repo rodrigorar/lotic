@@ -12,15 +12,21 @@ from tests.shared import UnitOfWorkMockProvider
 
 ACCOUNT_1_ID = uuid4()
 ACCOUNT_2_ID = uuid4()
+
 TASK_1_ID = uuid4()
 TASK_1_TITLE = "Task Title #1"
 TASK_1_DESCRIPTION = "Test Description #1"
+TASK_1_POSITION = 0
+
 TASK_2_ID = uuid4()
 TASK_2_TITLE = "Task Title #2"
 TASK_2_DESCRIPTION = "Task Description #2"
+TASK_2_POSITION = 1
+
 TASK_3_ID = uuid4()
 TASK_3_TITLE = "Task Title #3"
 TASK_3_DESCRIPTION = "Task Description #3"
+TASK_3_POSITION = 2
 
 
 class TestCreateTasks(DomainUnitTestsBase):
@@ -33,6 +39,7 @@ class TestCreateTasks(DomainUnitTestsBase):
                 TASK_1_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_1_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -40,6 +47,7 @@ class TestCreateTasks(DomainUnitTestsBase):
                 TASK_2_ID
                 , TASK_2_TITLE
                 , TASK_2_DESCRIPTION
+                , TASK_2_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -47,6 +55,7 @@ class TestCreateTasks(DomainUnitTestsBase):
                 TASK_3_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_3_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -114,6 +123,7 @@ class TestCreateTasks(DomainUnitTestsBase):
                 TASK_1_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_1_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -121,6 +131,7 @@ class TestCreateTasks(DomainUnitTestsBase):
                 TASK_2_ID
                 , TASK_2_TITLE
                 , TASK_2_DESCRIPTION
+                , TASK_2_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -128,6 +139,7 @@ class TestCreateTasks(DomainUnitTestsBase):
                 TASK_3_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_1_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -159,6 +171,7 @@ class TestCreateTasks(DomainUnitTestsBase):
                 TASK_1_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_1_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -166,6 +179,7 @@ class TestCreateTasks(DomainUnitTestsBase):
                 TASK_2_ID
                 , TASK_2_TITLE
                 , TASK_2_DESCRIPTION
+                , TASK_2_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -173,6 +187,7 @@ class TestCreateTasks(DomainUnitTestsBase):
                 TASK_3_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_3_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -217,6 +232,7 @@ class TestUpdateTasks(DomainUnitTestsBase):
                 TASK_1_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_1_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -224,6 +240,7 @@ class TestUpdateTasks(DomainUnitTestsBase):
                 TASK_2_ID
                 , TASK_2_TITLE
                 , TASK_2_DESCRIPTION
+                , TASK_2_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -231,6 +248,7 @@ class TestUpdateTasks(DomainUnitTestsBase):
                 TASK_3_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_3_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -283,6 +301,7 @@ class TestUpdateTasks(DomainUnitTestsBase):
                 TASK_1_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_1_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -290,6 +309,7 @@ class TestUpdateTasks(DomainUnitTestsBase):
                 TASK_2_ID
                 , TASK_2_TITLE
                 , TASK_2_DESCRIPTION
+                , TASK_2_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -297,6 +317,7 @@ class TestUpdateTasks(DomainUnitTestsBase):
                 TASK_3_ID
                 , TASK_3_TITLE
                 , TASK_3_DESCRIPTION
+                , TASK_3_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -343,6 +364,7 @@ class TestUpdateTasks(DomainUnitTestsBase):
                 TASK_1_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_1_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -350,6 +372,7 @@ class TestUpdateTasks(DomainUnitTestsBase):
                 TASK_2_ID
                 , TASK_2_TITLE
                 , TASK_2_DESCRIPTION
+                , TASK_2_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -357,6 +380,7 @@ class TestUpdateTasks(DomainUnitTestsBase):
                 TASK_3_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_3_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -393,6 +417,7 @@ class TestListTasks(DomainUnitTestsBase):
                 TASK_1_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_1_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -400,6 +425,7 @@ class TestListTasks(DomainUnitTestsBase):
                 TASK_2_ID
                 , TASK_2_TITLE
                 , TASK_2_DESCRIPTION
+                , TASK_2_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -407,6 +433,7 @@ class TestListTasks(DomainUnitTestsBase):
                 TASK_3_ID
                 , TASK_1_TITLE
                 , TASK_1_DESCRIPTION
+                , TASK_3_POSITION
                 , datetime.now()
                 , datetime.now()
                 , ACCOUNT_1_ID)
@@ -621,9 +648,9 @@ class TestListTasksForAccount(DomainUnitTestsBase):
         now = datetime.now()
 
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
-        task_1 = Task(task_1_id, "Task #1 Title", "Task #1 Description", now, now, account_id)
-        task_2 = Task(task_2_id, "Task #2 Title", "Task #2 Description", now, now, account_id)
-        task_3 = Task(task_3_id, "Task #3 Title", "Task #3 Description", now, now, account_id)
+        task_1 = Task(task_1_id, "Task #1 Title", "Task #1 Description", 0, now, now, account_id)
+        task_2 = Task(task_2_id, "Task #2 Title", "Task #2 Description", 1, now, now, account_id)
+        task_3 = Task(task_3_id, "Task #3 Title", "Task #3 Description", 2, now, now, account_id)
         mocked_tasks_repository = mock(TasksRepository)
         when(mocked_tasks_repository) \
             .list_tasks(mocked_unit_of_work, [task_1_id, task_2_id, task_3_id]) \
