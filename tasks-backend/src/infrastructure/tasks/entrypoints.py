@@ -35,7 +35,6 @@ tasks_bp = APIBlueprint(
 )
 def create_tasks(body: CreateTasksRequest):
     logger.info("Endpoint: Create Tasks")
-
     use_case = TasksUseCaseProvider.create_task()
     result = use_case.execute(body.to_dto())
 

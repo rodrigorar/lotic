@@ -35,6 +35,7 @@ class TasksRepositoryImpl(TasksRepository):
 
             task.title = update_data[0].title if update_data[0].title is not None else task.title
             task.description = update_data[0].description if update_data[0].description is not None else task.description
+            task.position = update_data[0].position if update_data[0].position is not None else task.position
             task.updated_at = update_data[0].updated_at
 
         query.flush()
