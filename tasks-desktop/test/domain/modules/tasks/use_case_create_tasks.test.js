@@ -10,6 +10,7 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
             {
                 id: v4()
                 , title: "Test task #1"
+                , position: 0
                 , createdAt: new Date()
                 , updatedAt: new Date()
                 , ownerId: ownerId
@@ -37,11 +38,13 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
             expect(tasksData.map(value => value.title)).toContain(task.title);
             expect(task.ownerId).toBe(ownerId);
         });
+        mockedTasksRepository.getMaxPosition = jest.fn((unitOfWork) => 0);
 
         const underTest = new UseCaseCreateTasks(mockedTasksRepository);
         await underTest.execute(unitOfWork, tasksData);
 
         expect(mockedTasksRepository.save.mock.calls).toHaveLength(3);
+        expect(mockedTasksRepository.getMaxPosition.mock.calls).toHaveLength(1);
     });
 
     it("Should succeed creating a single task", async () => {
@@ -64,11 +67,13 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
             expect(tasksData.map(value => value.title)).toContain(task.title);
             expect(task.ownerId).toBe(ownerId);
         });
+        mockedTasksRepository.getMaxPosition = jest.fn((unitOfWork) => 0);
 
         const underTest = new UseCaseCreateTasks(mockedTasksRepository);
         await underTest.execute(unitOfWork, tasksData);
 
         expect(mockedTasksRepository.save.mock.calls).toHaveLength(1);
+        expect(mockedTasksRepository.getMaxPosition.mock.calls).toHaveLength(1);
     });
 
     it("Should succeed creating no tasks", async () => {
@@ -77,11 +82,13 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
 
         const mockedTasksRepository = jest.fn();
         mockedTasksRepository.save = jest.fn((unitOfWork, task) => { /* Do Nothing */ });
+        mockedTasksRepository.getMaxPosition = jest.fn((unitOfWork) => 0);
 
         const underTest = new UseCaseCreateTasks(mockedTasksRepository);
         await underTest.execute(unitOfWork, tasksData);
 
         expect(mockedTasksRepository.save.mock.calls).toHaveLength(0);
+        expect(mockedTasksRepository.getMaxPosition.mock.calls).toHaveLength(1);
     });
 
     it("Should fail, tasks repository error", async () => {
@@ -91,6 +98,7 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
             {
                 id: v4()
                 , title: "Test task #1"
+                , position: 0
                 , createdAt: new Date()
                 , updatedAt: new Date()
                 , ownerId: ownerId
@@ -98,6 +106,7 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
             {
                 id: v4()
                 , title: "Test task #2"
+                , position: 1
                 , createdAt: new Date()
                 , updatedAt: new Date()
                 , ownerId: ownerId
@@ -105,6 +114,7 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
             {
                 id: v4()
                 , title: "Test task #3"
+                , position: 2
                 , createdAt: new Date()
                 , updatedAt: new Date()
                 , ownerId: ownerId
@@ -117,11 +127,13 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
                 throw new Error();
             }
         });
+        mockedTasksRepository.getMaxPosition = jest.fn((unitOfWork) => 0);
 
         const underTest = new UseCaseCreateTasks(mockedTasksRepository);
         expect(underTest.execute(unitOfWork, tasksData)).rejects.toThrow(Error);
 
-        expect(mockedTasksRepository.save.mock.calls).toHaveLength(1);
+        expect(mockedTasksRepository.save.mock.calls).toHaveLength(0);
+        expect(mockedTasksRepository.getMaxPosition.mock.calls).toHaveLength(1);
     });
 
     it("Should fail, no unit of work provided", async () => {

@@ -43,7 +43,7 @@ class UseCaseCreateTask extends Command {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskData, "No task data was provided!");
 
-        if (! taskData.position) {
+        if (taskData.position == undefined) {
             taskData.position = await this.tasksRepository.getMaxPosition(unitOfWork) + 1;
         }
 

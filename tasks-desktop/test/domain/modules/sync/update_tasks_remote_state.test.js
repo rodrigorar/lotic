@@ -14,9 +14,9 @@ describe("[Sync]: Test Update Tasks Remote State Effect", () => {
     it("Should succeed update tasks remotelly", async () => {
         const accountId = v4();
         const unsyncedTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, new Date(), new Date(), accountId)
         ];
         const unsyncedTaskSync = [
             new TaskSync(v4(), unsyncedTasks[0].id, TASK_SYNC_STATUS["LOCAL"], new Date(), new Date())
@@ -112,9 +112,9 @@ describe("[Sync]: Test Update Tasks Remote State Effect", () => {
     it("Should fail, list by id error", async () => {
         const accountId = v4();
         const unsyncedTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, new Date(), new Date(), accountId)
         ];
         const unsyncedTaskSync = [
             new TaskSync(v4(), unsyncedTasks[0].id, TASK_SYNC_STATUS["LOCAL"], new Date(), new Date())
@@ -151,9 +151,9 @@ describe("[Sync]: Test Update Tasks Remote State Effect", () => {
     it("Should fail, remote call error", async () => {
         const accountId = v4();
         const unsyncedTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, new Date(), new Date(), accountId)
         ];
         const unsyncedTaskSync = [
             new TaskSync(v4(), unsyncedTasks[0].id, TASK_SYNC_STATUS["LOCAL"], new Date(), new Date())
@@ -191,9 +191,9 @@ describe("[Sync]: Test Update Tasks Remote State Effect", () => {
     it("Should fail, mark synced error", async () => {
         const accountId = v4();
         const unsyncedTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, new Date(), new Date(), accountId)
         ];
         const unsyncedTaskSync = [
             new TaskSync(v4(), unsyncedTasks[0].id, TASK_SYNC_STATUS["LOCAL"], new Date(), new Date())

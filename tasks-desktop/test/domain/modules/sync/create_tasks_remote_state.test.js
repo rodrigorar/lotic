@@ -16,9 +16,9 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const refreshToken = v4();
         const accountId = v4();
         const unsyncedTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, new Date(), new Date(), accountId)
         ];
         const unsyncedTaskSyncs = [
             new TaskSync(v4(), unsyncedTasks[0].id, TASK_SYNC_STATUS.LOCAL, new Date(), new Date())
@@ -111,9 +111,9 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const refreshToken = v4();
         const accountId = v4();
         const unsyncedTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, new Date(), new Date(), accountId)
         ];
         const unsyncedTaskSyncs = [
             new TaskSync(v4(), unsyncedTasks[0].id, TASK_SYNC_STATUS.LOCAL, new Date(), new Date())
@@ -208,9 +208,9 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const refreshToken = v4();
         const accountId = v4();
         const unsyncedTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, new Date(), new Date(), accountId)
         ];
         const unsyncedTaskSyncs = [
             new TaskSync(v4(), unsyncedTasks[0].id, TASK_SYNC_STATUS["LOCAL"], new Date(), new Date())
@@ -266,9 +266,9 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const refreshToken = v4();
         const accountId = v4();
         const unsyncedTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, new Date(), new Date(), accountId)
         ];
         const unsyncedTaskSyncs = [
             new TaskSync(v4(), unsyncedTasks[0].id, TASK_SYNC_STATUS["LOCAL"], new Date(), new Date())
