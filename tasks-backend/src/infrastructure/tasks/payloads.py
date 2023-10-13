@@ -29,7 +29,7 @@ class CreateTaskRequest(BaseModel):
         self.id = task_id
         self.title = title
         self.description = description
-        self.position = position
+        self.position = position or 0
         self.created_at = created_at
         self.updated_at = updated_at
         self.owner_id = owner_id
@@ -58,8 +58,8 @@ class CreateTasksRequest(BaseModel):
                     CreateTaskRequest(
                         task["task_id"]
                         , task["title"]
-                        , task["description"]
-                        , task["position"]
+                        , task.get("description", "")
+                        , task.get("position", 0) # TODO: After apps are migrated this should become mandatory
                         , task["created_at"]
                         , task["updated_at"]
                         , task["owner_id"]

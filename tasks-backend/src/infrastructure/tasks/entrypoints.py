@@ -1,11 +1,10 @@
 import uuid
 
-from flask import request
 from flask_openapi3 import APIBlueprint, Tag
 from pydantic import BaseModel, Field
 
-from src.domain import InvalidArgumentError, LogProvider
-from src.infrastructure import from_json, to_json
+from src.domain import LogProvider
+from src.infrastructure import to_json
 from src.infrastructure.error_handlers import ConflictResponse, GenericErrorResponse, \
     NotFoundResponse, \
     UnauthorizedResponse
