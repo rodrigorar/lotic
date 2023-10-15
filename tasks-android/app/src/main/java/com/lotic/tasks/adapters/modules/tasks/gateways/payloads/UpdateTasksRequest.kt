@@ -8,6 +8,7 @@ data class UpdateTaskRequest(
     @SerializedName("task_id") val taskId: String
     , @SerializedName("title") val title: String
     , @SerializedName("description") val description: String
+    , @SerializedName("position") val position: Int
     , @SerializedName("updated_at") val updatedAt: String) {
 
     companion object {
@@ -16,6 +17,7 @@ data class UpdateTaskRequest(
                 task.id.value.toString()
                 , task.title.value
                 , task.description.value
+                , task.position.value
                 , task.updatedAt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
         }
     }

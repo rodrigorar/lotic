@@ -1,5 +1,9 @@
 package com.lotic.tasks.ui.components
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -13,6 +17,8 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -36,8 +42,7 @@ fun TaskComponent(
 
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly
-        , modifier = modifier
-            .padding(2.dp)
+        , modifier = modifier.padding(2.dp)
     ) {
         val focusManager = LocalFocusManager.current
 

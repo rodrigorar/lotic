@@ -3,6 +3,7 @@ package com.lotic.tasks.ui
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.runtime.toMutableStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +23,7 @@ import com.lotic.tasks.domain.shared.events.Event
 import com.lotic.tasks.domain.shared.events.Subscriber
 import com.lotic.tasks.domain.shared.value_objects.Description
 import com.lotic.tasks.domain.shared.value_objects.Id
+import com.lotic.tasks.domain.shared.value_objects.Position
 import com.lotic.tasks.domain.shared.value_objects.Title
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -124,11 +126,19 @@ class TasksViewModel : ViewModel() {
             val currentActiveAuthSessionProvider = AuthOperationsProvider.currentActiveAuthSessionProvider()
             val createTaskOperation = TasksOperationsProvider.createTask()
 
+            var maxPosition = 0;
+            uiState.taskList.forEach {
+                if (it.position.value > maxPosition) {
+                    maxPosition = it.position.value
+                }
+            }
+
             createTaskOperation.execute(
                 Task(
                     id = Task.newId()
                     , title = Title.of("")
                     , description = Description.of("")
+                    , position = Position.of(maxPosition + 1)
                     , createdAt = ZonedDateTime.now()
                     , updatedAt = ZonedDateTime.now()
                     , ownerId = currentActiveAuthSessionProvider.get()?.accountId)
@@ -177,5 +187,21 @@ class TasksViewModel : ViewModel() {
             taskList = taskList
             , taskTitles = taskList.map { it.id.value to it.title.value }.toMutableStateMap()
             , taskCheckboxes = taskList.map { it.id.value to false }.toMutableStateMap())
+    }
+
+    fun reorderTask(from: Int, to: Int) {
+        val mutableTaskList = uiState.taskList.toMutableStateList()
+        mutableTaskList.apply { add(to, removeAt(from)) }
+        uiState = uiState.copy(taskList = mutableTaskList.toList())
+
+        viewModelScope.launch {
+            val updateTaskOperation = TasksOperationsProvider.updateTask();
+
+            val fromTask = uiState.taskList[from];
+            updateTaskOperation.execute(fromTask.copy(position = Position.of(from)))
+
+            val toTask = uiState.taskList[to];
+            updateTaskOperation.execute(toTask.copy(position = Position.of(to)))
+        }
     }
 }

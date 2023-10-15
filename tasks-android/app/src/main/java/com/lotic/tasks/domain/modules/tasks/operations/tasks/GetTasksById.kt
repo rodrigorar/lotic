@@ -6,7 +6,6 @@ import com.lotic.tasks.domain.modules.tasks.Task
 import com.lotic.tasks.domain.modules.tasks.TasksRepository
 import com.lotic.tasks.domain.shared.operations.Query
 import com.lotic.tasks.domain.shared.value_objects.Id
-import java.util.*
 
 class GetTasksById(
     private val tasksRepository: TasksRepository
@@ -15,8 +14,10 @@ class GetTasksById(
 
     override suspend fun execute(parameter: List<Id<Task>>): List<Task> {
         val authSession: AuthToken? = authSessionProvider.get()
-        return authSession?.let {
-            this.tasksRepository.getTasksById(it.accountId.value, parameter)
+        return authSession?.let { authToken ->
+            this.tasksRepository
+                .getTasksById(authToken.accountId.value, parameter)
+                .sortedBy { it.position.value }
         }.orEmpty()
     }
 

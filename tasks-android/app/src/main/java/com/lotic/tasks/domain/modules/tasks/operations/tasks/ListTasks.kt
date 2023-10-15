@@ -15,7 +15,9 @@ class ListTasks(
         val activeUser: AuthToken? = this.currentActiveAuthSessionProvider.get();
 
         return if (activeUser != null) {
-            this.tasksRepository.listTasksForAccount(activeUser.accountId)
+            this.tasksRepository
+                .listTasksForAccount(activeUser.accountId)
+                .sortedBy { it.position.value }
         } else {
             emptyList()
         }

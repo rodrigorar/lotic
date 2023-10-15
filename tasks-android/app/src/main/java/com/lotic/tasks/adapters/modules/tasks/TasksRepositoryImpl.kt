@@ -25,6 +25,7 @@ class TasksRepositoryImpl(private val tasksDAO: DAOTasks) : TasksRepository {
             it.copy(
                 title = if (entity.title.value != it.title) entity.title.value else it.title
                 , description = if (entity.description.value != it.description) entity.description.value else it.description
+                , position = if (entity.position.value != it.position) entity.position.value else it.position
                 , updatedAt = ZonedDateTime.now().toString())
         }
         updatedTask?.also { this.tasksDAO.update(it) }
