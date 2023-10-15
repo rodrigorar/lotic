@@ -133,7 +133,7 @@ class UpdateTasksLocalStateEffect extends StateEffect {
                     , {
                         id: entry.task_id
                         , title: entry.title
-                        , position: entry.position ? entry.position : undefined
+                        , position: entry.position
                         , createdAt: new Date() // FIXME: This should come from the server
                         , updatedAt: new Date() // FIXME: This should come from the server
                         , ownerId: entry.owner_id
