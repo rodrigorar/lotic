@@ -33,9 +33,9 @@ class TasksRepositoryImpl(TasksRepository):
         for task in existing_tasks:
             update_data = list(filter(lambda entry: entry.get_id() == task.get_id(), tasks))
 
-            task.title = update_data[0].title if update_data[0].title is not None else task.title
-            task.description = update_data[0].description if update_data[0].description is not None else task.description
-            task.position = update_data[0].position if update_data[0].position is not None else task.position
+            task.title = task.title or update_data[0].title
+            task.description = task.description or update_data[0].description
+            task.position = task.position or update_data[0].position
             task.updated_at = update_data[0].updated_at
 
         query.flush()

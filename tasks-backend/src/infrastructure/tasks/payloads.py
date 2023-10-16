@@ -29,6 +29,7 @@ class CreateTaskRequest(BaseModel):
         self.id = task_id
         self.title = title
         self.description = description
+        # TODO: Stops being optional after the apps catch up to this.
         self.position = position or 0
         self.created_at = created_at
         self.updated_at = updated_at
@@ -124,8 +125,8 @@ class UpdateTasksRequest(BaseModel):
                 .append(UpdateTaskRequest(
                     task["task_id"]
                     , task["title"]
-                    , task["description"]
-                    , task["position"]
+                    , task.get("description", "")
+                    , task.get("position", 0) # TODO: Should be changed after apps catch up
                     , task["updated_at"]))
         self.tasks = task_entries
 
