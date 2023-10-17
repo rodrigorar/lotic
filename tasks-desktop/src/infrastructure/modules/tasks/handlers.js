@@ -15,6 +15,7 @@ const {
 } = require("./providers");
 const { RunUnitOfWork } = require("../../persistence/unitofwork");
 const { EventBus, Event, EventType } = require("../../../domain/shared/event-bus");
+const { SynchManager } = require('../sync/synch-manager');
 
 async function handleCreateTask(event, newTask) {
     const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
@@ -111,21 +112,17 @@ async function handleTaskRepositioning(event, targetTaskId, draggedTaskId) {
     EventBus.publish(new Event(EventType.REPOSITION_TASKS_SUCCESS, {}));
 }
 
-async function handleLogout(event, accountId) {
-    const useCaseDeleteAllTasksForAccount = UseCaseDeleteAllTasksForAccountProvider.get();
-    const useCaseDeleteAllTaskSyncsForAccount = UseCaseDeleteAllTaskSyncsForAccountProvider.get();
-
-    await RunUnitOfWork.run(async (unitOfWork) => {
-        await useCaseDeleteAllTaskSyncsForAccount.execute(unitOfWork, accountId);
-        await useCaseDeleteAllTasksForAccount.execute(unitOfWork, accountId);
+function configure(ipcMain) {
+    ipcMain.on('tasks:create', handleCreateTask);
+    ipcMain.on('tasks:update', handleUpdateTasks);
+    ipcMain.on('tasks:complete', handleCompletion);
+    ipcMain.handle('tasks:list', handleListTasks);
+    ipcMain.on('tasks:reposition', handleTaskRepositioning);
+    ipcMain.on('tasks:refresh', (event) => {
+        SynchManager.execute();
     });
 }
 
 module.exports.TasksHandler = {
-    handleCreateTask
-    , handleUpdateTasks
-    , handleCompletion
-    , handleListTasks
-    , handleTaskRepositioning
-    , handleLogout
+    configure
 }

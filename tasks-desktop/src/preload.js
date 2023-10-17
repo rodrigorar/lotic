@@ -38,7 +38,7 @@ contextBridge.exposeInMainWorld('accounts', {
 // auth
 
 contextBridge.exposeInMainWorld('auth', {
-    login: (loginData) => ipcRenderer.send('auth:login', loginData)
+    signin: (signInData) => ipcRenderer.send('auth:signin', signInData)
     , logout: () => ipcRenderer.send('auth:logout')
     , isLoggedIn: () => ipcRenderer.invoke('auth:is_logged_in')
     , handleLoggedIn: (callback) => ipcRenderer.on('auth:logged_in', callback)

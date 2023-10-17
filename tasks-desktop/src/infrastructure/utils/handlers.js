@@ -4,6 +4,10 @@ async function handleGenerateId() {
     return await generateId();
 }
 
+function configure(ipcMain) {
+    ipcMain.handle('utils:id:generate', handleGenerateId);
+}
+
 module.exports.UtilsHandler = {
-    handleGenerateId
+    configure
 }

@@ -5,10 +5,9 @@ const path = require('path');
 const { LoggerHandler } = require('./infrastructure/logging/handlers');
 const { UtilsHandler } = require('./infrastructure/utils/handlers');
 const { TasksHandler } = require('./infrastructure/modules/tasks/handlers');
+const { AuthHandler } = require('./infrastructure/modules/auth/handlers');
 const { OSMask, isDev } = require('./infrastructure/os/os-mask');
 const { SynchManager } = require('./infrastructure/modules/sync/synch-manager');
-const { AuthHandlers } = require('./infrastructure/modules/auth/handlers');
-const { UseCaseLoginProvider, UseCaseGetActiveSessionProvider } = require('./infrastructure/modules/auth/providers');
 const { EventBus, EventType, EventSubscriber } = require('./domain/shared/event-bus');
 const { RunUnitOfWork } = require('./infrastructure/persistence/unitofwork');
 const { v4 } = require('uuid');
@@ -17,7 +16,7 @@ const {
   , UseCaseUpdateTaskOwnerProvider
   , UseCaseListTasksForAccountProvider 
 } = require('./infrastructure/modules/tasks/providers');
-const { UseCaseCreateAccountProvider } = require('./infrastructure/modules/accounts/providers');
+const { AccountsHandler } = require('./infrastructure/modules/accounts/handlers');
 
 app.setName('Tasks');
 
@@ -54,11 +53,10 @@ app.on('ready', () => {
   Menu.setApplicationMenu(null);
 
   if (schemaMigrationSemaphor) {
-    // Run Synch Manager at the start
     SynchManager.execute();
   }
 
-  // TODO: This cron should come from a config file.
+  // FIXME: This cron should come from a config file.
   cron.schedule('*/30 * * * * *', () => {
     if (schemaMigrationSemaphor) {
       SynchManager.execute();
@@ -90,71 +88,20 @@ app.on('ready', () => {
   globalShortcut.register("F6", () => {
     SynchManager.execute(mainWindow.webContents);
   });
+
+  LoggerHandler.configure(ipcMain);
+  UtilsHandler.configure(ipcMain);
+  TasksHandler.configure(ipcMain);
+  AccountsHandler.configure(ipcMain, mainWindow);
+  AuthHandler.configure(ipcMain);
 });
 
-// Logging Event Listeners
-
-ipcMain.on('log:trace', LoggerHandler.handleTraceLog);
-ipcMain.on('log:info', LoggerHandler.handleInfoLog);
-ipcMain.on('log:warn', LoggerHandler.handleWarnLog);
-ipcMain.on('log:error', LoggerHandler.handleErrorLog);
-
-// Utils Event Listeners
-
-ipcMain.handle('utils:id:generate', UtilsHandler.handleGenerateId);
-
-// Tasks Event Listeners
-
-ipcMain.on('tasks:create', TasksHandler.handleCreateTask);
-ipcMain.on('tasks:update', TasksHandler.handleUpdateTasks);
-ipcMain.on('tasks:complete', TasksHandler.handleCompletion);
-ipcMain.handle('tasks:list', TasksHandler.handleListTasks);
-ipcMain.on('tasks:reposition', TasksHandler.handleTaskRepositioning);
-ipcMain.on('tasks:refresh', (event) => {
-  SynchManager.execute();
-});
-
-// Navigation Event Listeners
-
-ipcMain.on('nav:open:login', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/login/login.html')));
+ipcMain.on('nav:open:login', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/signin/signin.html')));
 ipcMain.on('nav:open:about', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/about/about.html')));
 ipcMain.on('nav:open:home', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html')));
 ipcMain.on('nav:open:signup', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/signup/signup.html')))
 
-// Auth Event Listeners FIXME: Move this to handlers
-
-ipcMain.on('accounts:signup', async (event, signUpData) => {
-  RunUnitOfWork.run(async (unitOfWork) => {
-    const useCaseCreateLocalAccount = UseCaseCreateAccountProvider.get();
-    await useCaseCreateLocalAccount.execute(unitOfWork, signUpData);
-
-    mainWindow.loadFile(path.join(__dirname, 'ui/login/login.html'));
-
-    setTimeout(() => {
-      webContents.getFocusedWebContents().send('accounts:signup_success', {
-        message: "Account Created, Please Log In"
-      });
-    }, 250);
-  });
-});
-ipcMain.on('auth:login', async (event, loginData) => {
-    const useCaseLogin = UseCaseLoginProvider.get();
-    await RunUnitOfWork.run(async (unitOfWork) => {
-        await useCaseLogin.execute(unitOfWork, loginData);
-    });
-});
-ipcMain.on('auth:logout', async (event) => {
-  const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
-  const activeSession = await RunUnitOfWork.run(async (unitOfWork) => {
-    return await useCaseGetActiveSession.execute(unitOfWork);
-  }); 
-  await TasksHandler.handleLogout(event, activeSession.accountId);
-  await AuthHandlers.handleLogout(event); // This one has to be last, we need to know which account is logging out
-});
-ipcMain.handle('auth:is_logged_in', AuthHandlers.handleIsLoggedIn);
-
 // UI Event Listeners
-
 
 EventBus.register(
   EventType.REPOSITION_TASKS_SUCCESS
@@ -184,7 +131,6 @@ EventBus.registerForSeveralEventTypes(
 EventBus.register(
   EventType.SYNC_STARTED
   , new EventSubscriber(v4(), (event) => {
-    // FIXME: Validate if the Main Window / Web Contents still exist before calling it
     mainWindow.webContents.send("ui:loading:start");
   })
 );
@@ -192,7 +138,6 @@ EventBus.register(
 EventBus.register(
   EventType.SYNC_ENDED
   , new EventSubscriber(v4(), (event) => {
-    // FIXME: Validate if the Main Window / Web Contents still exist before calling it  
     mainWindow.webContents.send("ui:loading:end")
   })
 );

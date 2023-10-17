@@ -1,7 +1,7 @@
 
 const emailInput = document.querySelector("#email-input");
 const passwordInput = document.querySelector("#password-input");
-const loginButton = document.querySelector("#submit-button");
+const signinButton = document.querySelector("#submit-button");
 const about = document.querySelector("#about");
 const notificationContainer = document.querySelector("#notification-container");
 
@@ -9,9 +9,9 @@ emailInput.focus();
 
 // Event Handlers
 
-loginButton.addEventListener('click', async (event) => {
+signinButton.addEventListener('click', async (event) => {
     document.querySelector("#loader").classList = ["loader"];
-    auth.login({
+    auth.signin({
         email: emailInput.value
         , password: passwordInput.value
     });
@@ -20,7 +20,7 @@ loginButton.addEventListener('click', async (event) => {
 window.addEventListener('keypress', (key) => {
     if (key.code === 'Enter') {
         document.querySelector("#loader").classList = ["loader"];
-        auth.login({
+        auth.signin({
             email: emailInput.value
             , password: passwordInput.value
         });

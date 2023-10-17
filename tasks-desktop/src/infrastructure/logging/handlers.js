@@ -17,9 +17,13 @@ function handleErrorLog(event, error) {
   Logger.error(error);
 }
 
+function configure(ipcMain) {
+  ipcMain.on('log:trace', handleTraceLog);
+  ipcMain.on('log:info', handleInfoLog);
+  ipcMain.on('log:warn', handleWarnLog);
+  ipcMain.on('log:error', handleErrorLog);
+}
+
 module.exports.LoggerHandler = {
-  handleTraceLog,
-  handleInfoLog,
-  handleWarnLog,
-  handleErrorLog
+  configure
 }
