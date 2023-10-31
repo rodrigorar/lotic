@@ -14,8 +14,14 @@ const { v4 } = require('uuid');
 const { 
   UseCaseListTasksWithoutOwnerProvider
   , UseCaseUpdateTaskOwnerProvider
-  , UseCaseListTasksForAccountProvider 
+  , UseCaseListTasksForAccountProvider
+  , UseCaseDeleteAllTasksForAccountProvider
+  , UseCaseDeleteAllTaskSyncsForAccountProvider
 } = require('./infrastructure/modules/tasks/providers');
+const {
+  UseCaseLogoutProvider
+  , UseCaseGetActiveSessionProvider
+} = require('./infrastructure/modules/auth/providers');
 const { AccountsHandler } = require('./infrastructure/modules/accounts/handlers');
 
 app.setName('Tasks');
@@ -112,7 +118,23 @@ EventBus.register(
 
 EventBus.register(
   EventType.REFRESH_FAILED
-  , new EventSubscriber(v4(), (event) => mainWindow.webContents.send("auth:logged_out")));
+  , new EventSubscriber(v4(), async (event) => {
+      const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
+      const useCaseDeleteAllTasksForAccount = UseCaseDeleteAllTasksForAccountProvider.get();
+      const useCaseDeleteAllTaskSyncsForAccount = UseCaseDeleteAllTaskSyncsForAccountProvider.get();
+      const useCaseLogout = UseCaseLogoutProvider.get();
+
+      await RunUnitOfWork.run(async (unitOfWork) => {
+          const activeSession = await useCaseGetActiveSession.execute(unitOfWork);
+          
+          await useCaseDeleteAllTaskSyncsForAccount.execute(unitOfWork, activeSession.accountId);
+          await useCaseDeleteAllTasksForAccount.execute(unitOfWork, activeSession.accountId);
+
+          await useCaseLogout.execute(unitOfWork, activeSession);
+      });
+
+      mainWindow.webContents.send("auth:logged_out");
+  }));
 
 EventBus.registerForSeveralEventTypes(
   [EventType.CREATED_LOCAL_TASKS, EventType.DELETED_LOCAL_TASKS]
