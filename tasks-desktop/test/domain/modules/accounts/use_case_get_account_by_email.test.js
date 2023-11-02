@@ -16,7 +16,7 @@ describe("[Accounts]: Test GetAccount By Email Service", () => {
         
         const unitOfWork = jest.fn();
 
-        const underTest = new UseCaseGetAccountByEmail(mockedAccountRepository);
+        const underTest = UseCaseGetAccountByEmail(mockedAccountRepository);
         const result = await underTest.execute(unitOfWork, accountEmail);
 
         expect(result).not.toBeNull();
@@ -37,7 +37,7 @@ describe("[Accounts]: Test GetAccount By Email Service", () => {
         
         const unitOfWork = jest.fn();
 
-        const underTest = new UseCaseGetAccountByEmail(mockedAccountRepository);
+        const underTest = UseCaseGetAccountByEmail(mockedAccountRepository);
         const result = await underTest.execute(unitOfWork, accountEmail);
         
         expect(result).toBeUndefined();
@@ -52,7 +52,7 @@ describe("[Accounts]: Test GetAccount By Email Service", () => {
         
         const unitOfWork = jest.fn();
 
-        const underTest = new UseCaseGetAccountByEmail(mockedAccountRepository);
+        const underTest = UseCaseGetAccountByEmail(mockedAccountRepository);
         expect(underTest.execute(unitOfWork, accountEmail)).rejects.toThrow(Error);
     });
 
@@ -62,7 +62,7 @@ describe("[Accounts]: Test GetAccount By Email Service", () => {
         const mockedAccountRepository = jest.fn();
         const unitOfWork = jest.fn();
 
-        const underTest = new UseCaseGetAccountByEmail(mockedAccountRepository);
+        const underTest = UseCaseGetAccountByEmail(mockedAccountRepository);
         expect(underTest.execute(undefined, accountEmail)).rejects.toThrow(Errors.NullArgumentError);
     });
 
@@ -70,7 +70,7 @@ describe("[Accounts]: Test GetAccount By Email Service", () => {
         const mockedAccountRepository = jest.fn();
         const unitOfWork = jest.fn();
 
-        const underTest = new UseCaseGetAccountByEmail(mockedAccountRepository);
+        const underTest = UseCaseGetAccountByEmail(mockedAccountRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

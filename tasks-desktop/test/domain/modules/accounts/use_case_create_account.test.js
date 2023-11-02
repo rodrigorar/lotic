@@ -18,7 +18,7 @@ describe("[Accounts]: Test Create Account Use Case", () => {
             id: v4()
         }));
 
-        const underTest = new UseCaseCreateAccount(mockedAccountRepository, mockedCreateAccountGateway);
+        const underTest = UseCaseCreateAccount(mockedAccountRepository, mockedCreateAccountGateway);
         await underTest.execute(mockedUnitOfWork, accountData);
         
         expect(mockedCreateAccountGateway.call.mock.calls).toHaveLength(1);
@@ -39,7 +39,7 @@ describe("[Accounts]: Test Create Account Use Case", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseCreateAccount(mockedAccountRepository, mockedCreateAccountGateway);
+        const underTest = UseCaseCreateAccount(mockedAccountRepository, mockedCreateAccountGateway);
         expect(underTest.execute(mockedUnitOfWork, accountData)).rejects.toThrow(Error);
         
         expect(mockedCreateAccountGateway.call.mock.calls).toHaveLength(1);
@@ -62,7 +62,7 @@ describe("[Accounts]: Test Create Account Use Case", () => {
             id: v4()
         }));
 
-        const underTest = new UseCaseCreateAccount(mockedAccountRepository, mockedCreateAccountGateway);
+        const underTest = UseCaseCreateAccount(mockedAccountRepository, mockedCreateAccountGateway);
         expect(underTest.execute(mockedUnitOfWork, accountData)).rejects.toThrow(Error);
         
         expect(mockedCreateAccountGateway.call.mock.calls).toHaveLength(1);

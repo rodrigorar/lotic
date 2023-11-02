@@ -1,5 +1,4 @@
 const { Validators } = require("../../shared/utils");
-const { Command, Query } = require("../../shared/ports");
 const { EventBus, EventType, Event } = require("../../shared/event-bus");
 
 class Account {
@@ -9,42 +8,30 @@ class Account {
     }
 }
 
-class UseCaseCreateLocalAccount extends Command {
-
-    constructor(accountsRepository) {
-        super();
-        
-        this.accountsRepository = accountsRepository;
-    }
-
-    async execute(unitOfWork, accountData) {
+const UseCaseCreateLocalAccount = (accountsRepository) => {
+    async function execute(unitOfWork, accountData) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(accountData, "No account data provided");
 
         const newAccount = new Account(accountData.id, accountData.email);
-        await this.accountsRepository.save(unitOfWork, newAccount);
+        await accountsRepository.save(unitOfWork, newAccount);
     }
-    
+
+    return {
+        execute
+    }
 }
 
-class UseCaseCreateAccount extends Command {
-
-    constructor(accountsRepository, createAccountGateway) {
-        super();
-        
-        this.accountsRepository = accountsRepository;
-        this.createAccountGateway = createAccountGateway;
-    }
-
-    async execute(unitOfWork, accountData) {
+const UseCaseCreateAccount = (accountsRepository, createAccountGateway) => {
+    async function execute(unitOfWork, accountData) {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(accountData, "No account data provided");
 
         try {
-            const result = await this.createAccountGateway.call(accountData);
+            const result = await createAccountGateway.call(accountData);
 
             const newAccount = new Account(result.id, accountData.email);
-            await this.accountsRepository.save(unitOfWork, newAccount);
+            await accountsRepository.save(unitOfWork, newAccount);
 
             EventBus.publish(new Event(EventType.SIGN_UP_SUCCESS, {}));
         } catch (error) {
@@ -54,37 +41,35 @@ class UseCaseCreateAccount extends Command {
             throw error;
         }
     }
+
+    return {
+        execute
+    }
 }
 
-class UseCaseGetAccount extends Query {
-
-    constructor(accountsRepository) {
-        super();
-
-        this.accountsRepository = accountsRepository;
-    }
-
-    async execute(unitOfWork, accountId) {
+const UseCaseGetAccount = (accountsRepository) => {
+    async function execute(unitOfWork, accountId) {
         Validators.isNotNull(unitOfWork, "No Unit of Work provided");
         Validators.isNotNull(accountId, "No accountId provided");
 
-        return await this.accountsRepository.get(unitOfWork, accountId);
+        return await accountsRepository.get(unitOfWork, accountId);
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseGetAccountByEmail extends Query {
-    
-    constructor(accountsRepository) {
-        super();
-
-        this.accountsRepository = accountsRepository;
-    }
-    
-    async execute(unitOfWork, email) {
+const UseCaseGetAccountByEmail = (accountsRepository) => {
+    async function execute(unitOfWork, email) {
         Validators.isNotNull(unitOfWork, "No Unit of Work provided");
         Validators.isNotNull(email, "No email provided");
 
-        return await this.accountsRepository.getByEmail(unitOfWork, email);
+        return await accountsRepository.getByEmail(unitOfWork, email);
+    }
+
+    return {
+        execute
     }
 }
 

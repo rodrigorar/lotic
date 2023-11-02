@@ -15,7 +15,7 @@ describe("[Accounts]: Test GetAccount By Id Service", () => {
         
         const unitOfWork = jest.fn();
 
-        const underTest = new UseCaseGetAccount(mockedAccountRepository);
+        const underTest = UseCaseGetAccount(mockedAccountRepository);
         const result = await underTest.execute(unitOfWork, accountId);
 
         expect(result).not.toBeNull();
@@ -35,7 +35,7 @@ describe("[Accounts]: Test GetAccount By Id Service", () => {
         
         const unitOfWork = jest.fn();
 
-        const underTest = new UseCaseGetAccount(mockedAccountRepository);
+        const underTest = UseCaseGetAccount(mockedAccountRepository);
         const result = await underTest.execute(unitOfWork, accountId);
 
         expect(result).toBeUndefined();
@@ -51,7 +51,7 @@ describe("[Accounts]: Test GetAccount By Id Service", () => {
         
         const unitOfWork = jest.fn();
 
-        const underTest = new UseCaseGetAccount(mockedAccountRepository);
+        const underTest = UseCaseGetAccount(mockedAccountRepository);
         expect(underTest.execute(unitOfWork, accountId)).rejects.toThrow(Error);
     });
 
@@ -64,7 +64,7 @@ describe("[Accounts]: Test GetAccount By Id Service", () => {
             jest.fn(async (unitOfWork, accountId) => 
                 new Account(accountId, email));
         
-        const underTest = new UseCaseGetAccount(mockedAccountRepository);
+        const underTest = UseCaseGetAccount(mockedAccountRepository);
         expect(underTest.execute(undefined, accountId)).rejects.toThrow(Errors.NullArgumentError);
     });
 
@@ -79,7 +79,7 @@ describe("[Accounts]: Test GetAccount By Id Service", () => {
         
         const unitOfWork = jest.fn();
 
-        const underTest = new UseCaseGetAccount(mockedAccountRepository);
+        const underTest = UseCaseGetAccount(mockedAccountRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

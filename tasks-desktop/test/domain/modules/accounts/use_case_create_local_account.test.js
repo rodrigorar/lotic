@@ -13,7 +13,7 @@ describe("[Accounts]: Test Create Local Account Use Case", () => {
             id: v4()
             , email: "test.mail@mail.not"
         }
-        const underTest = new UseCaseCreateLocalAccount(mockedAccountRepository);
+        const underTest = UseCaseCreateLocalAccount(mockedAccountRepository);
         await underTest.execute(unitOfWork, accountData);
 
         expect(mockedAccountRepository.save.mock.calls).toHaveLength(1);
@@ -28,7 +28,7 @@ describe("[Accounts]: Test Create Local Account Use Case", () => {
             id: v4()
             , email: "test.mail@mail.not"
         }
-        const underTest = new UseCaseCreateLocalAccount(mockedAccountRepository);
+        const underTest = UseCaseCreateLocalAccount(mockedAccountRepository);
         expect(underTest.execute(unitOfWork, accountData)).rejects.toThrow(Error);
     });
 
@@ -40,7 +40,7 @@ describe("[Accounts]: Test Create Local Account Use Case", () => {
             id: v4()
             , email: "test.mail@mail.not"
         }
-        const underTest = new UseCaseCreateLocalAccount(mockedAccountRepository);
+        const underTest = UseCaseCreateLocalAccount(mockedAccountRepository);
         expect(underTest.execute(undefined, accountData)).rejects.toThrow(NullArgumentError);
     });
 
@@ -49,7 +49,7 @@ describe("[Accounts]: Test Create Local Account Use Case", () => {
         mockedAccountRepository.save = jest.fn((unitOfWork, account) => { /* Do nothing */ });
 
         const unitOfWork = jest.fn();
-        const underTest = new UseCaseCreateLocalAccount(mockedAccountRepository);
+        const underTest = UseCaseCreateLocalAccount(mockedAccountRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(NullArgumentError);
     });
 });

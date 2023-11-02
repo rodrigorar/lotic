@@ -11,21 +11,21 @@ const { AccountRepositoryImpl } = require("./adapters");
 class UseCaseCreateAccountProvider extends UseCaseProvider {
 
     get() {
-        return new UseCaseCreateAccount(new AccountRepositoryImpl(), new CreateAccountGateway());
+        return UseCaseCreateAccount(new AccountRepositoryImpl(), new CreateAccountGateway());
     }
 }
 
 class UseCaseCreateLocalAccountProvider extends UseCaseProvider {
     
     get() {
-        return new UseCaseCreateLocalAccount(new AccountRepositoryImpl());
+        return UseCaseCreateLocalAccount(new AccountRepositoryImpl());
     }
 }
 
 class UseCaseGetAccountProvider extends UseCaseProvider {
 
     get() {
-        return new UseCaseGetAccount(new AccountRepositoryImpl());
+        return UseCaseGetAccount(new AccountRepositoryImpl());
     }
 }
 
@@ -33,7 +33,7 @@ class UseCaseGetAccountByEmailProvider extends UseCaseProvider {
 
     
     get() {
-        return new UseCaseGetAccountByEmail(new AccountRepositoryImpl());
+        return UseCaseGetAccountByEmail(new AccountRepositoryImpl());
     }
 }
 
