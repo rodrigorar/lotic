@@ -1,5 +1,5 @@
-const { Validators } = require("../../shared/utils");
-const { EventBus, EventType, Event } = require("../../shared/event-bus");
+const { Validators } = require("../shared/utils");
+const { EventBus, EventType, Event } = require("../shared/event-bus");
 
 class Account {
     constructor(id, email) {

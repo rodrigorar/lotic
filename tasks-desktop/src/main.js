@@ -19,7 +19,7 @@ const {
   , UseCaseDeleteAllTaskSyncsForAccountProvider
 } = require('./infrastructure/modules/tasks/providers');
 const {
-  UseCaseLogoutProvider
+  UseCaseSignOutProvider
   , UseCaseGetActiveSessionProvider
 } = require('./infrastructure/modules/auth/providers');
 const { AccountsHandler } = require('./infrastructure/modules/accounts/handlers');
@@ -122,7 +122,7 @@ EventBus.register(
       const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
       const useCaseDeleteAllTasksForAccount = UseCaseDeleteAllTasksForAccountProvider.get();
       const useCaseDeleteAllTaskSyncsForAccount = UseCaseDeleteAllTaskSyncsForAccountProvider.get();
-      const useCaseLogout = UseCaseLogoutProvider.get();
+      const useCaseSignOut = UseCaseSignOutProvider.get();
 
       await RunUnitOfWork.run(async (unitOfWork) => {
           const activeSession = await useCaseGetActiveSession.execute(unitOfWork);
@@ -130,7 +130,7 @@ EventBus.register(
           await useCaseDeleteAllTaskSyncsForAccount.execute(unitOfWork, activeSession.accountId);
           await useCaseDeleteAllTasksForAccount.execute(unitOfWork, activeSession.accountId);
 
-          await useCaseLogout.execute(unitOfWork, activeSession);
+          await useCaseSignOut.execute(unitOfWork, activeSession);
       });
 
       mainWindow.webContents.send("auth:logged_out");

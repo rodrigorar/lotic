@@ -1,42 +1,41 @@
-const { AuthRepositoryImpl } = require("./adapters");
-const { LoginGateway, RefreshGateway, LogoutGateway } = require("./gateways");
-const { UseCaseProvider } = require("../../../domain/shared/ports");
-const { UseCaseLogin, UseCaseRefresh, UseCaseLogout, UseCaseGetActiveSession } = require("../../../domain/modules/auth/domain");
+const { AuthRepository } = require("./repositories");
+const { SignInGateway, RefreshGateway, SignOutGateway } = require("./gateways");
+const { UseCaseRefresh, UseCaseGetActiveSession, UseCaseSignIn, UseCaseSignOut } = require("../../../domain/modules/auth");
 const { UseCaseCreateLocalAccountProvider, UseCaseGetAccountByEmailProvider } = require("../accounts/providers");
 
-class UseCaseLoginProvider extends UseCaseProvider {
-
-    get() {
-        return new UseCaseLogin(
-            UseCaseCreateLocalAccountProvider.get()
-            , UseCaseGetAccountByEmailProvider.get()
-            , new AuthRepositoryImpl()
-            , new LoginGateway())
+const UseCaseSignInProvider = (() => {
+    const get = () => UseCaseSignIn(
+        UseCaseCreateLocalAccountProvider.get()
+        , UseCaseGetAccountByEmailProvider.get()
+        , AuthRepository
+        , SignInGateway);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseRefreshProvider extends UseCaseProvider {
-
-    get() {
-        return new UseCaseRefresh(new AuthRepositoryImpl(), new RefreshGateway());
+const UseCaseRefreshProvider = (() => {
+    const get = () => UseCaseRefresh(AuthRepository, RefreshGateway);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseLogoutProvider extends UseCaseProvider {
-
-    get() {
-        return new UseCaseLogout(new AuthRepositoryImpl(), new LogoutGateway());
+const UseCaseSignOutProvider = (() => {
+    const get = () => UseCaseSignOut(AuthRepository, SignOutGateway);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseGetActiveSessionProvider extends UseCaseProvider {
-
-    get() {
-        return new UseCaseGetActiveSession(new AuthRepositoryImpl());
+const UseCaseGetActiveSessionProvider = (() => {
+    const get = () => UseCaseGetActiveSession(AuthRepository);
+    return {
+        get
     }
-}
+})();
 
-module.exports.UseCaseLoginProvider = new UseCaseLoginProvider();
-module.exports.UseCaseRefreshProvider = new UseCaseRefreshProvider();
-module.exports.UseCaseLogoutProvider = new UseCaseLogoutProvider();
-module.exports.UseCaseGetActiveSessionProvider = new UseCaseGetActiveSessionProvider();
+module.exports.UseCaseSignInProvider = UseCaseSignInProvider;
+module.exports.UseCaseRefreshProvider = UseCaseRefreshProvider;
+module.exports.UseCaseSignOutProvider = UseCaseSignOutProvider;
+module.exports.UseCaseGetActiveSessionProvider = UseCaseGetActiveSessionProvider;

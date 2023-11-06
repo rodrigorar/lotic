@@ -1,7 +1,7 @@
 const { v4 } = require("uuid");
 const { EventType, EventSubscriber, EventBus } = require("../../../../src/domain/shared/event-bus");
-const { Account } = require("../../../../src/domain/modules/accounts/domain");
-const { AuthToken, UseCaseRefresh } = require("../../../../src/domain/modules/auth/domain");
+const { Account } = require("../../../../src/domain/modules/accounts");
+const { AuthToken, UseCaseRefresh } = require("../../../../src/domain/modules/auth");
 const { Errors } = require("../../../../src/domain/errors");
 
 describe("[Auth]: Test Refresh Use Case", () => {
@@ -33,7 +33,7 @@ describe("[Auth]: Test Refresh Use Case", () => {
                 expect(event).not.toBeUndefined();
             }));
 
-        const underTest = new UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
+        const underTest = UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
         const result = await underTest.execute(unitOfWork, accountId);
 
         expect(result).not.toBeUndefined();
@@ -68,7 +68,7 @@ describe("[Auth]: Test Refresh Use Case", () => {
         const mockedRefreshGateway = jest.fn();
         mockedRefreshGateway.call = jest.fn((token, refreshToken) => serverResponse);
 
-        const underTest = new UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
+        const underTest = UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
         expect(underTest.execute(unitOfWork, accountId)).rejects.toThrow(Errors.UnknownAccountError);
     });
 
@@ -84,7 +84,7 @@ describe("[Auth]: Test Refresh Use Case", () => {
         const mockedRefreshGateway = jest.fn();
         mockedRefreshGateway.call = jest.fn((token, refreshToken) => { throw new Error(); });
 
-        const underTest = new UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
+        const underTest = UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
         expect(underTest.execute(unitOfWork, accountId)).rejects.toThrow(Error);
     });
 
@@ -115,7 +115,7 @@ describe("[Auth]: Test Refresh Use Case", () => {
                 expect(event).not.toBeUndefined();
             }));
 
-        const underTest = new UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
+        const underTest = UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
         const result = await underTest.execute(unitOfWork, accountId);
 
         expect(result).toBeUndefined();
@@ -150,7 +150,7 @@ describe("[Auth]: Test Refresh Use Case", () => {
                 expect(event).not.toBeUndefined();
             }));
 
-        const underTest = new UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
+        const underTest = UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
         const result = await underTest.execute(unitOfWork, accountId);
 
         expect(result).toBeUndefined();
@@ -178,7 +178,7 @@ describe("[Auth]: Test Refresh Use Case", () => {
         const mockedRefreshGateway = jest.fn();
         mockedRefreshGateway.call = jest.fn((token, refreshToken) => serverResponse);
 
-        const underTest = new UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
+        const underTest = UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
         expect(underTest.execute(unitOfWork, accountId)).rejects.toThrow(Error);
     });
 
@@ -188,7 +188,7 @@ describe("[Auth]: Test Refresh Use Case", () => {
         const mockedAuthRepository = jest.fn();
         const mockedRefreshGateway = jest.fn();
 
-        const underTest = new UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
+        const underTest = UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
         expect(underTest.execute(undefined, accountId)).rejects.toThrow(Errors.NullArgumentError);
     });
 
@@ -198,7 +198,7 @@ describe("[Auth]: Test Refresh Use Case", () => {
         const mockedAuthRepository = jest.fn();
         const mockedRefreshGateway = jest.fn();
 
-        const underTest = new UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
+        const underTest = UseCaseRefresh(mockedAuthRepository, mockedRefreshGateway);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

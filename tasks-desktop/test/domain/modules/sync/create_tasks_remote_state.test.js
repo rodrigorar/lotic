@@ -2,7 +2,7 @@ const { v4 } = require('uuid');
 const { 
     CreateTasksRemoteStateEffect
 } = require('../../../../src/infrastructure/modules/sync/states');
-const { AuthToken } = require('../../../../src/domain/modules/auth/domain');
+const { AuthToken } = require('../../../../src/domain/modules/auth');
 const { 
     TaskSync
     , Task

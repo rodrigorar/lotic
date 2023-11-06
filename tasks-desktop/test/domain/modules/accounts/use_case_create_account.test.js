@@ -1,5 +1,5 @@
 const { v4 } = require("uuid");
-const { UseCaseCreateAccount } = require("../../../../src/domain/modules/accounts/domain");
+const { UseCaseCreateAccount } = require("../../../../src/domain/modules/accounts");
 
 describe("[Accounts]: Test Create Account Use Case", () => {
 

@@ -1,43 +1,41 @@
-const { UseCaseProvider } = require("../../../domain/shared/ports");
 const { 
     UseCaseCreateAccount
     , UseCaseCreateLocalAccount
     , UseCaseGetAccount
     , UseCaseGetAccountByEmail 
-} = require("../../../domain/modules/accounts/domain");
+} = require("../../../domain/modules/accounts");
 const { CreateAccountGateway } = require("../accounts/gateways");
-const { AccountRepositoryImpl } = require("./adapters");
+const { AccountRepository } = require("./repositories");
 
-class UseCaseCreateAccountProvider extends UseCaseProvider {
-
-    get() {
-        return UseCaseCreateAccount(new AccountRepositoryImpl(), new CreateAccountGateway());
+const UseCaseCreateAccountProvider = (() => {
+    const get = () => UseCaseCreateAccount(AccountRepository, CreateAccountGateway);
+    return {
+        get
     }
-}
+})()
 
-class UseCaseCreateLocalAccountProvider extends UseCaseProvider {
-    
-    get() {
-        return UseCaseCreateLocalAccount(new AccountRepositoryImpl());
+const UseCaseCreateLocalAccountProvider = (() => {
+    const get = () => UseCaseCreateLocalAccount(AccountRepository);
+    return {
+        get
     }
-}
+})()
 
-class UseCaseGetAccountProvider extends UseCaseProvider {
-
-    get() {
-        return UseCaseGetAccount(new AccountRepositoryImpl());
+const UseCaseGetAccountProvider = (() => {
+    const get = () => UseCaseGetAccount(AccountRepository);
+    return {
+        get
     }
-}
+})()
 
-class UseCaseGetAccountByEmailProvider extends UseCaseProvider {
-
-    
-    get() {
-        return UseCaseGetAccountByEmail(new AccountRepositoryImpl());
+const UseCaseGetAccountByEmailProvider = (() => {
+    const get = () => UseCaseGetAccountByEmail(AccountRepository);
+    return {
+        get
     }
-}
+})()
 
-module.exports.UseCaseCreateAccountProvider = new UseCaseCreateAccountProvider();
-module.exports.UseCaseCreateLocalAccountProvider = new UseCaseCreateLocalAccountProvider();
-module.exports.UseCaseGetAccountProvider = new UseCaseGetAccountProvider();
-module.exports.UseCaseGetAccountByEmailProvider = new UseCaseGetAccountByEmailProvider();
+module.exports.UseCaseCreateAccountProvider = UseCaseCreateAccountProvider;
+module.exports.UseCaseCreateLocalAccountProvider = UseCaseCreateLocalAccountProvider;
+module.exports.UseCaseGetAccountProvider = UseCaseGetAccountProvider;
+module.exports.UseCaseGetAccountByEmailProvider = UseCaseGetAccountByEmailProvider;

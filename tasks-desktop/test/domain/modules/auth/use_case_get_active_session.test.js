@@ -1,5 +1,5 @@
 const { v4 } = require("uuid");
-const { AuthToken, UseCaseGetActiveSession } = require("../../../../src/domain/modules/auth/domain");
+const { AuthToken, UseCaseGetActiveSession } = require("../../../../src/domain/modules/auth");
 const { Errors } = require("../../../../src/domain/errors");
 
 describe("[Auth]: Test Get Active Session Use Case", () => {
@@ -15,7 +15,7 @@ describe("[Auth]: Test Get Active Session Use Case", () => {
         mockedAuthRepository.getActiveSession = jest.fn(
             (unitOfWork) => new AuthToken(accessToken, refreshToken, accountId, expiresAt));
 
-        const underTest = new UseCaseGetActiveSession(mockedAuthRepository);
+        const underTest = UseCaseGetActiveSession(mockedAuthRepository);
         const result = await underTest.execute(unitOfWork);
 
         expect(result).not.toBeUndefined();
@@ -34,7 +34,7 @@ describe("[Auth]: Test Get Active Session Use Case", () => {
         mockedAuthRepository.getActiveSession = jest.fn(
             (unitOfWork) => { throw new Error(); });
 
-        const underTest = new UseCaseGetActiveSession(mockedAuthRepository);
+        const underTest = UseCaseGetActiveSession(mockedAuthRepository);
         expect(underTest.execute(unitOfWork)).rejects.toThrow(Error);
 
         expect(mockedAuthRepository.getActiveSession.mock.calls).toHaveLength(1);
@@ -43,7 +43,7 @@ describe("[Auth]: Test Get Active Session Use Case", () => {
     it("Should fail, not unit of work provided", async () => {
         const mockedAuthRepository = jest.fn();
 
-        const underTest = new UseCaseGetActiveSession(mockedAuthRepository);
+        const underTest = UseCaseGetActiveSession(mockedAuthRepository);
         expect(underTest.execute()).rejects.toThrow(Errors.NullArgumentError);
     });
 });

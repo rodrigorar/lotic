@@ -1,13 +1,12 @@
-const { BrowserWindow, webContents } = require('electron');
-const path = require('path');
-const { UseCaseLoginProvider, UseCaseGetActiveSessionProvider, UseCaseLogoutProvider } = require('./providers');
+const { webContents } = require('electron');
+const { UseCaseSignInProvider, UseCaseGetActiveSessionProvider, UseCaseSignOutProvider } = require('./providers');
 const { UseCaseDeleteAllTasksForAccountProvider, UseCaseDeleteAllTaskSyncsForAccountProvider } = require('../tasks/providers');
 const { RunUnitOfWork } = require('../../persistence/unitofwork');
 
 async function handleSignIn(event, signInData) {
-    const useCaseLogin = UseCaseLoginProvider.get();
+    const useCaseSignIn = UseCaseSignInProvider.get();
     await RunUnitOfWork.run(async (unitOfWork) => {
-        await useCaseLogin.execute(unitOfWork, signInData);
+        await useCaseSignIn.execute(unitOfWork, signInData);
     });
 }
 
@@ -15,7 +14,7 @@ async function handleSignOut(event) {
     const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
     const useCaseDeleteAllTasksForAccount = UseCaseDeleteAllTasksForAccountProvider.get();
     const useCaseDeleteAllTaskSyncsForAccount = UseCaseDeleteAllTaskSyncsForAccountProvider.get();
-    const useCaseLogout = UseCaseLogoutProvider.get();
+    const useCaseSignOut = UseCaseSignOutProvider.get();
 
     await RunUnitOfWork.run(async (unitOfWork) => {
         const activeSession = await useCaseGetActiveSession.execute(unitOfWork);
@@ -23,7 +22,7 @@ async function handleSignOut(event) {
         await useCaseDeleteAllTaskSyncsForAccount.execute(unitOfWork, activeSession.accountId);
         await useCaseDeleteAllTasksForAccount.execute(unitOfWork, activeSession.accountId);
 
-        await useCaseLogout.execute(unitOfWork, activeSession);
+        await useCaseSignOut.execute(unitOfWork, activeSession);
     });
     
     // FIXME: This should be done with an event in the event bus

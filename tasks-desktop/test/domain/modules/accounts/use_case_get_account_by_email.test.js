@@ -1,5 +1,5 @@
 const { v4 } = require("uuid");
-const { Account, UseCaseGetAccountByEmail } = require("../../../../src/domain/modules/accounts/domain");
+const { Account, UseCaseGetAccountByEmail } = require("../../../../src/domain/modules/accounts");
 const { Errors } = require("../../../../src/domain/errors");
 
 describe("[Accounts]: Test GetAccount By Email Service", () => {

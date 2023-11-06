@@ -1,4 +1,4 @@
-const { UseCaseCreateLocalAccount } = require("../../../../src/domain/modules/accounts/domain");
+const { UseCaseCreateLocalAccount } = require("../../../../src/domain/modules/accounts");
 const { NullArgumentError } = require("../../../../src/domain/errors");
 const { v4 } = require("uuid");
 

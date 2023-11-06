@@ -1,7 +1,7 @@
 const { v4 } = require("uuid");
 const { EventType, EventSubscriber, EventBus } = require("../../../../src/domain/shared/event-bus");
-const { Account } = require("../../../../src/domain/modules/accounts/domain");
-const { AuthToken, UseCaseLogin } = require("../../../../src/domain/modules/auth/domain");
+const { Account } = require("../../../../src/domain/modules/accounts");
+const { AuthToken, UseCaseSignIn } = require("../../../../src/domain/modules/auth");
 const { Errors } = require("../../../../src/domain/errors");
 
 describe("[Auth]: Test Login Use Case", () => {
@@ -46,7 +46,7 @@ describe("[Auth]: Test Login Use Case", () => {
                 expect(event.body.account_id).toBe(accountId);
             }));
 
-        const underTest = new UseCaseLogin(
+        const underTest = UseCaseSignIn(
             mockedCreateAccountUseCase
             , mockedGetAccountByEmail
             , mockedAuthRepository
@@ -99,7 +99,7 @@ describe("[Auth]: Test Login Use Case", () => {
                 expect(event.body.account_id).toBe(accountId);
             }));
 
-        const underTest = new UseCaseLogin(
+        const underTest = UseCaseSignIn(
             mockedCreateAccountUseCase
             , mockedGetAccountByEmailUseCase
             ,  mockedAuthRepository
@@ -138,7 +138,7 @@ describe("[Auth]: Test Login Use Case", () => {
             , password: password
         }
 
-        const underTest = new UseCaseLogin(
+        const underTest = UseCaseSignIn(
             mockedCreateAccountUseAccount
             , mockedGetAccountUseCase
             , mockedAuthRepository
@@ -177,7 +177,7 @@ describe("[Auth]: Test Login Use Case", () => {
             , password: password
         }
 
-        const underTest = new UseCaseLogin(
+        const underTest = UseCaseSignIn(
             mockedCreateAccountUseCase
             , mockedGetAccountByEmailUseCase
             , mockedAuthRepository
@@ -216,7 +216,7 @@ describe("[Auth]: Test Login Use Case", () => {
             , password: password
         }
 
-        const underTest = new UseCaseLogin(
+        const underTest = UseCaseSignIn(
             mockedCreateAccountUseCase
             , mockedGetAccountByEmailUseCase
             , mockedAuthRepository
@@ -254,7 +254,7 @@ describe("[Auth]: Test Login Use Case", () => {
             , password: password
         }
 
-        const underTest = new UseCaseLogin(
+        const underTest = UseCaseSignIn(
             mockedCreateAccountUseCase
             , mockedGetAccountByEmail
             , mockedAuthRepository
@@ -286,7 +286,7 @@ describe("[Auth]: Test Login Use Case", () => {
             , expires_at: new Date()
         }));   
 
-        const underTest = new UseCaseLogin(
+        const underTest = UseCaseSignIn(
             mockedCreateAccountUseCase
             , mockedGetAccountByEmailUseCase
             , mockedAuthRepository

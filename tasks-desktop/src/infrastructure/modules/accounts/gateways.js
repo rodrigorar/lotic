@@ -1,5 +1,4 @@
 const { Logger } = require("../../../domain/shared/logger");
-const { Gateway } = require("../../../domain/shared/ports");
 const { BASE_URL, Client, Headers, ContentTypes } = require("../../http/client");
 
 const BASE_PATH = BASE_URL + "/accounts";
@@ -14,13 +13,8 @@ async function doCall(operation) {
     }
 }
 
-class CreateAccountGateway extends Gateway {
-
-    constructor() {
-        super();
-    }
-
-    async call(accountData) {
+const CreateAccountGateway = (() => {
+    const call = async (accountData) => {
         Logger.trace(`Calling URL: #POST ${BASE_PATH}/accounts`);
 
         const result = await doCall(async () => {
@@ -39,6 +33,10 @@ class CreateAccountGateway extends Gateway {
 
         return result.data;
     }
-}
+
+    return {
+        call
+    }
+})();
 
 module.exports.CreateAccountGateway = CreateAccountGateway;

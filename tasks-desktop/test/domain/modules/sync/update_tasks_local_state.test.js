@@ -1,7 +1,7 @@
 const { v4 } = require("uuid");
 const { Task } = require("../../../../src/domain/modules/tasks/domain");
-const { AuthToken } = require("../../../../src/infrastructure/modules/auth/adapters");
 const { UpdateTasksLocalStateEffect } = require("../../../../src/infrastructure/modules/sync/states");
+const { AuthToken } = require("../../../../src/domain/modules/auth");
 
 describe("[Sync]: Test Update Tasks Local State Effect", () => {
     

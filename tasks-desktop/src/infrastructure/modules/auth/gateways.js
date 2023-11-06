@@ -14,13 +14,8 @@ async function doCall(operation) {
     }
 }
 
-class LoginGateway extends Gateway {
-
-    constructor() {
-        super();
-    }
-
-    async call(principal) {
+const SignInGateway = (() => {
+    const call = async (principal) => {
         Logger.trace(`Calling URL: #POST ${BASE_PATH}/login`);
 
         const result = await doCall(async () => {
@@ -39,15 +34,14 @@ class LoginGateway extends Gateway {
         
         return result.data;
     }
-}
 
-class RefreshGateway extends Gateway {
-
-    constructor() {
-        super();
+    return {
+        call
     }
+})();
 
-    async call(authSession) {
+const RefreshGateway = (() => {
+    const call = async (authSession) => {
         Logger.trace(`Calling URL: #POST ${BASE_PATH}/refresh/${authSession.refreshToken}`);
 
         const result = await doCall(async () => {
@@ -64,15 +58,14 @@ class RefreshGateway extends Gateway {
 
         return result.data;
     }
-}
 
-class LogoutGateway extends Gateway {
-
-    constructor() {
-        super();
+    return {
+        call
     }
+})();
 
-    async call(accessToken) {
+const SignOutGateway = (() => {
+    const call = async (accessToken) => {
         Logger.trace(`Calling URL: #DELETE ${BASE_PATH}/${accessToken}`);
 
         await doCall(async () => {
@@ -86,8 +79,12 @@ class LogoutGateway extends Gateway {
                 });
         });
     }
-}
 
-module.exports.LoginGateway = LoginGateway;
+    return {
+        call
+    }
+})();
+
+module.exports.SignInGateway = SignInGateway;
 module.exports.RefreshGateway = RefreshGateway;
-module.exports.LogoutGateway = LogoutGateway;
+module.exports.SignOutGateway = SignOutGateway;
