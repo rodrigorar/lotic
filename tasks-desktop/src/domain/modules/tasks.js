@@ -188,7 +188,7 @@ const UseCaseDeleteTasks = (tasksRepository) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
 
         for (let taskId of taskIds) {
-            await this.tasksRepository.erase(unitOfWork, taskId)
+            await tasksRepository.erase(unitOfWork, taskId)
         }
     }
 

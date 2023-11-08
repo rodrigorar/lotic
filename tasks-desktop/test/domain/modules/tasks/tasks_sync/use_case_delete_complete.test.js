@@ -8,7 +8,7 @@ describe("[Tasks Sync]: Test Delete Complete Service", () => {
         const mockedTasksSyncRepository = jest.fn();
         mockedTasksSyncRepository.eraseComplete = jest.fn((unitOfWork) => { /* Do Nothing */ });
 
-        const underTest = new UseCaseDeleteCompleteTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseDeleteCompleteTaskSyncs(mockedTasksSyncRepository);
         await underTest.execute(unitOfWork);
 
         expect(mockedTasksSyncRepository.eraseComplete.mock.calls).toHaveLength(1);
@@ -22,7 +22,7 @@ describe("[Tasks Sync]: Test Delete Complete Service", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseDeleteCompleteTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseDeleteCompleteTaskSyncs(mockedTasksSyncRepository);
         expect(underTest.execute(unitOfWork)).rejects.toThrow(Error);
 
         expect(mockedTasksSyncRepository.eraseComplete.mock.calls).toHaveLength(1);
@@ -31,7 +31,7 @@ describe("[Tasks Sync]: Test Delete Complete Service", () => {
     it("Should fail, no unit of work provided", async () => {
         const mockedTasksSyncRepository = jest.fn();
 
-        const underTest = new UseCaseDeleteCompleteTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseDeleteCompleteTaskSyncs(mockedTasksSyncRepository);
         expect(underTest.execute(undefined)).rejects.toThrow(Error);
     });
 });

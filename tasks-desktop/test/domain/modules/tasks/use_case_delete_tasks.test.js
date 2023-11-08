@@ -11,7 +11,7 @@ describe("[Tasks]: Test Delete Multiple Tasks Use Case", () => {
         const mockedTasksRepository = jest.fn();
         mockedTasksRepository.erase = jest.fn((unitOfWork, taskIds) => { /* Do nothing */ });
 
-        const underTest = new UseCaseDeleteTasks(mockedTasksRepository);
+        const underTest = UseCaseDeleteTasks(mockedTasksRepository);
         await underTest.execute(unitOfWork, taskIds);
 
         expect(mockedTasksRepository.erase.mock.calls).toHaveLength(3);
@@ -24,7 +24,7 @@ describe("[Tasks]: Test Delete Multiple Tasks Use Case", () => {
         const mockedTasksRepository = jest.fn();
         mockedTasksRepository.erase = jest.fn((unitOfWork, taskIds) => { /* Do nothing */ });
 
-        const underTest = new UseCaseDeleteTasks(mockedTasksRepository);
+        const underTest = UseCaseDeleteTasks(mockedTasksRepository);
         await underTest.execute(unitOfWork, taskIds);
 
         expect(mockedTasksRepository.erase.mock.calls).toHaveLength(1);
@@ -37,7 +37,7 @@ describe("[Tasks]: Test Delete Multiple Tasks Use Case", () => {
         const mockedTasksRepository = jest.fn();
         mockedTasksRepository.erase = jest.fn((unitOfWork, taskIds) => { /* Do nothing */ });
 
-        const underTest = new UseCaseDeleteTasks(mockedTasksRepository);
+        const underTest = UseCaseDeleteTasks(mockedTasksRepository);
         await underTest.execute(unitOfWork, taskIds);
 
         expect(mockedTasksRepository.erase.mock.calls).toHaveLength(0);
@@ -49,7 +49,7 @@ describe("[Tasks]: Test Delete Multiple Tasks Use Case", () => {
         const mockedTasksRepository = jest.fn();
         mockedTasksRepository.erase = jest.fn((unitOfWork, taskIds) => { /* Do nothing */ });
 
-        const underTest = new UseCaseDeleteTasks(mockedTasksRepository);
+        const underTest = UseCaseDeleteTasks(mockedTasksRepository);
         await underTest.execute(unitOfWork);
 
         expect(mockedTasksRepository.erase.mock.calls).toHaveLength(0);
@@ -58,7 +58,7 @@ describe("[Tasks]: Test Delete Multiple Tasks Use Case", () => {
     it("Should fail, no unit of work provided", async () => {
         const mockedTasksRepository = jest.fn();
 
-        const underTest = new UseCaseDeleteTasks(mockedTasksRepository);
+        const underTest = UseCaseDeleteTasks(mockedTasksRepository);
         expect(underTest.execute(undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

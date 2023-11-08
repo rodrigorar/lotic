@@ -16,7 +16,7 @@ describe("[Tasks]: Test List Tasks Without Owner Use Case", () => {
         const mockedTasksRepository = jest.fn();
         mockedTasksRepository.listWithoutOwner = jest.fn((unitOfWork) => dbResult);
 
-        const underTest = new UseCaseListTasksWithoutOwner(mockedTasksRepository);
+        const underTest = UseCaseListTasksWithoutOwner(mockedTasksRepository);
         const result = await underTest.execute(unitOfWork);
 
         expect(result).toBeDefined();
@@ -33,7 +33,7 @@ describe("[Tasks]: Test List Tasks Without Owner Use Case", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseListTasksWithoutOwner(mockedTasksRepository);
+        const underTest = UseCaseListTasksWithoutOwner(mockedTasksRepository);
         expect(underTest.execute(unitOfWork)).rejects.toThrow(Error);
 
         expect(mockedTasksRepository.listWithoutOwner.mock.calls).toHaveLength(1);
@@ -42,7 +42,7 @@ describe("[Tasks]: Test List Tasks Without Owner Use Case", () => {
     it("Should fail, no unit of work provided", async () => {
         const mockedTasksRepository = jest.fn();
 
-        const underTest = new UseCaseListTasksWithoutOwner(mockedTasksRepository);
+        const underTest = UseCaseListTasksWithoutOwner(mockedTasksRepository);
         expect(underTest.execute(undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

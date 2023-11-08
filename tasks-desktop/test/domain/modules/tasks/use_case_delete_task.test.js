@@ -11,7 +11,7 @@ describe("[Tasks]: Test Delete Task Use Case", () => {
         const mockedTasksRepository = jest.fn();
         mockedTasksRepository.erase = jest.fn((unitOfWork, taskId) => { /* Do nothing */ });
 
-        const underTest = new UseCaseDeleteTask(mockedTasksRepository);
+        const underTest = UseCaseDeleteTask(mockedTasksRepository);
         await underTest.execute(unitOfWork, taskId);
 
         expect(mockedTasksRepository.erase.mock.calls).toHaveLength(1);
@@ -26,7 +26,7 @@ describe("[Tasks]: Test Delete Task Use Case", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseDeleteTask(mockedTasksRepository);
+        const underTest = UseCaseDeleteTask(mockedTasksRepository);
         expect(underTest.execute(unitOfWork, taskId)).rejects.toThrow(Error);
 
         expect(mockedTasksRepository.erase.mock.calls).toHaveLength(1);
@@ -36,7 +36,7 @@ describe("[Tasks]: Test Delete Task Use Case", () => {
         const taskId = v4();
         const mockedTasksRepository = jest.fn();
 
-        const underTest = new UseCaseDeleteTask(mockedTasksRepository);
+        const underTest = UseCaseDeleteTask(mockedTasksRepository);
         expect(underTest.execute(undefined, taskId)).rejects.toThrow(Errors.NullArgumentError);
     });
 
@@ -44,7 +44,7 @@ describe("[Tasks]: Test Delete Task Use Case", () => {
         const unitOfWork = jest.fn();
         const mockedTasksRepository = jest.fn();
 
-        const underTest = new UseCaseDeleteTask(mockedTasksRepository);
+        const underTest = UseCaseDeleteTask(mockedTasksRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

@@ -24,7 +24,7 @@ describe("[Tasks]: Test Create Task Use Case", () => {
         });
         mockedTasksRepository.getMaxPosition = jest.fn((unitOfWork) => {});
 
-        const underTest = new UseCaseCreateTask(mockedTasksRepository);
+        const underTest = UseCaseCreateTask(mockedTasksRepository);
         await underTest.execute(unitOfWork, taskData);
 
         expect(mockedTasksRepository.save.mock.calls).toHaveLength(1);
@@ -54,7 +54,7 @@ describe("[Tasks]: Test Create Task Use Case", () => {
         });
         mockedTasksRepository.getMaxPosition = jest.fn((unitOfWork) => 0);
 
-        const underTest = new UseCaseCreateTask(mockedTasksRepository);
+        const underTest = UseCaseCreateTask(mockedTasksRepository);
         await underTest.execute(unitOfWork, taskData);
 
         expect(mockedTasksRepository.save.mock.calls).toHaveLength(1);
@@ -77,7 +77,7 @@ describe("[Tasks]: Test Create Task Use Case", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseCreateTask(mockedTasksRepository);
+        const underTest = UseCaseCreateTask(mockedTasksRepository);
         expect(underTest.execute(unitOfWork, taskData)).rejects.toThrow(Error);
 
         expect(mockedTasksRepository.save.mock.calls).toHaveLength(1);
@@ -95,7 +95,7 @@ describe("[Tasks]: Test Create Task Use Case", () => {
 
         const mockedTasksRepository = jest.fn();
 
-        const underTest = new UseCaseCreateTask(mockedTasksRepository);
+        const underTest = UseCaseCreateTask(mockedTasksRepository);
         expect(underTest.execute(undefined, taskData)).rejects.toThrow(Error);
     });
 
@@ -103,7 +103,7 @@ describe("[Tasks]: Test Create Task Use Case", () => {
         const unitOfWork = jest.fn();
         const mockedTasksRepository = jest.fn();
 
-        const underTest = new UseCaseCreateTask(mockedTasksRepository);
+        const underTest = UseCaseCreateTask(mockedTasksRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Error);
     });
 });

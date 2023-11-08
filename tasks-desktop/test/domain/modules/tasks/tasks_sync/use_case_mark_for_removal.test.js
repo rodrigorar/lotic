@@ -13,7 +13,7 @@ describe("[Tasks Sync]: Test Mark For Removal Service", () => {
             // Do Nothing
         });
 
-        const underTest = new UseCaseMarkTaskSyncForRemoval(mockedTasksSyncRepository);
+        const underTest = UseCaseMarkTaskSyncForRemoval(mockedTasksSyncRepository);
         await underTest.execute(unitOfWork, taskId);
 
         expect(mockedTasksSyncRepository.update.mock.calls).toHaveLength(1);
@@ -28,7 +28,7 @@ describe("[Tasks Sync]: Test Mark For Removal Service", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseMarkTaskSyncForRemoval(mockedTasksSyncRepository);
+        const underTest = UseCaseMarkTaskSyncForRemoval(mockedTasksSyncRepository);
         expect(underTest.execute(unitOfWork, taskId)).rejects.toThrow(Error);
 
         expect(mockedTasksSyncRepository.update.mock.calls).toHaveLength(1);
@@ -38,7 +38,7 @@ describe("[Tasks Sync]: Test Mark For Removal Service", () => {
         const taskId = v4();
         const mockedTasksSyncRepository = jest.fn();
 
-        const underTest = new UseCaseMarkTaskSyncForRemoval(mockedTasksSyncRepository);
+        const underTest = UseCaseMarkTaskSyncForRemoval(mockedTasksSyncRepository);
         expect(underTest.execute(undefined, taskId)).rejects.toThrow(Errors.NullArgumentError);
     });
 
@@ -46,7 +46,7 @@ describe("[Tasks Sync]: Test Mark For Removal Service", () => {
         const unitOfWork = jest.fn();
         const mockedTasksSyncRepository = jest.fn();
 
-        const underTest = new UseCaseMarkTaskSyncForRemoval(mockedTasksSyncRepository);
+        const underTest = UseCaseMarkTaskSyncForRemoval(mockedTasksSyncRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

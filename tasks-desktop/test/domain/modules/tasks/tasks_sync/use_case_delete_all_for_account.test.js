@@ -13,7 +13,7 @@ describe("[Tasks Sync]: Test Delete All For Account Service", () => {
             // Do Nothing
         });
 
-        const underTest = new UseCaseDeleteAllTaskSyncsForAccount(mockedtasksSyncRepository);
+        const underTest = UseCaseDeleteAllTaskSyncsForAccount(mockedtasksSyncRepository);
         await underTest.execute(unitOfWork, accountId);
 
         expect(mockedtasksSyncRepository.eraseAllForAccount.mock.calls).toHaveLength(1);
@@ -28,7 +28,7 @@ describe("[Tasks Sync]: Test Delete All For Account Service", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseDeleteAllTaskSyncsForAccount(mockedtasksSyncRepository);
+        const underTest = UseCaseDeleteAllTaskSyncsForAccount(mockedtasksSyncRepository);
         expect(underTest.execute(unitOfWork, accountId)).rejects.toThrow(Error);
 
         expect(mockedtasksSyncRepository.eraseAllForAccount.mock.calls).toHaveLength(1);
@@ -38,7 +38,7 @@ describe("[Tasks Sync]: Test Delete All For Account Service", () => {
         const accountId = v4();
         const mockedtasksSyncRepository = jest.fn();
 
-        const underTest = new UseCaseDeleteAllTaskSyncsForAccount(mockedtasksSyncRepository);
+        const underTest = UseCaseDeleteAllTaskSyncsForAccount(mockedtasksSyncRepository);
         expect(underTest.execute(undefined, accountId)).rejects.toThrow(Errors.NullArgumentError);
     });
 
@@ -46,7 +46,7 @@ describe("[Tasks Sync]: Test Delete All For Account Service", () => {
         const unitOfWork = jest.fn();
         const mockedtasksSyncRepository = jest.fn();
 
-        const underTest = new UseCaseDeleteAllTaskSyncsForAccount(mockedtasksSyncRepository);
+        const underTest = UseCaseDeleteAllTaskSyncsForAccount(mockedtasksSyncRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

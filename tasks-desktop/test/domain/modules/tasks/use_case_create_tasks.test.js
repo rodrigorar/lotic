@@ -40,7 +40,7 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
         });
         mockedTasksRepository.getMaxPosition = jest.fn((unitOfWork) => 0);
 
-        const underTest = new UseCaseCreateTasks(mockedTasksRepository);
+        const underTest = UseCaseCreateTasks(mockedTasksRepository);
         await underTest.execute(unitOfWork, tasksData);
 
         expect(mockedTasksRepository.save.mock.calls).toHaveLength(3);
@@ -69,7 +69,7 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
         });
         mockedTasksRepository.getMaxPosition = jest.fn((unitOfWork) => 0);
 
-        const underTest = new UseCaseCreateTasks(mockedTasksRepository);
+        const underTest = UseCaseCreateTasks(mockedTasksRepository);
         await underTest.execute(unitOfWork, tasksData);
 
         expect(mockedTasksRepository.save.mock.calls).toHaveLength(1);
@@ -84,7 +84,7 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
         mockedTasksRepository.save = jest.fn((unitOfWork, task) => { /* Do Nothing */ });
         mockedTasksRepository.getMaxPosition = jest.fn((unitOfWork) => 0);
 
-        const underTest = new UseCaseCreateTasks(mockedTasksRepository);
+        const underTest = UseCaseCreateTasks(mockedTasksRepository);
         await underTest.execute(unitOfWork, tasksData);
 
         expect(mockedTasksRepository.save.mock.calls).toHaveLength(0);
@@ -129,7 +129,7 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
         });
         mockedTasksRepository.getMaxPosition = jest.fn((unitOfWork) => 0);
 
-        const underTest = new UseCaseCreateTasks(mockedTasksRepository);
+        const underTest = UseCaseCreateTasks(mockedTasksRepository);
         expect(underTest.execute(unitOfWork, tasksData)).rejects.toThrow(Error);
 
         expect(mockedTasksRepository.save.mock.calls).toHaveLength(0);
@@ -140,7 +140,7 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
         const tasksData = [];
         const mockedTasksRepository = jest.fn();
 
-        const underTest = new UseCaseCreateTasks(mockedTasksRepository);
+        const underTest = UseCaseCreateTasks(mockedTasksRepository);
         expect(underTest.execute(undefined, tasksData)).rejects.toThrow(Errors.NullArgumentError);
     });
 
@@ -148,7 +148,7 @@ describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
         const unitOfWork = jest.fn();
         const mockedTasksRepository = jest.fn();
 
-        const underTest = new UseCaseCreateTasks(mockedTasksRepository);
+        const underTest = UseCaseCreateTasks(mockedTasksRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

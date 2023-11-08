@@ -24,7 +24,7 @@ describe("[Tasks Sync]: Test Create Multiple Sync Monitors Service", () => {
        const mockedTasksSyncRepository = jest.fn();
        mockedTasksSyncRepository.save = jest.fn((unitOfWork, taskId, status) => { /* Do Nothing */ });
 
-       const underTest = new UseCaseCreateTaskSyncs(mockedTasksSyncRepository);
+       const underTest = UseCaseCreateTaskSyncs(mockedTasksSyncRepository);
        await underTest.execute(unitOfWork, tasksSyncData);
 
        expect(mockedTasksSyncRepository.save.mock.calls).toHaveLength(3);
@@ -42,7 +42,7 @@ describe("[Tasks Sync]: Test Create Multiple Sync Monitors Service", () => {
         const mockedTasksSyncRepository = jest.fn();
         mockedTasksSyncRepository.save = jest.fn((unitOfWork, taskId, status) => { /* Do Nothing */ });
 
-        const underTest = new UseCaseCreateTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseCreateTaskSyncs(mockedTasksSyncRepository);
         await underTest.execute(unitOfWork, tasksSyncData);
 
         expect(mockedTasksSyncRepository.save.mock.calls).toHaveLength(1);
@@ -55,7 +55,7 @@ describe("[Tasks Sync]: Test Create Multiple Sync Monitors Service", () => {
         const mockedTasksSyncRepository = jest.fn();
         mockedTasksSyncRepository.save = jest.fn((unitOfWork, taskId, status) => { /* Do Nothing */ });
 
-        const underTest = new UseCaseCreateTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseCreateTaskSyncs(mockedTasksSyncRepository);
         await underTest.execute(unitOfWork, tasksSyncData);
 
         expect(mockedTasksSyncRepository.save.mock.calls).toHaveLength(0);
@@ -75,7 +75,7 @@ describe("[Tasks Sync]: Test Create Multiple Sync Monitors Service", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseCreateTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseCreateTaskSyncs(mockedTasksSyncRepository);
         expect(underTest.execute(unitOfWork, tasksSyncData)).rejects.toThrow(Error);
 
         expect(mockedTasksSyncRepository.save.mock.calls).toHaveLength(1);
@@ -91,7 +91,7 @@ describe("[Tasks Sync]: Test Create Multiple Sync Monitors Service", () => {
 
         const mockedTasksSyncRepository = jest.fn();
 
-        const underTest = new UseCaseCreateTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseCreateTaskSyncs(mockedTasksSyncRepository);
         expect(underTest.execute(undefined, tasksSyncData)).rejects.toThrow(Errors.NullArgumentError);
     });
 
@@ -99,7 +99,7 @@ describe("[Tasks Sync]: Test Create Multiple Sync Monitors Service", () => {
         const unitOfWork = jest.fn();
         const mockedTasksSyncRepository = jest.fn();
 
-        const underTest = new UseCaseCreateTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseCreateTaskSyncs(mockedTasksSyncRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

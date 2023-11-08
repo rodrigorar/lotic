@@ -16,7 +16,7 @@ describe("[Tasks]: Test List Tasks For Account Use Case", () => {
         const mockedTasksRepository = jest.fn();
         mockedTasksRepository.listByAccountId = jest.fn((unitOfWork, accountId) => dbResult);
 
-        const underTest = new UseCaseListTasksForAccount(mockedTasksRepository);
+        const underTest = UseCaseListTasksForAccount(mockedTasksRepository);
         const result = await underTest.execute(unitOfWork, accountId);
 
         expect(result).toBeDefined();
@@ -34,7 +34,7 @@ describe("[Tasks]: Test List Tasks For Account Use Case", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseListTasksForAccount(mockedTasksRepository);
+        const underTest = UseCaseListTasksForAccount(mockedTasksRepository);
         expect(underTest.execute(unitOfWork, accountId)).rejects.toThrow(Error);
 
         expect(mockedTasksRepository.listByAccountId.mock.calls).toHaveLength(1);
@@ -44,7 +44,7 @@ describe("[Tasks]: Test List Tasks For Account Use Case", () => {
         const accountId = v4();
         const mockedTasksRepository = jest.fn();
 
-        const underTest = new UseCaseListTasksForAccount(mockedTasksRepository);
+        const underTest = UseCaseListTasksForAccount(mockedTasksRepository);
         expect(underTest.execute(undefined, accountId)).rejects.toThrow(Errors.NullArgumentError);
     });
 
@@ -52,7 +52,7 @@ describe("[Tasks]: Test List Tasks For Account Use Case", () => {
         const unitOfWork = jest.fn();
         const mockedTasksRepository = jest.fn();
 
-        const underTest = new UseCaseListTasksForAccount(mockedTasksRepository);
+        const underTest = UseCaseListTasksForAccount(mockedTasksRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

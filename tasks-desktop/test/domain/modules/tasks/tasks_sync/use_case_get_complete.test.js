@@ -16,7 +16,7 @@ describe("[Tasks Sync]: Test Get Complete Service", () => {
             ];
         });
 
-        const underTest = new UseCaseGetCompleteTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseGetCompleteTaskSyncs(mockedTasksSyncRepository);
         const result = await underTest.execute(unitOfWork);
 
         expect(result).toBeDefined();
@@ -33,7 +33,7 @@ describe("[Tasks Sync]: Test Get Complete Service", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseGetCompleteTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseGetCompleteTaskSyncs(mockedTasksSyncRepository);
         expect(underTest.execute(unitOfWork)).rejects.toThrow(Error);
 
         expect(mockedTasksSyncRepository.getComplete.mock.calls).toHaveLength(1);
@@ -42,7 +42,7 @@ describe("[Tasks Sync]: Test Get Complete Service", () => {
     it("Should fail, no unit of work provided", async () => {
         const mockedTasksSyncRepository = jest.fn();
 
-        const underTest = new UseCaseGetCompleteTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseGetCompleteTaskSyncs(mockedTasksSyncRepository);
         expect(underTest.execute(undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

@@ -16,7 +16,7 @@ describe("[Tasks Sync]: Test Get Non Synced Service", () => {
             ];
         });
 
-        const underTest = new UseCaseGetNonSyncedTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseGetNonSyncedTaskSyncs(mockedTasksSyncRepository);
         const result = await underTest.execute(unitOfWork);
 
         expect(result).toBeDefined();
@@ -33,7 +33,7 @@ describe("[Tasks Sync]: Test Get Non Synced Service", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseGetNonSyncedTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseGetNonSyncedTaskSyncs(mockedTasksSyncRepository);
         expect(underTest.execute(unitOfWork)).rejects.toThrow(Error);
 
         expect(mockedTasksSyncRepository.getLocalAndDirty.mock.calls).toHaveLength(1);
@@ -42,7 +42,7 @@ describe("[Tasks Sync]: Test Get Non Synced Service", () => {
     it("Should fail, no unit of work provided", async () => {
         const mockedTasksSyncRepository = jest.fn();
 
-        const underTest = new UseCaseGetNonSyncedTaskSyncs(mockedTasksSyncRepository);
+        const underTest = UseCaseGetNonSyncedTaskSyncs(mockedTasksSyncRepository);
         expect(underTest.execute(undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

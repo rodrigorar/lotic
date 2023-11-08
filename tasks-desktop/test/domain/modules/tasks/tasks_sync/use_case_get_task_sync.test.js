@@ -13,7 +13,7 @@ describe("[Tasks Sync]: Test Get Sync Status Service", () => {
             return new TaskSync(v4(), taskId, TASK_SYNC_STATUS.SYNCED, new Date(), new Date());
         });
 
-        const underTest = new UseCaseGetTaskSyncByTaskId(mockedTasksSyncRepository);
+        const underTest = UseCaseGetTaskSyncByTaskId(mockedTasksSyncRepository);
         const result = await underTest.execute(unitOfWork, taskId);
 
         expect(result).toBeDefined();
@@ -31,7 +31,7 @@ describe("[Tasks Sync]: Test Get Sync Status Service", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseGetTaskSyncByTaskId(mockedTasksSyncRepository);
+        const underTest = UseCaseGetTaskSyncByTaskId(mockedTasksSyncRepository);
         expect(underTest.execute(unitOfWork, taskId)).rejects.toThrow(Error);
 
         expect(mockedTasksSyncRepository.get.mock.calls).toHaveLength(1);
@@ -41,7 +41,7 @@ describe("[Tasks Sync]: Test Get Sync Status Service", () => {
         const taskId = v4();
         const mockedTasksSyncRepository = jest.fn();
 
-        const underTest = new UseCaseGetTaskSyncByTaskId(mockedTasksSyncRepository);
+        const underTest = UseCaseGetTaskSyncByTaskId(mockedTasksSyncRepository);
         expect(underTest.execute(undefined, taskId)).rejects.toThrow(Errors.NullArgumentError);
     });
 
@@ -49,7 +49,7 @@ describe("[Tasks Sync]: Test Get Sync Status Service", () => {
         const unitOfWork = jest.fn();
         const mockedTasksSyncRepository = jest.fn();
 
-        const underTest = new UseCaseGetTaskSyncByTaskId(mockedTasksSyncRepository);
+        const underTest = UseCaseGetTaskSyncByTaskId(mockedTasksSyncRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

@@ -15,7 +15,7 @@ describe("[Tasks]: Test List Tasks by Id Use Case", () => {
         const mockedTasksRepository = jest.fn();
         mockedTasksRepository.listById = jest.fn((unitOfWork, taskIds) => dbResult);
 
-        const underTest = new UseCaseListTasksById(mockedTasksRepository);
+        const underTest = UseCaseListTasksById(mockedTasksRepository);
         const result = await underTest.execute(unitOfWork, dbResult.map(value => value.id));
 
         expect(result).toBeDefined();
@@ -31,7 +31,7 @@ describe("[Tasks]: Test List Tasks by Id Use Case", () => {
         const mockedTasksRepository = jest.fn();
         mockedTasksRepository.listById = jest.fn((unitOfWork, taskIds) => dbResult);
 
-        const underTest = new UseCaseListTasksById(mockedTasksRepository);
+        const underTest = UseCaseListTasksById(mockedTasksRepository);
         const result = await underTest.execute(unitOfWork);
 
         expect(result).toBeDefined();
@@ -48,7 +48,7 @@ describe("[Tasks]: Test List Tasks by Id Use Case", () => {
             throw new Error();
         });
 
-        const underTest = new UseCaseListTasksById(mockedTasksRepository);
+        const underTest = UseCaseListTasksById(mockedTasksRepository);
         expect(underTest.execute(unitOfWork, [])).rejects.toThrow(Error);
 
         expect(mockedTasksRepository.listById.mock.calls).toHaveLength(1);
@@ -57,7 +57,7 @@ describe("[Tasks]: Test List Tasks by Id Use Case", () => {
     it("Should fail, no unit of work provided", async () => {
         const mockedTasksRepository = jest.fn();
 
-        const underTest = new UseCaseListTasksById(mockedTasksRepository);
+        const underTest = UseCaseListTasksById(mockedTasksRepository);
         expect(underTest.execute(undefined, [])).rejects.toThrow(Errors.NullArgumentError);
     });
 });
