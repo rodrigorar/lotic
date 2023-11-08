@@ -1,50 +1,88 @@
-const { OSMask } = require("../os/os-mask");
+const { OSMask } = require("../os/os-mask");
 const { isDev } = require("../../domain/shared/utils");
-const { UnitOfWork } = require("../../domain/shared/unitofwork");
 const sqlite3 = require("sqlite3").verbose();
 const { open } = require("sqlite");
 
-class UnitOfWorkImpl extends UnitOfWork {
+const OpenTx = (() => {
+    let queryManager = undefined;
+    let references = 0;
 
-    constructor() {
-        super();
-
-        this.queryManager = undefined;
-        this.isInitilized = false;
-    }
-    
-    async init() {
-        if (! this.isInitilized) {
-            // FIXME: Implement a connection manager in order the manage
-            // the single connection to the database
+    const init = async () => {
+        if (queryManager == undefined) {
             const databaseFile = OSMask.databaseFile(isDev);
-            this.queryManager = await open({
+            queryManager = await open({
                 filename: databaseFile
                 , driver: sqlite3.Database
             });
         }
     }
 
-    async begin() {
-        await this.queryManager.run("BEGIN TRANSACTION", []);
+    const addReference = () => {
+        references++;
     }
 
-    getQueryManager() {
-        return this.queryManager;
+    const removeReference = () => {
+        references = references === 0 ? 0 : references - 1;
     }
 
-    async commit() {
-        await this.queryManager.run("COMMIT", []);
+    const getReferences = () => {
+        return references;
     }
 
-    async rollback() {
-        await this.queryManager.run("ROLLBACK", []);
+    const getQueryManager = () => {
+        return queryManager;
+    }
+
+    return {
+        init
+        , addReference
+        , removeReference
+        , getReferences
+        , getQueryManager
+    }
+})();
+
+const UnitOfWork = () => {
+
+    const init = async () => await OpenTx.init()
+
+    const begin = async () => {
+        if (OpenTx.getReferences() === 0) {
+            await OpenTx.getQueryManager().run("BEGIN TRANSACTION", []);
+        }
+        OpenTx.addReference();
+    }
+
+    const getQueryManager = () => {
+        return OpenTx.getQueryManager();
+    }
+
+    const commit = async () => {
+        if (OpenTx.getReferences() === 1) {
+            await OpenTx.getQueryManager().run("COMMIT", []);
+        }
+        OpenTx.removeReference();
+    }
+
+    const rollback = async () => {
+        if (OpenTx.getReferences() === 1) {
+            await OpenTx.getQueryManager().run("ROLLBACK", []);
+        }
+        OpenTx.removeReference();
+    }
+
+    return {
+        init
+        , begin
+        , getQueryManager
+        , commit
+        , rollback
     }
 }
 
 async function runUnitOfWork(work) {
     let result;
-    const unitOfWork = new UnitOfWorkImpl();
+    const unitOfWork = UnitOfWork();
     await unitOfWork.init();
 
     try {
@@ -59,7 +97,7 @@ async function runUnitOfWork(work) {
     return result;
 }
 
-module.exports.UnitOfWork = UnitOfWorkImpl;
+module.exports.UnitOfWork = UnitOfWork;
 module.exports.RunUnitOfWork = {
     run: runUnitOfWork
 };

@@ -1,5 +1,5 @@
 const { v4 } = require('uuid');
-const { UseCaseDeleteAllTaskSyncsForAccount } = require('../../../../../src/domain/modules/tasks/domain');
+const { UseCaseDeleteAllTaskSyncsForAccount } = require('../../../../../src/domain/modules/tasks');
 const { Errors } = require('../../../../../src/domain/errors');
 
 describe("[Tasks Sync]: Test Delete All For Account Service", () => {

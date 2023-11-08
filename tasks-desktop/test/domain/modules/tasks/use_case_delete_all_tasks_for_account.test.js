@@ -1,6 +1,6 @@
 const { v4 } = require('uuid');
 const { Errors } = require('../../../../src/domain/errors');
-const { UseCaseDeleteAllTasksForAccount } = require('../../../../src/domain/modules/tasks/domain');
+const { UseCaseDeleteAllTasksForAccount } = require('../../../../src/domain/modules/tasks');
 
 describe("[Tasks]: Test Delete All For Account Service", () => {
     it("Should succeed deleting all tasks for account", async () => {

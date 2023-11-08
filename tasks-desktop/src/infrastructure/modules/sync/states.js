@@ -3,7 +3,7 @@ const { Logger } = require("../../../domain/shared/logger");
 const { RunUnitOfWork } = require("../../persistence/unitofwork");
 const { UseCaseGetActiveSessionProvider } = require("../auth/providers");
 const { State, StateEffect } = require("../../../domain/modules/sync/domain");
-const { TASK_SYNC_STATUS } = require("../../../domain/modules/tasks/domain");
+const { TASK_SYNC_STATUS } = require("../../../domain/modules/tasks");
 const { 
     ListTasksGateway
     , DeleteTasksGateway
@@ -159,7 +159,7 @@ class UpdateTasksLocalState extends State {
                 , UseCaseDeleteTasksProvider.get()
                 , UseCaseGetTaskSyncByTaskIdProvider.get()
                 , UseCaseDeleteTaskSyncsByTaskIdsProvider.get()
-                , new ListTasksGateway()));
+                , ListTasksGateway));
     }
 }
 
@@ -239,7 +239,7 @@ class CreateTasksLocalState extends State {
                     RunUnitOfWork
                     , UseCaseGetActiveSessionProvider.get()
                     , UseCaseUpdateTaskProvider.get()
-                    , new ListTasksGateway()));
+                    , ListTasksGateway));
         });
     }
 }
@@ -308,7 +308,7 @@ class DeleteTasksRemoteState extends State {
                 , UseCaseListTasksForAccountProvider.get()
                 , UseCaseCreateTasksProvider.get()
                 , UseCaseCreateTaskSyncsProvider.get()
-                , new ListTasksGateway()));
+                , ListTasksGateway));
     }
 }
 
@@ -372,7 +372,7 @@ class UpdateTasksRemoteState extends State {
                 RunUnitOfWork
                 , UseCaseGetCompleteTaskSyncsProvider.get()
                 , UseCaseDeleteTaskSyncsByTaskIdsProvider.get()
-                , new DeleteTasksGateway()));
+                , DeleteTasksGateway));
     }
 }
 
@@ -444,7 +444,7 @@ class CreateTasksRemoteState extends State {
                 , UseCaseListTasksByIdProvider.get()
                 , UseCaseGetNonSyncedTaskSyncsProvider.get()
                 , UseCaseMarkTaskSyncsSyncedProvider.get()
-                , new UpdateTasksGateway()));
+                , UpdateTasksGateway));
     }
 }
 
@@ -476,7 +476,7 @@ class StartSyncState extends State {
                         , UseCaseListTasksByIdProvider.get()
                         , UseCaseGetNonSyncedTaskSyncsProvider.get()
                         , UseCaseMarkTaskSyncsSyncedProvider.get()
-                        , new CreateTasksGateway()));
+                        , CreateTasksGateway));
             } else {
                 Logger.info("No account logged in, next state is SyncDoneState");
                 result = new SyncDoneState()

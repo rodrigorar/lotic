@@ -1,11 +1,9 @@
 const { generateId } = require("../../../domain/shared/utils");
-const { TasksRepository, TaskSyncRepository } = require("../../../domain/modules/tasks/data");
 const { Tables, Fields } = require("../../persistence/tables");
-const { Task, TaskSync, TASK_SYNC_STATUS } = require("../../../domain/modules/tasks/domain");
+const { Task, TaskSync } = require("../../../domain/modules/tasks");
 
-class TasksRepositoryImpl extends TasksRepository {
-
-    async save(unitOfWork, task) {
+const TasksRepository = (() => {
+    const save = async (unitOfWork, task) => {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
             `INSERT INTO ${Tables.Tasks}`
@@ -15,7 +13,7 @@ class TasksRepositoryImpl extends TasksRepository {
     }
 
     // FIXME: This is horrendous
-    async update(unitOfWork, task) {
+    const update = async (unitOfWork, task) => {
         const queryManager = unitOfWork.getQueryManager();
         if (task.position != undefined) {
             await queryManager.run(
@@ -33,7 +31,7 @@ class TasksRepositoryImpl extends TasksRepository {
     }
 
     // FIXME: This should be on the save function
-    async updateTaskOwner(unitOfWork, task) {
+    const updateTaskOwner = async (unitOfWork, task) => {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
             `UPDATE ${Tables.Tasks} `
@@ -42,7 +40,7 @@ class TasksRepositoryImpl extends TasksRepository {
             , [task.ownerId, new Date().toISOString(), task.id]);
     }
 
-    async get(unitOfWork, taskId) {
+    const get = async (unitOfWork, taskId) => {
         const queryManager = unitOfWork.getQueryManager();
         const result = await queryManager
             .all(`SELECT *`
@@ -59,7 +57,7 @@ class TasksRepositoryImpl extends TasksRepository {
             : undefined;
     }
 
-    async listByAccountId(unitOfWork, accountId) {
+    const listByAccountId = async (unitOfWork, accountId) => {
         const queryManager = unitOfWork.getQueryManager();
         const result = await queryManager
             .all(`SELECT * FROM `
@@ -74,7 +72,7 @@ class TasksRepositoryImpl extends TasksRepository {
                 , entry.owner_id));
     }
 
-    async listWithoutOwner(unitOfWork) {
+    const listWithoutOwner = async (unitOfWork) => {
         const queryManager = unitOfWork.getQueryManager();
         const result = await queryManager
             .all(`SELECT * `
@@ -89,7 +87,7 @@ class TasksRepositoryImpl extends TasksRepository {
                 , entry.owner_id));
     }
 
-    async listById(unitOfWork, tasksIds = []) {
+    const listById = async (unitOfWork, tasksIds = []) => {
         const queryManager = unitOfWork.getQueryManager();
         const result = await queryManager
             .all(`SELECT * `
@@ -104,7 +102,7 @@ class TasksRepositoryImpl extends TasksRepository {
                 , entry.owner_id));
     }
 
-    async getMaxPosition(unitOfWork) {
+    const getMaxPosition = async (unitOfWork) => {
         const queryManager = unitOfWork.getQueryManager();
         const queryResult = await queryManager
             .all(`SELECT MAX(${Fields.Tasks.Position}) as 'max_position'`
@@ -112,23 +110,35 @@ class TasksRepositoryImpl extends TasksRepository {
         const result = queryResult.map(entry => entry.max_position)[0];
         return result ? result : -1;
     }
-    
-    async erase(unitOfWork, id) {
+
+    const erase = async (unitOfWork, id) => {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(`DELETE FROM ${Tables.Tasks} `
             + `WHERE ${Fields.Tasks.Id} = ?`, [id]);
     }
 
-    async eraseAllForAccount(unitOfWork, accountId) {
+    const eraseAllForAccount = async (unitOfWork, accountId) => {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(`DELETE FROM ${Tables.Tasks} `
             + `WHERE ${Fields.Tasks.OwnerId} = ?`, [accountId]);
     }
-}
 
-class TasksSyncRepositoryImpl extends TaskSyncRepository {
+    return {
+        save
+        , update
+        , updateTaskOwner
+        , get
+        , listByAccountId
+        , listWithoutOwner
+        , listById
+        , getMaxPosition
+        , erase
+        , eraseAllForAccount
+    }
+})();
 
-    async save(unitOfWork, taskId, state = undefined) {
+const TasksSyncRepository = (() => {
+    const save = async (unitOfWork, taskId, state = undefined) => {
         const queryManager = unitOfWork.getQueryManager();
         const id = generateId();
         const currentDate = new Date();
@@ -140,7 +150,7 @@ class TasksSyncRepositoryImpl extends TaskSyncRepository {
             , [id, taskId, state , currentDate.toISOString(), currentDate.toISOString()]);   
     }
 
-    async markDirty(unitOfWork, taskId) {
+    const markDirty = async (unitOfWork, taskId) => {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
             `UPDATE ${Tables.TasksSync} `
@@ -149,7 +159,7 @@ class TasksSyncRepositoryImpl extends TaskSyncRepository {
             , [new Date().toISOString(), taskId]);
     }
 
-    async getLocalAndDirty(unitOfWork) {
+    const getLocalAndDirty = async (unitOfWork) => {
         const queryManager = unitOfWork.getQueryManager();
         const queryResult = await queryManager.all(
             `SELECT * `
@@ -164,7 +174,7 @@ class TasksSyncRepositoryImpl extends TaskSyncRepository {
             , new Date(row.updated_at)));
     }
 
-    async getComplete(unitOfWork) {
+    const getComplete = async (unitOfWork) => {
         const queryManager = unitOfWork.getQueryManager();
         const queryResult = await queryManager.all(
             `SELECT * `
@@ -179,7 +189,7 @@ class TasksSyncRepositoryImpl extends TaskSyncRepository {
             , new Date(row.updated_at)));
     }
 
-    async get(unitOfWork, taskId) {
+    const get = async (unitOfWork, taskId) => {
         const queryManager = unitOfWork.getQueryManager();
         const result = await queryManager.get(
             `SELECT * `
@@ -204,7 +214,7 @@ class TasksSyncRepositoryImpl extends TaskSyncRepository {
             , new Date(result.updated_at)) : undefined;
     }
 
-    async update(unitOfWork, taskSyncData) {
+    const update = async (unitOfWork, taskSyncData) => {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
             `UPDATE ${Tables.TasksSync} `
@@ -213,13 +223,13 @@ class TasksSyncRepositoryImpl extends TaskSyncRepository {
             , [taskSyncData.status, new Date().toISOString(), taskSyncData.taskId])
     }
 
-    async updateMultiple(unitOfWork, tasksSyncData) {
+    const updateMultiple = async (unitOfWork, tasksSyncData) => {
         for (let taskSyncData of tasksSyncData) {
-            this.update(unitOfWork, taskSyncData);
+            update(unitOfWork, taskSyncData);
         }
     }
 
-    async eraseComplete(unitOfWork) {
+    const eraseComplete = async (unitOfWork) => {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
             `DELETE FROM ${Tables.TasksSync} `
@@ -227,7 +237,7 @@ class TasksSyncRepositoryImpl extends TaskSyncRepository {
             , []);
     }
 
-    async eraseByTaskIds(unitOfWork, taskIds) {
+    const eraseByTaskIds = async (unitOfWork, taskIds) => {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
             `DELETE FROM ${Tables.TasksSync} `
@@ -235,7 +245,7 @@ class TasksSyncRepositoryImpl extends TaskSyncRepository {
             , taskIds);
     }
 
-    async eraseAllForAccount(unitOfWork, accountId) {
+    const eraseAllForAccount = async (unitOfWork, accountId) => {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
             `DELETE FROM ${Tables.TasksSync} `
@@ -246,8 +256,19 @@ class TasksSyncRepositoryImpl extends TaskSyncRepository {
             , [accountId]);
     }
 
-}
+    return {
+        save
+        , markDirty
+        , getLocalAndDirty
+        , getComplete
+        , get
+        , update
+        , updateMultiple
+        , eraseComplete
+        , eraseByTaskIds
+        , eraseAllForAccount
+    }
+})();
 
-
-module.exports.TasksRepositoryImpl = TasksRepositoryImpl;
-module.exports.TasksSyncRepositoryImpl = TasksSyncRepositoryImpl;
+module.exports.TasksRepository = TasksRepository;
+module.exports.TasksSyncRepository = TasksSyncRepository;

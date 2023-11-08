@@ -1,4 +1,3 @@
-const { UseCaseProvider } = require("../../../domain/shared/ports");
 const { 
     UseCaseCreateTask
     , UseCaseCreateTasks
@@ -23,177 +22,195 @@ const {
     , UseCaseGetNonSyncedTaskSyncs
     , UseCaseGetCompleteTaskSyncs
     , UseCaseGetTaskSyncByTaskId
-} = require("../../../domain/modules/tasks/domain");
-const { TasksRepositoryImpl, TasksSyncRepositoryImpl } = require("./adapters");
+} = require("../../../domain/modules/tasks");
+const { TasksRepository, TasksSyncRepository } = require("./adapters");
 
 // Task Use Case Providers
 
-class UseCaseCreateTaskProvider extends UseCaseProvider {
-
-    get() {
-        return new UseCaseCreateTask(new TasksRepositoryImpl());
+const UseCaseCreateTaskProvider = (() => {
+    const get = () => UseCaseCreateTask(TasksRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseCreateTasksProvider extends UseCaseProvider {
-
-    get() {
-        return new UseCaseCreateTasks(new TasksRepositoryImpl());
+const UseCaseCreateTasksProvider = (() => {
+    const get = () => UseCaseCreateTasks(TasksRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseUpdateTaskProvider extends UseCaseProvider {
-
-    get() {
-        return new UseCaseUpdateTask(new TasksRepositoryImpl());
+const UseCaseUpdateTaskProvider = (() => {
+    const get = () => UseCaseUpdateTask(TasksRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseUpdateTasksProvider extends UseCaseProvider {
-
-    get() {
-        return new UseCaseUpdateTasks(new TasksRepositoryImpl());
+const UseCaseUpdateTasksProvider = (() => {
+    const get = () => UseCaseUpdateTasks(TasksRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseGetTaskByIdProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseGetTaskById(new TasksRepositoryImpl());
+const UseCaseGetTaskByIdProvider = (() => {
+    const get = () => UseCaseGetTaskById(TasksRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseListTasksForAccountProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseListTasksForAccount(new TasksRepositoryImpl());
+const UseCaseListTasksForAccountProvider = (() => {
+    const get = () => UseCaseListTasksForAccount(TasksRepository);
+    return {
+        get
     }
-} 
+})();
 
-class UseCaseListTasksWithoutOwnerProvider extends UseCaseProvider {
-
-    get() {
-        return new UseCaseListTasksWithoutOwner(new TasksRepositoryImpl());
+const UseCaseListTasksWithoutOwnerProvider = (() => {
+    const get = () => UseCaseListTasksWithoutOwner(TasksRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseListTasksByIdProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseListTasksById(new TasksRepositoryImpl());
+const UseCaseListTasksByIdProvider = (() => {
+    const get = () => UseCaseListTasksById(TasksRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseDeleteTaskProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseDeleteTask(new TasksRepositoryImpl());
+const UseCaseDeleteTaskProvider = (() => {
+    const get = () => UseCaseDeleteTask(TasksRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseDeleteTasksProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseDeleteTasks(new TasksRepositoryImpl());
+const UseCaseDeleteTasksProvider = (() => {
+    const get = () => UseCaseDeleteTasks(TasksRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseDeleteAllTasksForAccountProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseDeleteAllTasksForAccount(new TasksRepositoryImpl());
+const UseCaseDeleteAllTasksForAccountProvider = (() => {
+    const get = () => UseCaseDeleteAllTasksForAccount(TasksRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseUpdateTaskOwnerProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseUpdateTaskOwner(new TasksRepositoryImpl());
+const UseCaseUpdateTaskOwnerProvider = (() => {
+    const get = () => UseCaseUpdateTaskOwner(TasksRepository);
+    return {
+        get
     }
-}
+})();
 
 // Task Sync Use Case Providers
 
-class UseCaseCreateTaskSyncProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseCreateTaskSync(new TasksSyncRepositoryImpl());
+const UseCaseCreateTaskSyncProvider = (() => {
+    const get = () => UseCaseCreateTaskSync(TasksSyncRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseCreateTaskSyncsProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseCreateTaskSyncs(new TasksSyncRepositoryImpl());
+const UseCaseCreateTaskSyncsProvider = (() => {
+    const get = () => UseCaseCreateTaskSyncs(TasksSyncRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseDeleteCompleteTaskSyncsProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseDeleteCompleteTaskSyncs(new TasksSyncRepositoryImpl());
+const UseCaseDeleteCompleteTaskSyncsProvider = (() => {
+    const get = () => UseCaseDeleteCompleteTaskSyncs(TasksSyncRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseDeleteTaskSyncsByTaskIdsProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseDeleteTaskSyncsByTaskIds(new TasksSyncRepositoryImpl());
+const UseCaseDeleteTaskSyncsByTaskIdsProvider = (() => {
+    const get = () => UseCaseDeleteTaskSyncsByTaskIds(TasksSyncRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseDeleteAllTaskSyncsForAccountProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseDeleteAllTaskSyncsForAccount(new TasksSyncRepositoryImpl());
+const UseCaseDeleteAllTaskSyncsForAccountProvider = (() => {
+    const get = () => UseCaseDeleteAllTaskSyncsForAccount(TasksSyncRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseMarkTaskSyncForRemovalProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseMarkTaskSyncForRemoval(new TasksSyncRepositoryImpl());
+const UseCaseMarkTaskSyncForRemovalProvider = (() => {
+    const get = () => UseCaseMarkTaskSyncForRemoval(TasksSyncRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseMarkTaskSyncDirtyProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseMarkTaskSyncDirty(new TasksSyncRepositoryImpl());
+const UseCaseMarkTaskSyncDirtyProvider = (() => {
+    const get = () => UseCaseMarkTaskSyncDirty(TasksSyncRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseMarkTaskSyncsSyncedProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseMarkTaskSyncsSynced(new TasksSyncRepositoryImpl());
+const UseCaseMarkTaskSyncsSyncedProvider = (() => {
+    const get = () => UseCaseMarkTaskSyncsSynced(TasksSyncRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseGetNonSyncedTaskSyncsProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseGetNonSyncedTaskSyncs(new TasksSyncRepositoryImpl());
+const UseCaseGetNonSyncedTaskSyncsProvider = (() => {
+    const get = () => UseCaseGetNonSyncedTaskSyncs(TasksSyncRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseGetCompleteTaskSyncsProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseGetCompleteTaskSyncs(new TasksSyncRepositoryImpl());
+const UseCaseGetCompleteTaskSyncsProvider = (() => {
+    const get = () => UseCaseGetCompleteTaskSyncs(TasksSyncRepository);
+    return {
+        get
+    } 
+})();
+
+const UseCaseGetTaskSyncByTaskIdProvider = (() => {
+    const get = () => UseCaseGetTaskSyncByTaskId(TasksSyncRepository);
+    return {
+        get
     }
-}
+})();
 
-class UseCaseGetTaskSyncByTaskIdProvider extends UseCaseProvider {
-    get() {
-        return new UseCaseGetTaskSyncByTaskId(new TasksSyncRepositoryImpl());
-    }
-}
+module.exports.UseCaseCreateTaskProvider = UseCaseCreateTaskProvider;
+module.exports.UseCaseCreateTasksProvider = UseCaseCreateTasksProvider;
+module.exports.UseCaseUpdateTaskProvider = UseCaseUpdateTaskProvider;
+module.exports.UseCaseUpdateTasksProvider = UseCaseUpdateTasksProvider;
+module.exports.UseCaseGetTaskByIdProvider = UseCaseGetTaskByIdProvider;
+module.exports.UseCaseListTasksForAccountProvider = UseCaseListTasksForAccountProvider;
+module.exports.UseCaseListTasksWithoutOwnerProvider = UseCaseListTasksWithoutOwnerProvider;
+module.exports.UseCaseListTasksByIdProvider = UseCaseListTasksByIdProvider;
+module.exports.UseCaseDeleteTaskProvider = UseCaseDeleteTaskProvider;
+module.exports.UseCaseDeleteTasksProvider = UseCaseDeleteTasksProvider;
+module.exports.UseCaseDeleteAllTasksForAccountProvider = UseCaseDeleteAllTasksForAccountProvider;
+module.exports.UseCaseUpdateTaskOwnerProvider = UseCaseUpdateTaskOwnerProvider;
 
-module.exports.UseCaseCreateTaskProvider = new UseCaseCreateTaskProvider();
-module.exports.UseCaseCreateTasksProvider = new UseCaseCreateTasksProvider();
-module.exports.UseCaseUpdateTaskProvider = new UseCaseUpdateTaskProvider();
-module.exports.UseCaseUpdateTasksProvider = new UseCaseUpdateTasksProvider();
-module.exports.UseCaseGetTaskByIdProvider = new UseCaseGetTaskByIdProvider();
-module.exports.UseCaseListTasksForAccountProvider = new UseCaseListTasksForAccountProvider();
-module.exports.UseCaseListTasksWithoutOwnerProvider = new UseCaseListTasksWithoutOwnerProvider();
-module.exports.UseCaseListTasksByIdProvider = new UseCaseListTasksByIdProvider();
-module.exports.UseCaseDeleteTaskProvider = new UseCaseDeleteTaskProvider();
-module.exports.UseCaseDeleteTasksProvider = new UseCaseDeleteTasksProvider();
-module.exports.UseCaseDeleteAllTasksForAccountProvider = new UseCaseDeleteAllTasksForAccountProvider();
-module.exports.UseCaseUpdateTaskOwnerProvider = new UseCaseUpdateTaskOwnerProvider();
-
-module.exports.UseCaseCreateTaskSyncProvider = new UseCaseCreateTaskSyncProvider();
-module.exports.UseCaseCreateTaskSyncsProvider = new UseCaseCreateTaskSyncsProvider();
-module.exports.UseCaseDeleteCompleteTaskSyncsProvider = new UseCaseDeleteCompleteTaskSyncsProvider();
-module.exports.UseCaseDeleteTaskSyncsByTaskIdsProvider = new UseCaseDeleteTaskSyncsByTaskIdsProvider();
-module.exports.UseCaseDeleteAllTaskSyncsForAccountProvider = new UseCaseDeleteAllTaskSyncsForAccountProvider();
-module.exports.UseCaseMarkTaskSyncForRemovalProvider = new UseCaseMarkTaskSyncForRemovalProvider();
-module.exports.UseCaseMarkTaskSyncDirtyProvider = new UseCaseMarkTaskSyncDirtyProvider();
-module.exports.UseCaseMarkTaskSyncsSyncedProvider = new UseCaseMarkTaskSyncsSyncedProvider();
-module.exports.UseCaseGetNonSyncedTaskSyncsProvider = new UseCaseGetNonSyncedTaskSyncsProvider();
-module.exports.UseCaseGetCompleteTaskSyncsProvider = new UseCaseGetCompleteTaskSyncsProvider();
-module.exports.UseCaseGetTaskSyncByTaskIdProvider = new UseCaseGetTaskSyncByTaskIdProvider();
+module.exports.UseCaseCreateTaskSyncProvider = UseCaseCreateTaskSyncProvider;
+module.exports.UseCaseCreateTaskSyncsProvider = UseCaseCreateTaskSyncsProvider;
+module.exports.UseCaseDeleteCompleteTaskSyncsProvider = UseCaseDeleteCompleteTaskSyncsProvider;
+module.exports.UseCaseDeleteTaskSyncsByTaskIdsProvider = UseCaseDeleteTaskSyncsByTaskIdsProvider;
+module.exports.UseCaseDeleteAllTaskSyncsForAccountProvider = UseCaseDeleteAllTaskSyncsForAccountProvider;
+module.exports.UseCaseMarkTaskSyncForRemovalProvider = UseCaseMarkTaskSyncForRemovalProvider;
+module.exports.UseCaseMarkTaskSyncDirtyProvider = UseCaseMarkTaskSyncDirtyProvider;
+module.exports.UseCaseMarkTaskSyncsSyncedProvider = UseCaseMarkTaskSyncsSyncedProvider;
+module.exports.UseCaseGetNonSyncedTaskSyncsProvider = UseCaseGetNonSyncedTaskSyncsProvider;
+module.exports.UseCaseGetCompleteTaskSyncsProvider = UseCaseGetCompleteTaskSyncsProvider;
+module.exports.UseCaseGetTaskSyncByTaskIdProvider = UseCaseGetTaskSyncByTaskIdProvider;

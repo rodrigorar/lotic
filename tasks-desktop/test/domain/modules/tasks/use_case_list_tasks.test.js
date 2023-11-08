@@ -1,6 +1,6 @@
 const { v4 } = require('uuid');
 const { Errors } = require('../../../../src/domain/errors');
-const { Task, UseCaseListTasksForAccount } = require('../../../../src/domain/modules/tasks/domain');
+const { Task, UseCaseListTasksForAccount } = require('../../../../src/domain/modules/tasks');
 
 describe("[Tasks]: Test List Tasks For Account Use Case", () => {
     

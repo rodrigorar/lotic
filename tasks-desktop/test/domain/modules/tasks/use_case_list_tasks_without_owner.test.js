@@ -1,6 +1,6 @@
 const { v4 } = require('uuid');
 const { Errors } = require('../../../../src/domain/errors');
-const { Task, UseCaseListTasksWithoutOwner } = require('../../../../src/domain/modules/tasks/domain');
+const { Task, UseCaseListTasksWithoutOwner } = require('../../../../src/domain/modules/tasks');
 
 describe("[Tasks]: Test List Tasks Without Owner Use Case", () => {
     

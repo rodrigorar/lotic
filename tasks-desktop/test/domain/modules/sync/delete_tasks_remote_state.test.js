@@ -1,6 +1,6 @@
 const { v4 } = require("uuid");
 const { NotImplementedError } = require("../../../../src/domain/errors");
-const { TaskSync, TASK_SYNC_STATUS } = require("../../../../src/domain/modules/tasks/domain");
+const { TaskSync, TASK_SYNC_STATUS } = require("../../../../src/domain/modules/tasks");
 const { DeleteTasksRemoteStateEffect } = require("../../../../src/infrastructure/modules/sync/states");
 
 describe("[Sync]: Test Delete Tasks Remote State Effect", () => {

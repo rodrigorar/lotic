@@ -1,5 +1,5 @@
 const { v4 } = require('uuid');
-const { TASK_SYNC_STATUS, TaskSync, UseCaseGetCompleteTaskSyncs } = require('../../../../../src/domain/modules/tasks/domain');
+const { TASK_SYNC_STATUS, TaskSync, UseCaseGetCompleteTaskSyncs } = require('../../../../../src/domain/modules/tasks');
 const { Errors } = require('../../../../../src/domain/errors');
 
 describe("[Tasks Sync]: Test Get Complete Service", () => {

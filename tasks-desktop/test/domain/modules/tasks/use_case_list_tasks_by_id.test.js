@@ -1,6 +1,6 @@
 const { v4 } = require('uuid');
 const { Errors } = require('../../../../src/domain/errors');
-const { Task, UseCaseListTasksById } = require('../../../../src/domain/modules/tasks/domain');
+const { Task, UseCaseListTasksById } = require('../../../../src/domain/modules/tasks');
 
 describe("[Tasks]: Test List Tasks by Id Use Case", () => {
     it("Should succeed listing tasks by id", async () => {

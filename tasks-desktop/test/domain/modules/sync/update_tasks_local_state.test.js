@@ -1,5 +1,5 @@
 const { v4 } = require("uuid");
-const { Task } = require("../../../../src/domain/modules/tasks/domain");
+const { Task } = require("../../../../src/domain/modules/tasks");
 const { UpdateTasksLocalStateEffect } = require("../../../../src/infrastructure/modules/sync/states");
 const { AuthToken } = require("../../../../src/domain/modules/auth");
 

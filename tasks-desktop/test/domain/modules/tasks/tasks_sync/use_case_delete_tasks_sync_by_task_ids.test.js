@@ -1,5 +1,5 @@
 const { v4 } = require('uuid');
-const { UseCaseDeleteTaskSyncsByTaskIds } = require('../../../../../src/domain/modules/tasks/domain');
+const { UseCaseDeleteTaskSyncsByTaskIds } = require('../../../../../src/domain/modules/tasks');
 
 describe("[Tasks Sync]: Test Multiple by Task Id Service", () => {
     

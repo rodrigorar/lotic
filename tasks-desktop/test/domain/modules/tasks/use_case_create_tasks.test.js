@@ -1,6 +1,6 @@
 const { v4 } = require('uuid');
 const { Errors } = require('../../../../src/domain/errors');
-const { UseCaseCreateTasks } = require('../../../../src/domain/modules/tasks/domain');
+const { UseCaseCreateTasks } = require('../../../../src/domain/modules/tasks');
 
 describe("[Tasks]: Test Create Multiple Tasks Use Case", () => {
     it("Should succeed creating all tasks", async () => {

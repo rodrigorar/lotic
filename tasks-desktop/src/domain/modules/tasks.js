@@ -1,5 +1,4 @@
-const { Validators } = require("../../shared/utils");
-const { Command, Query } = require("../../shared/ports");
+const { Validators } = require("../shared/utils");
 
 class Task {
     constructor(id, title, position, createdAt, updatedAt, ownerId) {
@@ -31,20 +30,13 @@ class TaskSync {
 
 // Tasks Use Case
 
-class UseCaseCreateTask extends Command {
-
-    constructor(tasksRepository) {
-        super();
-
-        this.tasksRepository = tasksRepository;
-    }
-
-    async execute(unitOfWork, taskData) {
+const UseCaseCreateTask = (tasksRepository) => {
+    const execute = async (unitOfWork, taskData) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskData, "No task data was provided!");
 
         if (taskData.position == undefined) {
-            taskData.position = await this.tasksRepository.getMaxPosition(unitOfWork) + 1;
+            taskData.position = await tasksRepository.getMaxPosition(unitOfWork) + 1;
         }
 
         const task = 
@@ -55,23 +47,20 @@ class UseCaseCreateTask extends Command {
                 , taskData.createdAt
                 , taskData.updatedAt
                 , taskData.ownerId);
-        await this.tasksRepository.save(unitOfWork, task);
+        await tasksRepository.save(unitOfWork, task);
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseCreateTasks extends Command {
-
-    constructor(tasksRepository) {
-        super();
-        
-        this.tasksRepository = tasksRepository;
-    }
-
-    async execute(unitOfWork, taskDataList) {
+const UseCaseCreateTasks = (tasksRepository) => {
+    const execute = async (unitOfWork, taskDataList) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskDataList, "No tasks where provided");
 
-        let maxPosition = await this.tasksRepository.getMaxPosition(unitOfWork);
+        let maxPosition = await tasksRepository.getMaxPosition(unitOfWork);
     
         const tasks = taskDataList
             .map(taskData => {
@@ -90,171 +79,145 @@ class UseCaseCreateTasks extends Command {
                     , taskData.ownerId)
             });
         for (let task of tasks) {
-            await this.tasksRepository.save(unitOfWork, task);
+            await tasksRepository.save(unitOfWork, task);
         }
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseUpdateTask extends Command {
-
-    constructor(tasksRepository) {
-        super();
-        
-        this.tasksRepository = tasksRepository;
-    }
-
-    async execute(unitOfWork, taskData) {
+const UseCaseUpdateTask = (tasksRepository) => {
+    const execute = async (unitOfWork, taskData) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskData, "No task data provided");
 
-        await this.tasksRepository.update(unitOfWork, taskData);
+        await tasksRepository.update(unitOfWork, taskData);
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseUpdateTasks extends Command {
-
-    constructor(tasksRepository) {
-        super();
-        
-        this.tasksRepository = tasksRepository;
-    }
-
-    async execute(unitOfWork, taskDataList) {
+const UseCaseUpdateTasks = (tasksRepository) => {
+    const execute = async (unitOfWork, taskDataList) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskDataList, "No task data list provided");
 
         for (let taskData of taskDataList) {
-            await this.tasksRepository.update(unitOfWork, taskData)
+            await tasksRepository.update(unitOfWork, taskData)
         }
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseGetTaskById extends Query {
-    
-    constructor(tasksRepository) {
-        super();
-
-        this.tasksRepository = tasksRepository;
-    }
-
-    async execute(unitOfWork, taskId) {
+const UseCaseGetTaskById = (tasksRepository) => {
+    const execute = async (unitOfWork, taskId) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskId, "No task id provided");
 
-        return await this.tasksRepository.get(unitOfWork, taskId);
+        return await tasksRepository.get(unitOfWork, taskId);
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseListTasksForAccount extends Query {
-
-    constructor(tasksRepository) {
-        super();
-        
-        this.tasksRepository = tasksRepository;
-    }
-
-    async execute(unitOfWork, accountId) {
+const UseCaseListTasksForAccount = (tasksRepository) => {
+    const execute = async (unitOfWork, accountId) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(accountId, "No account id provided");
         
-        const result = await this.tasksRepository.listByAccountId(unitOfWork, accountId);
+        const result = await tasksRepository.listByAccountId(unitOfWork, accountId);
         result.sort((a, b) => a.position - b.position);
         return result;
     }
-}
 
-class UseCaseListTasksWithoutOwner extends Query {
-
-    constructor(tasksRepository) {
-        super();
-        
-        this.tasksRepository = tasksRepository;
-    }
-
-    async execute(unitOfWork) {
-        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-
-        return await this.tasksRepository.listWithoutOwner(unitOfWork);
+    return {
+        execute
     }
 }
 
-class UseCaseListTasksById extends Query {
-
-    constructor(tasksRepository) {
-        super();
-        
-        this.tasksRepository = tasksRepository;
-    }
-
-    async execute(unitOfWork, taskIdList = []) {
+const UseCaseListTasksWithoutOwner = (tasksRepository) => {
+    const execute = async (unitOfWork) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
 
-        const result = await this.tasksRepository.listById(unitOfWork, taskIdList);
+        return await tasksRepository.listWithoutOwner(unitOfWork);
+    }
+
+    return {
+        execute
+    }
+}
+
+const UseCaseListTasksById = (tasksRepository) => {
+    const execute = async (unitOfWork, taskIdList = []) => {
+        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+
+        const result = await tasksRepository.listById(unitOfWork, taskIdList);
         result.sort((a, b) => a.position - b.position);
         return result;
     }
+
+    return {
+        execute
+    }
 }
 
-class UseCaseDeleteTask extends Command {
-
-    constructor(tasksRepository) {
-        super();
-        
-        this.tasksRepository = tasksRepository;
-    }
-
-    async execute(unitOfWork, taskId) {
+const UseCaseDeleteTask = (tasksRepository) => {
+    const execute = async (unitOfWork, taskId) => {
         Validators.isNotNull(unitOfWork, "No Unit of Work provided");
         Validators.isNotNull(taskId, "No task id provided");
 
-        await this.tasksRepository.erase(unitOfWork, taskId);
+        await tasksRepository.erase(unitOfWork, taskId);
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseDeleteTasks extends Command {
-
-    constructor(tasksRepository) {
-        super();
-        
-        this.tasksRepository = tasksRepository;
-    }
-
-    async execute(unitOfWork, taskIds = []) {
+const UseCaseDeleteTasks = (tasksRepository) => {
+    const execute = async (unitOfWork, taskIds = []) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
 
         for (let taskId of taskIds) {
             await this.tasksRepository.erase(unitOfWork, taskId)
         }
     }
+
+    return {
+        execute
+    }
 }
 
-class UseCaseDeleteAllTasksForAccount extends Command {
-
-    constructor(tasksRepository) {
-        super();
-        
-        this.tasksRepository = tasksRepository;
-    }
-
-    async execute(unitOfWork, accountId) {
+const UseCaseDeleteAllTasksForAccount = (tasksRepository) => {
+    const execute = async (unitOfWork, accountId) => {
         Validators.isNotNull(unitOfWork, "No Unit of Work provided");
         Validators.isNotNull(accountId, "No account id provided");
 
         // TODO: This should use the standard Repository API and not a specific method
-        this.tasksRepository.eraseAllForAccount(unitOfWork, accountId);
+        tasksRepository.eraseAllForAccount(unitOfWork, accountId);
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseUpdateTaskOwner extends Command {
-
-    constructor(tasksRepository) {
-        super();
-        
-        this.tasksRepository = tasksRepository;
+const UseCaseUpdateTaskOwner = (tasksRepository) => {
+    const execute = async (unitOfWork, taskData) => {
+        this.tasksRepository.updateTaskOwner(unitOfWork, data);
     }
 
-    async execute(unitOfWork, taskData) {
-        this.tasksRepository.updateTaskOwner(unitOfWork, data);
+    return {
+        execute
     }
 }
 
@@ -262,128 +225,99 @@ class UseCaseUpdateTaskOwner extends Command {
 // FIXME: These use cases should coalesce with the use cases from the Tasks since
 //  the Tasks entity is the aggregate root of this module. 
 
-class UseCaseCreateTaskSync extends Command {
-
-    constructor(taskSyncRepository) {
-        super();
-        
-        this.taskSyncRepository = taskSyncRepository;
-    }
-
-    async execute(unitOfWork, taskId) {
+const UseCaseCreateTaskSync = (taskSyncRepository) => {
+    const execute = async (unitOfWork, taskId) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskId, "No task id provided");
 
-        await this.taskSyncRepository.save(unitOfWork, taskId, TASK_SYNC_STATUS["LOCAL"]);
+        await taskSyncRepository.save(unitOfWork, taskId, TASK_SYNC_STATUS["LOCAL"]);
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseCreateTaskSyncs extends Command {
-
-    constructor(taskSyncRepository) {
-        super();
-        
-        this.taskSyncRepository = taskSyncRepository;
-    }
-
-    async execute(unitOfWork, tasksSyncData) {
+const UseCaseCreateTaskSyncs = (taskSyncRepository) => {
+    const execute = async (unitOfWork, tasksSyncData) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(tasksSyncData, "No task sync data provided");
 
         for (let taskSyncData of tasksSyncData) {
-            await this.taskSyncRepository.save(unitOfWork, taskSyncData.taskId, taskSyncData.status);
+            await taskSyncRepository.save(unitOfWork, taskSyncData.taskId, taskSyncData.status);
         }
     }
+
+    return {
+        execute
+    }
 }
 
-class UseCaseDeleteCompleteTaskSyncs extends Command {
-
-    constructor(taskSyncRepository) {
-        super();
-        
-        this.taskSyncRepository = taskSyncRepository;
-    }
-
-    async execute(unitOfWork) {
+const UseCaseDeleteCompleteTaskSyncs = (taskSyncRepository) => {
+    const execute = async (unitOfWork) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        await taskSyncRepository.eraseComplete(unitOfWork);
+    }
 
-        await this.taskSyncRepository.eraseComplete(unitOfWork);
+    return {
+        execute
     }
 }
 
-class UseCaseDeleteTaskSyncsByTaskIds extends Command {
-
-    constructor(taskSyncRepository) {
-        super();
-        
-        this.taskSyncRepository = taskSyncRepository;
-    }
-
-    async execute(unitOfWork, taskIds) {
+const UseCaseDeleteTaskSyncsByTaskIds = (taskSyncRepository) => {
+    const execute = async (unitOfWork, taskIds) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskIds, "No task ids provided");
 
-        await this.taskSyncRepository.eraseByTaskIds(unitOfWork, taskIds);
+        await taskSyncRepository.eraseByTaskIds(unitOfWork, taskIds);
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseDeleteAllTaskSyncsForAccount extends Command {
-
-    constructor(taskSyncRepository) {
-        super();
-        
-        this.taskSyncRepository = taskSyncRepository;
-    }
-
-    async execute(unitOfWork, accountId) {
+const UseCaseDeleteAllTaskSyncsForAccount = (taskSyncRepository) => {
+    const execute = async (unitOfWork, accountId) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(accountId, "No account id provided");
 
-        await this.taskSyncRepository.eraseAllForAccount(unitOfWork, accountId);
+        await taskSyncRepository.eraseAllForAccount(unitOfWork, accountId);
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseMarkTaskSyncForRemoval extends Command {
-
-    constructor(taskSyncRepository) {
-        super();
-        
-        this.tasksSyncRepository = taskSyncRepository;
-    }
-
-    async execute(unitOfWork, taskId) {
+const UseCaseMarkTaskSyncForRemoval = (taskSyncRepository) => {
+    const execute = async (unitOfWork, taskId) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskId, "No task id provided");
 
-        await this.tasksSyncRepository.update(unitOfWork, { taskId: taskId, status: TASK_SYNC_STATUS["COMPLETE"] });
+        await taskSyncRepository.update(unitOfWork, { taskId: taskId, status: TASK_SYNC_STATUS["COMPLETE"] });
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseMarkTaskSyncDirty extends Command {
-
-    constructor(taskSyncRepository) {
-        super();
-        
-        this.taskSyncRepository = taskSyncRepository;
-    }
-
-    async execute(unitOfWork, taskId) {
+const UseCaseMarkTaskSyncDirty = (taskSyncRepository) => {
+    const execute = async (unitOfWork, taskId) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskId, "No task id provided");
 
-        await this.taskSyncRepository.markDirty(unitOfWork, taskId);
+        await taskSyncRepository.markDirty(unitOfWork, taskId);
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseMarkTaskSyncsSynced extends Command {
-
-    constructor(taskSyncRepository) {
-        super();
-
-        this.taskSyncRepository = taskSyncRepository;
-    }
-
-    async execute(unitOfWork, taskIds) {
+const UseCaseMarkTaskSyncsSynced = (taskSyncRepository) => {
+    const execute = async (unitOfWork, taskIds) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskIds, "No task ids provided");
 
@@ -391,53 +325,46 @@ class UseCaseMarkTaskSyncsSynced extends Command {
             taskId: id
             , status: TASK_SYNC_STATUS["SYNCED"]
         }));
-        await this.taskSyncRepository.updateMultiple(unitOfWork, tasksSyncData);
+        await taskSyncRepository.updateMultiple(unitOfWork, tasksSyncData);
+    }
+
+    return {
+        execute
     }
 }
 
-class UseCaseGetNonSyncedTaskSyncs extends Query {
-
-    constructor(taskSyncRepository) {
-        super();
-
-        this.taskSyncRepository = taskSyncRepository;
-    }
-
-    async execute(unitOfWork) {
+const UseCaseGetNonSyncedTaskSyncs = (taskSyncRepository) => {
+    const execute = async (unitOfWork) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
+        return await taskSyncRepository.getLocalAndDirty(unitOfWork);
+    }
 
-        return await this.taskSyncRepository.getLocalAndDirty(unitOfWork);
+    return {
+        execute
     }
 }
 
-class UseCaseGetCompleteTaskSyncs extends Query {
-
-    constructor(taskSyncRepository) {
-        super();
-
-        this.taskSyncRepository = taskSyncRepository;
-    }
-
-    async execute(unitOfWork) {
+const UseCaseGetCompleteTaskSyncs = (taskSyncRepository) => {
+    const execute = async (unitOfWork) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-
-        return await this.taskSyncRepository.getComplete(unitOfWork);
-    }   
-}
-
-class UseCaseGetTaskSyncByTaskId extends Query {
-
-    constructor(taskSyncRepository) {
-        super();
-
-        this.taskSyncRepository = taskSyncRepository;
+        return await taskSyncRepository.getComplete(unitOfWork);
     }
 
-    async execute(unitOfWork, taskId) {
+    return {
+        execute
+    }
+}
+
+const UseCaseGetTaskSyncByTaskId = (taskSyncRepository) => {
+    const execute = async (unitOfWork, taskId) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskId, "No task id provided");
 
-        return await this.taskSyncRepository.get(unitOfWork, taskId);
+        return await taskSyncRepository.get(unitOfWork, taskId);
+    }
+
+    return {
+        execute
     }
 }
 

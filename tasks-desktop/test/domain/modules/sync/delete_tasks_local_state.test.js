@@ -1,6 +1,6 @@
 const { v4 } = require("uuid");
 const { DeleteTasksLocalStateEffect } = require("../../../../src/infrastructure/modules/sync/states");
-const { Task, TaskSync, TASK_SYNC_STATUS } = require("../../../../src/domain/modules/tasks/domain");
+const { Task, TaskSync, TASK_SYNC_STATUS } = require("../../../../src/domain/modules/tasks");
 const { AuthToken } = require("../../../../src/domain/modules/auth");
 
 describe("[Sync]: Test Delete Tasks Local State Effect", () => {

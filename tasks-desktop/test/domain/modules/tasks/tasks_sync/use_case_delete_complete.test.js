@@ -1,4 +1,4 @@
-const { UseCaseDeleteCompleteTaskSyncs } = require('../../../../../src/domain/modules/tasks/domain');
+const { UseCaseDeleteCompleteTaskSyncs } = require('../../../../../src/domain/modules/tasks');
 
 describe("[Tasks Sync]: Test Delete Complete Service", () => {
 

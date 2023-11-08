@@ -184,7 +184,7 @@ EventBus.register(
       });
 
       mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html'));
-      
+
       await SynchManager.execute();
 
       webContents.getFocusedWebContents().send('auth:logged_in');

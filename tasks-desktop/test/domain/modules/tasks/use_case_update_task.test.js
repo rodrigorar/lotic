@@ -1,6 +1,6 @@
 const { v4 } = require('uuid');
 const { Errors } = require('../../../../src/domain/errors');
-const { UseCaseUpdateTask } = require('../../../../src/domain/modules/tasks/domain');
+const { UseCaseUpdateTask } = require('../../../../src/domain/modules/tasks');
 
 describe("[Tasks]: Test Update Task Use Case", () => {
     it("Should succeed updating a task", async () => {

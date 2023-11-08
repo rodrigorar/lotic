@@ -1,6 +1,6 @@
 const { v4 } = require('uuid');
 const { Errors } = require('../../../../../src/domain/errors');
-const { TASK_SYNC_STATUS, UseCaseCreateTaskSync } = require('../../../../../src/domain/modules/tasks/domain');
+const { TASK_SYNC_STATUS, UseCaseCreateTaskSync } = require('../../../../../src/domain/modules/tasks');
 
 describe("[Tasks Sync]: Test Create Sync Monitor Service", () => {
     

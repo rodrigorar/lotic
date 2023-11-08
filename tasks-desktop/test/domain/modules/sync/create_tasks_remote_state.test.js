@@ -7,7 +7,7 @@ const {
     TaskSync
     , Task
     , TASK_SYNC_STATUS 
-} = require('../../../../src/domain/modules/tasks/domain');
+} = require('../../../../src/domain/modules/tasks');
 
 describe("[Sync]: Test Create Tasks Remote State Effect", () => {
     

@@ -1,5 +1,5 @@
 const { v4 } = require('uuid');
-const { UseCaseMarkTaskSyncsSynced } = require('../../../../../src/domain/modules/tasks/domain');
+const { UseCaseMarkTaskSyncsSynced } = require('../../../../../src/domain/modules/tasks');
 const { Errors } = require('../../../../../src/domain/errors');
 
 describe("[Tasks Sync]: Test Mark Synced Service", () => {

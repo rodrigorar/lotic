@@ -1,5 +1,5 @@
 const { v4 } = require('uuid');
-const { UseCaseCreateTask } = require('../../../../src/domain/modules/tasks/domain');
+const { UseCaseCreateTask } = require('../../../../src/domain/modules/tasks');
 
 describe("[Tasks]: Test Create Task Use Case", () => {
     

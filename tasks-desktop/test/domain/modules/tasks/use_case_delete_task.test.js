@@ -1,6 +1,6 @@
 const { v4 } = require('uuid');
 const { Errors } = require('../../../../src/domain/errors');
-const { UseCaseDeleteTask } = require('../../../../src/domain/modules/tasks/domain');
+const { UseCaseDeleteTask } = require('../../../../src/domain/modules/tasks');
 
 describe("[Tasks]: Test Delete Task Use Case", () => {
     
