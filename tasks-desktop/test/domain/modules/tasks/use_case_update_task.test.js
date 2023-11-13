@@ -14,7 +14,10 @@ describe("[Tasks]: Test Update Task Use Case", () => {
         const mockedTasksRepository = jest.fn();
         mockedTasksRepository.update = jest.fn((unitOfWork, task) => { /* Do Nothing */ });
 
-        const underTest = UseCaseUpdateTask(mockedTasksRepository);
+        const mockedTasksSyncRepository = jest.fn();
+        mockedTasksSyncRepository.update = jest.fn((unitOfWork, taskSync) => { /* Do Nothing */ });
+
+        const underTest = UseCaseUpdateTask(mockedTasksRepository, mockedTasksSyncRepository);
         await underTest.execute(unitOfWork, taskData);
 
         expect(mockedTasksRepository.update.mock.calls).toHaveLength(1);
@@ -31,7 +34,30 @@ describe("[Tasks]: Test Update Task Use Case", () => {
         const mockedTasksRepository = jest.fn();
         mockedTasksRepository.update = jest.fn((unitOfWork, task) => { throw new Error(); });
 
-        const underTest = UseCaseUpdateTask(mockedTasksRepository);
+        const mockedTasksSyncRepository = jest.fn();
+        mockedTasksSyncRepository.update = jest.fn((unitOfWork, taskSync) => { /* Do Nothing */ });
+
+        const underTest = UseCaseUpdateTask(mockedTasksRepository, mockedTasksSyncRepository);
+        expect(underTest.execute(unitOfWork, taskData)).rejects.toThrow(Error);
+
+        expect(mockedTasksRepository.update.mock.calls).toHaveLength(1);
+    });
+
+    it("Should fail, tasks sync repository error", async () => {
+        const unitOfWork = jest.fn();
+        const taskData = {
+            id: v4()
+            , title: "New title for task #1"
+            , updatedAt: new Date()
+        };
+
+        const mockedTasksRepository = jest.fn();
+        mockedTasksRepository.update = jest.fn((unitOfWork, task) => { /* Do Nothing */ });
+
+        const mockedTasksSyncRepository = jest.fn();
+        mockedTasksSyncRepository.update = jest.fn((unitOfWork, taskSync) => { throw new Error(); });
+
+        const underTest = UseCaseUpdateTask(mockedTasksRepository, mockedTasksSyncRepository);
         expect(underTest.execute(unitOfWork, taskData)).rejects.toThrow(Error);
 
         expect(mockedTasksRepository.update.mock.calls).toHaveLength(1);
@@ -45,16 +71,18 @@ describe("[Tasks]: Test Update Task Use Case", () => {
         };
 
         const mockedTasksRepository = jest.fn();
+        const mockedTasksSyncRepository = jest.fn();
 
-        const underTest = UseCaseUpdateTask(mockedTasksRepository);
+        const underTest = UseCaseUpdateTask(mockedTasksRepository, mockedTasksSyncRepository);
         expect(underTest.execute(undefined, taskData)).rejects.toThrow(Errors.NullArgumentError);
     });
 
     it("Should fail, no task data provided", async () => {
         const unitOfWork = jest.fn();
         const mockedTasksRepository = jest.fn();
+        const mockedTasksSyncRepository = jest.fn();
 
-        const underTest = UseCaseUpdateTask(mockedTasksRepository);
+        const underTest = UseCaseUpdateTask(mockedTasksRepository, mockedTasksSyncRepository);
         expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

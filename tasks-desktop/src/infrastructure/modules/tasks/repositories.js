@@ -12,32 +12,30 @@ const TasksRepository = (() => {
             [task.id, task.title, task.position, task.createdAt.toISOString(), task.updatedAt.toISOString(), task.ownerId]);
     }
 
-    // FIXME: This is horrendous
     const update = async (unitOfWork, task) => {
         const queryManager = unitOfWork.getQueryManager();
-        if (task.position != undefined) {
-            await queryManager.run(
-                `UPDATE ${Tables.Tasks} `
-                + `SET ${Fields.Tasks.Title}=?, ${Fields.Tasks.Position}=?, ${Fields.Tasks.UpdatedAt}=? `
-                + `WHERE ${Fields.Tasks.Id}=?`, 
-                [task.title, task.position, task.updatedAt.toISOString(), task.id]);
-        } else {
-            await queryManager.run(
-                `UPDATE ${Tables.Tasks} `
-                + `SET ${Fields.Tasks.Title}=?, ${Fields.Tasks.UpdatedAt}=? `
-                + `WHERE ${Fields.Tasks.Id}=?`, 
-                [task.title, task.updatedAt.toISOString(), task.id]);
-        }
-    }
 
-    // FIXME: This should be on the save function
-    const updateTaskOwner = async (unitOfWork, task) => {
-        const queryManager = unitOfWork.getQueryManager();
+        const setConditionFields = [Fields.Tasks.UpdatedAt];
+        const variables = [task.updatedAt.toISOString()];
+        if (task.title != undefined) {
+            setConditionFields.push(Fields.Tasks.Title);
+            variables.push(task.title);
+        }
+        if (task.position != undefined) {
+            setConditionFields.push(Fields.Tasks.Position);
+            variables.push(task.position);
+        }
+        if (task.ownerId != undefined) {
+            setConditionFields.push(Fields.Tasks.OwnerId);
+            variables.push(task.ownerId);
+        }
+        variables.push(task.id);
+        
         await queryManager.run(
             `UPDATE ${Tables.Tasks} `
-            + `SET ${Fields.Tasks.OwnerId}=?, ${Fields.Tasks.UpdatedAt}=?`
+            + `SET ${setConditionFields.join("=? ,")}=? `
             + `WHERE ${Fields.Tasks.Id}=?`
-            , [task.ownerId, new Date().toISOString(), task.id]);
+            , variables);
     }
 
     const get = async (unitOfWork, taskId) => {
@@ -126,7 +124,6 @@ const TasksRepository = (() => {
     return {
         save
         , update
-        , updateTaskOwner
         , get
         , listByAccountId
         , listWithoutOwner
@@ -148,45 +145,6 @@ const TasksSyncRepository = (() => {
             + `(${Fields.TasksSync.Id}, task_id, synch_status, created_at, updated_at) `
             + `VALUES (?, ?, ?, ?, ?)`
             , [id, taskId, state , currentDate.toISOString(), currentDate.toISOString()]);   
-    }
-
-    const markDirty = async (unitOfWork, taskId) => {
-        const queryManager = unitOfWork.getQueryManager();
-        await queryManager.run(
-            `UPDATE ${Tables.TasksSync} `
-            + `SET ${Fields.TasksSync.Status} = 'DIRTY', ${Fields.TasksSync.UpdatedAt} = ? `
-            + `WHERE ${Fields.TasksSync.TaskId} = ? AND ${Fields.TasksSync.Status} != 'LOCAL'`
-            , [new Date().toISOString(), taskId]);
-    }
-
-    const getLocalAndDirty = async (unitOfWork) => {
-        const queryManager = unitOfWork.getQueryManager();
-        const queryResult = await queryManager.all(
-            `SELECT * `
-            + `FROM ${Tables.TasksSync} `
-            + `WHERE ${Fields.TasksSync.Status} = 'LOCAL' OR ${Fields.TasksSync.Status} = 'DIRTY'`
-            , []);
-        return queryResult.map(row => new TaskSync(
-            row.task_synch_id
-            , row.task_id
-            , row.synch_status
-            , new Date(row.created_at)
-            , new Date(row.updated_at)));
-    }
-
-    const getComplete = async (unitOfWork) => {
-        const queryManager = unitOfWork.getQueryManager();
-        const queryResult = await queryManager.all(
-            `SELECT * `
-            + `FROM ${Tables.TasksSync} `
-            + `WHERE ${Fields.TasksSync.Status} = 'COMPLETE'`
-            , []);
-        return queryResult.map(row => new TaskSync(
-            row.task_synch_id
-            , row.task_id
-            , row.synch_status
-            , new Date(row.created_at)
-            , new Date(row.updated_at)));
     }
 
     const get = async (unitOfWork, taskId) => {
@@ -214,27 +172,41 @@ const TasksSyncRepository = (() => {
             , new Date(result.updated_at)) : undefined;
     }
 
+    const getByState = async (unitOfWork, syncStatusList) => {
+        const queryManager = unitOfWork.getQueryManager();
+        const result = await queryManager.all(
+            `SELECT * `
+            + `FROM ${Tables.TasksSync} `
+            + `WHERE ${Fields.TasksSync.Status} in (` + syncStatusList.map(_ => '?').join(',') + ')'
+            , syncStatusList);
+
+        return result 
+            ? result.map((row) => 
+                new TaskSync(
+                    row.task_sync_id
+                    , row.task_id
+                    , row.synch_status
+                    , new Date(row.created_at)
+                    , new Date(row.updated_at)))
+            : [];
+    }
+
     const update = async (unitOfWork, taskSyncData) => {
         const queryManager = unitOfWork.getQueryManager();
-        await queryManager.run(
-            `UPDATE ${Tables.TasksSync} `
+
+        console.log(taskSyncData);
+
+        let preparedStatement = `UPDATE ${Tables.TasksSync} `
             + `SET ${Fields.TasksSync.Status} = ?, ${Fields.TasksSync.UpdatedAt} = ? `
-            + `WHERE ${Fields.TasksSync.TaskId} = ?`
-            , [taskSyncData.status, new Date().toISOString(), taskSyncData.taskId])
-    }
+            + `WHERE ${Fields.TasksSync.TaskId} = ? `;
+        const variables = [taskSyncData.status, new Date().toISOString(), taskSyncData.taskId];
 
-    const updateMultiple = async (unitOfWork, tasksSyncData) => {
-        for (let taskSyncData of tasksSyncData) {
-            update(unitOfWork, taskSyncData);
+        if (taskSyncData.notCondition != undefined) {
+            preparedStatement = preparedStatement + `AND ${Fields.TasksSync.Status} != ?`
+            variables.push(taskSyncData.notCondition);
         }
-    }
 
-    const eraseComplete = async (unitOfWork) => {
-        const queryManager = unitOfWork.getQueryManager();
-        await queryManager.run(
-            `DELETE FROM ${Tables.TasksSync} `
-            + `WHERE ${Fields.TasksSync.Status} = 'COMPLETE'`
-            , []);
+        await queryManager.run(preparedStatement, variables);
     }
 
     const eraseByTaskIds = async (unitOfWork, taskIds) => {
@@ -245,6 +217,7 @@ const TasksSyncRepository = (() => {
             , taskIds);
     }
 
+    // FIXME: It's not deleting the task sync entries after logout
     const eraseAllForAccount = async (unitOfWork, accountId) => {
         const queryManager = unitOfWork.getQueryManager();
         await queryManager.run(
@@ -258,13 +231,9 @@ const TasksSyncRepository = (() => {
 
     return {
         save
-        , markDirty
-        , getLocalAndDirty
-        , getComplete
         , get
+        , getByState
         , update
-        , updateMultiple
-        , eraseComplete
         , eraseByTaskIds
         , eraseAllForAccount
     }

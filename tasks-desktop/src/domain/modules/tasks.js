@@ -30,6 +30,11 @@ class TaskSync {
 
 // Tasks Use Case
 
+// CONTINUE HERE: Merge this and create task sync function together
+// two use cases need to be supported, creation of tasks with LOCAL state
+// and creation of tasks with SYNCED state (came from server):
+// Possible solution is for the taskDTO/taskData to have the sync status 
+// and for this use case to create the sync status according to the one on the DTO
 const UseCaseCreateTask = (tasksRepository) => {
     const execute = async (unitOfWork, taskData) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
@@ -88,12 +93,18 @@ const UseCaseCreateTasks = (tasksRepository) => {
     }
 }
 
-const UseCaseUpdateTask = (tasksRepository) => {
+// FIXME: Task list position is not being maintained after sync with server
+const UseCaseUpdateTask = (tasksRepository, taskSyncRepository) => {
     const execute = async (unitOfWork, taskData) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskData, "No task data provided");
 
         await tasksRepository.update(unitOfWork, taskData);
+        await taskSyncRepository.update(unitOfWork, {
+            taskId: taskData.id
+            , status: taskData.syncStatus != undefined ? taskData.syncStatus : TASK_SYNC_STATUS.DIRTY
+            , notCondition: TASK_SYNC_STATUS.LOCAL
+        });
     }
 
     return {
@@ -213,7 +224,7 @@ const UseCaseDeleteAllTasksForAccount = (tasksRepository) => {
 
 const UseCaseUpdateTaskOwner = (tasksRepository) => {
     const execute = async (unitOfWork, taskData) => {
-        this.tasksRepository.updateTaskOwner(unitOfWork, data);
+        tasksRepository.update(unitOfWork, taskData);
     }
 
     return {
@@ -246,17 +257,6 @@ const UseCaseCreateTaskSyncs = (taskSyncRepository) => {
         for (let taskSyncData of tasksSyncData) {
             await taskSyncRepository.save(unitOfWork, taskSyncData.taskId, taskSyncData.status);
         }
-    }
-
-    return {
-        execute
-    }
-}
-
-const UseCaseDeleteCompleteTaskSyncs = (taskSyncRepository) => {
-    const execute = async (unitOfWork) => {
-        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        await taskSyncRepository.eraseComplete(unitOfWork);
     }
 
     return {
@@ -303,19 +303,6 @@ const UseCaseMarkTaskSyncForRemoval = (taskSyncRepository) => {
     }
 }
 
-const UseCaseMarkTaskSyncDirty = (taskSyncRepository) => {
-    const execute = async (unitOfWork, taskId) => {
-        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        Validators.isNotNull(taskId, "No task id provided");
-
-        await taskSyncRepository.markDirty(unitOfWork, taskId);
-    }
-
-    return {
-        execute
-    }
-}
-
 const UseCaseMarkTaskSyncsSynced = (taskSyncRepository) => {
     const execute = async (unitOfWork, taskIds) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
@@ -323,9 +310,12 @@ const UseCaseMarkTaskSyncsSynced = (taskSyncRepository) => {
 
         const tasksSyncData = taskIds.map((id) => ({
             taskId: id
-            , status: TASK_SYNC_STATUS["SYNCED"]
+            , status: TASK_SYNC_STATUS.SYNCED
         }));
-        await taskSyncRepository.updateMultiple(unitOfWork, tasksSyncData);
+
+        for (let taskSync of tasksSyncData) {
+            await taskSyncRepository.update(unitOfWork, taskSync);
+        }
     }
 
     return {
@@ -336,7 +326,9 @@ const UseCaseMarkTaskSyncsSynced = (taskSyncRepository) => {
 const UseCaseGetNonSyncedTaskSyncs = (taskSyncRepository) => {
     const execute = async (unitOfWork) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        return await taskSyncRepository.getLocalAndDirty(unitOfWork);
+        return await taskSyncRepository.getByState(
+            unitOfWork
+            , [TASK_SYNC_STATUS.LOCAL, TASK_SYNC_STATUS.DIRTY]);
     }
 
     return {
@@ -347,7 +339,7 @@ const UseCaseGetNonSyncedTaskSyncs = (taskSyncRepository) => {
 const UseCaseGetCompleteTaskSyncs = (taskSyncRepository) => {
     const execute = async (unitOfWork) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        return await taskSyncRepository.getComplete(unitOfWork);
+        return await taskSyncRepository.getByState(unitOfWork, [TASK_SYNC_STATUS.COMPLETE]);
     }
 
     return {
@@ -387,11 +379,9 @@ module.exports.UseCaseUpdateTaskOwner = UseCaseUpdateTaskOwner;
 
 module.exports.UseCaseCreateTaskSync = UseCaseCreateTaskSync;
 module.exports.UseCaseCreateTaskSyncs = UseCaseCreateTaskSyncs;
-module.exports.UseCaseDeleteCompleteTaskSyncs = UseCaseDeleteCompleteTaskSyncs;
 module.exports.UseCaseDeleteTaskSyncsByTaskIds = UseCaseDeleteTaskSyncsByTaskIds;
 module.exports.UseCaseDeleteAllTaskSyncsForAccount = UseCaseDeleteAllTaskSyncsForAccount;
 module.exports.UseCaseMarkTaskSyncForRemoval = UseCaseMarkTaskSyncForRemoval;
-module.exports.UseCaseMarkTaskSyncDirty = UseCaseMarkTaskSyncDirty;
 module.exports.UseCaseMarkTaskSyncsSynced = UseCaseMarkTaskSyncsSynced;
 module.exports.UseCaseGetNonSyncedTaskSyncs = UseCaseGetNonSyncedTaskSyncs;
 module.exports.UseCaseGetCompleteTaskSyncs = UseCaseGetCompleteTaskSyncs;

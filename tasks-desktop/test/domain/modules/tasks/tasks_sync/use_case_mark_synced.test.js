@@ -9,14 +9,14 @@ describe("[Tasks Sync]: Test Mark Synced Service", () => {
         const taskIds = [v4(), v4(), v4()];
 
         const mockedTasksSyncRepository = jest.fn();
-        mockedTasksSyncRepository.updateMultiple = jest.fn((unitOfWork, taskIds) => {
+        mockedTasksSyncRepository.update = jest.fn((unitOfWork, taskIds) => {
             expect(taskIds).toBeDefined();
         });
 
         const underTest = UseCaseMarkTaskSyncsSynced(mockedTasksSyncRepository);
         await underTest.execute(unitOfWork, taskIds);
 
-        expect(mockedTasksSyncRepository.updateMultiple.mock.calls).toHaveLength(1);
+        expect(mockedTasksSyncRepository.update.mock.calls).toHaveLength(3);
     });
 
     it("Should succeed marking single task as synced", async () => {
@@ -24,14 +24,14 @@ describe("[Tasks Sync]: Test Mark Synced Service", () => {
         const taskIds = [v4()];
 
         const mockedTasksSyncRepository = jest.fn();
-        mockedTasksSyncRepository.updateMultiple = jest.fn((unitOfWork, taskIds) => {
+        mockedTasksSyncRepository.update = jest.fn((unitOfWork, taskIds) => {
             expect(taskIds).toBeDefined();
         });
 
         const underTest = UseCaseMarkTaskSyncsSynced(mockedTasksSyncRepository);
         await underTest.execute(unitOfWork, taskIds);
 
-        expect(mockedTasksSyncRepository.updateMultiple.mock.calls).toHaveLength(1);
+        expect(mockedTasksSyncRepository.update.mock.calls).toHaveLength(1);
     });
 
     it("Should succeed marking no tasks as synced", async () => {
@@ -39,14 +39,14 @@ describe("[Tasks Sync]: Test Mark Synced Service", () => {
         const taskIds = [];
 
         const mockedTasksSyncRepository = jest.fn();
-        mockedTasksSyncRepository.updateMultiple = jest.fn((unitOfWork, taskIds) => {
+        mockedTasksSyncRepository.update = jest.fn((unitOfWork, taskIds) => {
             expect(taskIds).toBeDefined();
         });
 
         const underTest = UseCaseMarkTaskSyncsSynced(mockedTasksSyncRepository);
         await underTest.execute(unitOfWork, taskIds);
 
-        expect(mockedTasksSyncRepository.updateMultiple.mock.calls).toHaveLength(1);
+        expect(mockedTasksSyncRepository.update.mock.calls).toHaveLength(0);
     });
 
     it("Should fail, tasks sync repository error", async () => {
@@ -54,14 +54,14 @@ describe("[Tasks Sync]: Test Mark Synced Service", () => {
         const taskIds = [];
 
         const mockedTasksSyncRepository = jest.fn();
-        mockedTasksSyncRepository.updateMultiple = jest.fn((unitOfWork, taskIds) => {
+        mockedTasksSyncRepository.update = jest.fn((unitOfWork, taskIds) => {
             throw new Error();
         });
 
         const underTest = UseCaseMarkTaskSyncsSynced(mockedTasksSyncRepository);
         expect(underTest.execute(unitOfWork, taskIds)).rejects.toThrow(Error);
 
-        expect(mockedTasksSyncRepository.updateMultiple.mock.calls).toHaveLength(1);
+        expect(mockedTasksSyncRepository.update.mock.calls).toHaveLength(0);
     });
 
     it("Should fail, no unit of work provided", async () => {
@@ -69,7 +69,7 @@ describe("[Tasks Sync]: Test Mark Synced Service", () => {
         const mockedTasksSyncRepository = jest.fn();
 
         const underTest = UseCaseMarkTaskSyncsSynced(mockedTasksSyncRepository);
-        expect(underTest.execute(undefined, taskIds)).rejects.toThrow(Errors.NullArgumentError);
+        expect(underTest.execute(null, taskIds)).rejects.toThrow(Errors.NullArgumentError);
     });
 
     it("Should fail, no task ids provided", async () => {
@@ -77,6 +77,6 @@ describe("[Tasks Sync]: Test Mark Synced Service", () => {
         const mockedTasksSyncRepository = jest.fn();
 
         const underTest = UseCaseMarkTaskSyncsSynced(mockedTasksSyncRepository);
-        expect(underTest.execute(unitOfWork, undefined)).rejects.toThrow(Errors.NullArgumentError);
+        expect(underTest.execute(unitOfWork, null)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

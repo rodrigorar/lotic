@@ -4,14 +4,11 @@ const {
     , UseCaseUpdateTaskProvider
     , UseCaseUpdateTasksProvider
     , UseCaseDeleteTaskProvider
-    , UseCaseDeleteAllTasksForAccountProvider
     , UseCaseGetTaskByIdProvider
     , UseCaseListTasksForAccountProvider
     , UseCaseListTasksWithoutOwnerProvider
     , UseCaseCreateTaskSyncProvider
     , UseCaseMarkTaskSyncForRemovalProvider
-    , UseCaseDeleteAllTaskSyncsForAccountProvider
-    , UseCaseMarkTaskSyncDirtyProvider
 } = require("./providers");
 const { RunUnitOfWork } = require("../../persistence/unitofwork");
 const { EventBus, Event, EventType } = require("../../../domain/shared/event-bus");
@@ -37,11 +34,9 @@ async function handleCreateTask(event, newTask) {
 
 async function handleUpdateTasks(event, taskId, data) {
     const useCaseUpdateTaskProvider = UseCaseUpdateTaskProvider.get();
-    const useCaseMarkTaskSyncDirty = UseCaseMarkTaskSyncDirtyProvider.get();
 
     await RunUnitOfWork.run(async (unitOfWork) => {
         await useCaseUpdateTaskProvider.execute(unitOfWork, data);
-        await useCaseMarkTaskSyncDirty.execute(unitOfWork, taskId);
     });
 }
 
@@ -75,7 +70,6 @@ async function handleTaskRepositioning(event, targetTaskId, draggedTaskId) {
     const useCaseUpdateTask = UseCaseUpdateTaskProvider.get();
     const useCaseUpdateTasks = UseCaseUpdateTasksProvider.get();
     const useCaseGetTaskById = UseCaseGetTaskByIdProvider.get();
-    const useCaseMarkTaskSyncDirty = UseCaseMarkTaskSyncDirtyProvider.get();
     const useCaseListTasks = UseCaseListTasksForAccountProvider.get();
 
     await RunUnitOfWork.run(async (unitOfWork) => {
@@ -87,9 +81,7 @@ async function handleTaskRepositioning(event, targetTaskId, draggedTaskId) {
         draggedTask.position = auxPosition;
 
         await useCaseUpdateTask.execute(unitOfWork, targetTask);
-        await useCaseMarkTaskSyncDirty.execute(unitOfWork, targetTaskId);
         await useCaseUpdateTask.execute(unitOfWork, draggedTask);
-        await useCaseMarkTaskSyncDirty.execute(unitOfWork, draggedTaskId);
     });
     
     await RunUnitOfWork.run(async (unitOfWork) => {

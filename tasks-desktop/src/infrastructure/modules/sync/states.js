@@ -134,6 +134,7 @@ class UpdateTasksLocalStateEffect extends StateEffect {
                         id: entry.task_id
                         , title: entry.title
                         , position: entry.position
+                        , syncStatus: TASK_SYNC_STATUS.SYNCED
                         , createdAt: new Date() // FIXME: This should come from the server
                         , updatedAt: new Date() // FIXME: This should come from the server
                         , ownerId: entry.owner_id
@@ -404,7 +405,7 @@ class CreateTasksRemoteStateEffect extends StateEffect {
 
             const unsyncedCreatedTaskSyncs = await this.useCaseGetNonSyncedTaskSyncs.execute(unitOfWork);
             const locallyCreatedTaskSyncs = unsyncedCreatedTaskSyncs
-                .filter(task => task.status == TASK_SYNC_STATUS["LOCAL"]);
+                .filter(task => task.status == TASK_SYNC_STATUS.LOCAL);
 
             if (locallyCreatedTaskSyncs.length > 0) {
                 const locallyCreatedTasks = await this.useCaseListTasksById.execute(unitOfWork, locallyCreatedTaskSyncs.map(task_sync => task_sync.taskId));
