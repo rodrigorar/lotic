@@ -18,7 +18,6 @@ const {
     , UseCaseListTasksByIdProvider
     , UseCaseGetTaskSyncByTaskIdProvider
     , UseCaseDeleteTaskSyncsByTaskIdsProvider,
-    UseCaseCreateTaskSyncsProvider,
     UseCaseGetCompleteTaskSyncsProvider,
     UseCaseGetNonSyncedTaskSyncsProvider,
     UseCaseMarkTaskSyncsSyncedProvider
@@ -173,7 +172,6 @@ class CreateTasksLocalStateEffect extends StateEffect {
         , useCaseGetActiveSession
         , useCaseListTasksForAccountId
         , useCaseCreateTasks
-        , useCaseCreateTaskSyncs
         , listTasksGateway) {
 
         super();
@@ -182,7 +180,6 @@ class CreateTasksLocalStateEffect extends StateEffect {
         this.useCaseGetActiveSession = useCaseGetActiveSession;
         this.useCaseListTasksForAccountId = useCaseListTasksForAccountId; 
         this.useCaseCreateTasks = useCaseCreateTasks;
-        this.useCaseCreateTaskSyncs = useCaseCreateTaskSyncs;
         this.listTasksGateway = listTasksGateway;
     }
 
@@ -202,17 +199,13 @@ class CreateTasksLocalStateEffect extends StateEffect {
                             id: taskData.task_id
                             , title: taskData.title
                             , position: taskData.position ? taskData.position : undefined
+                            , syncStatus: TASK_SYNC_STATUS.SYNCED
                             , createdAt: new Date() // FIXME: This should come from the server
                             , updatedAt: new Date() // FIXME: This should come from the server
                             , ownerId: authToken.accountId
                         }));
 
                 await this.useCaseCreateTasks.execute(unitOfWork, tasksToInsert);
-                await this.useCaseCreateTaskSyncs
-                    .execute(unitOfWork, tasksToInsert.map(task => ({
-                        taskId: task.id
-                        , status: TASK_SYNC_STATUS['SYNCED']
-                    })));
             }
 
             EventBus.publish(new Event(EventType.CREATED_LOCAL_TASKS, { accountId: authToken.accountId }));
@@ -308,7 +301,6 @@ class DeleteTasksRemoteState extends State {
                 , UseCaseGetActiveSessionProvider.get()
                 , UseCaseListTasksForAccountProvider.get()
                 , UseCaseCreateTasksProvider.get()
-                , UseCaseCreateTaskSyncsProvider.get()
                 , ListTasksGateway));
     }
 }

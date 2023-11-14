@@ -30,12 +30,7 @@ class TaskSync {
 
 // Tasks Use Case
 
-// CONTINUE HERE: Merge this and create task sync function together
-// two use cases need to be supported, creation of tasks with LOCAL state
-// and creation of tasks with SYNCED state (came from server):
-// Possible solution is for the taskDTO/taskData to have the sync status 
-// and for this use case to create the sync status according to the one on the DTO
-const UseCaseCreateTask = (tasksRepository) => {
+const UseCaseCreateTask = (tasksRepository, taskSyncRepository) => {
     const execute = async (unitOfWork, taskData) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskData, "No task data was provided!");
@@ -53,6 +48,10 @@ const UseCaseCreateTask = (tasksRepository) => {
                 , taskData.updatedAt
                 , taskData.ownerId);
         await tasksRepository.save(unitOfWork, task);
+        await taskSyncRepository.save(
+            unitOfWork
+            , taskData.id
+            , taskData.syncStatus ? taskData.syncStatus : TASK_SYNC_STATUS.LOCAL);
     }
 
     return {
@@ -60,31 +59,30 @@ const UseCaseCreateTask = (tasksRepository) => {
     }
 }
 
-const UseCaseCreateTasks = (tasksRepository) => {
+const UseCaseCreateTasks = (tasksRepository, taskSyncRepository) => {
     const execute = async (unitOfWork, taskDataList) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskDataList, "No tasks where provided");
 
         let maxPosition = await tasksRepository.getMaxPosition(unitOfWork);
     
-        const tasks = taskDataList
-            .map(taskData => {
-                
-                if (! taskData.position) {
-                    maxPosition++;
-                    taskData.position = maxPosition;
-                }
-
-                return new Task(
-                    taskData.id
-                    , taskData.title
-                    , taskData.position
-                    , taskData.createdAt
-                    , taskData.updatedAt
-                    , taskData.ownerId)
-            });
-        for (let task of tasks) {
-            await tasksRepository.save(unitOfWork, task);
+        for (let taskData of taskDataList) {
+            if (! taskData.position) {
+                maxPosition++;
+                taskData.position = maxPosition;
+            }
+            
+            await tasksRepository.save(unitOfWork, new Task(
+                taskData.id
+                , taskData.title
+                , taskData.position
+                , taskData.createdAt
+                , taskData.updatedAt
+                , taskData.ownerId));
+            await taskSyncRepository.save(
+                unitOfWork
+                , taskData.id
+                , taskData.syncStatus ? taskData.syncStatus : TASK_SYNC_STATUS.LOCAL)
         }
     }
 
@@ -236,34 +234,6 @@ const UseCaseUpdateTaskOwner = (tasksRepository) => {
 // FIXME: These use cases should coalesce with the use cases from the Tasks since
 //  the Tasks entity is the aggregate root of this module. 
 
-const UseCaseCreateTaskSync = (taskSyncRepository) => {
-    const execute = async (unitOfWork, taskId) => {
-        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        Validators.isNotNull(taskId, "No task id provided");
-
-        await taskSyncRepository.save(unitOfWork, taskId, TASK_SYNC_STATUS["LOCAL"]);
-    }
-
-    return {
-        execute
-    }
-}
-
-const UseCaseCreateTaskSyncs = (taskSyncRepository) => {
-    const execute = async (unitOfWork, tasksSyncData) => {
-        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        Validators.isNotNull(tasksSyncData, "No task sync data provided");
-
-        for (let taskSyncData of tasksSyncData) {
-            await taskSyncRepository.save(unitOfWork, taskSyncData.taskId, taskSyncData.status);
-        }
-    }
-
-    return {
-        execute
-    }
-}
-
 const UseCaseDeleteTaskSyncsByTaskIds = (taskSyncRepository) => {
     const execute = async (unitOfWork, taskIds) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
@@ -377,8 +347,6 @@ module.exports.UseCaseDeleteTasks = UseCaseDeleteTasks;
 module.exports.UseCaseDeleteAllTasksForAccount = UseCaseDeleteAllTasksForAccount;
 module.exports.UseCaseUpdateTaskOwner = UseCaseUpdateTaskOwner;
 
-module.exports.UseCaseCreateTaskSync = UseCaseCreateTaskSync;
-module.exports.UseCaseCreateTaskSyncs = UseCaseCreateTaskSyncs;
 module.exports.UseCaseDeleteTaskSyncsByTaskIds = UseCaseDeleteTaskSyncsByTaskIds;
 module.exports.UseCaseDeleteAllTaskSyncsForAccount = UseCaseDeleteAllTaskSyncsForAccount;
 module.exports.UseCaseMarkTaskSyncForRemoval = UseCaseMarkTaskSyncForRemoval;

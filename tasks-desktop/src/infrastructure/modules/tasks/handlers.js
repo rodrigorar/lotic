@@ -7,7 +7,6 @@ const {
     , UseCaseGetTaskByIdProvider
     , UseCaseListTasksForAccountProvider
     , UseCaseListTasksWithoutOwnerProvider
-    , UseCaseCreateTaskSyncProvider
     , UseCaseMarkTaskSyncForRemovalProvider
 } = require("./providers");
 const { RunUnitOfWork } = require("../../persistence/unitofwork");
@@ -17,7 +16,6 @@ const { SynchManager } = require('../sync/synch-manager');
 async function handleCreateTask(event, newTask) {
     const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
     const useCaseCreateTask = UseCaseCreateTaskProvider.get();
-    const useCaseCreateTasksSync = UseCaseCreateTaskSyncProvider.get();
 
     await RunUnitOfWork.run(async (unitOfWork) => {
         const activeSession = await useCaseGetActiveSession.execute(unitOfWork);
@@ -26,9 +24,7 @@ async function handleCreateTask(event, newTask) {
             newTask.ownerId = activeSession.accountId;
         }
 
-        useCaseCreateTask
-            .execute(unitOfWork, newTask)
-            .then(() => useCaseCreateTasksSync.execute(unitOfWork, newTask.id));
+        await useCaseCreateTask.execute(unitOfWork, newTask)
     });
 }
 

@@ -11,8 +11,6 @@ const {
     , UseCaseDeleteTasks
     , UseCaseDeleteAllTasksForAccount
     , UseCaseUpdateTaskOwner
-    , UseCaseCreateTaskSync
-    , UseCaseCreateTaskSyncs
     , UseCaseDeleteTaskSyncsByTaskIds
     , UseCaseDeleteAllTaskSyncsForAccount
     , UseCaseMarkTaskSyncForRemoval
@@ -26,14 +24,14 @@ const { TasksRepository, TasksSyncRepository } = require("./repositories");
 // Task Use Case Providers
 
 const UseCaseCreateTaskProvider = (() => {
-    const get = () => UseCaseCreateTask(TasksRepository);
+    const get = () => UseCaseCreateTask(TasksRepository, TasksSyncRepository);
     return {
         get
     }
 })();
 
 const UseCaseCreateTasksProvider = (() => {
-    const get = () => UseCaseCreateTasks(TasksRepository);
+    const get = () => UseCaseCreateTasks(TasksRepository, TasksSyncRepository);
     return {
         get
     }
@@ -111,20 +109,6 @@ const UseCaseUpdateTaskOwnerProvider = (() => {
 
 // Task Sync Use Case Providers
 
-const UseCaseCreateTaskSyncProvider = (() => {
-    const get = () => UseCaseCreateTaskSync(TasksSyncRepository);
-    return {
-        get
-    }
-})();
-
-const UseCaseCreateTaskSyncsProvider = (() => {
-    const get = () => UseCaseCreateTaskSyncs(TasksSyncRepository);
-    return {
-        get
-    }
-})();
-
 const UseCaseDeleteTaskSyncsByTaskIdsProvider = (() => {
     const get = () => UseCaseDeleteTaskSyncsByTaskIds(TasksSyncRepository);
     return {
@@ -187,8 +171,6 @@ module.exports.UseCaseDeleteTasksProvider = UseCaseDeleteTasksProvider;
 module.exports.UseCaseDeleteAllTasksForAccountProvider = UseCaseDeleteAllTasksForAccountProvider;
 module.exports.UseCaseUpdateTaskOwnerProvider = UseCaseUpdateTaskOwnerProvider;
 
-module.exports.UseCaseCreateTaskSyncProvider = UseCaseCreateTaskSyncProvider;
-module.exports.UseCaseCreateTaskSyncsProvider = UseCaseCreateTaskSyncsProvider;
 module.exports.UseCaseDeleteTaskSyncsByTaskIdsProvider = UseCaseDeleteTaskSyncsByTaskIdsProvider;
 module.exports.UseCaseDeleteAllTaskSyncsForAccountProvider = UseCaseDeleteAllTaskSyncsForAccountProvider;
 module.exports.UseCaseMarkTaskSyncForRemovalProvider = UseCaseMarkTaskSyncForRemovalProvider;
