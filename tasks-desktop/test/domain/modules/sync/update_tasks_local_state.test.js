@@ -1,5 +1,5 @@
 const { v4 } = require("uuid");
-const { Task } = require("../../../../src/domain/modules/tasks");
+const { Task, TASK_SYNC_STATUS } = require("../../../../src/domain/modules/tasks");
 const { UpdateTasksLocalStateEffect } = require("../../../../src/infrastructure/modules/sync/states");
 const { AuthToken } = require("../../../../src/domain/modules/auth");
 
@@ -20,9 +20,9 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
         mockedUpdateTaskUseCase.execute = jest.fn((unitOfWork, task) => { /* Do Nothing */ });
 
         const taskList = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.SYNCED, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.SYNCED, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, TASK_SYNC_STATUS.SYNCED, new Date(), new Date(), accountId)
         ];
         const mockedListTasksGateway = jest.fn();
         mockedListTasksGateway.call = jest.fn((unitOfWork, accountId) => ({
@@ -92,9 +92,9 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
         mockedUpdateTaskUseCase.execute = jest.fn((unitOfWork, task) => { /* Do Nothing */ });
 
         const taskList = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
         ];
         const mockedListTasksGateway = jest.fn();
         mockedListTasksGateway.call = jest.fn((unitOfWork, accountId) => ({
@@ -131,9 +131,9 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
         mockedUpdateTaskUseCase.execute = jest.fn((unitOfWork, task) => { /* Do Nothing */ });
 
         const taskList = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
         ];
         const mockedListTasksGateway = jest.fn();
         mockedListTasksGateway.call = jest.fn((unitOfWork, accountId) => {
@@ -168,9 +168,9 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
         });
 
         const taskList = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
         ];
         const mockedListTasksGateway = jest.fn();
         mockedListTasksGateway.call = jest.fn((unitOfWork, accountId) => ({

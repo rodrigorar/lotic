@@ -13,13 +13,13 @@ describe("[Sync]: Test Delete Tasks Local State Effect", () => {
         const task_ids = [v4(), v4(), v4(), v4(), v4()];
 
         const remoteTasks = [
-            new Task(task_ids[0], "Task #1", new Date(), new Date(), accountId)
-            , new Task(task_ids[1], "Task #2", new Date(), new Date(), accountId)
+            new Task(task_ids[0], 0, TASK_SYNC_STATUS.COMPLETE, "Task #1", new Date(), new Date(), accountId)
+            , new Task(task_ids[1], 1, TASK_SYNC_STATUS.COMPLETE, "Task #2", new Date(), new Date(), accountId)
         ];
         const localTasks = [
-            new Task(task_ids[2], "Task #3", new Date(), new Date(), accountId)
-            , new Task(task_ids[3], "Task #4", new Date(), new Date(), accountId)
-            , new Task(task_ids[4], "Task #5", new Date(), new Date(), accountId)
+            new Task(task_ids[2], "Task #3", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[3], "Task #4", 1, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[4], "Task #5", 2, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
         ];
 
         const mockedUnitOfWork = jest.fn();
@@ -75,8 +75,8 @@ describe("[Sync]: Test Delete Tasks Local State Effect", () => {
         const task_ids = [v4(), v4(), v4(), v4(), v4()];
 
         const remoteTasks = [
-            new Task(task_ids[0], "Task #1", new Date(), new Date(), accountId)
-            , new Task(task_ids[1], "Task #2", new Date(), new Date(), accountId)
+            new Task(task_ids[0], "Task #1", 0, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
+            , new Task(task_ids[1], "Task #2", 1, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
         ];
         const localTasks = [];
 
@@ -130,13 +130,13 @@ describe("[Sync]: Test Delete Tasks Local State Effect", () => {
         const task_ids = [v4(), v4(), v4(), v4(), v4()];
 
         const remoteTasks = [
-            new Task(task_ids[0], "Task #1", new Date(), new Date(), accountId)
-            , new Task(task_ids[1], "Task #2", new Date(), new Date(), accountId)
+            new Task(task_ids[0], "Task #1", 0, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
+            , new Task(task_ids[1], "Task #2", 1, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
         ];
         const localTasks = [
-            new Task(task_ids[2], "Task #3", new Date(), new Date(), accountId)
-            , new Task(task_ids[3], "Task #4", new Date(), new Date(), accountId)
-            , new Task(task_ids[4], "Task #5", new Date(), new Date(), accountId)
+            new Task(task_ids[2], "Task #3", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[3], "Task #4", 1, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[4], "Task #5", 2, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
         ];
 
         const mockedUnitOfWork = jest.fn();
@@ -187,13 +187,13 @@ describe("[Sync]: Test Delete Tasks Local State Effect", () => {
         const task_ids = [v4(), v4(), v4(), v4(), v4()];
 
         const remoteTasks = [
-            new Task(task_ids[0], "Task #1", new Date(), new Date(), accountId)
-            , new Task(task_ids[1], "Task #2", new Date(), new Date(), accountId)
+            new Task(task_ids[0], "Task #1", 0, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
+            , new Task(task_ids[1], "Task #2", 1, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
         ];
         const localTasks = [
-            new Task(task_ids[2], "Task #3", new Date(), new Date(), accountId)
-            , new Task(task_ids[3], "Task #4", new Date(), new Date(), accountId)
-            , new Task(task_ids[4], "Task #5", new Date(), new Date(), accountId)
+            new Task(task_ids[2], "Task #3", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[3], "Task #4", 1, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[4], "Task #5", 2, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
         ];
 
         const mockedUnitOfWork = jest.fn();
@@ -242,13 +242,13 @@ describe("[Sync]: Test Delete Tasks Local State Effect", () => {
         const task_ids = [v4(), v4(), v4(), v4(), v4()];
 
         const remoteTasks = [
-            new Task(task_ids[0], "Task #1", new Date(), new Date(), accountId)
-            , new Task(task_ids[1], "Task #2", new Date(), new Date(), accountId)
+            new Task(task_ids[0], "Task #1", 0, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
+            , new Task(task_ids[1], "Task #2", 1, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
         ];
         const localTasks = [
-            new Task(task_ids[2], "Task #3", new Date(), new Date(), accountId)
-            , new Task(task_ids[3], "Task #4", new Date(), new Date(), accountId)
-            , new Task(task_ids[4], "Task #5", new Date(), new Date(), accountId)
+            new Task(task_ids[2], "Task #3", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[3], "Task #4", 1, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[4], "Task #5", 2, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
         ];
 
         const mockedUnitOfWork = jest.fn();
@@ -299,13 +299,13 @@ describe("[Sync]: Test Delete Tasks Local State Effect", () => {
         const task_ids = [v4(), v4(), v4(), v4(), v4()];
 
         const remoteTasks = [
-            new Task(task_ids[0], "Task #1", new Date(), new Date(), accountId)
-            , new Task(task_ids[1], "Task #2", new Date(), new Date(), accountId)
+            new Task(task_ids[0], "Task #1", 0, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
+            , new Task(task_ids[1], "Task #2", 1, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
         ];
         const localTasks = [
-            new Task(task_ids[2], "Task #3", new Date(), new Date(), accountId)
-            , new Task(task_ids[3], "Task #4", new Date(), new Date(), accountId)
-            , new Task(task_ids[4], "Task #5", new Date(), new Date(), accountId)
+            new Task(task_ids[2], "Task #3", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[3], "Task #4", 1, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[4], "Task #5", 2, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
         ];
 
         const mockedUnitOfWork = jest.fn();
@@ -356,13 +356,13 @@ describe("[Sync]: Test Delete Tasks Local State Effect", () => {
         const task_ids = [v4(), v4(), v4(), v4(), v4()];
 
         const remoteTasks = [
-            new Task(task_ids[0], "Task #1", new Date(), new Date(), accountId)
-            , new Task(task_ids[1], "Task #2", new Date(), new Date(), accountId)
+            new Task(task_ids[0], "Task #1", 0, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
+            , new Task(task_ids[1], "Task #2", 1, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
         ];
         const localTasks = [
-            new Task(task_ids[2], "Task #3", new Date(), new Date(), accountId)
-            , new Task(task_ids[3], "Task #4", new Date(), new Date(), accountId)
-            , new Task(task_ids[4], "Task #5", new Date(), new Date(), accountId)
+            new Task(task_ids[2], "Task #3", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[3], "Task #4", 1, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[4], "Task #5", 2, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
         ];
 
         const mockedUnitOfWork = jest.fn();
@@ -413,13 +413,13 @@ describe("[Sync]: Test Delete Tasks Local State Effect", () => {
         const task_ids = [v4(), v4(), v4(), v4(), v4()];
 
         const remoteTasks = [
-            new Task(task_ids[0], "Task #1", new Date(), new Date(), accountId)
-            , new Task(task_ids[1], "Task #2", new Date(), new Date(), accountId)
+            new Task(task_ids[0], "Task #1", 0, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
+            , new Task(task_ids[1], "Task #2", 1, TASK_SYNC_STATUS.COMPLETE, new Date(), new Date(), accountId)
         ];
         const localTasks = [
-            new Task(task_ids[2], "Task #3", new Date(), new Date(), accountId)
-            , new Task(task_ids[3], "Task #4", new Date(), new Date(), accountId)
-            , new Task(task_ids[4], "Task #5", new Date(), new Date(), accountId)
+            new Task(task_ids[2], "Task #3", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[3], "Task #4", 1, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
+            , new Task(task_ids[4], "Task #5", 2, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
         ];
 
         const mockedUnitOfWork = jest.fn();

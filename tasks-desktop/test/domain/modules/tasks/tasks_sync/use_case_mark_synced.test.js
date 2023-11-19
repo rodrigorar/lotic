@@ -59,7 +59,7 @@ describe("[Tasks Sync]: Test Mark Synced Service", () => {
         });
 
         const underTest = UseCaseMarkTaskSyncsSynced(mockedTasksSyncRepository);
-        expect(underTest.execute(unitOfWork, taskIds)).rejects.toThrow(Error);
+        await expect(async () => await underTest.execute(unitOfWork, taskIds)).rejects.toThrow(Error);
 
         expect(mockedTasksSyncRepository.update.mock.calls).toHaveLength(0);
     });
@@ -69,7 +69,7 @@ describe("[Tasks Sync]: Test Mark Synced Service", () => {
         const mockedTasksSyncRepository = jest.fn();
 
         const underTest = UseCaseMarkTaskSyncsSynced(mockedTasksSyncRepository);
-        expect(underTest.execute(null, taskIds)).rejects.toThrow(Errors.NullArgumentError);
+        await expect(async () => await underTest.execute(null, taskIds)).rejects.toThrow(Errors.NullArgumentError);
     });
 
     it("Should fail, no task ids provided", async () => {
@@ -77,6 +77,6 @@ describe("[Tasks Sync]: Test Mark Synced Service", () => {
         const mockedTasksSyncRepository = jest.fn();
 
         const underTest = UseCaseMarkTaskSyncsSynced(mockedTasksSyncRepository);
-        expect(underTest.execute(unitOfWork, null)).rejects.toThrow(Errors.NullArgumentError);
+        await expect(async () => await underTest.execute(unitOfWork, null)).rejects.toThrow(Errors.NullArgumentError);
     });
 });

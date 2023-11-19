@@ -16,7 +16,6 @@ const {
   , UseCaseUpdateTaskOwnerProvider
   , UseCaseListTasksForAccountProvider
   , UseCaseDeleteAllTasksForAccountProvider
-  , UseCaseDeleteAllTaskSyncsForAccountProvider
 } = require('./infrastructure/modules/tasks/providers');
 const {
   UseCaseSignOutProvider
@@ -121,15 +120,11 @@ EventBus.register(
   , new EventSubscriber(v4(), async (event) => {
       const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
       const useCaseDeleteAllTasksForAccount = UseCaseDeleteAllTasksForAccountProvider.get();
-      const useCaseDeleteAllTaskSyncsForAccount = UseCaseDeleteAllTaskSyncsForAccountProvider.get();
       const useCaseSignOut = UseCaseSignOutProvider.get();
 
       await RunUnitOfWork.run(async (unitOfWork) => {
           const activeSession = await useCaseGetActiveSession.execute(unitOfWork);
-          
-          await useCaseDeleteAllTaskSyncsForAccount.execute(unitOfWork, activeSession.accountId);
           await useCaseDeleteAllTasksForAccount.execute(unitOfWork, activeSession.accountId);
-
           await useCaseSignOut.execute(unitOfWork, activeSession);
       });
 

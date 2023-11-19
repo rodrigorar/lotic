@@ -1,10 +1,11 @@
 const { Validators } = require("../shared/utils");
 
 class Task {
-    constructor(id, title, position, createdAt, updatedAt, ownerId) {
+    constructor(id, title, position, syncStatus, createdAt, updatedAt, ownerId) {
         this.id = id;
         this.title = title;
         this.position = position;
+        this.syncStatus = syncStatus
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.ownerId = ownerId;
@@ -44,6 +45,7 @@ const UseCaseCreateTask = (tasksRepository, taskSyncRepository) => {
                 taskData.id
                 , taskData.title
                 , taskData.position
+                , taskData.syncStatus != undefined ? taskData.syncStatus : TASK_SYNC_STATUS.LOCAL
                 , taskData.createdAt
                 , taskData.updatedAt
                 , taskData.ownerId);
@@ -76,6 +78,7 @@ const UseCaseCreateTasks = (tasksRepository, taskSyncRepository) => {
                 taskData.id
                 , taskData.title
                 , taskData.position
+                , taskData.syncStatus
                 , taskData.createdAt
                 , taskData.updatedAt
                 , taskData.ownerId));
@@ -110,12 +113,17 @@ const UseCaseUpdateTask = (tasksRepository, taskSyncRepository) => {
     }
 }
 
-const UseCaseUpdateTasks = (tasksRepository) => {
+const UseCaseUpdateTasks = (tasksRepository, taskSyncRepository) => {
     const execute = async (unitOfWork, taskDataList) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(taskDataList, "No task data list provided");
 
         for (let taskData of taskDataList) {
+            await taskSyncRepository.update(unitOfWork, {
+                taskId: taskData.id
+                , status: taskData.syncStatus != undefined ? taskData.syncStatus : TASK_SYNC_STATUS.DIRTY
+                , notCondition: TASK_SYNC_STATUS.LOCAL
+            });
             await tasksRepository.update(unitOfWork, taskData)
         }
     }
@@ -131,6 +139,19 @@ const UseCaseGetTaskById = (tasksRepository) => {
         Validators.isNotNull(taskId, "No task id provided");
 
         return await tasksRepository.get(unitOfWork, taskId);
+    }
+
+    return {
+        execute
+    }
+}
+
+const UseCaseGetBySyncStatus = (tasksRepository) => {
+    const execute = async (unitOfWork, syncStatus) => {
+        Validators.isNotNull(unitOfWork, "No Unit of Work provided");
+        Validators.isNotNull(syncStatus, "No sync status provided");
+
+        return await tasksRepository.getBySyncState(unitOfWork, syncStatus);
     }
 
     return {
@@ -179,11 +200,14 @@ const UseCaseListTasksById = (tasksRepository) => {
     }
 }
 
-const UseCaseDeleteTask = (tasksRepository) => {
+const UseCaseDeleteTask = (tasksRepository, taskSyncRepository) => {
     const execute = async (unitOfWork, taskId) => {
         Validators.isNotNull(unitOfWork, "No Unit of Work provided");
         Validators.isNotNull(taskId, "No task id provided");
 
+        await taskSyncRepository.update(
+            unitOfWork
+            , { taskId: taskId, status: TASK_SYNC_STATUS.COMPLETE });
         await tasksRepository.erase(unitOfWork, taskId);
     }
 
@@ -192,10 +216,11 @@ const UseCaseDeleteTask = (tasksRepository) => {
     }
 }
 
-const UseCaseDeleteTasks = (tasksRepository) => {
+const UseCaseDeleteTasks = (tasksRepository, taskSyncRepository) => {
     const execute = async (unitOfWork, taskIds = []) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
 
+        await taskSyncRepository.eraseByTaskIds(unitOfWork, taskIds);
         for (let taskId of taskIds) {
             await tasksRepository.erase(unitOfWork, taskId)
         }
@@ -206,13 +231,14 @@ const UseCaseDeleteTasks = (tasksRepository) => {
     }
 }
 
-const UseCaseDeleteAllTasksForAccount = (tasksRepository) => {
+const UseCaseDeleteAllTasksForAccount = (tasksRepository, taskSyncRepository) => {
     const execute = async (unitOfWork, accountId) => {
         Validators.isNotNull(unitOfWork, "No Unit of Work provided");
         Validators.isNotNull(accountId, "No account id provided");
 
         // TODO: This should use the standard Repository API and not a specific method
-        tasksRepository.eraseAllForAccount(unitOfWork, accountId);
+        await taskSyncRepository.eraseAllForAccount(unitOfWork, accountId);
+        await tasksRepository.eraseAllForAccount(unitOfWork, accountId);
     }
 
     return {
@@ -234,45 +260,6 @@ const UseCaseUpdateTaskOwner = (tasksRepository) => {
 // FIXME: These use cases should coalesce with the use cases from the Tasks since
 //  the Tasks entity is the aggregate root of this module. 
 
-const UseCaseDeleteTaskSyncsByTaskIds = (taskSyncRepository) => {
-    const execute = async (unitOfWork, taskIds) => {
-        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        Validators.isNotNull(taskIds, "No task ids provided");
-
-        await taskSyncRepository.eraseByTaskIds(unitOfWork, taskIds);
-    }
-
-    return {
-        execute
-    }
-}
-
-const UseCaseDeleteAllTaskSyncsForAccount = (taskSyncRepository) => {
-    const execute = async (unitOfWork, accountId) => {
-        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        Validators.isNotNull(accountId, "No account id provided");
-
-        await taskSyncRepository.eraseAllForAccount(unitOfWork, accountId);
-    }
-
-    return {
-        execute
-    }
-}
-
-const UseCaseMarkTaskSyncForRemoval = (taskSyncRepository) => {
-    const execute = async (unitOfWork, taskId) => {
-        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        Validators.isNotNull(taskId, "No task id provided");
-
-        await taskSyncRepository.update(unitOfWork, { taskId: taskId, status: TASK_SYNC_STATUS["COMPLETE"] });
-    }
-
-    return {
-        execute
-    }
-}
-
 const UseCaseMarkTaskSyncsSynced = (taskSyncRepository) => {
     const execute = async (unitOfWork, taskIds) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
@@ -293,43 +280,6 @@ const UseCaseMarkTaskSyncsSynced = (taskSyncRepository) => {
     }
 }
 
-const UseCaseGetNonSyncedTaskSyncs = (taskSyncRepository) => {
-    const execute = async (unitOfWork) => {
-        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        return await taskSyncRepository.getByState(
-            unitOfWork
-            , [TASK_SYNC_STATUS.LOCAL, TASK_SYNC_STATUS.DIRTY]);
-    }
-
-    return {
-        execute
-    }
-}
-
-const UseCaseGetCompleteTaskSyncs = (taskSyncRepository) => {
-    const execute = async (unitOfWork) => {
-        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        return await taskSyncRepository.getByState(unitOfWork, [TASK_SYNC_STATUS.COMPLETE]);
-    }
-
-    return {
-        execute
-    }
-}
-
-const UseCaseGetTaskSyncByTaskId = (taskSyncRepository) => {
-    const execute = async (unitOfWork, taskId) => {
-        Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
-        Validators.isNotNull(taskId, "No task id provided");
-
-        return await taskSyncRepository.get(unitOfWork, taskId);
-    }
-
-    return {
-        execute
-    }
-}
-
 module.exports.Task = Task;
 module.exports.TaskSync = TaskSync;
 module.exports.TASK_SYNC_STATUS = TASK_SYNC_STATUS;
@@ -339,6 +289,7 @@ module.exports.UseCaseCreateTasks = UseCaseCreateTasks;
 module.exports.UseCaseUpdateTask = UseCaseUpdateTask;
 module.exports.UseCaseUpdateTasks = UseCaseUpdateTasks;
 module.exports.UseCaseGetTaskById = UseCaseGetTaskById;
+module.exports.UseCaseGetBySyncStatus = UseCaseGetBySyncStatus;
 module.exports.UseCaseListTasksForAccount = UseCaseListTasksForAccount;
 module.exports.UseCaseListTasksWithoutOwner = UseCaseListTasksWithoutOwner;
 module.exports.UseCaseListTasksById = UseCaseListTasksById;
@@ -347,10 +298,4 @@ module.exports.UseCaseDeleteTasks = UseCaseDeleteTasks;
 module.exports.UseCaseDeleteAllTasksForAccount = UseCaseDeleteAllTasksForAccount;
 module.exports.UseCaseUpdateTaskOwner = UseCaseUpdateTaskOwner;
 
-module.exports.UseCaseDeleteTaskSyncsByTaskIds = UseCaseDeleteTaskSyncsByTaskIds;
-module.exports.UseCaseDeleteAllTaskSyncsForAccount = UseCaseDeleteAllTaskSyncsForAccount;
-module.exports.UseCaseMarkTaskSyncForRemoval = UseCaseMarkTaskSyncForRemoval;
 module.exports.UseCaseMarkTaskSyncsSynced = UseCaseMarkTaskSyncsSynced;
-module.exports.UseCaseGetNonSyncedTaskSyncs = UseCaseGetNonSyncedTaskSyncs;
-module.exports.UseCaseGetCompleteTaskSyncs = UseCaseGetCompleteTaskSyncs;
-module.exports.UseCaseGetTaskSyncByTaskId = UseCaseGetTaskSyncByTaskId;

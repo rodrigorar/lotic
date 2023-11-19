@@ -7,11 +7,11 @@ const {
     , UseCaseGetTaskByIdProvider
     , UseCaseListTasksForAccountProvider
     , UseCaseListTasksWithoutOwnerProvider
-    , UseCaseMarkTaskSyncForRemovalProvider
 } = require("./providers");
 const { RunUnitOfWork } = require("../../persistence/unitofwork");
 const { EventBus, Event, EventType } = require("../../../domain/shared/event-bus");
 const { SynchManager } = require('../sync/synch-manager');
+const { TASK_SYNC_STATUS } = require("../../../domain/modules/tasks");
 
 async function handleCreateTask(event, newTask) {
     const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
@@ -38,10 +38,8 @@ async function handleUpdateTasks(event, taskId, data) {
 
 async function handleCompletion(event, taskId) {
     const useCaseEraseTask = UseCaseDeleteTaskProvider.get();
-    const useCaseMarkTaskSyncsForRemoval = UseCaseMarkTaskSyncForRemovalProvider.get();
     await RunUnitOfWork.run(async (unitOfWork) => {
         await useCaseEraseTask.execute(unitOfWork, taskId);
-        await useCaseMarkTaskSyncsForRemoval.execute(unitOfWork, taskId);
     });
 }
 
@@ -74,7 +72,10 @@ async function handleTaskRepositioning(event, targetTaskId, draggedTaskId) {
         
         const auxPosition = targetTask.position;
         targetTask.position = draggedTask.position;
-        draggedTask.position = auxPosition;
+        draggedTask.position = draggedTask.position == auxPosition ? auxPosition + 1 : auxPosition;
+
+        targetTask.syncStatus = TASK_SYNC_STATUS.DIRTY;
+        draggedTask.syncStatus = TASK_SYNC_STATUS.DIRTY;
 
         await useCaseUpdateTask.execute(unitOfWork, targetTask);
         await useCaseUpdateTask.execute(unitOfWork, draggedTask);
@@ -87,6 +88,7 @@ async function handleTaskRepositioning(event, targetTaskId, draggedTaskId) {
             let currentPosition = 0;
             taskList = taskList
                 .map((task) => {
+                    task.syncStatus = TASK_SYNC_STATUS.DIRTY;
                     if (currentPosition != task.position) {
                         task.position = currentPosition;
                     }

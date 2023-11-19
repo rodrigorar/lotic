@@ -19,7 +19,6 @@ async function handleSignUp(event, signUpData, mainWindow) {
 }
 
 function configure(ipcMain, mainWindow) {
-    console.log(mainWindow);
     ipcMain.on('accounts:signup', (event, signUpData) => handleSignUp(event, signUpData, mainWindow));
 }
 

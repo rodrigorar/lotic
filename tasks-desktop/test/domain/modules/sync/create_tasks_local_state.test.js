@@ -1,6 +1,6 @@
 const { v4 } = require("uuid");
 const { AuthToken } = require("../../../../src/domain/modules/auth");
-const { Task } = require("../../../../src/domain/modules/tasks");
+const { Task, TASK_SYNC_STATUS } = require("../../../../src/domain/modules/tasks");
 const { NotImplementedError } = require("../../../../src/domain/errors");
 const { CreateTasksLocalStateEffect } = require("../../../../src/infrastructure/modules/sync/states");
 
@@ -18,9 +18,9 @@ describe("[Sync]: Test Create Tasks Local State Effect", () => {
         mockedGetActiveSessionUseCase.execute = jest.fn((unitOfWork) => new AuthToken(accessToken, v4(), accessToken, new Date()));
 
         const existingTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, TASK_SYNC_STATUS.LOCAL,  new Date(), new Date(), accountId)
         ];
 
         const mockedUseCaseListTasksForAccountId = jest.fn();
@@ -102,9 +102,9 @@ describe("[Sync]: Test Create Tasks Local State Effect", () => {
         mockedGetActiveSessionUseCase.execute = jest.fn((unitOfWork) => null);
 
         const existingTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
         ];
 
         const mockedUseCaseListTasksForAccountId = jest.fn();
@@ -144,9 +144,9 @@ describe("[Sync]: Test Create Tasks Local State Effect", () => {
         mockedGetActiveSessionUseCase.execute = jest.fn((unitOfWork) => new AuthToken(accessToken, v4(), accessToken, new Date()));
 
         const existingTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3",  1, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
         ];
 
         const mockedUseCaseListTasksForAccountId = jest.fn();
@@ -182,9 +182,9 @@ describe("[Sync]: Test Create Tasks Local State Effect", () => {
         mockedGetActiveSessionUseCase.execute = jest.fn((unitOfWork) => new AuthToken(accessToken, v4(), accessToken, new Date()));
 
         const existingTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1",  0, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, TASK_SYNC_STATUS.LOCAL,  new Date(), new Date(), accountId)
         ];
 
         const mockedUseCaseListTasksForAccountId = jest.fn();
@@ -224,9 +224,9 @@ describe("[Sync]: Test Create Tasks Local State Effect", () => {
         mockedGetActiveSessionUseCase.execute = jest.fn((unitOfWork) => new AuthToken(accessToken, v4(), accessToken, new Date()));
 
         const existingTasks = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.LOCAL,  new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, TASK_SYNC_STATUS.LOCAL,  new Date(), new Date(), accountId)
         ];
 
         const mockedUseCaseListTasksForAccountId = jest.fn();

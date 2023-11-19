@@ -1,6 +1,6 @@
 const { webContents } = require('electron');
 const { UseCaseSignInProvider, UseCaseGetActiveSessionProvider, UseCaseSignOutProvider } = require('./providers');
-const { UseCaseDeleteAllTasksForAccountProvider, UseCaseDeleteAllTaskSyncsForAccountProvider } = require('../tasks/providers');
+const { UseCaseDeleteAllTasksForAccountProvider } = require('../tasks/providers');
 const { RunUnitOfWork } = require('../../persistence/unitofwork');
 
 async function handleSignIn(event, signInData) {
@@ -13,15 +13,11 @@ async function handleSignIn(event, signInData) {
 async function handleSignOut(event) {
     const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
     const useCaseDeleteAllTasksForAccount = UseCaseDeleteAllTasksForAccountProvider.get();
-    const useCaseDeleteAllTaskSyncsForAccount = UseCaseDeleteAllTaskSyncsForAccountProvider.get();
     const useCaseSignOut = UseCaseSignOutProvider.get();
 
     await RunUnitOfWork.run(async (unitOfWork) => {
         const activeSession = await useCaseGetActiveSession.execute(unitOfWork);
-        
-        await useCaseDeleteAllTaskSyncsForAccount.execute(unitOfWork, activeSession.accountId);
         await useCaseDeleteAllTasksForAccount.execute(unitOfWork, activeSession.accountId);
-
         await useCaseSignOut.execute(unitOfWork, activeSession);
     });
     

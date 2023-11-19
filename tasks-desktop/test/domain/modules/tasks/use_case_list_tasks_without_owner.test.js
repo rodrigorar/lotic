@@ -1,6 +1,6 @@
 const { v4 } = require('uuid');
 const { Errors } = require('../../../../src/domain/errors');
-const { Task, UseCaseListTasksWithoutOwner } = require('../../../../src/domain/modules/tasks');
+const { Task, UseCaseListTasksWithoutOwner, TASK_SYNC_STATUS } = require('../../../../src/domain/modules/tasks');
 
 describe("[Tasks]: Test List Tasks Without Owner Use Case", () => {
     
@@ -8,9 +8,9 @@ describe("[Tasks]: Test List Tasks Without Owner Use Case", () => {
         const unitOfWork = jest.fn();
         const accountId = v4();
         const dbResult = [
-            new Task(v4(), "Task #1", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #2", new Date(), new Date(), accountId)
-            , new Task(v4(), "Task #3", new Date(), new Date(), accountId)
+            new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
+            , new Task(v4(), "Task #3", 2, TASK_SYNC_STATUS.LOCAL, new Date(), new Date(), accountId)
         ];
 
         const mockedTasksRepository = jest.fn();

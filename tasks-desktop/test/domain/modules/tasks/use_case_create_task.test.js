@@ -1,5 +1,5 @@
 const { v4 } = require('uuid');
-const { UseCaseCreateTask } = require('../../../../src/domain/modules/tasks');
+const { UseCaseCreateTask, TASK_SYNC_STATUS } = require('../../../../src/domain/modules/tasks');
 
 describe("[Tasks]: Test Create Task Use Case", () => {
     
@@ -8,6 +8,7 @@ describe("[Tasks]: Test Create Task Use Case", () => {
         const taskData = {
             id: v4()
             , title: "Test title"
+            , syncStatus: TASK_SYNC_STATUS.LOCAL
             , createdAt: new Date()
             , updatedAt: new Date()
             , ownerId: v4()
@@ -18,6 +19,7 @@ describe("[Tasks]: Test Create Task Use Case", () => {
             expect(task).not.toBeNull();
             expect(task.id).toBe(taskData.id);
             expect(task.title).toBe(taskData.title);
+            expect(task.syncStatus).toBe(TASK_SYNC_STATUS.LOCAL);
             expect(task.createdAt).toBe(taskData.createdAt);
             expect(task.updatedAt).toBe(taskData.updatedAt);
             expect(task.ownerId).toBe(taskData.ownerId);
@@ -41,6 +43,7 @@ describe("[Tasks]: Test Create Task Use Case", () => {
             id: v4()
             , title: "Test title"
             , position: 0
+            , syncStatus: TASK_SYNC_STATUS.LOCAL
             , createdAt: new Date()
             , updatedAt: new Date()
             , ownerId: v4()
@@ -52,6 +55,7 @@ describe("[Tasks]: Test Create Task Use Case", () => {
             expect(task.id).toBe(taskData.id);
             expect(task.title).toBe(taskData.title);
             expect(task.position).toBe(taskData.position);
+            expect(task.syncStatus).toBe(taskData.syncStatus);
             expect(task.createdAt).toBe(taskData.createdAt);
             expect(task.updatedAt).toBe(taskData.updatedAt);
             expect(task.ownerId).toBe(taskData.ownerId);
@@ -75,6 +79,7 @@ describe("[Tasks]: Test Create Task Use Case", () => {
             id: v4()
             , title: "Test title"
             , position: 0
+            , syncStatus: TASK_SYNC_STATUS.LOCAL
             , createdAt: new Date()
             , updatedAt: new Date()
             , ownerId: v4()
@@ -134,6 +139,7 @@ describe("[Tasks]: Test Create Task Use Case", () => {
             id: v4()
             , title: "Test title"
             , position: 0
+            , syncStatus: TASK_SYNC_STATUS.LOCAL
             , createdAt: new Date()
             , updatedAt: new Date()
             , ownerId: v4()
