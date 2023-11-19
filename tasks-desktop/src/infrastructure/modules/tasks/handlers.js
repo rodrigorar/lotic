@@ -81,6 +81,7 @@ async function handleTaskRepositioning(event, targetTaskId, draggedTaskId) {
         await useCaseUpdateTask.execute(unitOfWork, draggedTask);
     });
     
+    // Recalculates all the other positions to remove duplicates
     await RunUnitOfWork.run(async (unitOfWork) => {
         const activeSession = await useCaseGetActiveSession.execute(unitOfWork);
         if (activeSession != undefined) {
@@ -88,9 +89,9 @@ async function handleTaskRepositioning(event, targetTaskId, draggedTaskId) {
             let currentPosition = 0;
             taskList = taskList
                 .map((task) => {
-                    task.syncStatus = TASK_SYNC_STATUS.DIRTY;
                     if (currentPosition != task.position) {
                         task.position = currentPosition;
+                        task.syncStatus = TASK_SYNC_STATUS.DIRTY;
                     }
                     currentPosition++;
                     return task;
