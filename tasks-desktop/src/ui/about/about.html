@@ -2,22 +2,29 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta name="xel-theme" content="../../../node_modules/xel/themes/adwaita.css">
+    <meta name="xel-accent-color" content="blue">
+    <meta name="xel-iconsets" content="../../../node_modules/xel/iconsets/material.svg">
     <title>Tasks</title>
     <link rel="stylesheet" href="../../style.css" />
+    <script src="../../../node_modules/xel/xel.js" type="module"></script>
     <script defer src="./about.js"></script>
   </head>
-  <body class="gradient-background">
+  <body>
     <div id="notification-container"></div>
     <div class="cln-1">
+        <div style='margin-left:0.5rem;margin-top:0.25rem;'>
+          <x-button id='back-action' class='btn-flat' style='background-color:transparent;'>
+            <x-icon href="#chevron-left" class='primary-color-icon'></x-icon>
+          </x-button>
+        </div>
         <p class="font-sml">Lotic</p>
         <div class="row-1">
-            <h2 id="tasks-title" class="font-hd-1 easter-egg">Tasks</h2>
+            <h2 id="tasks-title" class="font-hd-1">Tasks</h2>
             <p class="font-hd-2">Version - 1.0.0</p>
-            <p class="font-hd-4-blk bold">Todos & Daily Planner App</p>
-            <div class="v-spacer-20"></div>
-            <p class="font-hd-4-blk bold">2023</p>
-            <a href="https://github.com/rodrigorar" class="font-hd-3-blk underlined">Dev: rodrigorar</a>
-            <p class="font-hd-4-blk">Copyright © 2023</p>
+            <p class="font-hd-3-blk bold">Todos & Daily Planner App</p>
+            <div class="v-spacer-30"></div>
+            <p class="font-hd-3">Copyright © 2023</p>
         </div>
     </div>
   </body>

@@ -23,7 +23,8 @@
     "node-cron": "3.0.2",
     "sqlite": "4.1.2",
     "sqlite3": "5.1.4",
-    "uuid": "9.0.0"
+    "uuid": "9.0.0",
+    "xel": "^0.24.2"
   },
   "devDependencies": {
     "@electron-forge/cli": "6.2.1",

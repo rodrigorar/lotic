@@ -7,7 +7,23 @@ const notificationContainer = document.querySelector("#notification-container");
 
 emailInput.focus();
 
+const toggleSignInButton = () => {
+    if (emailInput.value && passwordInput.value) {
+        signinButton.disabled = '';
+    } else {
+        signinButton.disabled = 'disbaled';
+    }
+}
+
 // Event Handlers
+
+emailInput.addEventListener('input', (event) => {
+    toggleSignInButton();
+});
+
+passwordInput.addEventListener('input', (event) => {
+    toggleSignInButton();
+})
 
 signinButton.addEventListener('click', async (event) => {
     document.querySelector("#loader").classList = ["loader"];

@@ -291,7 +291,7 @@ body::-webkit-scrollbar {
   text-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 0.3);
 }
 
-.font-hd-4 {
+.font-hd-4-blk {
   font-family: "Open Sans", "PT Sans", Calibri, Tahoma, sans-serif;
   font-size: 0.5em;
   color: black;
@@ -357,6 +357,22 @@ body::-webkit-scrollbar {
   background-color: #355ba2;
   text-shadow: 10px;
   border-style: dashed;
+}
+
+.btn-flat {
+  position: relative;
+  padding: 1em;
+  overflow: hidden;
+  text-align: center;
+}
+
+.btn-flat:hover {
+  background-color: #355ba2;
+  transform: scale(1.25)
+}
+
+.btn-flat:active {
+  transform: scale(1.0)
 }
 
 .btn-primary {
@@ -445,6 +461,12 @@ body::-webkit-scrollbar {
 
 .transparent-text-input:focus {
   outline: none;
+}
+
+/* Icon */
+
+.primary-color-icon {
+  color: #357ba2;
 }
 
 /* Alert */
