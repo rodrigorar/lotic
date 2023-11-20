@@ -51,7 +51,7 @@ describe("[Tasks Sync]: Test Mark Synced Service", () => {
 
     it("Should fail, tasks sync repository error", async () => {
         const unitOfWork = jest.fn();
-        const taskIds = [];
+        const taskIds = [v4()];
 
         const mockedTasksSyncRepository = jest.fn();
         mockedTasksSyncRepository.update = jest.fn((unitOfWork, taskIds) => {
@@ -61,7 +61,7 @@ describe("[Tasks Sync]: Test Mark Synced Service", () => {
         const underTest = UseCaseMarkTaskSyncsSynced(mockedTasksSyncRepository);
         await expect(async () => await underTest.execute(unitOfWork, taskIds)).rejects.toThrow(Error);
 
-        expect(mockedTasksSyncRepository.update.mock.calls).toHaveLength(0);
+        expect(mockedTasksSyncRepository.update.mock.calls).toHaveLength(1);
     });
 
     it("Should fail, no unit of work provided", async () => {

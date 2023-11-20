@@ -2,6 +2,8 @@ const { v4 } = require('uuid');
 const { Errors } = require('../../../../src/domain/errors');
 const { UseCaseDeleteTask } = require('../../../../src/domain/modules/tasks');
 
+// CONTINUE HERE - Fixing unit tests
+
 describe("[Tasks]: Test Delete Task Use Case", () => {
     
     it("Should succeed deleting the task", async () => {
@@ -37,7 +39,7 @@ describe("[Tasks]: Test Delete Task Use Case", () => {
         await expect(async () => await underTest.execute(unitOfWork, taskId)).rejects.toThrow(Error);
 
         expect(mockedTasksRepository.erase.mock.calls).toHaveLength(1);
-        expect(mockedTaskSyncRepository.update.mock.calls).toHaveLength(0);
+        expect(mockedTaskSyncRepository.update.mock.calls).toHaveLength(1);
     });
 
     it("Should fail, task sync repository error", async () => {
@@ -55,7 +57,7 @@ describe("[Tasks]: Test Delete Task Use Case", () => {
         const underTest = UseCaseDeleteTask(mockedTasksRepository, mockedTaskSyncRepository);
         await expect(async () => await underTest.execute(unitOfWork, taskId)).rejects.toThrow(Error);
 
-        expect(mockedTasksRepository.erase.mock.calls).toHaveLength(1);
+        expect(mockedTasksRepository.erase.mock.calls).toHaveLength(0);
         expect(mockedTaskSyncRepository.update.mock.calls).toHaveLength(1);
     });
 

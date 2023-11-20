@@ -33,12 +33,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const mockedGetActiveSessionUseCase = jest.fn();
         mockedGetActiveSessionUseCase.execute = jest.fn((unitOfWork) => new AuthToken(accessToken, refreshToken, accountId, new Date()));
 
-        const mockedListTasksByIdUseCase = jest.fn();
-        mockedListTasksByIdUseCase.execute = jest.fn((unitOfWork, taskIds) => {
-            expect(taskIds).toHaveLength(3);
-            return unsyncedTasks;
-        });
-
         const mockedGetNonSyncedUseCase = jest.fn();
         mockedGetNonSyncedUseCase.execute = jest.fn((unitOfWork) => unsyncedTaskSyncs);
 
@@ -56,7 +50,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const underTest = new CreateTasksRemoteStateEffect(
             mockedUnitOfWorkProvider
             , mockedGetActiveSessionUseCase
-            , mockedListTasksByIdUseCase
             , mockedGetNonSyncedUseCase
             , mockedMarkSyncedUseCase
             , mockedCreateTasksGateway);
@@ -64,8 +57,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
 
         expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
         expect(mockedGetActiveSessionUseCase.execute.mock.calls).toHaveLength(1);
-        expect(mockedListTasksByIdUseCase.execute.mock.calls).toHaveLength(1);
-        expect(mockedGetNonSyncedUseCase.execute.mock.calls).toHaveLength(1);
         expect(mockedGetNonSyncedUseCase.execute.mock.calls).toHaveLength(1);
         expect(mockedCreateTasksGateway.call.mock.calls).toHaveLength(1);
     });
@@ -83,8 +74,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const mockedGetActiveSessionUseCase = jest.fn();
         mockedGetActiveSessionUseCase.execute = jest.fn((unitOfWork) => new AuthToken(accessToken, refreshToken, accountId, new Date()));
         
-        const mockedListTasksByIdUseCase = jest.fn();
-
         const mockedMarkSyncedUseCase = jest.fn();
         
         const mockedGetNonSyncedUseCase = jest.fn();
@@ -95,7 +84,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const underTest = new CreateTasksRemoteStateEffect(
             mockedUnitOfWorkProvider
             , mockedGetActiveSessionUseCase
-            , mockedListTasksByIdUseCase
             , mockedGetNonSyncedUseCase
             , mockedMarkSyncedUseCase
             , mockedCreateTasksGateway);
@@ -128,14 +116,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const mockedGetActiveSessionUseCase = jest.fn();
         mockedGetActiveSessionUseCase.execute = jest.fn((unitOfWork) => new AuthToken(accessToken, refreshToken, accountId, new Date()));
         
-        const mockedAccountServices = jest.fn();
-        
-        const mockedListTasksByIdUseCase = jest.fn();
-        mockedListTasksByIdUseCase.execute = jest.fn((unitOfWork, taskIds) => {
-            expect(taskIds).toHaveLength(3);
-            return unsyncedTasks;
-        });
-        
         const mockedGetNonSyncedUseCase = jest.fn();
         mockedGetNonSyncedUseCase.execute = jest.fn((unitOfWork) => unsyncedTaskSyncs);
 
@@ -153,7 +133,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const underTest = new CreateTasksRemoteStateEffect(
             mockedUnitOfWorkProvider
             , mockedGetActiveSessionUseCase
-            , mockedListTasksByIdUseCase
             , mockedGetNonSyncedUseCase
             , mockedMarkSyncedUseCase
             , mockedCreateTasksGateway);
@@ -161,7 +140,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
 
         expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
         expect(mockedGetActiveSessionUseCase.execute.mock.calls).toHaveLength(1);
-        expect(mockedListTasksByIdUseCase.execute.mock.calls).toHaveLength(1);
         expect(mockedGetNonSyncedUseCase.execute.mock.calls).toHaveLength(1);
         expect(mockedMarkSyncedUseCase.execute.mock.calls).toHaveLength(1);
         expect(mockedCreateTasksGateway.call.mock.calls).toHaveLength(1);
@@ -179,8 +157,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const mockedGetActiveSessionUseCase = jest.fn();
         mockedGetActiveSessionUseCase.execute = jest.fn((unitOfWork) => new AuthToken(accessToken, refreshToken, accountId, new Date()));
 
-        const mockedListTasksByIdUseCase = jest.fn();
-        
         const mockedGetNonSyncedUseCase = jest.fn();
         mockedGetNonSyncedUseCase.getNonSynced = jest.fn((unitOfWork) => {
             throw new Error();
@@ -193,7 +169,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const underTest = new CreateTasksRemoteStateEffect(
             mockedUnitOfWorkProvider
             , mockedGetActiveSessionUseCase
-            , mockedListTasksByIdUseCase
             , mockedGetNonSyncedUseCase
             , mockedMarkSyncedUseCase
             , mockedCreateTasksGateway);
@@ -227,12 +202,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         
         const mockedAccountServices = jest.fn();
         
-        const mockedListTasksByIdUseCase = jest.fn();
-        mockedListTasksByIdUseCase.execute = jest.fn((unitOfWork, taskIds) => {
-            expect(taskIds).toHaveLength(3);
-            return unsyncedTasks;
-        });
-        
         const mockedGetNonSyncedUseCase = jest.fn();
         mockedGetNonSyncedUseCase.getNonSynced = jest.fn((unitOfWork) => unsyncedTaskSyncs);
 
@@ -251,7 +220,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
             mockedUnitOfWorkProvider
             , mockedGetActiveSessionUseCase
             , mockedAccountServices
-            , mockedListTasksByIdUseCase
             , mockedGetNonSyncedUseCase
             , mockedMarkSyncedUseCase
             , mockedCreateTasksGateway);
@@ -283,14 +251,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const mockedGetActiveSessionUseCase = jest.fn();
         mockedGetActiveSessionUseCase.execute = jest.fn((unitOfWork) => new AuthToken(accessToken, refreshToken, accountId, new Date()));
         
-        const mockedAccountServices = jest.fn();
-        
-        const mockedListTasksByIdUseCase = jest.fn();
-        mockedListTasksByIdUseCase.exeucte = jest.fn((unitOfWork, taskIds) => {
-            expect(taskIds).toHaveLength(3);
-            return unsyncedTasks;
-        });
-        
         const mockedGetNonSyncedTasksUseCase = jest.fn();
         mockedGetNonSyncedTasksUseCase.execute = jest.fn((unitOfWork) => unsyncedTaskSyncs);
 
@@ -307,7 +267,6 @@ describe("[Sync]: Test Create Tasks Remote State Effect", () => {
         const underTest = new CreateTasksRemoteStateEffect(
             mockedUnitOfWorkProvider
             , mockedGetActiveSessionUseCase
-            , mockedListTasksByIdUseCase
             , mockedGetNonSyncedTasksUseCase
             , mockedCreateTasksGateway);
         expect(underTest.execute()).rejects.toThrow();

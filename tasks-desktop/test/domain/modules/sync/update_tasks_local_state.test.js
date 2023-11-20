@@ -19,6 +19,9 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
         const mockedUpdateTaskUseCase = jest.fn();
         mockedUpdateTaskUseCase.execute = jest.fn((unitOfWork, task) => { /* Do Nothing */ });
 
+        const mockedListTasksByAccountIdUseCase = jest.fn();
+        mockedListTasksByAccountIdUseCase.execute = jest.fn(((unitOfWork, accountId) => []));
+
         const taskList = [
             new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.SYNCED, new Date(), new Date(), accountId)
             , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.SYNCED, new Date(), new Date(), accountId)
@@ -35,12 +38,14 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
             mockedUnitOfWorkProvider
             , mockedUseCaseGetActiveSession
             , mockedUpdateTaskUseCase
-            , mockedListTasksGateway)
+            , mockedListTasksGateway
+            , mockedListTasksByAccountIdUseCase)
         await underTest.execute();
 
         expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
         expect(mockedUseCaseGetActiveSession.execute.mock.calls).toHaveLength(1);
         expect(mockedUpdateTaskUseCase.execute.mock.calls).toHaveLength(3);
+        expect(mockedListTasksByAccountIdUseCase.execute.mock.calls).toHaveLength(1);
         expect(mockedListTasksGateway.call.mock.calls).toHaveLength(1);
     });
 
@@ -58,6 +63,9 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
         const mockedUpdateTaskUseCase = jest.fn();
         mockedUpdateTaskUseCase.execute = jest.fn((unitOfWork, task) => { /* Do Nothing */ });
 
+        const mockedListTasksByAccountIdUseCase = jest.fn();
+        mockedListTasksByAccountIdUseCase.execute = jest.fn(((unitOfWork, accountId) => []));
+
         const taskList = [];
         const mockedListTasksGateway = jest.fn();
         mockedListTasksGateway.call = jest.fn((unitOfWork, accountId) => ({
@@ -70,11 +78,13 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
             mockedUnitOfWorkProvider
             , mockedUseCaseGetActiveSession
             , mockedUpdateTaskUseCase
-            , mockedListTasksGateway)
+            , mockedListTasksGateway
+            , mockedListTasksByAccountIdUseCase)
         await underTest.execute();
 
         expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
         expect(mockedUseCaseGetActiveSession.execute.mock.calls).toHaveLength(1);
+        expect(mockedListTasksByAccountIdUseCase.execute.mock.calls).toHaveLength(1);
         expect(mockedUpdateTaskUseCase.execute.mock.calls).toHaveLength(0);
     });
 
@@ -90,6 +100,9 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
 
         const mockedUpdateTaskUseCase = jest.fn();
         mockedUpdateTaskUseCase.execute = jest.fn((unitOfWork, task) => { /* Do Nothing */ });
+
+        const mockedListTasksByAccountIdUseCase = jest.fn();
+        mockedListTasksByAccountIdUseCase.execute = jest.fn(((unitOfWork, accountId) => []));
 
         const taskList = [
             new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
@@ -107,12 +120,14 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
             mockedUnitOfWorkProvider
             , mockedUseCaseGetActiveSession
             , mockedUpdateTaskUseCase
-            , mockedListTasksGateway)
+            , mockedListTasksGateway
+            , mockedListTasksByAccountIdUseCase)
         await underTest.execute();
 
         expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
         expect(mockedUseCaseGetActiveSession.execute.mock.calls).toHaveLength(1);
         expect(mockedUpdateTaskUseCase.execute.mock.calls).toHaveLength(0);
+        expect(mockedListTasksByAccountIdUseCase.execute.mock.calls).toHaveLength(0);
         expect(mockedListTasksGateway.call.mock.calls).toHaveLength(0);
     });
 
@@ -130,6 +145,9 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
         const mockedUpdateTaskUseCase = jest.fn();
         mockedUpdateTaskUseCase.execute = jest.fn((unitOfWork, task) => { /* Do Nothing */ });
 
+        const mockedListTasksByAccountIdUseCase = jest.fn();
+        mockedListTasksByAccountIdUseCase.execute = jest.fn(((unitOfWork, accountId) => []));
+
         const taskList = [
             new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
             , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
@@ -144,7 +162,8 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
             mockedUnitOfWorkProvider
             , mockedUseCaseGetActiveSession
             , mockedUpdateTaskUseCase
-            , mockedListTasksGateway)
+            , mockedListTasksGateway
+            , mockedListTasksByAccountIdUseCase)
         expect(underTest.execute()).rejects.toThrow(Error);
 
         expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);
@@ -167,6 +186,9 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
             throw new Error();
         });
 
+        const mockedListTasksByAccountIdUseCase = jest.fn();
+        mockedListTasksByAccountIdUseCase.execute = jest.fn(((unitOfWork, accountId) => []));
+
         const taskList = [
             new Task(v4(), "Task #1", 0, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
             , new Task(v4(), "Task #2", 1, TASK_SYNC_STATUS.DIRTY, new Date(), new Date(), accountId)
@@ -183,7 +205,8 @@ describe("[Sync]: Test Update Tasks Local State Effect", () => {
             mockedUnitOfWorkProvider
             , mockedUseCaseGetActiveSession
             , mockedUpdateTaskUseCase
-            , mockedListTasksGateway)
+            , mockedListTasksGateway
+            , mockedListTasksByAccountIdUseCase)
         expect(underTest.execute()).rejects.toThrow(Error);
 
         expect(mockedUnitOfWorkProvider.run.mock.calls).toHaveLength(1);

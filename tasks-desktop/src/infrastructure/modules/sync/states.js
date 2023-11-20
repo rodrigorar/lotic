@@ -310,7 +310,6 @@ class UpdateTasksRemoteStateEffect extends StateEffect {
 
     constructor(
         unitOfWorkProvider = RunUnitOfWork
-        , useCaseListTasksById
         , useCaseGetBySyncStatus
         , useCaseMarkTaskSyncAsSynced
         , updateTasksGateway) {
@@ -318,7 +317,6 @@ class UpdateTasksRemoteStateEffect extends StateEffect {
         super();
 
         this.unitOfWorkProvider = unitOfWorkProvider;
-        this.useCaseListTasksById = useCaseListTasksById;
         this.useCaseGetBySyncStatus = useCaseGetBySyncStatus;
         this.useCaseMarkTaskSyncAsSynced = useCaseMarkTaskSyncAsSynced;
         this.updateTasksGateway = updateTasksGateway;
@@ -373,7 +371,6 @@ class CreateTasksRemoteStateEffect extends StateEffect {
     constructor(
         unitOfWorkProvider = RunUnitOfWork
         , useCaseGetActiveSession
-        , useCaseListTasksById
         , useCaseGetBySyncStatus
         , useCaseMarkTaskSyncSynced
         , createTasksGateway) {
@@ -382,7 +379,6 @@ class CreateTasksRemoteStateEffect extends StateEffect {
 
         this.unitOfWorkProvider = unitOfWorkProvider
         this.useCaseGetActiveSession = useCaseGetActiveSession;
-        this.useCaseListTasksById = useCaseListTasksById;
         this.useCaseGetBySyncStatus = useCaseGetBySyncStatus;
         this.useCaseMarkTaskSyncSynced = useCaseMarkTaskSyncSynced;
         this.createTasksGateway = createTasksGateway;
@@ -430,7 +426,6 @@ class CreateTasksRemoteState extends State {
         return new UpdateTasksRemoteState(
             new UpdateTasksRemoteStateEffect(
                 RunUnitOfWork
-                , UseCaseListTasksByIdProvider.get()
                 , UseCaseGetBySyncStatusProvider.get()
                 , UseCaseMarkTaskSyncsSyncedProvider.get()
                 , UpdateTasksGateway));
