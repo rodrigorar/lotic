@@ -126,7 +126,7 @@ const TasksRepository = (() => {
             .all(`SELECT t.*, ts.synch_status `
                 + `FROM ${Tables.Tasks} t `
                 + `INNER JOIN ${Tables.TasksSync} ts ON t.task_id = ts.task_id `
-                + `WHERE ${Fields.Tasks.Id} in (` + tasksIds.map(task => '?').join(',') + ')', tasksIds);
+                + `WHERE t.${Fields.Tasks.Id} in (` + tasksIds.map(task => '?').join(',') + ')', tasksIds);
 
         return result.map(entry => new Task(
                 entry.task_id

@@ -2,8 +2,6 @@ const { v4 } = require('uuid');
 const { Errors } = require('../../../../src/domain/errors');
 const { UseCaseDeleteTask } = require('../../../../src/domain/modules/tasks');
 
-// CONTINUE HERE - Fixing unit tests
-
 describe("[Tasks]: Test Delete Task Use Case", () => {
     
     it("Should succeed deleting the task", async () => {

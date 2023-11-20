@@ -1,9 +1,9 @@
 const { default: axios } = require("axios");
+const { AppConfig } = require("../configs");
 
 
 const client = axios.create({
-    baseURL: 'https://lotic.eu/tasks'
-    //baseURL: "http://localhost:5000"
+    baseURL: AppConfig.serverURL
     , timeout: 5000
 });
 

@@ -10,8 +10,9 @@ const { OSMask, isDev } = require('./infrastructure/os/os-mask');
 const { SynchManager } = require('./infrastructure/modules/sync/synch-manager');
 const { AccountsHandler } = require('./infrastructure/modules/accounts/handlers');
 const { SetupUIEventBusSubscribers } = require('./ui/EventBusUISubscribers');
+const { AppConfig } = require('./infrastructure/configs');
 
-app.setName('Tasks');
+app.setName(AppConfig.appName);
 
 // Prepare local data directories
 OSMask.prepareDataDirIfNecessary(isDev);
@@ -50,7 +51,7 @@ app.on('ready', () => {
   }
 
   // FIXME: This cron should come from a config file.
-  cron.schedule('*/30 * * * * *', () => {
+  cron.schedule(AppConfig.syncManagerCron, () => {
     if (schemaMigrationSemaphor) {
       SynchManager.execute();
     }
