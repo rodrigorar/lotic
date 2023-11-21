@@ -2,6 +2,7 @@
 const emailInput = document.querySelector("#email-input");
 const passwordInput = document.querySelector("#password-input");
 const signinButton = document.querySelector("#submit-button");
+const backAction = document.querySelector("#back-action");
 const about = document.querySelector("#about");
 const notificationContainer = document.querySelector("#notification-container");
 
@@ -14,6 +15,10 @@ const toggleSignInButton = () => {
         signinButton.disabled = 'disbaled';
     }
 }
+
+backAction.addEventListener('click', (event) => {
+    nav.openHome();
+});
 
 // Event Handlers
 

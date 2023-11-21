@@ -3,10 +3,15 @@ const emailInput = document.querySelector("#email-input");
 const passwordInput = document.querySelector("#password-input");
 const passwordInputRepeat = document.querySelector("#password-input-repeat");
 const signUpButton = document.querySelector("#submit-button");
+const backAction = document.querySelector("#back-action");
 const about = document.querySelector("#about");
 const notificationContainer = document.querySelector("#notification-container");
 
 emailInput.focus();
+
+backAction.addEventListener('click', (event) => {
+    nav.openHome();
+});
 
 // Event Handlers
 

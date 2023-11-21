@@ -29,11 +29,15 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 400,
     height: 500,
+    minWidth: 400,
+    minHeight: 500,
+    maxWidth: 1200,
+    maxHeight: 1500,
     webPreferences: {
       nodeIntegration: true
       , preload: path.join(__dirname, 'preload.js'),
     }
-    , resizable: false
+    //, resizable: false
   });
 
   mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html'));

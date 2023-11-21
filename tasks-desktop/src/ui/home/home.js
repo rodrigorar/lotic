@@ -146,10 +146,6 @@ function setInitialFocus() {
     }
 }
 
-function refreshTaskList() {
-    
-}
-
 async function initUI() {
     await createMainMenu();
 
