@@ -17,7 +17,7 @@
 body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(to bottom right, #fcfbf9, white)
+  /* background: linear-gradient(to bottom right, #fcfbf9, white); */
 }
 
 body::-webkit-scrollbar {
@@ -25,10 +25,6 @@ body::-webkit-scrollbar {
 }
 
 /* Effects */
-
-.gradient-background {
-  background: linear-gradient(to right, #ddd5a5, white, #a0d1eb)
-}
 
 .easter-egg {
   transform: scale(1, 1);
@@ -196,6 +192,8 @@ body::-webkit-scrollbar {
 
 .dropdown {
   position: inline-block;
+  float: right;
+  margin-right: 2px;
 }
 
 .dropdown-content {
@@ -415,6 +413,10 @@ body::-webkit-scrollbar {
   height: 28px;
 }
 
+.btn-transparent {
+  background-color: transparent;
+}
+
 /* Inputs */
 
 .input-marker {
@@ -468,6 +470,10 @@ body::-webkit-scrollbar {
 
 .primary-color-icon {
   color: #357ba2;
+}
+
+.blk-color-icon {
+  color: black;
 }
 
 /* Alert */

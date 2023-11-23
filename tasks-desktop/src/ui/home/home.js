@@ -54,62 +54,54 @@ function createTaskDOM(id, title = undefined) {
     return containerDiv;
 }
 
+function createMenuItem(onClick, icon, label) {
+    const menuItem = document.createElement('x-menuitem');
+    menuItem.addEventListener("click", onClick);
+
+    const menuItemIcon = document.createElement('x-icon');
+    menuItemIcon.href = `#${icon}`;
+    menuItem.appendChild(menuItemIcon);
+
+    const menuItemLabel = document.createElement('x-label');
+    menuItemLabel.innerText = label;
+    menuItem.appendChild(menuItemLabel);
+
+    return menuItem;
+}
+
 async function createMainMenu() {
-    const dropdown = document.createElement("div");
-    dropdown.classList.add("dropdown");
+    const dropdownContainer = document.createElement('x-box');
+    dropdownContainer.classList.add('dropdown');
 
-    const dropdownButton = document.createElement("button");
-    dropdownButton.id = "main-menu"
-    dropdownButton.classList.add("btn-dropdown");
-    dropdownButton.classList.add("font-hd-2");
-    dropdownButton.classList.add("right");
-    dropdownButton.innerText = "...";
-    dropdown.appendChild(dropdownButton);
+    const menuIcon = document.createElement('x-icon');
+    menuIcon.href = '#menu';
+    menuIcon.classList.add('primary-color-icon');
 
-    const dropdownContent = document.createElement("div");
-    dropdownContent.id = "main-menu-content";
-    dropdownContent.classList.add("dropdown-content");
-    dropdown.appendChild(dropdownContent);
+    const dropdownButton = document.createElement('x-button');
+    dropdownButton.id = 'main-menu';
+    dropdownButton.classList.add('right');
+    dropdownButton.style.backgroundColor = 'transparent';
+    dropdownButton.appendChild(menuIcon);
+    dropdownContainer.appendChild(dropdownButton);
+
+    const dropdownMenu = document.createElement('x-menu');
+    dropdownMenu.id = 'main-menu-content';  
+    dropdownButton.appendChild(dropdownMenu);  
+
+    dropdownMenu.appendChild(createMenuItem((event) => nav.openAbout(), 'info', 'About'));
 
     const isLoggedIn = await auth.isLoggedIn();
-    
     if (isLoggedIn) {
-        const logoutOption = document.createElement("a");
-        logoutOption.href = "#";
-        logoutOption.innerText = "Logout";
-        logoutOption.addEventListener("click", async (event) => {
-            auth.logout();
-        });
-        dropdownContent.appendChild(logoutOption);
+        dropdownMenu.appendChild(document.createElement('hr'));
+        dropdownMenu.appendChild(createMenuItem((event) => auth.logout(), 'logout', 'Sign Out'));
     } else {
-        const signInOption = document.createElement("a");
-        signInOption.href = "#";
-        signInOption.innerText = "Sign In";
-        signInOption.addEventListener("click", async (event) => {
-            nav.openLogin();
-        });
-        dropdownContent.appendChild(signInOption);
-
-        const signUpOption = document.createElement("a");
-        signUpOption.href = "#";
-        signUpOption.innerText = "Sign Up";
-        signUpOption.addEventListener("click", async (event) => {
-            nav.openSignUp();
-        });
-        dropdownContent.appendChild(signUpOption);
+        dropdownMenu.appendChild(document.createElement('hr'));
+        dropdownMenu.appendChild(createMenuItem((event) => nav.openLogin(), 'person', 'Sign In'));
+        dropdownMenu.appendChild(createMenuItem((event) => nav.openSignUp(), 'open', 'Sign Up'));
     }
 
-    const aboutOption = document.createElement("a");
-    aboutOption.innerText = "About";
-    aboutOption.href = "#";
-    aboutOption.addEventListener("click", async (event) => {
-        logger.info("About Option has been pressed. / Not implemented");
-        nav.openAbout();
-    });
-    dropdownContent.appendChild(aboutOption);
-
     const headerRight = document.querySelector('#header-right');
-    headerRight.appendChild(dropdown);
+    headerRight.appendChild(dropdownContainer);
 }
 
 async function refreshMainMenu() {
