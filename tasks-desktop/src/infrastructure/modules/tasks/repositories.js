@@ -217,7 +217,7 @@ const TasksSyncRepository = (() => {
             , new Date(result.updated_at)) : undefined;
     }
 
-    const getByState = async (unitOfWork, syncStatusList) => {
+    const getBySyncState = async (unitOfWork, syncStatusList) => {
         const queryManager = unitOfWork.getQueryManager();
         const result = await queryManager.all(
             `SELECT * `
@@ -254,9 +254,10 @@ const TasksSyncRepository = (() => {
 
     const eraseByTaskIds = async (unitOfWork, taskIds) => {
         const queryManager = unitOfWork.getQueryManager();
+        //${Fields.TasksSync.Status} = 'COMPLETE' AND 
         await queryManager.run(
             `DELETE FROM ${Tables.TasksSync} `
-            + `WHERE ${Fields.TasksSync.Status} = 'COMPLETE' AND ${Fields.TasksSync.TaskId} in (` + taskIds.map(_ => '?').join(',') + ")"
+            + `WHERE ${Fields.TasksSync.TaskId} in (` + taskIds.map(_ => '?').join(',') + ")"
             , taskIds);
     }
 
@@ -275,7 +276,7 @@ const TasksSyncRepository = (() => {
     return {
         save
         , get
-        , getByState
+        , getBySyncState
         , update
         , eraseByTaskIds
         , eraseAllForAccount

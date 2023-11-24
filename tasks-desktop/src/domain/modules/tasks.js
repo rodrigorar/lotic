@@ -205,10 +205,21 @@ const UseCaseDeleteTask = (tasksRepository, taskSyncRepository) => {
         Validators.isNotNull(unitOfWork, "No Unit of Work provided");
         Validators.isNotNull(taskId, "No task id provided");
 
-        await taskSyncRepository.update(
-            unitOfWork
-            , { taskId: taskId, status: TASK_SYNC_STATUS.COMPLETE });
-        await tasksRepository.erase(unitOfWork, taskId);
+        const existingTask = await tasksRepository.get(unitOfWork, taskId);
+        console.log('Deleting task');
+        console.log(existingTask);
+        if (existingTask) {
+            if (existingTask.ownerId) {
+                await taskSyncRepository.update(
+                    unitOfWork
+                    , { taskId: existingTask.id, status: TASK_SYNC_STATUS.COMPLETE });
+            } else {
+                console.log('Erasing task sync');
+                await taskSyncRepository.eraseByTaskIds(unitOfWork, [existingTask.id]);
+            }
+
+            await tasksRepository.erase(unitOfWork, existingTask.id);
+        }
     }
 
     return {
@@ -257,8 +268,6 @@ const UseCaseUpdateTaskOwner = (tasksRepository) => {
 }
 
 // Tasks Sync Use Cases
-// FIXME: These use cases should coalesce with the use cases from the Tasks since
-//  the Tasks entity is the aggregate root of this module. 
 
 const UseCaseMarkTaskSyncsSynced = (taskSyncRepository) => {
     const execute = async (unitOfWork, taskIds) => {

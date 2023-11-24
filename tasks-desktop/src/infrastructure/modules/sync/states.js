@@ -392,6 +392,7 @@ class CreateTasksRemoteStateEffect extends StateEffect {
                 unitOfWork
                 , [TASK_SYNC_STATUS.LOCAL]
             );
+            console.log(locallyCreatedTasks);
             if (locallyCreatedTasks.length > 0) {
                 const tasksRequest = locallyCreatedTasks
                     .map(task => ({
@@ -452,12 +453,10 @@ class StartSyncState extends State {
 
             let result = undefined;
             if (authSession) {
-                // FIXME: This State & StateAction should come from a provider
                 result = new CreateTasksRemoteState(
                     new CreateTasksRemoteStateEffect(
                         this.unitOfWorkRunner
                         , UseCaseGetActiveSessionProvider.get()
-                        , UseCaseListTasksByIdProvider.get()
                         , UseCaseGetBySyncStatusProvider.get()
                         , UseCaseMarkTaskSyncsSyncedProvider.get()
                         , CreateTasksGateway));
