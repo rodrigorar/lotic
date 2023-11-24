@@ -18,6 +18,7 @@ app.setName(AppConfig.appName);
 OSMask.prepareDataDirIfNecessary(isDev);
 
 let schemaMigrationSemaphor = false;
+let allowSyncSemaphor = true;
 
 runSchemaMigrations()
   .then(_ => schemaMigrationSemaphor = true);
@@ -56,7 +57,8 @@ app.on('ready', () => {
 
   // FIXME: This cron should come from a config file.
   cron.schedule(AppConfig.syncManagerCron, () => {
-    if (schemaMigrationSemaphor) {
+   console.log(`Regular sync ${allowSyncSemaphor}`);
+    if (schemaMigrationSemaphor && allowSyncSemaphor) {
       SynchManager.execute();
     }
   }).start();
@@ -86,7 +88,8 @@ app.on('ready', () => {
   });
 
   globalShortcut.register('F6', () => {
-    SynchManager.execute(mainWindow.webContents);
+    console.log(`F6 sync ${allowSyncSemaphor}`);
+    setTimeout(() => SynchManager.execute(mainWindow.webContents), 100);
   });
 
   LoggerHandler.configure(ipcMain);
@@ -104,3 +107,10 @@ ipcMain.on('nav:open:login', async (event) => mainWindow.loadFile(path.join(__di
 ipcMain.on('nav:open:about', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/about/about.html')));
 ipcMain.on('nav:open:home', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html')));
 ipcMain.on('nav:open:signup', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/signup/signup.html')))
+
+ipcMain.on('sync:allow', (event) => {
+  allowSyncSemaphor = true;
+});
+ipcMain.on('sync:disallow', (event) => {
+  allowSyncSemaphor = false;
+});

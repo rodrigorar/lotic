@@ -15,6 +15,13 @@ contextBridge.exposeInMainWorld('utils', {
     generateId: () => ipcRenderer.invoke('utils:id:generate')
 });
 
+// sync
+
+contextBridge.exposeInMainWorld('sync', {
+    allowSync: () => ipcRenderer.send('sync:allow')
+    , disallowSync: () => ipcRenderer.send('sync:disallow')
+});
+
 // tasks
 
 contextBridge.exposeInMainWorld('tasks', {

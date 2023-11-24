@@ -186,8 +186,7 @@ refreshButton.addEventListener('click', async () => {
 
 // UI Handlers
 
-let debouncedUpdateOperation;
-let updatedText = "";
+let debouncedAllowSync;
 function handleTextInput(event) {
     const taskId = extractId(event.target.id);
 
@@ -203,18 +202,21 @@ function handleTextInput(event) {
         
         return;
     }
-    
-    updatedText = event.target.value;
-    if (debouncedUpdateOperation) {
-        clearTimeout(debouncedUpdateOperation);
-    }
-    debouncedUpdateOperation = setTimeout(() => {
-        tasks.updateTask(taskId, {
+
+    tasks.updateTask(
+        taskId
+        , {
             id: taskId
-            , title: updatedText
+            , title: event.target.value
             , updatedAt: new Date()
-        }, 1000);
-    });
+        }
+    );
+    sync.disallowSync();
+
+    if (debouncedAllowSync) {
+        clearTimeout(debouncedAllowSync);
+    }
+    debouncedAllowSync = setTimeout(() => sync.allowSync(), 500);
 }
 
 function handleCompleteInput(event) {
@@ -235,6 +237,13 @@ function handleCompleteInput(event) {
             event.target.parentElement.remove();
             tasks.completeTask(taskId);
         }, 1000);
+
+        sync.disallowSync();
+
+        if (debouncedAllowSync) {
+            clearTimeout(debouncedAllowSync);
+        }
+        debouncedAllowSync = setTimeout(() => sync.allowSync(), 500);
     }
 }
 
