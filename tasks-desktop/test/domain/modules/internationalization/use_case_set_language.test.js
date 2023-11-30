@@ -1,3 +1,4 @@
+const { v4 } = require("uuid");
 const { UseCaseSetLanguage } = require("../../../../src/domain/modules/internationalization");
 
 describe('[Internationalization]: Test Set Language Use Case', () => {
@@ -12,7 +13,7 @@ describe('[Internationalization]: Test Set Language Use Case', () => {
         mockedAccountsRepository.setLanguage = jest.fn((unitOfWork, language) => { /* Do Nothing */ });
 
         const underTest = UseCaseSetLanguage(mockedInternationalizatoinRepository, mockedAccountsRepository);
-        await underTest.execute(mockedUnitOfWork, 'en');
+        await underTest.execute(mockedUnitOfWork, v4(), 'en');
 
         expect(mockedInternationalizatoinRepository.exists.mock.calls).toHaveLength(1);
         expect(mockedAccountsRepository.setLanguage.mock.calls).toHaveLength(1);
@@ -27,7 +28,7 @@ describe('[Internationalization]: Test Set Language Use Case', () => {
         const mockedAccountsRepository = jest.fn();
 
         const underTest = UseCaseSetLanguage(mockedInternationalizatoinRepository, mockedAccountsRepository);
-        await expect(async () => await underTest.execute(mockedUnitOfWork, 'pt')).rejects.toThrow(Error);
+        await expect(async () => await underTest.execute(mockedUnitOfWork, v4(), 'pt')).rejects.toThrow(Error);
 
         expect(mockedInternationalizatoinRepository.exists.mock.calls).toHaveLength(1);
     });
@@ -37,8 +38,17 @@ describe('[Internationalization]: Test Set Language Use Case', () => {
         const mockedAccountsRepository = jest.fn();
 
         const underTest = UseCaseSetLanguage(mockedInternationalizatoinRepository, mockedAccountsRepository);
-        await expect(async () => await underTest.execute(null, language)).rejects.toThrow(Error);
+        await expect(async () => await underTest.execute(null, v4(), language)).rejects.toThrow(Error);
     });
+
+    it('Should fail no account id provided', async () => {
+        const mockedUnitOfWork = jest.fn();
+        const mockedInternationalizatoinRepository = jest.fn();
+        const mockedAccountsRepository = jest.fn();
+
+        const underTest = UseCaseSetLanguage(mockedInternationalizatoinRepository, mockedAccountsRepository);
+        await expect(async () => await underTest.execute(mockedUnitOfWork, null, 'en')).rejects.toThrow(Error);
+    })
 
     it('Should fail no unit of work provided', async () => {
         const mockedUnitOfWork = jest.fn();
@@ -46,7 +56,7 @@ describe('[Internationalization]: Test Set Language Use Case', () => {
         const mockedAccountsRepository = jest.fn();
 
         const underTest = UseCaseSetLanguage(mockedInternationalizatoinRepository, mockedAccountsRepository);
-        await expect(async () => await underTest.execute(mockedUnitOfWork, null)).rejects.toThrow(Error);
+        await expect(async () => await underTest.execute(mockedUnitOfWork, v4(), null)).rejects.toThrow(Error);
     });
 
 });

@@ -24,16 +24,11 @@ const getByEmail = async (unitOfWork, email) => {
 
 const get = async (unitOfWork, accountId) => {
     const queryManager = unitOfWork.getQueryManager();
-
-    console.log(accountId);
-
     const queryResult = await queryManager.get(
         `SELECT * `
         + `FROM ${Tables.Accounts} `
         + `WHERE ${Fields.Accounts.Id} = ?`
         , [accountId]);
-
-    console.log(queryResult);
 
     return queryResult != undefined 
             ? new Account(queryResult.id, queryResult.email, queryResult.language) 

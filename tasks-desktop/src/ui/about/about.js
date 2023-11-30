@@ -13,7 +13,7 @@ backAction.addEventListener('click', (event) => {
 
 async function translateUI() {
     const translations = await i18n.getTranslations();
-    appVersion.innerText = `${translations['version']} - 1.0.0`;
+    appVersion.innerText = `${translations['version']} - 0.6.0`;
     appDescription.innerText = translations['appDescription'];
 }
 

@@ -19,6 +19,7 @@ class Language {
 const UseCaseSetLanguage = (internationalizationRepository, accountsRepository) => {
     const execute = async (unitOfWork, accountId, language) => {
         Validators.isNotNull(unitOfWork, 'No unit of work provided');
+        Validators.isNotNull(accountId, 'No account id provided');
         Validators.isNotNull(language, 'No language provided');
 
         const languageExists = await internationalizationRepository.exists(unitOfWork, language);

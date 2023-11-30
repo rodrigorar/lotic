@@ -392,7 +392,6 @@ class CreateTasksRemoteStateEffect extends StateEffect {
                 unitOfWork
                 , [TASK_SYNC_STATUS.LOCAL]
             );
-            console.log(locallyCreatedTasks);
             if (locallyCreatedTasks.length > 0) {
                 const tasksRequest = locallyCreatedTasks
                     .map(task => ({

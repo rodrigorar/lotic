@@ -206,15 +206,12 @@ const UseCaseDeleteTask = (tasksRepository, taskSyncRepository) => {
         Validators.isNotNull(taskId, "No task id provided");
 
         const existingTask = await tasksRepository.get(unitOfWork, taskId);
-        console.log('Deleting task');
-        console.log(existingTask);
         if (existingTask) {
             if (existingTask.ownerId) {
                 await taskSyncRepository.update(
                     unitOfWork
                     , { taskId: existingTask.id, status: TASK_SYNC_STATUS.COMPLETE });
             } else {
-                console.log('Erasing task sync');
                 await taskSyncRepository.eraseByTaskIds(unitOfWork, [existingTask.id]);
             }
 

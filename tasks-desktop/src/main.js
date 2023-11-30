@@ -58,11 +58,21 @@ app.on('ready', () => {
 
   // FIXME: This cron should come from a config file.
   cron.schedule(AppConfig.syncManagerCron, () => {
-   console.log(`Regular sync ${allowSyncSemaphor}`);
     if (schemaMigrationSemaphor && allowSyncSemaphor) {
       SynchManager.execute();
     }
   }).start();
+
+  mainWindow.on('focus', () => {
+    setTimeout(() => {
+      allowSyncSemaphor = true;
+      SynchManager.execute();
+    }, 500);
+  });
+
+  mainWindow.on('blur', () => {
+    allowSyncSemaphor = false;
+  })
 
   app.on('window-all-closed', () => {
     app.quit();
@@ -89,7 +99,6 @@ app.on('ready', () => {
   });
 
   globalShortcut.register('F6', () => {
-    console.log(`F6 sync ${allowSyncSemaphor}`);
     setTimeout(() => SynchManager.execute(mainWindow.webContents), 100);
   });
 
@@ -115,6 +124,7 @@ ipcMain.on('nav:open:settings', async (event) => mainWindow.loadFile(path.join(_
 ipcMain.on('nav:open:home', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html')));
 ipcMain.on('nav:open:signup', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/signup/signup.html')))
 
+// Prevents syncs while the user is writting.
 ipcMain.on('sync:allow', (event) => {
   allowSyncSemaphor = true;
 });
