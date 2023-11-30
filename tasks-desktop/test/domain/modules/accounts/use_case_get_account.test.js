@@ -7,11 +7,12 @@ describe("[Accounts]: Test GetAccount By Id Service", () => {
     it("Should Succeed Get Account By Id", async () => {
         const accountId = v4();
         const email = "test@mail.not";
+        const language = 'en';
         
         const mockedAccountRepository = jest.fn();
         mockedAccountRepository.get = 
             jest.fn(async (unitOfWork, accountId) => 
-                new Account(accountId, email));
+                new Account(accountId, email, language));
         
         const unitOfWork = jest.fn();
 
@@ -58,11 +59,12 @@ describe("[Accounts]: Test GetAccount By Id Service", () => {
     it("Should Fail No Unit Of Work", async () => {
         const accountId = v4();
         const email = "test@mail.not";
+        const language = 'en';
         
         const mockedAccountRepository = jest.fn();
         mockedAccountRepository.get = 
             jest.fn(async (unitOfWork, accountId) => 
-                new Account(accountId, email));
+                new Account(accountId, email, language));
         
         const underTest = UseCaseGetAccount(mockedAccountRepository);
         expect(underTest.execute(undefined, accountId)).rejects.toThrow(Errors.NullArgumentError);
@@ -71,11 +73,12 @@ describe("[Accounts]: Test GetAccount By Id Service", () => {
     it("Should Fail No Account Id", async () => {
         const accountId = v4();
         const email = "test@mail.not";
+        const language = 'en';
         
         const mockedAccountRepository = jest.fn();
         mockedAccountRepository.get = 
             jest.fn(async (unitOfWork, accountId) => 
-                new Account(accountId, email));
+                new Account(accountId, email, language));
         
         const unitOfWork = jest.fn();
 

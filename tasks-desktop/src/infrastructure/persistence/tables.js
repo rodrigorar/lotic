@@ -4,12 +4,15 @@ const Tables = {
     , AuthSessions: "auth_sessions"
     , Tasks: "tasks"
     , TasksSync: "tasks_sync"
+    , I18N: 'i18n'
+    , I18NLanguages: 'i18n_languages'
 }
 
 const Fields = {
     Accounts: {
         Id: "id"
         , Email: "email"
+        , Language: "language"
     }
     , AuthSessions: {
         Id: "id"
@@ -32,6 +35,17 @@ const Fields = {
         , Status: "synch_status"
         , CreatedAt: "created_at"
         , UpdatedAt: "updated_at"
+    }
+    , I18N: {
+        Id: "id"
+        , Key: "key"
+        , Language: "language"
+        , Value: "value"
+    }
+    , I18NLanguages: {
+        Id: "id"
+        , Name: "name"
+        , Code: "code"
     }
 }
 

@@ -4,7 +4,8 @@ const { Logger } = require('../../domain/shared/logger');
 const { open } = require('sqlite');
 const sqlite3 = require('sqlite3').verbose();
 const { v4 } = require("uuid");
-const { Tables } = require('./tables');
+const { Tables, Fields } = require('./tables');
+const { SupportedLanguages, Translations } = require('../../resources/internationalization.config');
 
 // DEPRECATED //////////////////////////////////////////////////////////
 
@@ -34,6 +35,51 @@ module.exports.UnitOfWork = {
 
 // DEPRECATED //////////////////////////////////////////////////////////
 
+// Base App Data
+
+const persistNewLanguage = async (name, code) => {
+    const result = await db.get(
+        `SELECT * FROM ${Tables.I18NLanguages} WHERE ${Fields.I18NLanguages.Name} = ?`
+        , [name]
+    );
+    if (! result) {
+        await db.run(
+            `INSERT INTO ${Tables.I18NLanguages} (${Fields.I18NLanguages.Name}, ${Fields.I18NLanguages.Code}) `
+            + `VALUES (?, ?)`
+            , [name, code]
+        );
+    }
+}
+
+const addTranslation = async (key, language, value) => {
+    const result = await db.get(
+        `SELECT * FROM ${Tables.I18N} WHERE ${Fields.I18N.Key} = ? AND ${Fields.I18N.Language} = ?`
+        , [key, language]
+    );
+    
+    if (! result) {
+        await db.run(
+            `INSERT INTO ${Tables.I18N} (${Fields.I18N.Key}, ${Fields.I18N.Language}, ${Fields.I18N.Value}) `
+            + `VALUES (?, ?, ?)`
+            , [key, language, value]
+        );
+    }
+}
+
+// FIXME: Add a flag to AppConfig that will run the data migrations or not
+// the way this is right now it might make the application slow to launch.
+// also, after running the default data migration the flag in the configs should
+// be reset to false (prevents from running more than once)
+const runDefaultData = async () => {
+    for (const language of SupportedLanguages) {
+        persistNewLanguage(language.name, language.code);
+        const translation = Translations[language.code];
+        for (const entry of Object.keys(translation)) {
+            addTranslation(entry, language.code, translation[entry]);
+        }
+    }
+}
+
 // Create base data structures
 
 async function run_schema_migration(schemaMigration) {    
@@ -62,6 +108,8 @@ module.exports.runSchemaMigrations = async () => {
     for (let index = currentVersion.version_max + 1; index < migrations.length; index++) {
         await run_schema_migration(migrations[index]);
     }
+
+    await runDefaultData();
 
     db.close();
 }
@@ -135,5 +183,29 @@ const migrations = [
         version: 7
         , description: "Add position field tasks table"
         , migration: "ALTER TABLE tasks ADD position INTEGER NOT NULL DEFAULT 0"
+    },
+    {
+        version: 8
+        , description: "Add language field to account"
+        , migration: "ALTER TABLE accounts ADD language TEXT DEFAULT en"
+    },
+    {
+        version: 9
+        , description: "Add a i18n table"
+        , migration: "CREATE TABLE IF NOT EXISTS i18n ("
+            + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + "key TEXT NOT NULL, "
+            + "language TEXT NOT NULL, "
+            + "value TEXT NOT NULL"
+            + ")"
+    },
+    {
+        version: 10
+        , description: "Add a i18n_languages table"
+        , migration: "CREATE TABLE IF NOT EXISTS i18n_languages ("
+            + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + "name TEXT UNIQUE NOT NULL, "
+            + "code TEXT UNIQUE NOT NULL"
+            + ")"
     }
 ];

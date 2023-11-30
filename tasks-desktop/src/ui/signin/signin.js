@@ -1,4 +1,5 @@
 
+const pageTitle = document.querySelector('#page-title');
 const emailInput = document.querySelector("#email-input");
 const passwordInput = document.querySelector("#password-input");
 const signinButton = document.querySelector("#submit-button");
@@ -19,6 +20,17 @@ const toggleSignInButton = () => {
 backAction.addEventListener('click', (event) => {
     nav.openHome();
 });
+
+async function translateUI() {
+    const translations = await i18n.getTranslations();
+    pageTitle.innerText = translations['signIn'];
+    emailInput.placeholder = translations['email'];
+    passwordInput.placeholder = translations['password'];
+    signinButton.innerText = translations['signIn'];
+    about.innerText = translations['about'];
+}
+
+translateUI();
 
 // Event Handlers
 

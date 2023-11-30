@@ -2,9 +2,10 @@ const { Validators } = require("../shared/utils");
 const { EventBus, EventType, Event } = require("../shared/event-bus");
 
 class Account {
-    constructor(id, email) {
+    constructor(id, email, language) {
         this.id = id;
         this.email = email;
+        this.language = language;
     }
 }
 
@@ -13,7 +14,8 @@ const UseCaseCreateLocalAccount = (accountsRepository) => {
         Validators.isNotNull(unitOfWork, "No Unit Of Work provided");
         Validators.isNotNull(accountData, "No account data provided");
 
-        const newAccount = new Account(accountData.id, accountData.email);
+        // FIXME: The language should come from the systems language
+        const newAccount = new Account(accountData.id, accountData.email, 'en');
         await accountsRepository.save(unitOfWork, newAccount);
     }
 
@@ -30,7 +32,8 @@ const UseCaseCreateAccount = (accountsRepository, createAccountGateway) => {
         try {
             const result = await createAccountGateway.call(accountData);
 
-            const newAccount = new Account(result.id, accountData.email);
+            // FIXME: The language should come from the server information
+            const newAccount = new Account(result.id, accountData.email, 'en');
             await accountsRepository.save(unitOfWork, newAccount);
 
             EventBus.publish(new Event(EventType.SIGN_UP_SUCCESS, {}));

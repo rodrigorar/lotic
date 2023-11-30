@@ -3,6 +3,7 @@
  * otherwise we won't be able to extract the task id from the DOM id. 
  */
 
+const upcoming = document.querySelector('#upcoming');
 const taskContainer = document.querySelector("#tasks-container");
 const addTaskButton = document.querySelector("#add-task-button");
 const notificationContainer = document.querySelector("#notification-container");
@@ -29,7 +30,7 @@ function createTaskDOM(id, title = undefined) {
     text.classList.add('transparent-text-input');
     text.id = 'text-input:' + id; // text-input:<task-id>
     text.type = 'text';
-    text.placeholder = 'Tasks title'
+    text.placeholder = '>>>'
     if (title) {
         text.value = title;
     }
@@ -69,7 +70,7 @@ function createMenuItem(onClick, icon, label) {
     return menuItem;
 }
 
-async function createMainMenu() {
+async function createMainMenu(translations) {
     const dropdownContainer = document.createElement('x-box');
     dropdownContainer.classList.add('dropdown');
 
@@ -88,16 +89,17 @@ async function createMainMenu() {
     dropdownMenu.id = 'main-menu-content';  
     dropdownButton.appendChild(dropdownMenu);  
 
-    dropdownMenu.appendChild(createMenuItem((event) => nav.openAbout(), 'info', 'About'));
+    dropdownMenu.appendChild(createMenuItem((event) => nav.openSettings(), 'settings', translations['settings']));
+    dropdownMenu.appendChild(createMenuItem((event) => nav.openAbout(), 'info', translations['about']));
 
     const isLoggedIn = await auth.isLoggedIn();
     if (isLoggedIn) {
         dropdownMenu.appendChild(document.createElement('hr'));
-        dropdownMenu.appendChild(createMenuItem((event) => auth.logout(), 'logout', 'Sign Out'));
+        dropdownMenu.appendChild(createMenuItem((event) => auth.logout(), 'logout', translations['signOut']));
     } else {
         dropdownMenu.appendChild(document.createElement('hr'));
-        dropdownMenu.appendChild(createMenuItem((event) => nav.openLogin(), 'person', 'Sign In'));
-        dropdownMenu.appendChild(createMenuItem((event) => nav.openSignUp(), 'open', 'Sign Up'));
+        dropdownMenu.appendChild(createMenuItem((event) => nav.openLogin(), 'person', translations['signIn']));
+        dropdownMenu.appendChild(createMenuItem((event) => nav.openSignUp(), 'open', translations['signOut']));
     }
 
     const headerRight = document.querySelector('#header-right');
@@ -138,8 +140,14 @@ function setInitialFocus() {
     }
 }
 
+function translateUI(translations) {
+    upcoming.innerText = translations['upcoming'];
+}
+
 async function initUI() {
-    await createMainMenu();
+    const translations = await i18n.getTranslations();
+    translateUI(translations);
+    await createMainMenu(translations);
 
     tasks.listTasks()
         .then(taskList => {

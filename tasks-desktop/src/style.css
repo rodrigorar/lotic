@@ -152,6 +152,26 @@ body::-webkit-scrollbar {
   margin-top: 50%;
 }
 
+.h-spacer-10 {
+  margin-right: 10%;
+}
+
+.h-spacer-20 {
+  margin-right: 20%;
+}
+
+.h-spacer-40 {
+  margin-right: 40%;
+}
+
+.h-spacer-45 {
+  margin-right: 45%;
+}
+
+.h-spacer-50 {
+  margin-right: 50%;
+}
+
 .h-spacer-70 {
   margin-right: 70%;
 }
@@ -240,6 +260,11 @@ body::-webkit-scrollbar {
 
 .row-1 {
   display: flex;
+}
+
+.row-1-with-margin {
+  display: flex;
+  margin: 20px;
 }
 
 /* Fonts */

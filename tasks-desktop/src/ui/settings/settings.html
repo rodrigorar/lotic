@@ -5,10 +5,10 @@
     <meta name="xel-theme" content="../../../node_modules/xel/themes/adwaita.css">
     <meta name="xel-accent-color" content="blue">
     <meta name="xel-iconsets" content="../../../node_modules/xel/iconsets/material.svg">
-    <title>Sign Up</title>
+    <title>Login</title>
     <link rel="stylesheet" href="../../style.css" />
     <script src="../../../node_modules/xel/xel.js" type="module"></script>
-    <script defer src="./signup.js"></script>
+    <script defer src="./settings.js"></script>
   </head>
   <body style='background-color: white;'>
     <div id="notification-container"></div>
@@ -18,22 +18,9 @@
           <x-icon href="#chevron-left" class='primary-color-icon'></x-icon>
         </x-button>
       </div>
-      <div class="cln-1">
-        <h1 id='page-title' class="font-hd-1">Sign Up</h1>
-        <div id="loader"></div>
-        <div class="cln-1">
-          <input id="email-input" class="input" type="text" placeholder="Email" />
-          <input id="password-input" class="input" type="password" placeholder="Pass****" />
-          <input id="password-input-repeat" class="input" type="password" placeholder="Repeat Pass****" />
-        </div>
-        <div class="v-spacer-10"></div>
-        <div class="width:50%">
-          <button id="submit-button" disabled="disabled" class="btn btn-primary font-neutral">Sign Up</button>
-        </div>
+      <div id='settings-container' class="cln-1">
+        <hr />
       </div>
-      <div class="footer txt-align-center">
-        <p id="about" class="font-tiny link">About</p>
-      </div>
-      </div>
+    </div>
   </body>
 </html>

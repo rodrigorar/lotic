@@ -15,6 +15,14 @@ contextBridge.exposeInMainWorld('utils', {
     generateId: () => ipcRenderer.invoke('utils:id:generate')
 });
 
+// i18n
+
+contextBridge.exposeInMainWorld('i18n', {
+    getTranslations: () => ipcRenderer.invoke('i18n:translations:get')
+    , getLanguage: () => ipcRenderer.invoke('i18n:language:get')
+    , setLanguage: (language) => ipcRenderer.send('i18n:language:set', language)
+})
+
 // sync
 
 contextBridge.exposeInMainWorld('sync', {
@@ -38,6 +46,7 @@ contextBridge.exposeInMainWorld('tasks', {
 
 contextBridge.exposeInMainWorld('accounts', {
     signup: (signUpData) => ipcRenderer.send('accounts:signup', signUpData)
+    , get: () => ipcRenderer.invoke('accounts:get')
     , handleSignUpFailure: (callback) => ipcRenderer.on('accounts:signup_failure', callback)
     , handleSignUpSuccess: (callback) => ipcRenderer.on('accounts:signup_success', callback)
 })
@@ -59,6 +68,7 @@ contextBridge.exposeInMainWorld('ui', {
     handleLoadingStart: (callback) => ipcRenderer.on("ui:loading:start", callback)
     , handleLoadingEnd: (callback) => ipcRenderer.on("ui:loading:end", callback)
     , handleUIRefresh: (callback) => ipcRenderer.on("ui:refresh", callback)
+    , reload: () => ipcRenderer.send('ui:reload')
 })
 
 // navigation
@@ -67,5 +77,6 @@ contextBridge.exposeInMainWorld('nav', {
     openLogin: () => ipcRenderer.send('nav:open:login')
     , openSignUp: () => ipcRenderer.send('nav:open:signup')
     , openAbout: () => ipcRenderer.send('nav:open:about')
+    , openSettings: () => ipcRenderer.send('nav:open:settings')
     , openHome: () => ipcRenderer.send('nav:open:home')
 });

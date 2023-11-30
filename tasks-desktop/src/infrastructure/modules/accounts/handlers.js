@@ -1,7 +1,8 @@
 const path = require('path');
 const { webContents } = require('electron');
-const { UseCaseCreateAccountProvider } = require('./providers');
+const { UseCaseCreateAccountProvider, UseCaseGetAccountProvider } = require('./providers');
 const { RunUnitOfWork } = require('../../persistence/unitofwork');
+const { UseCaseGetActiveSessionProvider } = require('../auth/providers');
 
 async function handleSignUp(event, signUpData, mainWindow) {
     RunUnitOfWork.run(async (unitOfWork) => {
@@ -18,8 +19,23 @@ async function handleSignUp(event, signUpData, mainWindow) {
       });
 }
 
+async function handleGetAccount(event) {
+  const useCaseGetActiveSession = UseCaseGetActiveSessionProvider.get();
+  const useCaseGetAccount = UseCaseGetAccountProvider.get();
+
+  return await RunUnitOfWork.run(async (unitOfWork) => {
+    const activeSession = await useCaseGetActiveSession.execute(unitOfWork);
+    let account = null;
+    if (activeSession) {
+      account = await useCaseGetAccount.execute(unitOfWork, activeSession.accountId);
+    }
+    return account;
+  });
+}
+
 function configure(ipcMain, mainWindow) {
     ipcMain.on('accounts:signup', (event, signUpData) => handleSignUp(event, signUpData, mainWindow));
+    ipcMain.handle('accounts:get', handleGetAccount);
 }
 
 module.exports.AccountsHandler = {

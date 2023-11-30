@@ -11,6 +11,7 @@ const { SynchManager } = require('./infrastructure/modules/sync/synch-manager');
 const { AccountsHandler } = require('./infrastructure/modules/accounts/handlers');
 const { SetupUIEventBusSubscribers } = require('./ui/EventBusUISubscribers');
 const { AppConfig } = require('./infrastructure/configs');
+const { InternationalizationHandler } = require('./infrastructure/modules/internationalization/handlers');
 
 app.setName(AppConfig.appName);
 
@@ -92,19 +93,25 @@ app.on('ready', () => {
     setTimeout(() => SynchManager.execute(mainWindow.webContents), 100);
   });
 
+  AppConfig.defaultLanguage = app.getLocale().substring(0, 2);
+
   LoggerHandler.configure(ipcMain);
   UtilsHandler.configure(ipcMain);
   TasksHandler.configure(ipcMain);
   AccountsHandler.configure(ipcMain, mainWindow);
   AuthHandler.configure(ipcMain);
+  InternationalizationHandler.configure(ipcMain);
 
   SetupUIEventBusSubscribers(mainWindow);
+
+  ipcMain.on('ui:reload', () => mainWindow.webContents.reloadIgnoringCache());
 });
 
 // Page Navigation
 
 ipcMain.on('nav:open:login', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/signin/signin.html')));
 ipcMain.on('nav:open:about', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/about/about.html')));
+ipcMain.on('nav:open:settings', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/settings/settings.html')));
 ipcMain.on('nav:open:home', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/home/home.html')));
 ipcMain.on('nav:open:signup', async (event) => mainWindow.loadFile(path.join(__dirname, 'ui/signup/signup.html')))
 

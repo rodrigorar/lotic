@@ -1,4 +1,5 @@
 
+const pageTitle = document.querySelector('#page-title');
 const emailInput = document.querySelector("#email-input");
 const passwordInput = document.querySelector("#password-input");
 const passwordInputRepeat = document.querySelector("#password-input-repeat");
@@ -12,6 +13,18 @@ emailInput.focus();
 backAction.addEventListener('click', (event) => {
     nav.openHome();
 });
+
+async function translateUI() {
+    const translations = await i18n.getTranslations();
+    pageTitle.innerText = translations['signUp'];
+    emailInput.placeholder = translations['email'];
+    passwordInput.placeholder = translations['password'];
+    passwordInputRepeat.placeholder = translations['repeatPassword'];
+    signUpButton.innerText = translations['signUp'];
+    about.innerText = translations['about'];
+}
+
+translateUI();
 
 // Event Handlers
 

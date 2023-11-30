@@ -11,13 +11,14 @@ describe("[Auth]: Test Login Use Case", () => {
         const unitOfWork = jest.fn();
         const accountId = v4();
         const email = "test@mail.not";
+        const language = 'en';
         const password = "qwerty";
         const access_token = v4();
         const refresh_token = v4();
 
         const mockedGetAccountByEmail = jest.fn();
         mockedGetAccountByEmail.execute = 
-            jest.fn((unitOfWork, email) => new Account(accountId, email));
+            jest.fn((unitOfWork, email) => new Account(accountId, email, language));
         
         const mockedCreateAccountUseCase = jest.fn();
 
@@ -119,13 +120,14 @@ describe("[Auth]: Test Login Use Case", () => {
         const unitOfWork = jest.fn();
         const accountId = v4();
         const email = "test@mail.not";
+        const language = 'en';
         const password = "qwerty";
 
         const mockedCreateAccountUseAccount = jest.fn();
 
         const mockedGetAccountUseCase = jest.fn();
         mockedGetAccountUseCase.execute = 
-            jest.fn((unitOfWork, email) => new Account(accountId, email));
+            jest.fn((unitOfWork, email) => new Account(accountId, email, language));
 
         const mockedAuthRepository = jest.fn();
         mockedAuthRepository.getByAccountId = jest.fn((unitOfWork, accountId) => { return undefined; });
@@ -189,6 +191,7 @@ describe("[Auth]: Test Login Use Case", () => {
         const unitOfWork = jest.fn();
         const accountId = v4();
         const email = "test@mail.not";
+        const language = 'en';
         const password = "qwerty";
         const access_token = v4();
         const refresh_token = v4();
@@ -197,7 +200,7 @@ describe("[Auth]: Test Login Use Case", () => {
 
         const mockedGetAccountByEmailUseCase = jest.fn();
         mockedGetAccountByEmailUseCase.execute = 
-            jest.fn((unitOfWork, email) => new Account(accountId, email));
+            jest.fn((unitOfWork, email) => new Account(accountId, email, language));
 
         const mockedAuthRepository = jest.fn();
         mockedAuthRepository.getByAccountId = jest.fn((unitOfWork, accountId) => { return undefined; });
@@ -227,6 +230,7 @@ describe("[Auth]: Test Login Use Case", () => {
     it("Should fail, no unit of work provided", async () => {
         const accountId = v4();
         const email = "test@mail.not";
+        const language = 'en';
         const password = "qwerty";
         const access_token = v4();
         const refresh_token = v4();
@@ -235,7 +239,7 @@ describe("[Auth]: Test Login Use Case", () => {
 
         const mockedGetAccountByEmail = jest.fn();
         mockedGetAccountByEmail.execute = 
-            jest.fn((unitOfWork, email) => new Account(accountId, email));
+            jest.fn((unitOfWork, email) => new Account(accountId, email, language));
 
         const mockedAuthRepository = jest.fn();
         mockedAuthRepository.getByAccountId = jest.fn((unitOfWork, accountId) => { return undefined; });
@@ -272,7 +276,7 @@ describe("[Auth]: Test Login Use Case", () => {
 
         const mockedGetAccountByEmailUseCase = jest.fn();
         mockedGetAccountByEmailUseCase.execute = 
-            jest.fn((unitOfWork, email) => new Account(accountId, email));
+            jest.fn((unitOfWork, email) => new Account(accountId, email, 'en'));
 
         const mockedAuthRepository = jest.fn();
         mockedAuthRepository.getByAccountId = jest.fn((unitOfWork, accountId) => { return undefined; });

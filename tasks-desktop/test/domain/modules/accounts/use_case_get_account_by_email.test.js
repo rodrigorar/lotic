@@ -7,11 +7,12 @@ describe("[Accounts]: Test GetAccount By Email Service", () => {
     it("Should Succeed Get Account", async () => {
         const accountId = v4();
         const accountEmail = "test@mail.not";
+        const accountLanguage = 'en';
 
         const mockedAccountRepository = jest.fn();
         mockedAccountRepository.getByEmail = 
             jest.fn(async (unitOfWork, email) => { 
-                return new Account(accountId, accountEmail);
+                return new Account(accountId, accountEmail, accountLanguage);
             });
         
         const unitOfWork = jest.fn();

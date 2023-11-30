@@ -4,9 +4,9 @@ const { Tables, Fields } = require("../../persistence/tables");
 const save = async (unitOfWork, account) => {
     const queryManager = unitOfWork.getQueryManager();
     await queryManager.run(
-        `INSERT INTO ${Tables.Accounts}(${Fields.Accounts.Id}, ${Fields.Accounts.Email})`
-        + `VALUES (?, ?)`
-        , [account.id, account.email]);
+        `INSERT INTO ${Tables.Accounts}(${Fields.Accounts.Id}, ${Fields.Accounts.Email}, ${Fields.Accounts.Language})`
+        + `VALUES (?, ?, ?)`
+        , [account.id, account.email, account.language]);
 }
 
 const getByEmail = async (unitOfWork, email) => {
@@ -18,12 +18,14 @@ const getByEmail = async (unitOfWork, email) => {
         + `WHERE ${Fields.Accounts.Email} = ?`
         , [email]);
     return queryResult != undefined 
-            ? new Account(queryResult.id, queryResult.email) 
+            ? new Account(queryResult.id, queryResult.email, queryResult.language) 
             : undefined;
 }
 
 const get = async (unitOfWork, accountId) => {
     const queryManager = unitOfWork.getQueryManager();
+
+    console.log(accountId);
 
     const queryResult = await queryManager.get(
         `SELECT * `
@@ -31,13 +33,26 @@ const get = async (unitOfWork, accountId) => {
         + `WHERE ${Fields.Accounts.Id} = ?`
         , [accountId]);
 
+    console.log(queryResult);
+
     return queryResult != undefined 
-            ? new Account(queryResult.id, queryResult.email) 
+            ? new Account(queryResult.id, queryResult.email, queryResult.language) 
             : undefined;
+}
+
+const setLanguage = async (unitOfWork, accountId, language) => {
+    const queryManager = unitOfWork.getQueryManager();
+
+    await queryManager.run(
+        `UPDATE ${Tables.Accounts} SET ${Fields.Accounts.Language}=? `
+        + `WHERE ${Fields.Accounts.Id}=? `
+        , [language, accountId]
+    );
 }
 
 module.exports.AccountRepository = {
     save
     , getByEmail
     , get
+    , setLanguage
 };
