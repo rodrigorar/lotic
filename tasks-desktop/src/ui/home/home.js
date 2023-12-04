@@ -99,7 +99,7 @@ async function createMainMenu(translations) {
     } else {
         dropdownMenu.appendChild(document.createElement('hr'));
         dropdownMenu.appendChild(createMenuItem((event) => nav.openLogin(), 'person', translations['signIn']));
-        dropdownMenu.appendChild(createMenuItem((event) => nav.openSignUp(), 'open', translations['signOut']));
+        dropdownMenu.appendChild(createMenuItem((event) => nav.openSignUp(), 'open', translations['signUp']));
     }
 
     const headerRight = document.querySelector('#header-right');
