@@ -106,14 +106,6 @@ async function createMainMenu(translations) {
     headerRight.appendChild(dropdownContainer);
 }
 
-async function refreshMainMenu() {
-    const headerRight = document.querySelector('#header-right');
-    if (headerRight.children.length > 0) {
-        headerRight.innerHTML = "";
-    }
-    createMainMenu();
-}
-
 let emptyTask = undefined;
 let emptyTaskElement = undefined;
 
@@ -290,12 +282,7 @@ auth.handleLoggedIn(event => {
 
 auth.handleLoggedOut(event => {
     logger.trace('Handling logged out event');
-
-    refreshMainMenu();
-
-    document.querySelector('#tasks-container').innerHTML = '';
-    updateEmptyTask();
-    createTask();
+    ui.reload();
 });
 
 ui.handleLoadingStart((event) => {
