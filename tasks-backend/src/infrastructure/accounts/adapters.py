@@ -2,11 +2,24 @@ from datetime import datetime
 import uuid
 from typing import Optional
 from src.application import UnitOfWork
-from src.application.accounts import UseCaseCreateAccount, UseCaseGetAccount
-from src.domain import LogProvider, NotFoundError
-from src.domain.accounts import \
-    Account, AccountBusinessRulesProvider, GetAccount \
-    , CreateAccount, AccountRepository, GetAccountByEmail, ValidateAccountEmail
+from src.application.accounts import (
+    UseCaseCreateAccount
+    , UseCaseUpdateAccount
+    , UseCaseGetAccount
+)
+from src.domain import (
+    LogProvider
+    , NotFoundError
+)
+from src.domain.accounts import (
+    Account
+, AccountBusinessRulesProvider
+, GetAccount
+, CreateAccount
+, AccountRepository
+, GetAccountByEmail
+, UpdateAccount, ValidateAccountEmail
+)
 
 
 logger = LogProvider().get()
@@ -45,8 +58,9 @@ class AccountRepositoryImpl(AccountRepository):
         if entry is None:
             raise NotFoundError("No valid accounts was found for id " + str(account.id))
 
-        entry.subject = account.email if account.email is not None else entry.subject
-        entry.secret = account.password if account.password is not None else entry.secret
+        entry.email = account.email if account.email is not None else entry.email
+        entry.password = account.password if account.password is not None else entry.password
+        entry.language = account.language if account.language else entry.language
         entry.updated_at = datetime.now()
 
         query_manager.add(entry)
@@ -61,6 +75,10 @@ class AccountBusinessRulesProviderImpl(AccountBusinessRulesProvider):
     @staticmethod
     def create_account(unit_of_work) -> CreateAccount:
         return CreateAccount(logger, unit_of_work, account_repository)
+
+    @staticmethod
+    def update_account(unit_of_work) -> UpdateAccount:
+        return UpdateAccount(logger, unit_of_work, account_repository)
 
     @staticmethod
     def validate_account_email(unit_of_work) -> ValidateAccountEmail:
@@ -98,6 +116,10 @@ class AccountUseCaseProvider:
             , unit_of_work_provider
             , account_br_provider
             , encryption_engine)
+
+    @staticmethod
+    def update_account():
+        return UseCaseUpdateAccount(logger, unit_of_work_provider, account_br_provider)
 
     @staticmethod
     def get_account():

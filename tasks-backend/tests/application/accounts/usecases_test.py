@@ -10,11 +10,13 @@ from tests.shared import MockDatabase
 
 DatabaseProvider().set_database(MockDatabase())
 
-from src.domain.accounts import Account, CreateAccount, ValidateAccountEmail, GetAccount, AccountBusinessRulesProvider
+from src.domain.accounts import Account, CreateAccount, UpdateAccount, ValidateAccountEmail, \
+    GetAccount, AccountBusinessRulesProvider
 from tests.application.shared import ApplicationUnitTestsBase, MockedUnitOfWorkProvider, MockedLogger
 from src.application.auth.shared import AuthorizationContext
 
 global create_account_br
+global update_account_br
 global validate_account_email_br
 global get_account_br
 
@@ -24,6 +26,10 @@ class MockedAccountBusinessRulesProvider(AccountBusinessRulesProvider):
     @staticmethod
     def create_account(unit_of_work):
         return create_account_br
+
+    @staticmethod
+    def update_account(unit_of_work) -> UpdateAccount:
+        return update_account_br
 
     @staticmethod
     def validate_account_email(unit_of_work):
@@ -39,6 +45,7 @@ UNKNOWN_ACCOUNT_ID = uuid4()
 ACCOUNT_EMAIL = "john.doe@mail.not"
 ACCOUNT_PASSWORD = "passwd01"
 ACCOUNT_ENCRYPTED_PASSWORD = "uiskjdiuytrn4"
+ACCOUNT_LANGUAGE = "en"
 
 
 class TestUseCaseCreateAccount:
@@ -61,7 +68,13 @@ class TestUseCaseCreateAccount:
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
         from src.application.auth.shared import EncryptionEngine
 
-        input_value = AccountDTO(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
+        input_value = AccountDTO(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
 
         when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(True)
         when(create_account_br).execute(...).thenReturn(ACCOUNT_ID)
@@ -102,7 +115,13 @@ class TestUseCaseCreateAccount:
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
         from src.application.auth.shared import EncryptionEngine
 
-        input_value = AccountDTO(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
+        input_value = AccountDTO(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
 
         when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(True)
         when(create_account_br).execute(...).thenRaise(InternalError("Something went wrong"))
@@ -133,7 +152,13 @@ class TestUseCaseCreateAccount:
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
         from src.application.auth.shared import EncryptionEngine
 
-        input_value = AccountDTO(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
+        input_value = AccountDTO(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
 
         when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(False)
 
@@ -157,7 +182,13 @@ class TestUseCaseCreateAccount:
         from src.application.accounts import UseCaseCreateAccount, AccountDTO
         from src.application.auth.shared import EncryptionEngine
 
-        input_value = AccountDTO(None, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
+        input_value = AccountDTO(
+            None
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
 
         when(validate_account_email_br).execute(ACCOUNT_EMAIL).thenReturn(True)
         when(create_account_br).execute(...)  # Will throw error, no need to configure a behaviour
@@ -184,6 +215,81 @@ class TestUseCaseCreateAccount:
             , mocked_encryption_engine)
 
 
+class TestUseCaseUpdateAccount(ApplicationUnitTestsBase):
+
+    @pytest.fixture(autouse=True)
+    def setup_mocks_aspect(self):
+        global update_account_br
+
+        update_account_br = mock(UpdateAccount)
+        yield
+        update_account_br = None
+
+    def test_should_succeed(self):
+        from src.application.accounts import AccountDTO, UseCaseUpdateAccount
+
+        when(update_account_br).execute(...)
+
+        under_test = UseCaseUpdateAccount(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider())
+
+        under_test.execute(
+            AccountDTO(
+                ACCOUNT_ID
+                , ACCOUNT_EMAIL
+                , ACCOUNT_PASSWORD
+                , ACCOUNT_LANGUAGE
+                , datetime.now()
+                , datetime.now()
+            )
+        )
+
+        verify(update_account_br).execute(...)
+
+        verifyNoMoreInteractions(update_account_br)
+
+    def test_should_fail_update_account_br_error(self):
+        from src.application.accounts import AccountDTO, UseCaseUpdateAccount
+
+        when(update_account_br).execute(...).thenRaise(InternalError('Test error'))
+
+        under_test = UseCaseUpdateAccount(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider())
+
+        with pytest.raises(InternalError):
+            under_test.execute(
+                AccountDTO(
+                    ACCOUNT_ID
+                    , ACCOUNT_EMAIL
+                    , ACCOUNT_PASSWORD
+                    , ACCOUNT_LANGUAGE
+                    , datetime.now()
+                    , datetime.now()
+                )
+            )
+
+        verify(update_account_br).execute(...)
+
+        verifyNoMoreInteractions(update_account_br)
+
+    def test_should_fail_no_input(self):
+        from src.application.accounts import UseCaseUpdateAccount
+
+        under_test = UseCaseUpdateAccount(
+            MockedLogger()
+            , MockedUnitOfWorkProvider()
+            , MockedAccountBusinessRulesProvider())
+
+        with pytest.raises(AssertionError):
+            under_test.execute(None)
+
+        verifyNoMoreInteractions(update_account_br)
+
+
 class TestUseCaseGetAccount(ApplicationUnitTestsBase):
 
     @pytest.fixture(autouse=True)
@@ -201,7 +307,13 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
     def test_should_succeed_with_result(self):
         from src.application.accounts import UseCaseGetAccount, AccountDTO
 
-        result_value = Account(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
+        result_value = Account(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
 
         when(get_account_br).execute(ACCOUNT_ID).thenReturn(result_value)
 
@@ -259,7 +371,13 @@ class TestUseCaseGetAccount(ApplicationUnitTestsBase):
     def test_should_fail_entity_to_dto_error(self):
         from src.application.accounts import UseCaseGetAccount
 
-        result_value = Account(ACCOUNT_ID, None, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
+        result_value = Account(
+            ACCOUNT_ID
+            , None
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
 
         when(get_account_br).execute(ACCOUNT_ID).thenReturn(result_value)
 

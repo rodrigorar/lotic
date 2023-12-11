@@ -4,7 +4,7 @@ import uuid
 from mockito import mock, verify, verifyNoMoreInteractions, when
 import pytest
 
-from src.domain.errors import InternalError
+from src.domain.errors import InternalError, NotFoundError
 from tests.application.shared import MockedLogger
 from tests.domain.shared import DomainUnitTestsBase
 from tests.shared import DummyLogger, UnitOfWorkMockProvider
@@ -14,6 +14,7 @@ ACCOUNT_EMAIL = "john.doe@mail.not"
 ACCOUNT_EMAIL_UNKNOWN = "unknown@mail.not"
 ACCOUNT_EMAIL_INVALID = "llaksiouirekkewoidkoid"
 ACCOUNT_PASSWORD = "passwd01"
+ACCOUNT_LANGUAGE = "en"
 
 
 class TestCreateAccount(DomainUnitTestsBase):
@@ -23,7 +24,13 @@ class TestCreateAccount(DomainUnitTestsBase):
 
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
 
-        test_input = Account.from_values(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
+        test_input = Account.from_values(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
 
         mocked_account_repository = mock(AccountRepository)
         when(mocked_account_repository) \
@@ -70,7 +77,13 @@ class TestCreateAccount(DomainUnitTestsBase):
         mocked_account_repository = mock(AccountRepository)
         when(mocked_account_repository).insert(mocked_unit_of_work, ...).thenRaise(InternalError)
 
-        test_input = Account.from_values(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
+        test_input = Account.from_values(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
 
         under_test = CreateAccount(
             DummyLogger()
@@ -86,12 +99,121 @@ class TestCreateAccount(DomainUnitTestsBase):
             , mocked_account_repository)
 
 
+# CONTINUE HERE
+class TestUpdateAccount(DomainUnitTestsBase):
+    def test_should_succeed_update_account(self):
+        from src.domain.accounts import Account, UpdateAccount, AccountRepository
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+
+        account = Account.from_values(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_PASSWORD
+            , datetime.now()
+            , datetime.now())
+
+        mocked_account_repository = mock(AccountRepository)
+        when(mocked_account_repository).get_by_id(mocked_unit_of_work, ...).thenReturn(account)
+        when(mocked_account_repository).update(mocked_unit_of_work, ...)
+
+        test_input = Account.from_values(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
+
+        under_test = UpdateAccount(DummyLogger(), mocked_unit_of_work, mocked_account_repository)
+        under_test.execute(test_input)
+
+        verify(mocked_account_repository).get_by_id(mocked_unit_of_work, ...)
+        verify(mocked_account_repository).update(mocked_unit_of_work, ...)
+
+        verifyNoMoreInteractions(mocked_unit_of_work, mocked_account_repository)
+
+    def test_should_fail_non_existent_account(self):
+        from src.domain.accounts import Account, UpdateAccount, AccountRepository
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+
+        mocked_account_repository = mock(AccountRepository)
+        when(mocked_account_repository).get_by_id(mocked_unit_of_work, ...).thenReturn(None)
+
+        test_input = Account.from_values(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
+
+        under_test = UpdateAccount(DummyLogger(), mocked_unit_of_work, mocked_account_repository)
+        with pytest.raises(NotFoundError):
+            under_test.execute(test_input)
+
+        verify(mocked_account_repository).get_by_id(mocked_unit_of_work, ...)
+
+        verifyNoMoreInteractions(mocked_unit_of_work, mocked_account_repository)
+
+    def test_should_fail_repository_error(self):
+        from src.domain.accounts import Account, UpdateAccount, AccountRepository
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+
+        account = Account.from_values(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_PASSWORD
+            , datetime.now()
+            , datetime.now())
+
+        mocked_account_repository = mock(AccountRepository)
+        when(mocked_account_repository).get_by_id(mocked_unit_of_work, ...).thenReturn(account)
+        when(mocked_account_repository).update(mocked_unit_of_work, ...).thenRaise(InternalError)
+
+        test_input = Account.from_values(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
+
+        under_test = UpdateAccount(DummyLogger(), mocked_unit_of_work, mocked_account_repository)
+        with pytest.raises(InternalError):
+            under_test.execute(test_input)
+
+        verify(mocked_account_repository).get_by_id(mocked_unit_of_work, ...)
+        verify(mocked_account_repository).update(mocked_unit_of_work, ...)
+
+        verifyNoMoreInteractions(mocked_unit_of_work, mocked_account_repository)
+
+    def test_should_fail_no_account_provided(self):
+        from src.domain.accounts import Account, UpdateAccount, AccountRepository
+
+        mocked_unit_of_work = UnitOfWorkMockProvider.get()
+        mocked_account_repository = mock(AccountRepository)
+
+        under_test = UpdateAccount(DummyLogger(), mocked_unit_of_work, mocked_account_repository)
+        with pytest.raises(AssertionError):
+            under_test.execute(None)
+
 class TestGetAccount(DomainUnitTestsBase):
 
     def test_should_succeed_get_account(self):
         from src.domain.accounts import Account, GetAccount, AccountRepository
 
-        account_result = Account(ACCOUNT_ID, ACCOUNT_EMAIL, ACCOUNT_PASSWORD, datetime.now(), datetime.now())
+        account_result = Account(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
 
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
         mocked_account_repository = mock(AccountRepository)
@@ -145,7 +267,7 @@ class TestGetAccountByEmail(DomainUnitTestsBase):
         from src.domain.accounts import Account, ValidateAccountEmail, GetAccountByEmail, \
             AccountRepository
 
-        repo_return = Account(ACCOUNT_ID, ACCOUNT_EMAIL, "", datetime.now(), datetime.now())
+        repo_return = Account(ACCOUNT_ID, ACCOUNT_EMAIL, "", ACCOUNT_LANGUAGE, datetime.now(), datetime.now())
 
         mocked_unit_of_work = UnitOfWorkMockProvider.get()
         mocked_validate_email_br = mock(ValidateAccountEmail)

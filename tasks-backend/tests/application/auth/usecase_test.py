@@ -21,6 +21,7 @@ ACCOUNT_EMAIL = "test.account@mail.not"
 ACCOUNT_PASSWORD = "qwerty"
 ACCOUNT_PASSWORD_INVALID = "123456"
 ENCRYPTED_PASSWORD = "testencryptedpassword"
+ACCOUNT_LANGUAGE = "en"
 AUTH_TOKEN_EXPIRES_AT = datetime.now() + timedelta(hours=1)
 AUTH_TOKEN = uuid4()
 VALID_REFRESH_TOKEN = uuid4()
@@ -36,7 +37,13 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
         from src.application.auth.usecases import UseCaseLogin
         from src.application.auth.models import Principal
 
-        account = Account(ACCOUNT_ID, ACCOUNT_EMAIL, ENCRYPTED_PASSWORD, datetime.now(), datetime.now())
+        account = Account(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ENCRYPTED_PASSWORD
+            , ACCOUNT_LANGUAGE
+            , datetime.now()
+            , datetime.now())
 
         mocked_get_account_by_email = mock(GetAccountByEmail)
         when(mocked_get_account_by_email) \
@@ -152,7 +159,13 @@ class TestUseCaseLogin(ApplicationUnitTestsBase):
         from src.application.auth.providers import AuthTokenStorage
         from src.application.auth.usecases import UseCaseLogin
 
-        account = Account(ACCOUNT_ID, ACCOUNT_EMAIL, ENCRYPTED_PASSWORD, datetime.now(), datetime.now())
+        account = Account(
+            ACCOUNT_ID
+            , ACCOUNT_EMAIL
+            , ACCOUNT_LANGUAGE
+            , ENCRYPTED_PASSWORD
+            , datetime.now()
+            , datetime.now())
 
         mocked_get_account_by_email = mock(GetAccountByEmail)
         when(mocked_get_account_by_email) \

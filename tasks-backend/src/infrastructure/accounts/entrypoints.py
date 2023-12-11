@@ -7,7 +7,7 @@ from src.domain import LogProvider
 from src.infrastructure import to_json
 from src.infrastructure.accounts import CreateAccountRequest, GetAccountResponse \
     , AccountUseCaseProvider
-from src.infrastructure.accounts.payloads import CreateAccountResponse
+from src.infrastructure.accounts.payloads import CreateAccountResponse, UpdateAccountRequest
 from src.infrastructure.error_handlers import BadRequestResponse, ConflictResponse, \
     GenericErrorResponse, NotFoundResponse
 from src.utils import URL_PREFIX_V1
@@ -42,8 +42,26 @@ def create_account(body: CreateAccountRequest):
         , {'Content-Type': 'application/json'}
 
 
-class GetAccountPath(BaseModel):
+class AccountIdPath(BaseModel):
     account_id: str = Field(None, description="Account id to obtain information of")
+
+
+@accounts_bp.put(
+    "/<account_id>"
+    , responses={
+        "204": None
+        , "400": BadRequestResponse
+        , "404": NotFoundResponse
+        , "500": GenericErrorResponse
+    }
+)
+def update_account(path: AccountIdPath, body: UpdateAccountRequest):
+    logger.info("Endpoint: Update Account " + path.account_id)
+
+    use_case = AccountUseCaseProvider.update_account()
+    use_case.execute(body.to_dto(uuid.UUID(path.account_id)))
+
+    return '', 204
 
 
 @accounts_bp.get(
@@ -54,7 +72,7 @@ class GetAccountPath(BaseModel):
         , "500": GenericErrorResponse
     }
 )
-def get_account(path: GetAccountPath):
+def get_account(path: AccountIdPath):
     logger.info("Endpoint: Get account " + str(path.account_id))
 
     use_case = AccountUseCaseProvider.get_account()

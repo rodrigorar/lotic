@@ -8,6 +8,7 @@ from behave import fixture, use_fixture
 JOHN_DOE_ID = uuid.UUID("59dc6d88-d894-4d26-a2d5-dad9c57cde05")
 JOHN_DOE_EMAIL = "john.doe@mail.not"
 JOHN_DOE_PASSWORD = "passwd01"
+JOHN_DOE_LANGUAGE = "en"
 JOHN_DOE_AUTH_TOKEN = uuid.UUID("2c924286-753c-46b8-9711-fc716606ee0c")
 JOHN_DOE_OLD_AUTH_TOKEN = uuid.UUID("9cd043e4-6f0b-4581-bc4d-818982a4cdcf")
 JOHN_DOE_REFRESH_TOKEN = uuid.UUID("dd62564a-f36a-486d-915a-3c46517847f0")
@@ -19,6 +20,7 @@ JOHN_DOE_TASK_3 = uuid.UUID("30fa464f-4692-45aa-a4d2-752dc19fa0cc")
 JANE_DOE_ID = uuid.UUID("065c2e09-06d0-4000-a152-e95aebd4a9ca")
 JANE_DOE_EMAIL = "jane.doe@mail.not"
 JANE_DOE_PASSWORD = "passwd01"
+JANE_DOE_LANGUAGE = "pt"
 JANE_DOE_AUTH_TOKEN = uuid.UUID("1e07d32c-c1b8-4228-8d2f-839963dab11c")
 JANE_DOE_REFRESH_TOKEN = uuid.UUID("8d960c55-454b-481e-9eeb-1c2790ef417b")
 JANE_DOE_TASK_1 = uuid.UUID("fd612110-1f34-4154-b3f2-bf15a12da4e0")
@@ -72,6 +74,7 @@ def before_scenario(context, scenario):
                 JOHN_DOE_ID
                 , JOHN_DOE_EMAIL
                 , EncryptionEngineBCrypt().encrypt(JOHN_DOE_PASSWORD)
+                , JOHN_DOE_LANGUAGE
                 , datetime.now()
                 , datetime.now()))
 
@@ -132,6 +135,7 @@ def before_scenario(context, scenario):
                 JANE_DOE_ID
                 , JANE_DOE_EMAIL
                 , EncryptionEngineBCrypt().encrypt(JANE_DOE_PASSWORD)
+                , JANE_DOE_LANGUAGE
                 , datetime.now()
                 , datetime.now()))
 

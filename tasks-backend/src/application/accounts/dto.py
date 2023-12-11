@@ -9,10 +9,19 @@ from src.domain.accounts import Account
 
 class AccountDTO(DTOTranslator):
 
-    def __init__(self, account_id: uuid, email: str, password: str, created_at: datetime, updated_at: datetime):
+    def __init__(
+            self
+            , account_id: uuid
+            , email: str
+            , password: str
+            , language: str
+            , created_at: datetime
+            , updated_at: datetime):
+
         self.id = account_id
         self.email = email
         self.password = password
+        self.language = language
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -21,6 +30,7 @@ class AccountDTO(DTOTranslator):
             self.id
             , self.email
             , self.password
+            , self.language
             , self.created_at
             , self.updated_at)
 
@@ -34,6 +44,7 @@ class AccountDTO(DTOTranslator):
         assert entity is not None, "Entity cannot be empty"
         assert entity.id is not None, "Id cannot be empty"
         assert entity.email is not None, "Email cannot be empty"
+        assert entity.language is not None, "Language cannot be empty"
         assert entity.created_at is not None, "Created at cannot be empty"
         assert entity.updated_at is not None, "Updated at cannot be empty"
 
@@ -41,5 +52,6 @@ class AccountDTO(DTOTranslator):
             uuid.UUID(entity.id)
             , entity.email
             , entity.password
+            , entity.language
             , parser.parse(entity.created_at)
             , parser.parse(entity.updated_at))

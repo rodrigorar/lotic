@@ -40,6 +40,27 @@ class UseCaseCreateAccount(UseCase):
         return result
 
 
+class UseCaseUpdateAccount(UseCase):
+
+    def __init__(
+            self
+            , logger: Logger
+            , unit_of_work_provider: UnitOfWorkProvider
+            , account_business_rules_provider: AccountBusinessRulesProvider
+            , ):
+
+        self.logger = logger
+        self.unit_of_work_provider = unit_of_work_provider
+        self.account_business_rules_provider = account_business_rules_provider
+
+    def execute(self, account: AccountDTO):
+        assert account is not None, 'No account has been provided'
+
+        with self.unit_of_work_provider.get() as unit_of_work:
+            update_account_br = self.account_business_rules_provider.update_account(unit_of_work)
+            update_account_br.execute(account.to_entity())
+
+
 class UseCaseGetAccount(UseCase):
 
     def __init__(

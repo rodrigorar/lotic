@@ -3,7 +3,7 @@ import re
 from typing import Optional
 import uuid
 
-from src.domain import BaseBusinessRule
+from src.domain import BaseBusinessRule, NotFoundError
 from src.domain.accounts import AccountRepository, Account
 
 
@@ -25,6 +25,29 @@ class CreateAccount(BaseBusinessRule):
 
         assert account is not None, "Account cannot be empty"
         return self.account_repository.insert(self.unit_of_work, account)
+
+
+class UpdateAccount(BaseBusinessRule):
+
+    def __init__(
+            self
+            , logger: Logger
+            , unit_of_work
+            , account_repository: AccountRepository):
+
+        super().__init__(unit_of_work)
+
+        self.logger = logger
+        self.account_repository = account_repository
+
+    def execute(self, account: Account):
+        assert account is not None, 'No account has been provided'
+
+        existing_account = self.account_repository.get_by_id(self.unit_of_work, account.get_id())
+        if existing_account is None:
+            raise NotFoundError('No account found for ' + account.id)
+
+        self.account_repository.update(self.unit_of_work, account)
 
 
 class ValidateAccountEmail(BaseBusinessRule):
@@ -87,6 +110,10 @@ class AccountBusinessRulesProvider:
     @staticmethod
     def create_account(unit_of_work) -> CreateAccount:
         raise NotImplemented("AccountBusinessRulesProvider#created_account is not implemented.")
+
+    @staticmethod
+    def update_account(unit_of_work) -> UpdateAccount:
+        raise NotImplemented("AccountBusinessRulesProvider#update_account is not implemented.")
 
     @staticmethod
     def validate_account_email(unit_of_work) -> ValidateAccountEmail:

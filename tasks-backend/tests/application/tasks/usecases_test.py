@@ -125,7 +125,7 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
     def test_should_succeed(self):
         when(get_account_br) \
             .execute(...) \
-            .thenReturn(Account(uuid4(), 'test@mail.com', '123456', NOW, NOW))
+            .thenReturn(Account(uuid4(), 'test@mail.com', '123456', 'en', NOW, NOW))
 
         br_result = [TASK_1_ID, TASK_2_ID, TASK_3_ID]
         when(create_tasks_br) \
@@ -160,7 +160,7 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
     def test_should_succeed_single_task(self):
         when(get_account_br) \
             .execute(...) \
-            .thenReturn(Account(uuid4(), 'test@mail.com', '123456', NOW, NOW))
+            .thenReturn(Account(uuid4(), 'test@mail.com', '123456', 'en', NOW, NOW))
 
         br_result = [TASK_1_ID]
         when(create_tasks_br) \
@@ -216,7 +216,7 @@ class TestUseCaseCreateTasks(TasksUseCaseBaseTest):
     def test_should_fail_create_tasks_br_error(self):
         when(get_account_br) \
             .execute(...) \
-            .thenReturn(Account(uuid4(), 'test@mail.com', '123456', NOW, NOW))
+            .thenReturn(Account(uuid4(), 'test@mail.com', '123456', 'en', NOW, NOW))
 
         when(create_tasks_br) \
             .execute(...) \
